@@ -1,8 +1,9 @@
-import React, { startTransition, useMemo } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { startTransition, useContext, useMemo, useState } from "react";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import type { ModuleSummary } from "src/careerReadiness/types";
 
@@ -23,6 +24,8 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const sortedModules = useMemo(() => {
     return [...modules].sort((a, b) => a.sort_order - b.sort_order);
@@ -37,6 +40,8 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
 
   const handleContinue = () => {
     if (!nextModule) return;
+    if (!isOnline || isNavigating) return;
+    setIsNavigating(true);
     startTransition(() => {
       navigate(`${routerPaths.CAREER_READINESS}/${nextModule.id}`);
     });
@@ -129,6 +134,8 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
             type="button"
             color="primary"
             showCircle
+            disableWhenOffline
+            disabled={isNavigating}
             onClick={handleContinue}
             data-testid={DATA_TEST_ID.CONTINUE_BUTTON}
             sx={{
@@ -139,7 +146,11 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
               fontSize: "1rem",
             }}
           >
-            {t("careerReadiness.continue")}: {nextModule.title}
+            {isNavigating ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              `${t("careerReadiness.continue")}: ${nextModule.title}`
+            )}
           </PrimaryButton>
         )}
       </Box>

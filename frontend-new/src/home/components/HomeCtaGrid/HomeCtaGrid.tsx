@@ -1,8 +1,9 @@
-import React, { startTransition } from "react";
+import React, { startTransition, useContext, useState } from "react";
 import { alpha } from "@mui/material/styles";
-import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Grid, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { routerPaths } from "src/app/routerPaths";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
@@ -46,6 +47,7 @@ interface CtaCardProps {
   description: string;
   cta: string;
   onClick: () => void;
+  isLoading?: boolean;
   backgroundColor: string;
   titleLeadColor: string;
   titleTailColor: string;
@@ -66,6 +68,7 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
   description,
   cta,
   onClick,
+  isLoading = false,
   backgroundColor,
   titleLeadColor,
   titleTailColor,
@@ -111,6 +114,8 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
             color={filledButton.color}
             variant="contained"
             showCircle
+            disableWhenOffline
+            disabled={isLoading}
             onClick={onClick}
             sx={{
               alignSelf: "flex-start",
@@ -118,11 +123,17 @@ const HomeCtaCard: React.FC<CtaCardProps> = ({
               color: filledButton.textColor,
             }}
           >
-            {cta}
+            {isLoading ? <CircularProgress size={16} color="inherit" /> : cta}
           </PrimaryButton>
         ) : (
-          <SecondaryButton color={outlinedButton?.color} showCircle onClick={onClick}>
-            {cta}
+          <SecondaryButton
+            color={outlinedButton?.color}
+            showCircle
+            disableWhenOffline
+            disabled={isLoading}
+            onClick={onClick}
+          >
+            {isLoading ? <CircularProgress size={16} color="inherit" /> : cta}
           </SecondaryButton>
         )}
       </Box>
@@ -134,8 +145,12 @@ const HomeCtaGrid: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const [loadingCta, setLoadingCta] = useState<CtaCardProps["testKey"] | null>(null);
 
   const go = (path: string) => {
+    if (!isOnline) return;
+    if (loadingCta !== null) return;
     startTransition(() => {
       navigate(path);
     });
@@ -170,7 +185,11 @@ const HomeCtaGrid: React.FC = () => {
             title={t("home.cta.buildProfileTitle")}
             description={t("home.cta.buildProfileDesc")}
             cta={t("home.cta.buildProfileCta")}
-            onClick={() => go(routerPaths.SKILLS_INTERESTS)}
+            onClick={() => {
+              setLoadingCta("profile");
+              go(routerPaths.SKILLS_INTERESTS);
+            }}
+            isLoading={loadingCta === "profile"}
             backgroundColor={profileCardBg}
             titleLeadColor={profileCardText}
             titleTailColor={alpha(profileCardText, 0.8)}
@@ -187,7 +206,11 @@ const HomeCtaGrid: React.FC = () => {
             title={t("home.cta.explorePathsTitle")}
             description={t("home.cta.explorePathsDesc")}
             cta={t("home.cta.explorePathsCta")}
-            onClick={() => go(routerPaths.CAREER_EXPLORER)}
+            onClick={() => {
+              setLoadingCta("paths");
+              go(routerPaths.CAREER_EXPLORER);
+            }}
+            isLoading={loadingCta === "paths"}
             backgroundColor={pathwaysCardBg}
             titleLeadColor={theme.palette.common.white}
             titleTailColor={alpha(theme.palette.common.white, 0.8)}
@@ -204,7 +227,11 @@ const HomeCtaGrid: React.FC = () => {
             title={t("home.cta.jobMatchesTitle")}
             description={t("home.cta.jobMatchesDesc")}
             cta={t("home.cta.jobMatchesCta")}
-            onClick={() => go(routerPaths.JOB_MATCHING)}
+            onClick={() => {
+              setLoadingCta("jobs");
+              go(routerPaths.JOB_MATCHING);
+            }}
+            isLoading={loadingCta === "jobs"}
             backgroundColor={theme.palette.common.cream}
             titleLeadColor={theme.palette.secondary.main}
             titleTailColor={theme.palette.secondary.main}

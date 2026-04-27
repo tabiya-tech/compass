@@ -1,7 +1,8 @@
-import React, { startTransition, useMemo } from "react";
+import React, { startTransition, useContext, useMemo } from "react";
 import { Box, Container, Stack, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { getAllDocuments } from "src/knowledgeHub/documentLoader";
 import { routerPaths } from "src/app/routerPaths";
 import Footer from "src/home/components/Footer/Footer";
@@ -60,10 +61,12 @@ const KnowledgeHubList: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isOnline = useContext(IsOnlineContext);
 
   const documents = useMemo(() => getAllDocuments(), []);
 
   const handleDocumentClick = (id: string) => {
+    if (!isOnline) return;
     startTransition(() => {
       navigate(`${routerPaths.KNOWLEDGE_HUB}/${id}`);
     });
@@ -258,19 +261,22 @@ const KnowledgeHubList: React.FC = () => {
                       <Typography
                         component="button"
                         type="button"
+                        disabled={!isOnline}
+                        aria-disabled={!isOnline}
                         onClick={() => handleDocumentClick(doc.id)}
                         sx={{
                           mt: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                           border: 0,
                           p: 0,
-                          cursor: "pointer",
+                          cursor: isOnline ? "pointer" : "default",
+                          opacity: isOnline ? 1 : 0.5,
                           background: "transparent",
                           color: theme.palette.brandAction.main,
                           fontWeight: 600,
                           fontSize: "0.95rem",
                           textAlign: "left",
                           display: "inline-block",
-                          "&:hover": { textDecoration: "underline" },
+                          "&:hover:not(:disabled)": { textDecoration: "underline" },
                         }}
                       >
                         {t("knowledgeHub.discoverSectorCta", { sector: discoverLabel })}

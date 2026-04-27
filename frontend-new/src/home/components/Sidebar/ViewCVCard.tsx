@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "e4f5a6b7-c8d9-0123-efab-456789012345";
 
@@ -14,12 +15,20 @@ interface ViewCVCardProps {
 
 const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
   const theme = useTheme();
+  const isOnline = useContext(IsOnlineContext);
+
+  const handleClick = () => {
+    if (!isOnline) return;
+    onClick();
+  };
 
   return (
     <Box
       component="button"
       data-testid={DATA_TEST_ID.VIEW_CV_CARD_BUTTON}
-      onClick={onClick}
+      onClick={handleClick}
+      disabled={!isOnline}
+      aria-disabled={!isOnline}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -29,9 +38,10 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
         borderRadius: theme.rounding(theme.tabiyaRounding.sm * 1.25),
         border: `1px solid ${theme.palette.divider}`,
         backgroundColor: theme.palette.background.paper,
-        cursor: "pointer",
+        cursor: isOnline ? "pointer" : "default",
+        opacity: isOnline ? 1 : 0.6,
         textAlign: "left",
-        "&:hover": { backgroundColor: theme.palette.action.hover },
+        "&:hover:not(:disabled)": { backgroundColor: theme.palette.action.hover },
       }}
     >
       <Box

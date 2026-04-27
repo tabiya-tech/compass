@@ -1,9 +1,10 @@
-import React, { startTransition } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { startTransition, useContext, useState } from "react";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
@@ -22,8 +23,12 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ module }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleContinue = () => {
+    if (!isOnline || isNavigating) return;
+    setIsNavigating(true);
     startTransition(() => {
       navigate(`${routerPaths.CAREER_READINESS}/${module.id}`);
     });
@@ -78,9 +83,11 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ module }) => {
         onClick={handleContinue}
         color="careerReadiness"
         showCircle
+        disableWhenOffline
+        disabled={isNavigating}
         sx={{ flexShrink: 0, fontSize: { xs: "0.75rem", sm: "1rem" } }}
       >
-        {t("careerReadiness.continue")}
+        {isNavigating ? <CircularProgress size={16} color="inherit" /> : t("careerReadiness.continue")}
       </PrimaryButton>
     </Box>
   );

@@ -1,4 +1,4 @@
-import React, { startTransition } from "react";
+import React, { startTransition, useContext } from "react";
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { PaletteColor, Theme } from "@mui/material/styles";
@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "a7b3e9f1-2d4c-4a8b-b6e5-1f0c3d9a8b7e";
 
@@ -39,6 +40,7 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
+  const isOnline = useContext(IsOnlineContext);
 
   const paletteColor = theme.palette[headerColor as keyof typeof theme.palette] as PaletteColor;
   const bgColor = paletteColor?.main ?? theme.palette.primary.main;
@@ -49,13 +51,13 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
     alignItems: "center",
     justifyContent: "flex-start",
     color: "white",
-    opacity: 0.85,
+    opacity: isOnline ? 0.85 : 0.5,
     fontSize: "0.9rem",
     fontWeight: 500,
     textDecoration: "none",
-    cursor: "pointer",
+    cursor: isOnline ? "pointer" : "default",
     "&:hover": {
-      textDecoration: "underline",
+      textDecoration: isOnline ? "underline" : "none",
     },
   };
 
@@ -120,10 +122,12 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
             }),
           }}
           onClick={() => {
+            if (!isOnline) return;
             startTransition(() => {
               navigate(backTo);
             });
           }}
+          aria-disabled={!isOnline}
           data-testid={DATA_TEST_ID.SUB_NAVBAR_BACK_LINK}
         >
           <ArrowBackIcon sx={{ fontSize: "1rem" }} />

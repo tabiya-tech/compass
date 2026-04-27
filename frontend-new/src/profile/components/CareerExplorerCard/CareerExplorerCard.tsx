@@ -1,9 +1,10 @@
-import React, { startTransition } from "react";
+import React, { startTransition, useContext } from "react";
 import { Box, Typography, Skeleton, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import type { TranslationKey } from "src/react-i18next";
 import type { UserSectorEngagementItem } from "src/careerExplorer/services/CareerExplorerService";
 
@@ -54,14 +55,17 @@ export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors:
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
 
   const handleBrowseAll = () => {
+    if (!isOnline) return;
     startTransition(() => {
       navigate(routerPaths.KNOWLEDGE_HUB);
     });
   };
 
   const handlePathwayNavigate = (pathwayId: string) => {
+    if (!isOnline) return;
     startTransition(() => {
       navigate(`${routerPaths.KNOWLEDGE_HUB}/${pathwayId}`);
     });
@@ -81,10 +85,20 @@ export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors:
           {t("home.profile.careerPathways")}
         </Typography>
         <Typography
+          component="button"
+          type="button"
+          disabled={!isOnline}
           onClick={handleBrowseAll}
           variant="body2"
           color="brandAction"
-          sx={{ cursor: "pointer", fontWeight: "bold", "&:hover": { textDecoration: "underline" } }}
+          sx={{
+            fontWeight: "bold",
+            background: "none",
+            border: "none",
+            cursor: isOnline ? "pointer" : "default",
+            opacity: isOnline ? 1 : 0.5,
+            "&:hover:not(:disabled)": { textDecoration: "underline" },
+          }}
         >
           {t("home.profile.browseAllPathways")}
         </Typography>
@@ -120,16 +134,18 @@ export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors:
               return (
                 <Box
                   key={sector.id}
-                  onClick={() => handlePathwayNavigate(sector.id)}
+                  onClick={isOnline ? () => handlePathwayNavigate(sector.id) : undefined}
+                  aria-disabled={!isOnline}
                   data-testid={DATA_TEST_ID.SECTOR_ITEM(index)}
                   sx={{
-                    cursor: "pointer",
+                    cursor: isOnline ? "pointer" : "default",
+                    opacity: isOnline ? 1 : 0.5,
                     display: "flex",
                     alignItems: "center",
                     gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
                     py: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                     borderBottom: isLast ? "none" : `1px solid ${theme.palette.divider}`,
-                    "&:hover": { backgroundColor: theme.palette.action.hover },
+                    "&:hover": { backgroundColor: isOnline ? theme.palette.action.hover : "transparent" },
                   }}
                 >
                   <Box

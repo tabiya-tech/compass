@@ -214,6 +214,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
               <PrimaryButton
                 color="primary"
                 showCircle
+                disableWhenOffline
                 startIcon={<DescriptionOutlinedIcon />}
                 onClick={handleViewCv}
                 data-testid={DATA_TEST_ID.VIEW_MY_CV_BUTTON}
@@ -226,6 +227,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
               </PrimaryButton>
               <SecondaryButton
                 startIcon={<ShareOutlinedIcon />}
+                disableWhenOffline
                 onClick={() => void handleShareProfile()}
                 data-testid={DATA_TEST_ID.SHARE_BUTTON}
                 sx={{

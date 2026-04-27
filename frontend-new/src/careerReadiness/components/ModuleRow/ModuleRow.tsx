@@ -1,10 +1,11 @@
-import React, { startTransition } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
+import React, { startTransition, useContext, useState } from "react";
+import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { mapModuleStatusToDisplay } from "src/careerReadiness/types";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
@@ -23,11 +24,15 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const [isNavigating, setIsNavigating] = useState(false);
   const status = mapModuleStatusToDisplay(module.status);
   const isActive = status === "in_progress";
   const isDone = status === "done";
 
   const handleClick = () => {
+    if (!isOnline || isNavigating) return;
+    setIsNavigating(true);
     startTransition(() => {
       navigate(`${routerPaths.CAREER_READINESS}/${module.id}`);
     });
@@ -44,15 +49,16 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
     <Box
       data-testid={DATA_TEST_ID.MODULE_ROW}
       onClick={handleClick}
+      aria-disabled={!isOnline || isNavigating}
       sx={{
         display: "flex",
         alignItems: "center",
         gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
         paddingY: theme.fixedSpacing(theme.tabiyaSpacing.sm),
         borderBottom: `1px solid ${theme.palette.divider}`,
-        cursor: "pointer",
+        cursor: isOnline && !isNavigating ? "pointer" : "default",
         "&:last-child": { borderBottom: "none" },
-        "&:hover": { opacity: 0.8 },
+        "&:hover": { opacity: isOnline && !isNavigating ? 0.8 : 1 },
       }}
     >
       <Box
@@ -77,7 +83,7 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
       </Box>
 
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant="body2" fontWeight={isActive ? 700 : 400} color="text.primary">
+        <Typography variant="body2" fontWeight={700} color="text.primary">
           {module.title}
         </Typography>
         <Box
@@ -103,18 +109,24 @@ const ModuleRow: React.FC<ModuleRowProps> = ({ module, index }) => {
       </Box>
 
       {isActive && (
-        <PrimaryButton color="careerReadiness" sx={pillSx}>
-          {t("careerReadiness.continue")} →
+        <PrimaryButton color="careerReadiness" disableWhenOffline disabled={isNavigating} sx={pillSx}>
+          {isNavigating ? <CircularProgress size={14} color="inherit" /> : `${t("careerReadiness.continue")} →`}
         </PrimaryButton>
       )}
       {!isActive && !isDone && (
-        <PrimaryButton variant="outlined" color="careerReadiness" sx={pillSx}>
-          {t("careerReadiness.chat")}
+        <PrimaryButton
+          variant="outlined"
+          color="careerReadiness"
+          disableWhenOffline
+          disabled={isNavigating}
+          sx={pillSx}
+        >
+          {isNavigating ? <CircularProgress size={14} color="inherit" /> : t("careerReadiness.chat")}
         </PrimaryButton>
       )}
       {isDone && (
-        <PrimaryButton color="careerReadiness" sx={pillSx}>
-          {t("careerReadiness.statusDone")}
+        <PrimaryButton color="careerReadiness" disableWhenOffline disabled={isNavigating} sx={pillSx}>
+          {isNavigating ? <CircularProgress size={14} color="inherit" /> : t("careerReadiness.statusDone")}
         </PrimaryButton>
       )}
     </Box>

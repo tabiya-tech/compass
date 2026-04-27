@@ -1,8 +1,9 @@
-import React, { startTransition, useEffect, useMemo, useState } from "react";
+import React, { startTransition, useContext, useEffect, useMemo, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import HomeJobReadyListSkeleton from "./HomeJobReadyListSkeleton";
 import JobReadyListRow from "./JobReadyListRow";
@@ -35,6 +36,7 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
 
   const sorted = useMemo(() => sortModules(modules), [modules]);
   const [expandedModuleId, setExpandedModuleId] = useState<string | null>(null);
@@ -49,6 +51,7 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
   }, [sorted]);
 
   const go = (path: string) => {
+    if (!isOnline) return;
     startTransition(() => {
       navigate(path);
     });
@@ -109,6 +112,7 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
           type="button"
           variant="body2"
           fontWeight="bold"
+          disabled={!isOnline}
           onClick={() => go(routerPaths.CAREER_READINESS)}
           sx={{
             color: "brandAction.main",
@@ -118,8 +122,9 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
             border: 0,
             padding: 0,
             margin: 0,
-            cursor: "pointer",
-            "&:hover": { textDecoration: "underline" },
+            cursor: isOnline ? "pointer" : "default",
+            opacity: isOnline ? 1 : 0.5,
+            "&:hover": { textDecoration: isOnline ? "underline" : "none" },
           }}
         >
           {t("home.jobReadySection.seeFullCourse")}

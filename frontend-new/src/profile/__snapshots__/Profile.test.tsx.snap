@@ -166,11 +166,12 @@ exports[`Profile Component Rendering should render all profile sections with cor
             >
               Career Pathways
             </h4>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-lqinz7-MuiTypography-root"
+            <button
+              class="MuiTypography-root MuiTypography-body2 css-1cn72rn-MuiTypography-root"
+              type="button"
             >
               Browse all →
-            </p>
+            </button>
           </div>
           <div
             class="MuiBox-root css-rzonq7"
@@ -180,7 +181,8 @@ exports[`Profile Component Rendering should render all profile sections with cor
               class="MuiBox-root css-j7qwjs"
             >
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -223,7 +225,8 @@ exports[`Profile Component Rendering should render all profile sections with cor
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -266,7 +269,8 @@ exports[`Profile Component Rendering should render all profile sections with cor
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -309,7 +313,8 @@ exports[`Profile Component Rendering should render all profile sections with cor
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -352,7 +357,8 @@ exports[`Profile Component Rendering should render all profile sections with cor
                 </div>
               </div>
               <div
-                class="MuiBox-root css-tvy6wc"
+                aria-disabled="false"
+                class="MuiBox-root css-k46aon"
                 data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -589,11 +595,12 @@ exports[`Profile Component Rendering should render correctly with partial data 1
             >
               Career Pathways
             </h4>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-lqinz7-MuiTypography-root"
+            <button
+              class="MuiTypography-root MuiTypography-body2 css-1cn72rn-MuiTypography-root"
+              type="button"
             >
               Browse all →
-            </p>
+            </button>
           </div>
           <div
             class="MuiBox-root css-rzonq7"
@@ -603,7 +610,8 @@ exports[`Profile Component Rendering should render correctly with partial data 1
               class="MuiBox-root css-j7qwjs"
             >
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -646,7 +654,8 @@ exports[`Profile Component Rendering should render correctly with partial data 1
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -689,7 +698,8 @@ exports[`Profile Component Rendering should render correctly with partial data 1
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -732,7 +742,8 @@ exports[`Profile Component Rendering should render correctly with partial data 1
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -775,7 +786,8 @@ exports[`Profile Component Rendering should render correctly with partial data 1
                 </div>
               </div>
               <div
-                class="MuiBox-root css-tvy6wc"
+                aria-disabled="false"
+                class="MuiBox-root css-k46aon"
                 data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -1012,11 +1024,12 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
             >
               Career Pathways
             </h4>
-            <p
-              class="MuiTypography-root MuiTypography-body2 css-lqinz7-MuiTypography-root"
+            <button
+              class="MuiTypography-root MuiTypography-body2 css-1cn72rn-MuiTypography-root"
+              type="button"
             >
               Browse all →
-            </p>
+            </button>
           </div>
           <div
             class="MuiBox-root css-rzonq7"
@@ -1026,7 +1039,8 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
               class="MuiBox-root css-j7qwjs"
             >
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-0-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -1069,7 +1083,8 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-1-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -1112,7 +1127,8 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-2-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -1155,7 +1171,8 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
                 </div>
               </div>
               <div
-                class="MuiBox-root css-1s6iw6g"
+                aria-disabled="false"
+                class="MuiBox-root css-11ce1cm"
                 data-testid="career-explorer-sector-3-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div
@@ -1198,7 +1215,8 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
                 </div>
               </div>
               <div
-                class="MuiBox-root css-tvy6wc"
+                aria-disabled="false"
+                class="MuiBox-root css-k46aon"
                 data-testid="career-explorer-sector-4-career-explorer-card-d1e2f3a4-5b6c-7d8e-9f0a-1b2c3d4e5f6a"
               >
                 <div

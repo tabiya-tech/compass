@@ -155,11 +155,12 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
 
   const navigateWithTransition = useCallback(
     (path: string) => {
+      if (!isOnline) return;
       startTransition(() => {
         navigate(path);
       });
     },
-    [navigate]
+    [navigate, isOnline]
   );
 
   const navigateToPathways = useCallback(() => {
@@ -178,7 +179,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         id: MENU_ITEM_ID.VIEW_PROFILE,
         text: t("chat.chatHeader.viewMyProfile"),
         icon: <CircleUser size={18} />,
-        disabled: false,
+        disabled: !isOnline,
         action: navigateToProfile,
       },
       {
@@ -210,7 +211,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: t("common.buttons.logout"),
         icon: <LogOut size={18} />,
-        disabled: !isOnline,
+        disabled: false,
         action: () => {
           void handleLogout();
         },
@@ -254,7 +255,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         id: MENU_ITEM_ID.VIEW_PROFILE,
         text: t("chat.chatHeader.viewMyProfile").toLowerCase(),
         icon: <CircleUser size={18} />,
-        disabled: false,
+        disabled: !isOnline,
         action: navigateToProfile,
       },
       {
@@ -268,7 +269,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         id: MENU_ITEM_ID.PATHWAYS,
         text: t("nav.pathways" as TranslationKey).toLowerCase(),
         icon: <BookOpenText size={18} />,
-        disabled: false,
+        disabled: !isOnline,
         action: navigateToPathways,
       },
       ...(hasMultipleLocales
@@ -312,7 +313,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: t("common.buttons.logout").toLowerCase(),
         icon: <LogOut size={18} />,
-        disabled: !isOnline,
+        disabled: false,
         action: () => {
           void handleLogout();
         },
@@ -334,7 +335,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     hasMultipleLocales,
   ]);
 
-  const getNavLinkSx = (isActive: boolean) => ({
+  const getNavLinkSx = (isActive: boolean, disabled = false) => ({
     display: "flex",
     alignItems: "center",
     gap: 0.5,
@@ -342,11 +343,12 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     textDecoration: "none",
     fontSize: "0.875rem",
     fontWeight: isActive ? 700 : 400,
-    opacity: isActive ? 0.6 : 1,
+    opacity: disabled ? 0.5 : isActive ? 0.7 : 1,
+    cursor: disabled ? "default" : "pointer",
     px: 1,
     py: 0.5,
     borderRadius: "6px",
-    "&:hover": { opacity: 0.8 },
+    "&:hover": { opacity: disabled ? 0.5 : 0.8 },
   });
 
   return (
@@ -378,6 +380,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
               event.preventDefault();
               navigateWithTransition(routerPaths.ROOT);
             }}
+            aria-disabled={!isOnline}
             data-testid={DATA_TEST_ID.NAVBAR_LOGO_LINK}
           >
             <img src={logoSrc} alt={t("app.compassLogoAlt")} height={28} data-testid={DATA_TEST_ID.NAVBAR_LOGO} />
@@ -440,7 +443,8 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                   event.preventDefault();
                   navigateWithTransition(routerPaths.ROOT);
                 }}
-                sx={getNavLinkSx(isOnDashboard)}
+                aria-disabled={!isOnline}
+                sx={getNavLinkSx(isOnDashboard, !isOnline)}
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_DASHBOARD}
               >
                 <LayoutDashboard size={18} />
@@ -453,7 +457,8 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                   event.preventDefault();
                   navigateWithTransition(routerPaths.KNOWLEDGE_HUB);
                 }}
-                sx={getNavLinkSx(isOnPathways)}
+                aria-disabled={!isOnline}
+                sx={getNavLinkSx(isOnPathways, !isOnline)}
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_PATHWAYS}
               >
                 <BookOpenText size={18} />

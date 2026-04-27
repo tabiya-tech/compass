@@ -1,11 +1,12 @@
-import React, { startTransition } from "react";
-import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
+import React, { startTransition, useContext, useState } from "react";
+import { Box, CircularProgress, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
 import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { mapModuleStatusToDisplay } from "src/careerReadiness/types";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -56,6 +57,8 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const [isNavigating, setIsNavigating] = useState(false);
   const isSmallMobile = useMediaQuery((th: Theme) => th.breakpoints.down("sm"));
   const secondary = theme.palette.secondary;
 
@@ -70,6 +73,8 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
   const primaryCtaLabel = getJobReadyPrimaryCtaLabel(isDone, isInProgress, t);
 
   const goToModule = (id: string) => {
+    if (!isOnline || isNavigating) return;
+    setIsNavigating(true);
     startTransition(() => {
       navigate(`${routerPaths.CAREER_READINESS}/${id}`);
     });
@@ -166,13 +171,15 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
                 <PrimaryButton
                   color="secondary"
                   showCircle
+                  disableWhenOffline
+                  disabled={isNavigating}
                   onClick={() => goToModule(module.id)}
                   sx={{
                     alignSelf: "flex-start",
                     marginTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
                   }}
                 >
-                  {primaryCtaLabel}
+                  {isNavigating ? <CircularProgress size={16} color="inherit" /> : primaryCtaLabel}
                 </PrimaryButton>
               )}
             </Box>
@@ -219,7 +226,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="body1"
-              fontWeight={isInProgress ? 700 : 400}
+              fontWeight={700}
               color="text.primary"
               sx={{ overflowWrap: "anywhere", wordBreak: "break-word" }}
             >
@@ -258,6 +265,8 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
             {isInProgress && (
               <PrimaryButton
                 color="secondary"
+                disableWhenOffline
+                disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
                 sx={{
                   fontSize: theme.typography.caption.fontSize,
@@ -266,31 +275,35 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
                   lineHeight: 1.2,
                 }}
               >
-                {t("careerReadiness.continue")} →
+                {isNavigating ? <CircularProgress size={14} color="inherit" /> : `${t("careerReadiness.continue")} →`}
               </PrimaryButton>
             )}
             {isUnlocked && (
               <SecondaryButton
                 color="secondary"
+                disableWhenOffline
+                disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
                 sx={{
                   fontSize: theme.typography.caption.fontSize,
                   padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
                 }}
               >
-                {t("careerReadiness.chat")}
+                {isNavigating ? <CircularProgress size={14} color="inherit" /> : t("careerReadiness.chat")}
               </SecondaryButton>
             )}
             {isDone && (
               <PrimaryButton
                 color="secondary"
+                disableWhenOffline
+                disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
                 sx={{
                   fontSize: theme.typography.caption.fontSize,
                   padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.md)}`,
                 }}
               >
-                {t("careerReadiness.statusDone")}
+                {isNavigating ? <CircularProgress size={14} color="inherit" /> : t("careerReadiness.statusDone")}
               </PrimaryButton>
             )}
           </Box>
