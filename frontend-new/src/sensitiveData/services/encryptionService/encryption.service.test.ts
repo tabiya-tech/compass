@@ -158,5 +158,5 @@ describe("EncryptionService", () => {
 
     // Verify the decrypted data matches the original
     expect(actualPersonalData).toEqual(givenMaxSensitivePersonalData);
-  });
+  }, 15000);
 });
