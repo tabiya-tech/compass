@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import {
   SensitivePersonalDataRequirement,
   UserPreference,
@@ -41,10 +42,12 @@ export default class UserPreferencesStateService {
   public setUserPreferences(preferences: UserPreference): void {
     // Store a deep copy of the user preferences object to prevent direct modification
     this.userPreferences = this.cloneUserPreferences(preferences);
+    Sentry.setTag("session_id", this.getActiveSessionId() ?? undefined);
   }
 
   public clearUserPreferences(): void {
     this.userPreferences = null;
+    Sentry.setTag("session_id", undefined);
   }
 
   public getActiveSessionId(): number | null {

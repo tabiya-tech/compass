@@ -10,6 +10,8 @@ import { getRandomString } from "./_test_utilities/specialCharacters";
 import { createTransport } from "@sentry/core";
 import { setupFetchSpy } from "./_test_utilities/fetchSpy";
 import brotliPromise from "brotli-wasm";
+import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 
 // Mock all the required dependencies
 jest.mock("@sentry/react", () => ({
@@ -42,6 +44,20 @@ jest.mock("brotli-wasm", () => ({
   default: Promise.resolve({
     compress: jest.fn().mockImplementation((input) => input),
   }),
+}));
+
+// Mock the state services that beforeSend reads from
+jest.mock("src/auth/services/AuthenticationState.service", () => ({
+  __esModule: true,
+  default: { getInstance: jest.fn() },
+}));
+jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
+  __esModule: true,
+  default: { getInstance: jest.fn() },
+}));
+jest.mock("src/userPreferences/UserPreferencesService/userPreferences.service", () => ({
+  __esModule: true,
+  default: { getInstance: jest.fn(() => ({ getClientID: jest.fn(() => "test-client-id") })) },
 }));
 
 // Mock fetch globally
@@ -309,6 +325,70 @@ describe("sentryInit", () => {
       expect(console.error).not.toHaveBeenCalled();
       // AND no warning should be logged
       expect(console.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("beforeSend", () => {
+    beforeEach(() => {
+      // Provide a valid config so initSentry does not log a "config not available" warning
+      // that would leak into the (no-beforeEach) sentryTransport describe below.
+      (getSentryConfig as jest.Mock).mockReturnValue("{}");
+    });
+
+    function getCapturedBeforeSend(): (event: any, hint: any) => any {
+      initSentry();
+      const initArgs = (Sentry.init as jest.Mock).mock.calls[0][0];
+      return initArgs.beforeSend;
+    }
+
+    test("should attach user_id and session_id tags to feedback events that carry no originalException", () => {
+      // GIVEN a known user is set in AuthenticationStateService
+      const givenUserId = "test-firebase-uid";
+      (AuthenticationStateService.getInstance as jest.Mock).mockReturnValue({
+        getUser: () => ({ id: givenUserId }),
+      });
+      // AND a known active session id is set in UserPreferencesStateService
+      const givenSessionId = 12345;
+      (UserPreferencesStateService.getInstance as jest.Mock).mockReturnValue({
+        getActiveSessionId: () => givenSessionId,
+      });
+      // AND beforeSend has been registered with Sentry.init
+      const beforeSend = getCapturedBeforeSend();
+      // AND a feedback-shaped event with no originalException
+      const givenEvent = { tags: {} };
+      const givenHint = {};
+
+      // WHEN beforeSend is invoked
+      const actualEvent = beforeSend(givenEvent, givenHint);
+
+      // THEN expect user_id to be tagged
+      expect(actualEvent.tags.user_id).toBe(givenUserId);
+      // AND expect session_id to be tagged
+      expect(actualEvent.tags.session_id).toBe(givenSessionId);
+    });
+
+    test("should still attach user_id and session_id tags when an originalException is present", () => {
+      // GIVEN a known user and session
+      const givenUserId = "another-firebase-uid";
+      const givenSessionId = 67890;
+      (AuthenticationStateService.getInstance as jest.Mock).mockReturnValue({
+        getUser: () => ({ id: givenUserId }),
+      });
+      (UserPreferencesStateService.getInstance as jest.Mock).mockReturnValue({
+        getActiveSessionId: () => givenSessionId,
+      });
+      // AND beforeSend has been registered with Sentry.init
+      const beforeSend = getCapturedBeforeSend();
+      // AND an event accompanied by an originalException
+      const givenEvent = { tags: {} };
+      const givenHint = { originalException: new Error("boom") };
+
+      // WHEN beforeSend is invoked
+      const actualEvent = beforeSend(givenEvent, givenHint);
+
+      // THEN expect user_id and session_id tags to be present (regression guard)
+      expect(actualEvent.tags.user_id).toBe(givenUserId);
+      expect(actualEvent.tags.session_id).toBe(givenSessionId);
     });
   });
 });

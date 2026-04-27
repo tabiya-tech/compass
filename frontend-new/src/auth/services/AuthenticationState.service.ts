@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 
@@ -64,6 +65,8 @@ export default class AuthenticationStateService {
    */
   public setUser(user: TabiyaUser | null): TabiyaUser | null {
     this.user = user;
+    // Without this, Sentry attributes events to the request IP, not the Firebase UID.
+    Sentry.setUser(user ? { id: user.id } : null);
     return this.user;
   }
 

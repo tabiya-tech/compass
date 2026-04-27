@@ -1,6 +1,7 @@
 // mock the console logs
 import "src/_test_utilities/consoleMock";
 
+import * as Sentry from "@sentry/react";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import {
   Language,
@@ -9,6 +10,11 @@ import {
 } from "src/userPreferences/UserPreferencesService/userPreferences.types";
 import { nanoid } from "nanoid";
 import { QUESTION_KEYS } from "src/feedback/overallFeedback/overallFeedbackService/OverallFeedback.service.types";
+
+// Mock Sentry — only the methods this service calls
+jest.mock("@sentry/react", () => ({
+  setTag: jest.fn(),
+}));
 
 function getMockUserPreference(): UserPreference {
   const random = Math.floor(Math.random() * 1000000);
@@ -143,6 +149,17 @@ describe("UserPreferencesStateService", () => {
         // THEN expect an error to be thrown
         expect(() => service.setUserPreferences(givenPreferences)).toThrow();
       });
+      test("should mirror the active session id into the Sentry session_id tag", () => {
+        // GIVEN user preferences with a known active session id
+        const givenPreferences: UserPreference = getMockUserPreference();
+        const expectedActiveSessionId = givenPreferences.sessions[0];
+
+        // WHEN setting the user preferences
+        service.setUserPreferences(givenPreferences);
+
+        // THEN expect Sentry to be tagged with the active session id
+        expect(Sentry.setTag).toHaveBeenCalledWith("session_id", expectedActiveSessionId);
+      });
     });
     describe("get/setUserPreferences", () => {
       test("should set and get user preferences correctly", () => {
@@ -180,6 +197,19 @@ describe("UserPreferencesStateService", () => {
         // THEN expect the user preferences to be null
         const actualUserPreferences = service.getUserPreferences();
         expect(actualUserPreferences).toBeNull();
+      });
+      test("should clear the Sentry session_id tag", () => {
+        // GIVEN user preferences are set (which leaves a session_id tag on Sentry)
+        service = UserPreferencesStateService.getInstance();
+        service.setUserPreferences(getMockUserPreference());
+        // AND the prior Sentry.setTag calls are discarded
+        (Sentry.setTag as jest.Mock).mockClear();
+
+        // WHEN clearUserPreferences is called
+        service.clearUserPreferences();
+
+        // THEN expect the Sentry session_id tag to be removed
+        expect(Sentry.setTag).toHaveBeenCalledWith("session_id", undefined);
       });
     });
     describe("getActiveSessionId", () => {

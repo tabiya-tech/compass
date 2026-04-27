@@ -232,6 +232,13 @@ export function initSentry() {
 
     // Add the beforeSend callback to modify the event before sending it
     beforeSend(event, hint) {
+      // Tag every event (incl. feedback, which carries no originalException).
+      event.tags = {
+        ...event.tags,
+        user_id: AuthenticationStateService.getInstance().getUser()?.id,
+        session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
+      };
+
       // This will add the error details to the extra field of the event
       const originalError = hint?.originalException;
       if (originalError && typeof originalError === "object") {
@@ -240,11 +247,6 @@ export function initSentry() {
         event.extra = {
           ...event.extra,
           errorDetails: serialized,
-        };
-        event.tags = {
-          ...event.tags,
-          user_id: AuthenticationStateService.getInstance().getUser()?.id,
-          session_id: UserPreferencesStateService.getInstance().getActiveSessionId(),
         };
       }
 

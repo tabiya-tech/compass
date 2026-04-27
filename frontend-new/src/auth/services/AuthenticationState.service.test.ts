@@ -1,6 +1,7 @@
 // mock the console logs
 import "src/_test_utilities/consoleMock";
 
+import * as Sentry from "@sentry/react";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import { TabiyaUser } from "src/auth/auth.types";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -13,6 +14,11 @@ jest.mock("src/app/PersistentStorageService/PersistentStorageService", () => ({
     setToken: jest.fn(),
     clearToken: jest.fn(),
   },
+}));
+
+// Mock Sentry — only the methods this service calls
+jest.mock("@sentry/react", () => ({
+  setUser: jest.fn(),
 }));
 
 function getMockTabiyaUser(): TabiyaUser {
@@ -83,25 +89,28 @@ describe("AuthenticationStateService", () => {
       it("should set the user and update Sentry", () => {
         // GIVEN a user
         const givenUser = getMockTabiyaUser();
-        // const setTagSpy = jest.spyOn(require("@sentry/react"), "setTag");
 
         // WHEN setUser is called
-        const result = service.setUser(givenUser);
+        const actualResult = service.setUser(givenUser);
 
         // THEN expect the user to be set
         expect(service.getUser()).toEqual(givenUser);
         // AND expect the result to be the user
-        expect(result).toEqual(givenUser);
+        expect(actualResult).toEqual(givenUser);
+        // AND expect Sentry to be informed of the user identity
+        expect(Sentry.setUser).toHaveBeenCalledWith({ id: givenUser.id });
       });
 
       it("should handle null user and update Sentry", () => {
         // WHEN setUser is called with null
-        const result = service.setUser(null);
+        const actualResult = service.setUser(null);
 
         // THEN expect the user to be null
         expect(service.getUser()).toBeNull();
         // AND expect the result to be null
-        expect(result).toBeNull();
+        expect(actualResult).toBeNull();
+        // AND expect Sentry to be cleared of the user identity
+        expect(Sentry.setUser).toHaveBeenCalledWith(null);
       });
     });
 
@@ -231,6 +240,8 @@ describe("AuthenticationStateService", () => {
         // guard
         expect(service.getUser()).not.toBeNull();
         expect(service.getToken()).not.toBeNull();
+        // AND Sentry has prior calls from the setup above
+        (Sentry.setUser as jest.Mock).mockClear();
 
         // WHEN clearUser is called
         service.clearUser();
@@ -241,6 +252,8 @@ describe("AuthenticationStateService", () => {
         expect(service.getToken()).toBeNull();
         // AND expect persistent storage to be cleared
         expect(PersistentStorageService.clearToken).toHaveBeenCalled();
+        // AND expect Sentry to be cleared of the user identity
+        expect(Sentry.setUser).toHaveBeenCalledWith(null);
       });
     });
   });
