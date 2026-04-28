@@ -297,7 +297,8 @@ def _build_instruction_mode_instructions(module_title: str, module_content: str,
     )
 
 
-def _build_support_mode_instructions(module_title: str, module_content: str) -> str:
+def _build_support_mode_instructions(module_title: str, module_content: str,
+                                      quiz_answer_key: list[dict] | None = None) -> str:
     """Build system instructions for support mode (post-quiz follow-up Q&A).
 
     The student has already passed the lesson plan; topic coverage is no longer tracked,
@@ -318,6 +319,17 @@ def _build_support_mode_instructions(module_title: str, module_content: str) -> 
         - "message": Your response to the student. Do not format with markdown. Keep under 200 words.
         - "quick_reply_options": An optional array of quick-reply button options. Each option is an object with a "label" field (the button text). Only include when your message asks a question with limited clear answers.""")
 
+    if quiz_answer_key:
+        lines = ["# Quiz Answer Key"]
+        for entry in quiz_answer_key:
+            lines.append(f"Q{entry['index']}. {entry['question']}")
+            for opt in entry["options"]:
+                marker = " ✓" if opt.startswith(entry["correct_answer"] + ".") else ""
+                lines.append(f"  {opt}{marker}")
+        quiz_section = "\n".join(lines)
+    else:
+        quiz_section = ""
+
     template = dedent("""\
         You are a career readiness support assistant for "{module_title}".
         The student has already completed the lesson and passed the quiz for this module.
@@ -329,6 +341,7 @@ def _build_support_mode_instructions(module_title: str, module_content: str) -> 
 
         {module_content}
 
+        {quiz_section}
         # Rules
         - Answer questions grounded in the module content above.
         - Be helpful, encouraging, and concise.
@@ -337,6 +350,9 @@ def _build_support_mode_instructions(module_title: str, module_content: str) -> 
         - Keep responses under 200 words.
         - If the user asks something outside the scope of this module,
           politely redirect them.
+        - If the student asks about their quiz results or which answers were wrong,
+          use the Quiz Answer Key above together with the "Quiz answers: ..." message
+          in the conversation history to give an accurate, specific answer.
 
         {language_style}
 
@@ -348,6 +364,7 @@ def _build_support_mode_instructions(module_title: str, module_content: str) -> 
     return template.format(
         module_title=module_title,
         module_content=module_content,
+        quiz_section=quiz_section + "\n" if quiz_section else "",
         language_style=language_style,
         quick_reply_prompt=QUICK_REPLY_PROMPT,
         response_instructions=response_instructions,
@@ -365,7 +382,8 @@ class CareerReadinessAgent:
 
     def __init__(self, module_title: str, module_content: str,
                  mode: ConversationMode = ConversationMode.INSTRUCTION,
-                 topics: list[str] | None = None):
+                 topics: list[str] | None = None,
+                 quiz_answer_key: list[dict] | None = None):
         self._logger = logging.getLogger(CareerReadinessAgent.__name__)
 
         resolved_topics = topics or []
@@ -375,7 +393,7 @@ class CareerReadinessAgent:
                 module_title, module_content, resolved_topics)
         else:
             self._base_system_instructions = _build_support_mode_instructions(
-                module_title, module_content)
+                module_title, module_content, quiz_answer_key=quiz_answer_key)
 
         # Build a per-module response model so Vertex AI structured output only
         # permits topic values from the module's topics list. Falls back to the

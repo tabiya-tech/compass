@@ -252,7 +252,7 @@ def _make_mock_agent_factory(agent: MockCareerReadinessAgent | None = None):
     """Factory that returns a mock agent regardless of mode."""
     mock_agent = agent or MockCareerReadinessAgent()
 
-    def factory(module_config, mode):
+    def factory(module_config, mode, **kwargs):
         return mock_agent
 
     return factory

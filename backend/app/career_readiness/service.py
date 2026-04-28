@@ -204,13 +204,15 @@ class ICareerReadinessService(ABC):
         raise NotImplementedError()
 
 
-def _default_agent_factory(module_config: ModuleConfig, mode: ConversationMode) -> CareerReadinessAgent:
+def _default_agent_factory(module_config: ModuleConfig, mode: ConversationMode,
+                           quiz_answer_key: list[dict] | None = None) -> CareerReadinessAgent:
     """Default factory that creates a real CareerReadinessAgent."""
     return CareerReadinessAgent(
         module_title=module_config.title,
         module_content=module_config.content,
         mode=mode,
         topics=module_config.topics,
+        quiz_answer_key=quiz_answer_key,
     )
 
 
@@ -315,7 +317,7 @@ class CareerReadinessService(ICareerReadinessService):
         self,
         repository: ICareerReadinessConversationRepository,
         module_registry: ModuleRegistry,
-        agent_factory: Callable[[ModuleConfig, ConversationMode], CareerReadinessAgent] | None = None,
+        agent_factory: Callable[..., CareerReadinessAgent] | None = None,
     ):
         self._repository = repository
         self._module_registry = module_registry
@@ -560,7 +562,16 @@ class CareerReadinessService(ICareerReadinessService):
 
         all_messages = existing_messages + [user_message]
         context = _build_conversation_context(all_messages)
-        agent = self._agent_factory(module, ConversationMode.SUPPORT)
+        quiz_answer_key = [
+            {
+                "index": i + 1,
+                "question": q.question,
+                "options": q.options,
+                "correct_answer": q.correct_answer,
+            }
+            for i, q in enumerate(module.quiz.questions)
+        ] if module.quiz else None
+        agent = self._agent_factory(module, ConversationMode.SUPPORT, quiz_answer_key=quiz_answer_key)
         agent_input = AgentInput(message=user_input, sent_at=now)
         agent_result: CareerReadinessAgentOutput = await agent.execute(agent_input, context)
         agent_output = agent_result.agent_output
