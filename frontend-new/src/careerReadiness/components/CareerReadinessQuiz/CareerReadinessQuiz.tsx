@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import ArrowBackIosNewOutlined from "@mui/icons-material/ArrowBackIosNewOutlined";
 import ArrowForwardIosOutlined from "@mui/icons-material/ArrowForwardIosOutlined";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
-import type { QuizQuestionResponse } from "src/careerReadiness/types";
+import type { QuizQuestionResponse, QuizQuestionResult } from "src/careerReadiness/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const uniqueId = "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e";
@@ -34,6 +34,7 @@ export interface CareerReadinessQuizProps {
   questions: QuizQuestionResponse[];
   onComplete: (answers: Record<number, string>) => void | Promise<void>;
   initialAnswers?: Record<number, string>;
+  lastAnswers?: Record<number, string>;
   moduleId?: string;
   conversationId?: string;
   submissionResult?: {
@@ -41,6 +42,7 @@ export interface CareerReadinessQuizProps {
     total?: number;
     passed: boolean;
     correctAnswersSummary?: string;
+    questionResults?: QuizQuestionResult[];
   };
   onRetry?: () => void;
 }
@@ -49,6 +51,7 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
   questions,
   onComplete,
   initialAnswers,
+  lastAnswers,
   moduleId,
   conversationId,
   submissionResult,
@@ -239,48 +242,106 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
               borderTop: `1px solid ${theme.palette.divider}`,
             }}
           >
-            {submissionResult.correctAnswersSummary && (
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                {submissionResult.correctAnswersSummary}
-              </Typography>
-            )}
             {submissionResult.passed ? (
               <Typography variant="body2">{t("careerReadiness.quizPassedInline")}</Typography>
             ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-                  flexWrap: "wrap",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  fontWeight="bold"
+              <>
+                <Box
                   sx={{
-                    color: theme.palette.error.dark,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                    flexWrap: "wrap",
+                    mb: submissionResult.questionResults?.some((r) => !r.is_correct) ? 2 : 0,
                   }}
                 >
-                  {t("careerReadiness.quizFailedInline")}
-                </Typography>
-                {onRetry && (
-                  <PrimaryButton
-                    variant="outlined"
-                    size="small"
-                    onClick={onRetry}
+                  <Typography
+                    variant="body2"
+                    fontWeight="bold"
                     sx={{
                       color: theme.palette.error.dark,
-                      borderColor: theme.palette.error.dark,
-                      "&:hover": {
-                        backgroundColor: theme.palette.error.light,
-                      },
                     }}
                   >
-                    {t("careerReadiness.quizRetry")}
-                  </PrimaryButton>
+                    {t("careerReadiness.quizFailedInline")}
+                  </Typography>
+                  {onRetry && (
+                    <PrimaryButton
+                      variant="outlined"
+                      size="small"
+                      onClick={onRetry}
+                      sx={{
+                        color: theme.palette.error.dark,
+                        borderColor: theme.palette.error.dark,
+                        "&:hover": {
+                          backgroundColor: theme.palette.error.light,
+                        },
+                      }}
+                    >
+                      {t("careerReadiness.quizRetry")}
+                    </PrimaryButton>
+                  )}
+                </Box>
+
+                {submissionResult.questionResults?.some((r) => !r.is_correct) && (
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>
+                      {t("careerReadiness.quizWrongAnswersTitle")}
+                    </Typography>
+                    {submissionResult.questionResults
+                      .filter((r) => !r.is_correct)
+                      .map((r) => {
+                        const q = questions[r.question_index - 1];
+                        if (!q) return null;
+                        const userAnswer = lastAnswers?.[r.question_index];
+                        return (
+                          <Box key={r.question_index} sx={{ mb: 2 }}>
+                            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
+                              {q.question}
+                            </Typography>
+                            {q.options.map((opt) => {
+                              const { key } = parseOption(opt);
+                              const isCorrect = key === r.correct_answer;
+                              const isWrong = key === userAnswer && !isCorrect;
+                              return (
+                                <Box
+                                  key={key}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    px: 1,
+                                    py: 0.5,
+                                    my: 0.25,
+                                    borderRadius: 1,
+                                    bgcolor: isCorrect
+                                      ? theme.palette.success.light
+                                      : isWrong
+                                        ? theme.palette.error.light
+                                        : "transparent",
+                                  }}
+                                >
+                                  <Typography variant="body2" sx={{ flex: 1 }}>
+                                    {opt}
+                                  </Typography>
+                                  {isCorrect && (
+                                    <Typography variant="caption" color="success.dark" sx={{ whiteSpace: "nowrap" }}>
+                                      {t("careerReadiness.quizCorrectAnswer")}
+                                    </Typography>
+                                  )}
+                                  {isWrong && (
+                                    <Typography variant="caption" color="error.dark" sx={{ whiteSpace: "nowrap" }}>
+                                      {t("careerReadiness.quizYourAnswer")}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              );
+                            })}
+                          </Box>
+                        );
+                      })}
+                  </Box>
                 )}
-              </Box>
+              </>
             )}
           </Box>
         )}

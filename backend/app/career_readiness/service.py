@@ -656,7 +656,11 @@ class CareerReadinessService(ICareerReadinessService):
         passed = (score / total) >= module.quiz.pass_threshold if total > 0 else False
 
         question_results = [
-            QuizQuestionResult(question_index=i + 1, is_correct=correct)
+            QuizQuestionResult(
+                question_index=i + 1,
+                is_correct=correct,
+                correct_answer=None if correct else module.quiz.questions[i].correct_answer,
+            )
             for i, correct in enumerate(results)
         ]
 

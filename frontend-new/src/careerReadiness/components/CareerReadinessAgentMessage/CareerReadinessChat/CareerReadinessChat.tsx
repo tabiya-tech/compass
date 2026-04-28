@@ -159,6 +159,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         passed: submission.passed,
         submittedAt: Date.now(),
         correctAnswersSummary: buildCorrectAnswersSummary(answers, submission.question_results),
+        questionResults: submission.question_results,
       };
     },
     [buildCorrectAnswersSummary]
@@ -172,6 +173,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         passed: submissionResult.passed,
         submitted_at: submissionResult.submittedAt,
         correct_answers_summary: submissionResult.correctAnswersSummary,
+        question_results: submissionResult.questionResults,
       });
     },
     [moduleId]
@@ -312,6 +314,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
                       passed: latestQuizSummary?.passed ?? storedResult?.passed ?? false,
                       submittedAt: storedResult?.submitted_at ?? Date.now(),
                       correctAnswersSummary: storedResult?.correct_answers_summary,
+                      questionResults: storedResult?.question_results,
                     }
                   : undefined,
               lastAnswers: latestQuizSummary?.answers ?? storedQuizData?.answers ?? undefined,

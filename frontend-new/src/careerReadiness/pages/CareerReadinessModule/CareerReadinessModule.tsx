@@ -8,6 +8,7 @@ import CareerReadinessService from "src/careerReadiness/services/CareerReadiness
 import type { ModuleSummary } from "src/careerReadiness/types";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import { isConnectionError } from "src/error/restAPIError/isConnectionError";
+import { RestAPIError } from "src/error/restAPIError/RestAPIError";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import ModuleHandoffBanner from "src/home/components/ModuleHandoffBanner/ModuleHandoffBanner";
 import { useNextModule } from "src/home/useNextModule";
@@ -79,8 +80,20 @@ const CareerReadinessModule: React.FC = () => {
       if (existingId) {
         setConversationId(existingId);
       } else {
-        const res = await CareerReadinessService.getInstance().createConversation(moduleId);
-        setConversationId(res.conversation_id);
+        try {
+          const res = await CareerReadinessService.getInstance().createConversation(moduleId);
+          setConversationId(res.conversation_id);
+        } catch (createError) {
+          // 409 means a conversation already exists but our context was stale — fetch the real ID
+          if (createError instanceof RestAPIError && createError.statusCode === 409) {
+            const moduleRes = await CareerReadinessService.getInstance().getModule(moduleId);
+            if (moduleRes.active_conversation_id) {
+              setConversationId(moduleRes.active_conversation_id);
+              return;
+            }
+          }
+          throw createError;
+        }
       }
     } catch (convError) {
       setConversationLoadError(convError);

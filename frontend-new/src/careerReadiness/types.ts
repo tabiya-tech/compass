@@ -75,6 +75,7 @@ export interface QuizResponse {
 export interface QuizQuestionResult {
   question_index: number;
   is_correct: boolean;
+  correct_answer?: string;
 }
 
 export interface PersistedCareerReadinessQuizResult {
@@ -83,6 +84,7 @@ export interface PersistedCareerReadinessQuizResult {
   passed: boolean;
   submitted_at: number;
   correct_answers_summary?: string;
+  question_results?: QuizQuestionResult[];
 }
 
 export interface QuizSubmissionResponse {

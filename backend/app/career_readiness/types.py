@@ -261,12 +261,15 @@ class QuizSubmissionInput(BaseModel):
 
 
 class QuizQuestionResult(BaseModel):
-    """Per-question result (no correct answer exposed)."""
+    """Per-question result."""
 
     question_index: int
     """1-indexed question number"""
 
     is_correct: bool
+
+    correct_answer: str | None = None
+    """The correct answer letter (e.g. 'A', 'B', 'C', 'D'). Only populated when is_correct=False."""
 
     class Config:
         extra = "forbid"

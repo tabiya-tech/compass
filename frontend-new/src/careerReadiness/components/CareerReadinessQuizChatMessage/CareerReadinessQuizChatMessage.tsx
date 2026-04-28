@@ -4,7 +4,7 @@ import { ConversationMessageSender } from "src/chat/ChatService/ChatService.type
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import CareerReadinessQuiz from "src/careerReadiness/components/CareerReadinessQuiz/CareerReadinessQuiz";
 import BrandLogo from "src/chat/chatMessage/components/brandLogo/BrandLogo";
-import type { QuizQuestionResponse } from "src/careerReadiness/types";
+import type { QuizQuestionResponse, QuizQuestionResult } from "src/careerReadiness/types";
 
 const uniqueId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 
@@ -21,6 +21,7 @@ export interface QuizSubmissionResult {
   passed: boolean;
   submittedAt: number;
   correctAnswersSummary?: string;
+  questionResults?: QuizQuestionResult[];
 }
 
 export interface CareerReadinessQuizChatMessageProps {
@@ -99,6 +100,7 @@ const CareerReadinessQuizChatMessage: React.FC<CareerReadinessQuizChatMessagePro
             questions={questions}
             onComplete={onSubmit}
             initialAnswers={lastAnswers}
+            lastAnswers={lastAnswers}
             moduleId={moduleId}
             conversationId={conversationId}
             submissionResult={submissionResult && !hideResultForRetry ? submissionResult : undefined}
