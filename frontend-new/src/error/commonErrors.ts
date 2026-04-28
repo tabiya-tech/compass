@@ -1,6 +1,6 @@
 enum CommonError {
-  TOKEN_ERROR = "TokenError",
-  AUTHENTICATION_ERROR = "AuthenticationError",
+  TOKEN_ERROR = "T0kenError",
+  AUTHENTICATION_ERROR = "HTUAenticationError",
   USER_PREFERENCE_ERROR = "UserPreferenceError",
   REQUEST_INVITATION_CODE_ERROR = "RequestInvitationCodeError",
   SESSION_ERROR = "SessionError",
