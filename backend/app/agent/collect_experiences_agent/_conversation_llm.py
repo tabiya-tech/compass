@@ -717,8 +717,6 @@ def _get_explore_experiences_instructions(*,
         experiences_summary = _get_summary_of_experiences(collected_data)
 
         instructions_template = dedent("""\
-        {language_style}                               
-
         Currently we are exploring work experiences that include:
             '{experiences_in_type}'.
         
@@ -737,8 +735,6 @@ def _get_explore_experiences_instructions(*,
         A single work experience may involve multiple organizations or time periods.
         
         If I provide the same work experience multiple times, you should tell me that you already have this information.
-        Here are the work experiences that I have shared with you so far:
-            {experiences_summary}
         
         For each work experience, ask me questions to gather information following the '#Gather Details' instructions.
         
@@ -755,11 +751,12 @@ def _get_explore_experiences_instructions(*,
         return replace_placeholders_with_indent(instructions_template,
                                                 questions_to_ask=questions_to_ask,
                                                 experiences_in_type=experiences_in_type,
-                                                language_style=get_language_style(),
+                                                # language_style=get_language_style(),
                                                 # excluding_experiences=excluding_experiences,
                                                 # already_explored_types=already_explored_types,
                                                 # not_explored_types=not_explored_types,
-                                                experiences_summary=experiences_summary)
+                                                # experiences_summary=experiences_summary
+                                                )
 
     else:
         return replace_placeholders_with_indent(dedent("""\

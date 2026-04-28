@@ -96,6 +96,7 @@ def setup_multi_locale_app_config():
             features={},
             language_config=language_config,
             app_name="Compass",
+            admin_firebase_tenant_id="temp-tenant-id"
         )
     else:
         config = current.model_copy(update={"language_config": language_config})

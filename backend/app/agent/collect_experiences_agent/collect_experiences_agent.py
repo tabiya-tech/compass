@@ -280,6 +280,29 @@ class CollectExperiencesAgent(Agent):
         """
         self._state = state
 
+    @staticmethod
+    def _has_incomplete_required_fields_for_type(
+            *,
+            collected_data: list[CollectedData],
+            exploring_type: WorkType | None,
+    ) -> bool:
+        """
+        Required fields for transitioning a work type are title and work_type.
+        If any experience of the current exploring type is missing these,
+        we must keep collecting.
+        """
+        if exploring_type is None:
+            return False
+        key = exploring_type.name
+        for exp in collected_data:
+            if exp.work_type and exp.work_type.strip() == key:
+                if not (exp.experience_title and exp.experience_title.strip()):
+                    return True
+                if not (exp.work_type and exp.work_type.strip()):
+                    return True
+        return False
+
+
     async def execute(self, user_input: AgentInput,
                       context: ConversationContext) -> AgentOutput:
 
@@ -350,6 +373,21 @@ class CollectExperiencesAgent(Agent):
 
         conversation_llm_output.llm_stats = data_extraction_llm_stats + conversation_llm_output.llm_stats + transition_llm_stats
         reasoning_text = transition_reasoning.reasoning if transition_reasoning else "No reasoning provided"
+
+        if (
+                transition_decision == TransitionDecision.CONTINUE
+                and conversation_llm_output.exploring_type_finished
+                and not self._has_incomplete_required_fields_for_type(
+            collected_data=collected_data,
+            exploring_type=exploring_type,
+        )
+        ):
+            self.logger.info(
+                "Conversation LLM signaled END_OF_WORKTYPE while transition tool returned CONTINUE; "
+                "overriding decision to END_WORKTYPE for exploring_type=%s.",
+                exploring_type.name if exploring_type else "None",
+            )
+            transition_decision = TransitionDecision.END_WORKTYPE
 
         if transition_decision == TransitionDecision.END_WORKTYPE:
             did_update = False

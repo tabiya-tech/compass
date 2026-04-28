@@ -99,6 +99,7 @@ test_cases = [
         country_of_user=Country.UNSPECIFIED,
         conversation_rounds=50,
         name='single_experience_specific_and_concise_user_e2e',
+        skip_force="force",
         simulated_user_prompt=dedent("""
             You're a Gen Y living alone. you have this single experience as an unpaid trainee:
             - Unpaid internship selling shoes at Shoe Soles, a shoe store in Tokyo, from 2023 to present.

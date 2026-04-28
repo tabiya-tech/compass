@@ -36,7 +36,7 @@
       "company": "company/receiver of work",
       "location": "location"
     },
-    "askAboutType": "Ask me about experiences that include: {experience_type}",
+    "askAboutType": "Have you had any experiences that include: {experience_type}",
     "recapPrompt": "Let's recap, and give me a chance to correct any mistakes."
   },
   "exploreExperiences": {

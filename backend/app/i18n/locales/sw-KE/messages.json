@@ -36,7 +36,7 @@
       "company": "kampuni/mpokeaji wa kazi",
       "location": "mahali"
     },
-    "askAboutType": "Niulize kuhusu uzoefu unaojumuisha: {experience_type}",
+    "askAboutType": "Umewahi kuwa na uzoefu unaojumuisha: {experience_type}",
     "recapPrompt": "Tuangalie tena, na unipe nafasi ya kusahihisha makosa yoyote."
   },
   "exploreExperiences": {
