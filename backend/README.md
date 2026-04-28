@@ -157,7 +157,8 @@ The backend uses the following environment variables:
 - `USERDATA_DATABASE_NAME`: The name of the mongo db database used by the application to store user data.
 - `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
 - `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
-- `VERTEX_API_REGION`: (optional) The region of the Vertex API to use. If not set defaults to `us-central1`.
+- `VERTEX_API_EMBEDDINGS_REGION`: The region of the Vertex API to use for embedding models. Must be a regional location (e.g. `us-central1`) — embedding models such as `text-embedding-005` are not published in the global publisher catalog.
+- `VERTEX_API_GEN_AI_REGION`: (optional) The region of the Vertex API to use for generative-AI calls (Gemini etc.). Can be a regional location or `global`. If not set, defaults to `us-central1`.
 - `EMBEDDINGS_SERVICE_NAME`: The name of the embeddings service to use. Currently, the only supported service is `GOOGLE-VERTEX-AI`.
 - `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models for the list of supported models.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
@@ -196,7 +197,8 @@ USERDATA_MONGODB_URI=<URI_TO_MONGODB>
 USERDATA_DATABASE_NAME=<USERDATA_DATABASE_NAME>
 METRICS_MONGODB_URI=<URI_TO_MONGODB>
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
-VERTEX_API_REGION=<REGION>
+VERTEX_API_EMBEDDINGS_REGION=<REGIONAL_LOCATION>
+VERTEX_API_GEN_AI_REGION=<REGIONAL_LOCATION_OR_GLOBAL>
 EMBEDDINGS_SERVICE_NAME=<EMBEDDINGS_SERVICE_NAME>
 EMBEDDINGS_MODEL_NAME=<EMBEDDINGS_MODEL_NAME>
 LOG_CONFIG_FILE=<YAML_FILE>
@@ -268,7 +270,7 @@ To run the image, you'll need to mount a volume with the service account key and
 the container:
 
 ```shell
-docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -e VERTEX_API_REGION="<REGION>" -p 8080:8080 compass-backend
+docker run -v "<PATH_TO_KEY_FILE>:/code/credentials.json" -e GOOGLE_APPLICATION_CREDENTIALS="/code/credentials.json" -e MONGODB_URI="<URI_TO_MONGODB>" -e VERTEX_API_EMBEDDINGS_REGION="<REGION>" -e VERTEX_API_GEN_AI_REGION="<REGION>" -p 8080:8080 compass-backend
 ```
 
 If you have set up the `.env` file, you can run the image using the `--env-file` option.
@@ -289,7 +291,8 @@ USERDATA_DATABASE_NAME=_compass-users-local
 METRICS_MONGODB_URI=mongodb://localhost:27017
 METRICS_DATABASE_NAME=<METRICS_DATABASE_NAME>
 GOOGLE_APPLICATION_CREDENTIALS=keys/credentials.json
-VERTEX_API_REGION=<REGION>
+VERTEX_API_EMBEDDINGS_REGION=<REGION>
+VERTEX_API_GEN_AI_REGION=<REGION>
 EMBEDDINGS_SERVICE_VERSION=<EMBEDDINGS_SERVICE_VERSION>
 LOG_CONFIG_FILE=logging.cfg.dev.yaml
 # allow all origins

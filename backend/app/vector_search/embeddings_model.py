@@ -45,9 +45,16 @@ class GoogleEmbeddingService(EmbeddingService):
 
     def __init__(self, model_name: str):
         super().__init__(service_name="GOOGLE-VERTEX-AI", model_name=model_name)
-        if os.getenv("VERTEX_API_REGION") is None:
-            raise ValueError("Environment variable 'VERTEX_API_REGION' is not set.")
-        self.region = os.getenv("VERTEX_API_REGION")
+        # Embeddings run in their own region, separate from the generative-AI region, because
+        # legacy embedding models (e.g. text-embedding-005) are not published in the global
+        # publisher catalog. Resolving via vertexai.init(location=...) before from_pretrained
+        # binds the returned model to that regional endpoint for all subsequent embed calls.
+        self.region = os.getenv("VERTEX_API_EMBEDDINGS_REGION")
+        if not self.region:
+            raise ValueError("Environment variable 'VERTEX_API_EMBEDDINGS_REGION' is not set.")
+        self.logger.info(f"Constructing {self.__class__.__name__} with model: {model_name} and region: {self.region}")
+
+        vertexai.init(location=self.region)
         self.model = TextEmbeddingModel.from_pretrained(model_name)
 
     async def embed(self, text: str) -> list[float]:

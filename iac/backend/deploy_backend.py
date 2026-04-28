@@ -30,7 +30,8 @@ class BackendServiceConfig:
     metrics_database_name: str
     userdata_mongodb_uri: str
     userdata_database_name: str
-    vertex_api_region: str
+    vertex_api_embeddings_region: str
+    vertex_api_gen_ai_region: str
     embeddings_service_name: str
     embeddings_model_name: str
     target_environment_name: str
@@ -360,8 +361,11 @@ def _deploy_cloud_run_service(
                             name="USERDATA_DATABASE_NAME",
                             value=backend_service_cfg.userdata_database_name),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
-                            name="VERTEX_API_REGION",
-                            value=backend_service_cfg.vertex_api_region),
+                            name="VERTEX_API_EMBEDDINGS_REGION",
+                            value=backend_service_cfg.vertex_api_embeddings_region),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="VERTEX_API_GEN_AI_REGION",
+                            value=backend_service_cfg.vertex_api_gen_ai_region),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="EMBEDDINGS_SERVICE_NAME",
                             value=backend_service_cfg.embeddings_service_name),
