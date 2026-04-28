@@ -65,6 +65,15 @@ class GoogleEmbeddingService(EmbeddingService):
         return (await self.embed_batch([text]))[0]
 
     async def embed_batch(self, text_list: list[str]) -> list[list[float]]:
+        async def _callback() -> list[list[float]]:
+            return await self.internal_embed_batch(text_list=text_list)
+
+        return await Retry[list[list[float]]].call_with_exponential_backoff(
+            callback=_callback,
+            logger=self.logger
+        )
+
+    async def internal_embed_batch(self, text_list: list[str]) -> list[list[float]]:
         """
         Generates embeddings for a list of texts.
         Splits the texts into batches, according to the region's maximum batch size, and processes them.
