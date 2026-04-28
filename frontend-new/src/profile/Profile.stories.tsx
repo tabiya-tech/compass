@@ -11,6 +11,7 @@ const makeModule = (id: string, status: ModuleSummary["status"]): ModuleSummary 
   sort_order: 0,
   input_placeholder: "",
   active_conversation_id: null,
+  topics: [],
 });
 
 /**

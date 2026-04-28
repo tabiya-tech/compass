@@ -35,6 +35,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 1,
     input_placeholder: "",
     active_conversation_id: null,
+    topics: [],
   },
   {
     id: "m2",
@@ -45,6 +46,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 2,
     input_placeholder: "",
     active_conversation_id: "conv-123",
+    topics: [],
   },
 ];
 

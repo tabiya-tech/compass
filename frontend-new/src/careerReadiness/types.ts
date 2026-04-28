@@ -28,6 +28,7 @@ export interface ModuleSummary {
   sort_order: number;
   input_placeholder: string;
   active_conversation_id: string | null;
+  topics: string[];
 }
 
 export interface ModuleDetail extends ModuleSummary {

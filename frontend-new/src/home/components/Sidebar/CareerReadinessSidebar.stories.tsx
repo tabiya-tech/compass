@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import CareerReadinessSidebar from "./CareerReadinessSidebar";
-import SidebarService from "./SidebarService";
 
 const meta: Meta<typeof CareerReadinessSidebar> = {
   title: "Home/Sidebar/CareerReadiness",
@@ -19,49 +18,27 @@ export default meta;
 
 type Story = StoryObj<typeof CareerReadinessSidebar>;
 
+const CV_TOPICS = ["What is a CV?", "CV Structure", "CV Writing Tips", "Common Mistakes to Avoid"];
+
 export const NoProgress: Story = {
   name: "No progress",
-  decorators: [
-    (Story) => {
-      SidebarService.getInstance().getObjectivesData = async () => ({
-        objectives: [
-          { label: "Describe yourself with 3 key strengths", status: "pending" },
-          { label: "Back each strength with a real example", status: "pending" },
-          { label: "Write a 2-sentence professional intro", status: "pending" },
-        ],
-      });
-      return <Story />;
-    },
-  ],
+  args: {
+    moduleId: "cv-development",
+    coveredTopics: [],
+  },
 };
 
 export const InProgress: Story = {
   name: "In progress",
-  decorators: [
-    (Story) => {
-      SidebarService.getInstance().getObjectivesData = async () => ({
-        objectives: [
-          { label: "Describe yourself with 3 key strengths", status: "done" },
-          { label: "Back each strength with a real example", status: "active" },
-          { label: "Write a 2-sentence professional intro", status: "pending" },
-        ],
-      });
-      return <Story />;
-    },
-  ],
+  args: {
+    moduleId: "cv-development",
+    coveredTopics: [CV_TOPICS[0], CV_TOPICS[1]],
+  },
 };
 
 export const Complete: Story = {
-  decorators: [
-    (Story) => {
-      SidebarService.getInstance().getObjectivesData = async () => ({
-        objectives: [
-          { label: "Describe yourself with 3 key strengths", status: "done" },
-          { label: "Back each strength with a real example", status: "done" },
-          { label: "Write a 2-sentence professional intro", status: "done" },
-        ],
-      });
-      return <Story />;
-    },
-  ],
+  args: {
+    moduleId: "cv-development",
+    coveredTopics: CV_TOPICS,
+  },
 };

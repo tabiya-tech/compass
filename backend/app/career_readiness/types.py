@@ -85,6 +85,9 @@ class ModuleSummary(BaseModel):
     active_conversation_id: str | None = None
     """The ID of the active conversation for this module, if one exists"""
 
+    topics: list[str] = []
+    """The list of topics this module covers"""
+
     class Config:
         extra = "forbid"
 

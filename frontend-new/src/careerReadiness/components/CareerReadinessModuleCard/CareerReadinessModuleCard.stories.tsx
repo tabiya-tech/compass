@@ -36,6 +36,7 @@ const mockModule: ModuleSummary = {
   sort_order: 1,
   input_placeholder: "Ask about CVs...",
   active_conversation_id: null,
+  topics: [],
 };
 
 export const NotStarted: Story = {

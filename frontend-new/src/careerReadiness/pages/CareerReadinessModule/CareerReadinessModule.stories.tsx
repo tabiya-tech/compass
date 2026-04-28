@@ -47,6 +47,7 @@ const moduleDetailBase: ModuleDetail = {
   input_placeholder: "Ask about workplace readiness...",
   scope: "Workplace communication and collaboration",
   active_conversation_id: null,
+  topics: [],
 };
 
 const newConversationResponse: CareerReadinessConversationResponse = {
@@ -175,6 +176,7 @@ export const NewConversation: Story = {
       getModule: async () => ({
         ...moduleDetailBase,
         active_conversation_id: null,
+        topics: [],
       }),
       createConversation: async () => newConversationResponse,
       // getConversationHistory: async () => newConversationResponse,

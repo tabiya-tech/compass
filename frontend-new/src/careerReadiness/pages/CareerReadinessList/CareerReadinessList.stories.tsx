@@ -24,6 +24,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 1,
     input_placeholder: "Ask about professional identity and skills…",
     active_conversation_id: null,
+    topics: [],
   },
   {
     id: "cv-development",
@@ -34,6 +35,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 2,
     input_placeholder: "Ask about CV writing…",
     active_conversation_id: null,
+    topics: [],
   },
   {
     id: "cover-letter",
@@ -44,6 +46,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 3,
     input_placeholder: "Ask about cover letters…",
     active_conversation_id: null,
+    topics: [],
   },
   {
     id: "interview-preparation",
@@ -54,6 +57,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 4,
     input_placeholder: "Ask about interviews…",
     active_conversation_id: null,
+    topics: [],
   },
   {
     id: "workplace-readiness",
@@ -65,6 +69,7 @@ const mockModules: ModuleSummary[] = [
     sort_order: 5,
     input_placeholder: "Ask about workplace readiness…",
     active_conversation_id: null,
+    topics: [],
   },
 ];
 

@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { Box, useTheme } from "@mui/material";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import type { ObjectiveItem } from "src/home/components/Sidebar/SidebarService";
-import { moduleStatusToObjectiveStatus } from "src/home/components/Sidebar/SidebarService";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
 
 const uniqueId = "d3e4f5a6-b7c8-9012-defa-345678901234";
@@ -68,36 +67,37 @@ const ObjectiveRow: React.FC<ObjectiveRowProps> = ({ objective, accentColor }) =
 };
 
 interface CareerReadinessSidebarProps {
-  refreshToken?: number;
+  moduleId: string;
+  coveredTopics?: string[];
 }
 
-const CareerReadinessSidebar: React.FC<CareerReadinessSidebarProps> = () => {
+const CareerReadinessSidebar: React.FC<CareerReadinessSidebarProps> = ({ moduleId, coveredTopics = [] }) => {
   const theme = useTheme();
   const accentColor = theme.palette.warning.main;
 
-  // Read modules from shared context — no additional API call needed
   const { profileData } = useUserProfileContext();
-  const objectives: ObjectiveItem[] = useMemo(
-    () =>
-      profileData.modules.map((m) => ({
-        id: m.id,
-        label: m.title,
-        status: moduleStatusToObjectiveStatus(m.status),
-      })),
-    [profileData.modules]
-  );
+
+  const objectives: ObjectiveItem[] = useMemo(() => {
+    const topics = profileData.modules.find((m) => m.id === moduleId)?.topics ?? [];
+    const coveredSet = new Set(coveredTopics.map((t) => t.toLowerCase()));
+    return topics.map((topic) => ({
+      id: topic,
+      label: topic,
+      status: coveredSet.has(topic.toLowerCase()) ? ("done" as const) : ("pending" as const),
+    }));
+  }, [profileData.modules, moduleId, coveredTopics]);
 
   const completedCount = objectives.filter((o) => o.status === "done").length;
   const progressPct = objectives.length > 0 ? Math.round((completedCount / objectives.length) * 100) : 0;
 
   return (
-    <Sidebar title="Learning Objectives" width={300}>
+    <Sidebar title="Topics" width={300}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.5) }}>
         <Box
           data-testid={DATA_TEST_ID.CAREER_READINESS_SIDEBAR_PROGRESS_BAR}
           sx={{
             height: "4px",
-            borderRadius: theme.rounding(theme.tabiyaRounding.full),
+            borderRadius: "2px",
             backgroundColor: theme.palette.grey[100],
             overflow: "hidden",
           }}

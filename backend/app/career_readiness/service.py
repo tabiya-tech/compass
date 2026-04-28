@@ -363,6 +363,7 @@ class CareerReadinessService(ICareerReadinessService):
                 sort_order=module.sort_order,
                 input_placeholder=module.input_placeholder,
                 active_conversation_id=conversation_by_module.get(module.id),
+                topics=module.topics,
             ))
 
         return ModuleListResponse(modules=summaries)
