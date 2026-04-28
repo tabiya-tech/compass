@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Tabs, Tab, Typography, useTheme, Chip, Alert } from "@mui/material";
+import { Box, Tabs, Tab, Typography, useTheme, Chip } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
 import DataTable from "src/jobMatching/components/DataTable/DataTable";
 import type { ColumnDef } from "src/jobMatching/components/DataTable/DataTable";
@@ -7,6 +9,7 @@ import JobDetailModal from "src/jobMatching/components/JobDetailModal/JobDetailM
 import { useJobs } from "src/jobMatching/hooks/useJobs";
 import JobService from "src/jobMatching/services/JobService";
 import type { JobFilters, JobRow, JobSortKey } from "src/jobMatching/types";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -51,6 +54,7 @@ export const DATA_TEST_ID = {
 
 const JobMatchingPage: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState(0);
   const [browseFilters, setBrowseFilters] = useState<JobFilters>(EMPTY_FILTERS);
@@ -294,6 +298,13 @@ const JobMatchingPage: React.FC = () => {
     ],
     [columns, theme]
   );
+  const hasError = Boolean(error);
+  const isConnectionFailure = hasError && isConnectionError(error);
+  const errorMessage = (() => {
+    if (!hasError) return null;
+    if (isConnectionFailure) return t("common.errors.api.serverConnectionError");
+    return t("common.errors.api.unableToProcessRequest");
+  })();
 
   return (
     <Box
@@ -335,10 +346,26 @@ const JobMatchingPage: React.FC = () => {
         {/* Browse Jobs tab */}
         {activeTab === 0 && (
           <>
-            {error && (
-              <Alert severity="error" sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
-                {error}
-              </Alert>
+            {hasError && (
+              <Box
+                sx={{
+                  mb: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography variant="body1" color="error.main">
+                  {errorMessage}
+                </Typography>
+                <Box>
+                  <PrimaryButton onClick={() => globalThis.location.reload()}>
+                    {t("error.errorPage.refreshButton")}
+                  </PrimaryButton>
+                </Box>
+              </Box>
             )}
             <DataTable<JobRow>
               rows={jobs}

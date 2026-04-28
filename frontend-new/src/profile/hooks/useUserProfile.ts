@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { fetchSkills } from "./utils/fetchSkills";
 import { Skill } from "src/experiences/experienceService/experiences.types";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
@@ -54,6 +55,7 @@ export interface UseUserProfileResult {
  * across multiple sessions client-side.
  */
 export const useUserProfile = (): UseUserProfileResult => {
+  const reconnectVersion = useContext(ReconnectVersionContext);
   // Individual loading states
   const [isLoadingSecurity, setIsLoadingSecurity] = useState(true);
   const [isLoadingPreferences, setIsLoadingPreferences] = useState(true);
@@ -266,7 +268,7 @@ export const useUserProfile = (): UseUserProfileResult => {
     };
 
     fetchProgress();
-  }, [activeSessionId]);
+  }, [activeSessionId, reconnectVersion]);
 
   // Combine all data into a single profile object
   const profileData: UserProfileData = {

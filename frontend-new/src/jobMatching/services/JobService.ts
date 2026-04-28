@@ -65,6 +65,7 @@ export default class JobService {
       serviceFunction: "listJobs",
       failureMessage: "Failed to fetch jobs",
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<JobsApiResponse>(body, errorFactory);

@@ -8,9 +8,11 @@ type IsOnlineProviderProps = {
 };
 
 export const IsOnlineContext = createContext<boolean>(navigator.onLine);
+export const ReconnectVersionContext = createContext<number>(0);
 
 export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [reconnectVersion, setReconnectVersion] = useState(0);
   const renderCount = useRef(0);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { t } = useTranslation();
@@ -63,6 +65,7 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
       });
     } else {
       if (wasOffline) {
+        setReconnectVersion((value) => value + 1);
         enqueueSnackbar(t("app.isOnlineProvider.backOnline"), {
           variant: "success",
           key: SNACKBAR_KEYS.ONLINE_SUCCESS,
@@ -75,5 +78,9 @@ export const IsOnlineProvider: React.FC<IsOnlineProviderProps> = ({ children }) 
     }
   }, [isOnline, closeSnackbar, enqueueSnackbar, wasOffline, t]);
 
-  return <IsOnlineContext.Provider value={isOnline}>{children}</IsOnlineContext.Provider>;
+  return (
+    <IsOnlineContext.Provider value={isOnline}>
+      <ReconnectVersionContext.Provider value={reconnectVersion}>{children}</ReconnectVersionContext.Provider>
+    </IsOnlineContext.Provider>
+  );
 };

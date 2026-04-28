@@ -6,6 +6,8 @@ import { routerPaths } from "src/app/routerPaths";
 import CareerReadinessChat from "src/careerReadiness/components/CareerReadinessAgentMessage/CareerReadinessChat/CareerReadinessChat";
 import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
 import type { ModuleSummary } from "src/careerReadiness/types";
+import ErrorPage from "src/error/errorPage/ErrorPage";
+import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import ModuleHandoffBanner from "src/home/components/ModuleHandoffBanner/ModuleHandoffBanner";
 import { useNextModule } from "src/home/useNextModule";
@@ -25,12 +27,17 @@ const CareerReadinessModule: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moduleCompleted, setModuleCompleted] = useState(false);
+  const [conversationLoadError, setConversationLoadError] = useState<unknown>(null);
   const topLevelNextModule = useNextModule("job_readiness");
 
   // Read modules from shared context — already fetched by UserProfileProvider
-  const { profileData } = useUserProfileContext();
+  const { profileData, errors } = useUserProfileContext();
   const siblingModules = profileData.modules;
   const moduleDetail: ModuleSummary | null = siblingModules.find((m) => m.id === moduleId) ?? null;
+  const modulesLoadError = Boolean(errors?.modules);
+  const modulesConnectionError = isConnectionError(errors?.modules);
+  const hasConversationLoadError = Boolean(conversationLoadError);
+  const conversationConnectionError = isConnectionError(conversationLoadError);
 
   const sortedSiblings = useMemo(
     () => [...siblingModules].sort((a, b) => a.sort_order - b.sort_order),
@@ -60,6 +67,7 @@ const CareerReadinessModule: React.FC = () => {
     }
     setConversationId(null);
     setModuleCompleted(false);
+    setConversationLoadError(null);
 
     // moduleDetail comes from context — no getModule() call needed.
     // If context hasn't loaded yet (e.g. direct navigation), wait for it via the effect dep.
@@ -74,8 +82,11 @@ const CareerReadinessModule: React.FC = () => {
         setConversationId(res.conversation_id);
       }
     } catch (convError) {
-      console.error("Failed to start conversation", convError);
-      enqueueSnackbar((convError as Error)?.message ?? t("careerReadiness.listError"), { variant: "error" });
+      setConversationLoadError(convError);
+      if (!isConnectionError(convError)) {
+        console.error("Failed to start conversation", convError);
+        enqueueSnackbar((convError as Error)?.message ?? t("careerReadiness.listError"), { variant: "error" });
+      }
     }
   }, [moduleId, moduleDetail, t, enqueueSnackbar, navigate]);
 
@@ -84,6 +95,19 @@ const CareerReadinessModule: React.FC = () => {
   }, [loadModuleAndConversation]);
 
   const subNavTitle = moduleDetail ? t("careerReadiness.subNavTitle", { number: moduleNumber }) : "";
+
+  if (modulesLoadError || hasConversationLoadError) {
+    return (
+      <ErrorPage
+        errorMessage={
+          modulesConnectionError || conversationConnectionError
+            ? t("common.errors.api.serverConnectionError")
+            : t("error.errorPage.defaultMessage")
+        }
+        showRefreshButton
+      />
+    );
+  }
 
   return (
     <Box

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import type { ModuleSummary } from "src/careerReadiness/types";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import HomeJobReadyListSkeleton from "./HomeJobReadyListSkeleton";
 import JobReadyListRow from "./JobReadyListRow";
 
@@ -30,9 +31,10 @@ export interface HomeJobReadyListProps {
   modules: ModuleSummary[];
   isLoading: boolean;
   loadError: boolean;
+  loadErrorMessage?: string;
 }
 
-const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading, loadError }) => {
+const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading, loadError, loadErrorMessage }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -68,9 +70,20 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
   if (loadError || sorted.length === 0) {
     return (
       <Box data-testid={DATA_TEST_ID.HOME_JOB_READY}>
-        <Typography variant="body2" color="text.primary">
-          {loadError ? t("home.jobReadySection.loadError") : t("home.jobReadySection.empty")}
-        </Typography>
+        {loadError ? (
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }}>
+            <Typography variant="body2" color="error.main">
+              {loadErrorMessage ?? t("home.jobReadySection.loadError")}
+            </Typography>
+            <PrimaryButton onClick={() => globalThis.location.reload()}>
+              {t("error.errorPage.refreshButton")}
+            </PrimaryButton>
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.primary">
+            {t("home.jobReadySection.empty")}
+          </Typography>
+        )}
       </Box>
     );
   }

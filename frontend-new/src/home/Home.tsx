@@ -2,6 +2,8 @@ import React from "react";
 
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
+import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
 import HomeHero from "src/home/components/HomeHero/HomeHero";
 import HomeCtaGrid from "src/home/components/HomeCtaGrid/HomeCtaGrid";
@@ -19,11 +21,16 @@ export const DATA_TEST_ID = {
 
 const Home: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const { profileData, isLoadingModules, errors } = useUserProfileContext();
 
   const modulesLoadError = Boolean(errors?.modules);
+  const modulesConnectionError = isConnectionError(errors?.modules);
   const careerReadinessModules = profileData?.modules ?? [];
+  const moduleErrorMessage = modulesConnectionError
+    ? t("common.errors.api.serverConnectionError")
+    : t("error.errorPage.defaultMessage");
 
   return (
     <Box
@@ -112,6 +119,7 @@ const Home: React.FC = () => {
                 modules={careerReadinessModules}
                 isLoading={isLoadingModules}
                 loadError={modulesLoadError}
+                loadErrorMessage={moduleErrorMessage}
               />
             </Box>
             <Box sx={{ minWidth: 0 }}>

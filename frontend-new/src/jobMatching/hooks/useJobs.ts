@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import JobService from "src/jobMatching/services/JobService";
 import type { JobApiDocument, JobFilters, JobRow, JobSortDir, JobSortKey } from "src/jobMatching/types";
 
@@ -34,7 +35,7 @@ const mapSortKeyToApiField = (key: JobSortKey): "title" | "category" | "location
 export interface UseJobsResult {
   jobs: JobRow[];
   loading: boolean;
-  error: string | null;
+  error: unknown;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   page: number;
@@ -48,12 +49,13 @@ export interface UseJobsResult {
 }
 
 export function useJobs(filters: JobFilters): UseJobsResult {
+  const reconnectVersion = useContext(ReconnectVersionContext);
   const [cursorStack, setCursorStack] = useState<(string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [sortKey, setSortKey] = useState<JobSortKey | null>("posted");
   const [sortDir, setSortDir] = useState<JobSortDir>("desc");
 
@@ -88,7 +90,7 @@ export function useJobs(filters: JobFilters): UseJobsResult {
         }
       } catch (e: unknown) {
         if (!cancelled) {
-          setError(e instanceof Error ? e.message : "Failed to load jobs");
+          setError(e);
           setJobs([]);
           setNextCursor(null);
         }
@@ -110,6 +112,7 @@ export function useJobs(filters: JobFilters): UseJobsResult {
     filters.location,
     sortKey,
     sortDir,
+    reconnectVersion,
   ]);
 
   const onSortChange = useCallback((key: JobSortKey, dir?: JobSortDir) => {
