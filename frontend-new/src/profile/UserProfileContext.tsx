@@ -34,6 +34,7 @@ const defaultUserProfileContext: UseUserProfileResult = {
     modules: null,
     careerExplorer: null,
   },
+  refreshModules: () => {},
 };
 
 export const UserProfileContext = createContext<UseUserProfileResult>(defaultUserProfileContext);

@@ -65,6 +65,7 @@ const makeProfileContext = (programmeSkills: string[]): UseUserProfileResult => 
     modules: null,
     careerExplorer: null,
   },
+  refreshModules: () => {},
 });
 
 const meta: Meta<typeof HomeSidebar> = {

@@ -31,7 +31,7 @@ const CareerReadinessModule: React.FC = () => {
   const topLevelNextModule = useNextModule("job_readiness");
 
   // Read modules from shared context — already fetched by UserProfileProvider
-  const { profileData, errors } = useUserProfileContext();
+  const { profileData, errors, refreshModules } = useUserProfileContext();
   const siblingModules = profileData.modules;
   const moduleDetail: ModuleSummary | null = siblingModules.find((m) => m.id === moduleId) ?? null;
   const modulesLoadError = Boolean(errors?.modules);
@@ -58,7 +58,8 @@ const CareerReadinessModule: React.FC = () => {
   const handleModuleCompleted = useCallback(() => {
     enqueueSnackbar(t("careerReadiness.moduleComplete"), { variant: "success" });
     setModuleCompleted(true);
-  }, [t, enqueueSnackbar]);
+    refreshModules();
+  }, [t, enqueueSnackbar, refreshModules]);
 
   const loadModuleAndConversation = useCallback(async () => {
     if (!moduleId) {

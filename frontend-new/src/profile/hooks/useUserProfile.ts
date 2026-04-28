@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { fetchSkills } from "./utils/fetchSkills";
 import { Skill } from "src/experiences/experienceService/experiences.types";
@@ -42,6 +42,7 @@ export interface UseUserProfileResult {
     modules: Error | null;
     careerExplorer: Error | null;
   };
+  refreshModules: () => void;
 }
 
 /**
@@ -238,37 +239,50 @@ export const useUserProfile = (): UseUserProfileResult => {
     fetchProfileAndSkills();
   }, []);
 
-  // Effect 5: GET /users/me/progress — chat progress % + modules + sector engagement (3 old calls → 1)
-  useEffect(() => {
-    const fetchProgress = async () => {
+  const fetchProgress = useCallback(
+    async (opts: { setLoading: boolean } = { setLoading: true }) => {
       if (!authenticationStateService.getInstance().getUser()) {
         console.warn("useUserProfile: no authenticated user, skipping progress fetch");
-        setIsLoadingModules(false);
-        setIsLoadingCareerExplorer(false);
+        if (opts.setLoading) {
+          setIsLoadingModules(false);
+          setIsLoadingCareerExplorer(false);
+        }
         return;
       }
-
-      try {
+      if (opts.setLoading) {
         setIsLoadingModules(true);
         setIsLoadingCareerExplorer(true);
         setErrors((prev) => ({ ...prev, modules: null, careerExplorer: null }));
-
+      }
+      try {
         const progressResponse = await UserMeService.getInstance().getProgress(activeSessionId);
-
         setSkillsInterestsProgress(progressResponse.skills_interests_progress);
         setModules(progressResponse.career_readiness_modules);
         setCareerExplorerSectors(progressResponse.sector_engagement);
       } catch (error) {
         console.error("Error fetching user progress:", error);
-        setErrors((prev) => ({ ...prev, modules: error as Error, careerExplorer: error as Error }));
+        if (opts.setLoading) {
+          setErrors((prev) => ({ ...prev, modules: error as Error, careerExplorer: error as Error }));
+        }
       } finally {
-        setIsLoadingModules(false);
-        setIsLoadingCareerExplorer(false);
+        if (opts.setLoading) {
+          setIsLoadingModules(false);
+          setIsLoadingCareerExplorer(false);
+        }
       }
-    };
+    },
+    [activeSessionId]
+  );
 
-    fetchProgress();
-  }, [activeSessionId, reconnectVersion]);
+  // Effect 5: GET /users/me/progress — chat progress % + modules + sector engagement (3 old calls → 1)
+  // reconnectVersion triggers a re-fetch when the app comes back online
+  useEffect(() => {
+    fetchProgress({ setLoading: true });
+  }, [fetchProgress, reconnectVersion]);
+
+  const refreshModules = useCallback(() => {
+    fetchProgress({ setLoading: false });
+  }, [fetchProgress]);
 
   // Combine all data into a single profile object
   const profileData: UserProfileData = {
@@ -306,5 +320,6 @@ export const useUserProfile = (): UseUserProfileResult => {
     isLoadingModules,
     isLoadingCareerExplorer,
     errors,
+    refreshModules,
   };
 };
