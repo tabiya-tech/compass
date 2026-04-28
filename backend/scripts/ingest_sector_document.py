@@ -19,7 +19,7 @@ Usage (all sectors):
 Environment:
   CAREER_EXPLORER_MONGODB_URI, CAREER_EXPLORER_DATABASE_NAME - for the database
   CAREER_EXPLORER_CONFIG - JSON with sectors, country (sectors list used for --ingest-all)
-  VERTEX_API_REGION - for embeddings
+  VERTEX_API_EMBEDDINGS_REGION - for embeddings
   EMBEDDINGS_MODEL_NAME - same as app config for consistency
 """
 import argparse

@@ -34,7 +34,7 @@ from app.i18n.translation_service import t
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.utils import extract_grounding_metadata_from_genai_response
-from common_libs.llm.models_utils import DEFAULT_VERTEX_API_REGION, LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
+from common_libs.llm.models_utils import DEFAULT_VERTEX_API_GEN_AI_REGION, LLMConfig, LOW_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
 from common_libs.llm.schema_builder import with_response_schema
 
 
@@ -185,7 +185,7 @@ class NonPrioritySectorExplorer:
         contents = _llm_input_to_contents(llm_input)
 
         project = os.getenv("GOOGLE_CLOUD_PROJECT")
-        location = os.getenv("VERTEX_API_REGION") or DEFAULT_VERTEX_API_REGION
+        location = os.getenv("VERTEX_API_GEN_AI_REGION") or DEFAULT_VERTEX_API_GEN_AI_REGION
         client = genai.Client(
             vertexai=True,
             project=project,

@@ -17,14 +17,15 @@ logger = logging.getLogger(__name__)
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize the default region for the Vertex AI client
+# Initialize the default region for the Vertex AI generative-AI client.
+# Embeddings use a separate region (VERTEX_API_EMBEDDINGS_REGION) — see GoogleEmbeddingService.
 
-DEFAULT_VERTEX_API_REGION = os.getenv("VERTEX_API_REGION")
-if not DEFAULT_VERTEX_API_REGION:
-    logging.warning("Default Vertex AI region is not set. Using 'us-central1' as the default region.")
-    DEFAULT_VERTEX_API_REGION = "us-central1"
+DEFAULT_VERTEX_API_GEN_AI_REGION = os.getenv("VERTEX_API_GEN_AI_REGION")
+if not DEFAULT_VERTEX_API_GEN_AI_REGION:
+    logging.warning("VERTEX_API_GEN_AI_REGION is not set. Using 'us-central1' as the default region.")
+    DEFAULT_VERTEX_API_GEN_AI_REGION = "us-central1"
 else:
-    logging.debug("Default Vertex AI region is %s", DEFAULT_VERTEX_API_REGION)
+    logging.info("Default Vertex AI gen-AI region is %s", DEFAULT_VERTEX_API_GEN_AI_REGION)
 
 DEFAULT_GENERATION_CONFIG = {
     "temperature": 0.1,
@@ -149,7 +150,7 @@ class LLMConfig(BaseModel):
     Configuration for the LLM.
     """
     language_model_name: str = AgentsConfig.default_model
-    location: str = DEFAULT_VERTEX_API_REGION
+    location: str = DEFAULT_VERTEX_API_GEN_AI_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     safety_settings: frozenset[SafetySetting] = DEFAULT_SAFETY_SETTINGS
     retry_config: RetryConfigWithExponentialBackOff = DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF
@@ -214,6 +215,8 @@ class BasicLLM(LLM):
     def __init__(self, *, config: LLMConfig = LLMConfig()):
         # Before constructing the llm model, we need to initialize the VertexAI client
         # as the init function may have been called in another module with different parameters
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info("Initializing VertexAI client with location: %s", config.location)
         vertexai.init(location=config.location)
         self._retry_config = config.retry_config
         self._model = None
