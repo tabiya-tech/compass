@@ -22,7 +22,8 @@
       "yes": "Inde",
       "no": "Ayi",
       "skip": "Siya",
-      "yesExit": "Inde, pitani"
+      "yesExit": "Inde, pitani",
+      "rebuildProfile": "Jambulani mbiri yanu kuchokera ku CV yanu"
     },
     "fields": {
       "email": "Imelo",

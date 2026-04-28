@@ -7,6 +7,7 @@ import NavBar from "src/navigation/NavBar/NavBar";
 import SubNavBar from "src/navigation/SubNavBar/SubNavBar";
 import { UserProfileProvider } from "src/profile/UserProfileContext";
 import { ExperiencesDrawerProvider } from "src/experiences/ExperiencesDrawerProvider";
+import { RebuildProfileProvider } from "src/chat/RebuildProfileContext";
 
 export interface RouteHandle {
   title?: string;
@@ -47,36 +48,38 @@ const Layout: React.FC = () => {
 
   return (
     <UserProfileProvider>
-      <ExperiencesDrawerProvider>
-        <Box
-          display="flex"
-          flexDirection="column"
-          height="100vh"
-          sx={(theme) => ({
-            "--layout-content-max-width": "80rem",
-            "--layout-gutter-x": {
-              xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
-              md: theme.spacing(theme.tabiyaSpacing.xl),
-            },
-          })}
-        >
-          <Box sx={{ flexShrink: 0 }}>
-            <NavBar headerColor={headerColor} />
-            {currentHandle?.title && currentHandle?.subtitle && (
-              <SubNavBar
-                title={t(currentHandle.title as TranslationKey)}
-                subtitle={t(currentHandle.subtitle as TranslationKey)}
-                headerColor={headerColor}
-                backLabelKey={currentHandle.backLabelKey as TranslationKey | undefined}
-                backTo={currentHandle.backTo}
-              />
-            )}
+      <RebuildProfileProvider>
+        <ExperiencesDrawerProvider>
+          <Box
+            display="flex"
+            flexDirection="column"
+            height="100vh"
+            sx={(theme) => ({
+              "--layout-content-max-width": "80rem",
+              "--layout-gutter-x": {
+                xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                md: theme.spacing(theme.tabiyaSpacing.xl),
+              },
+            })}
+          >
+            <Box sx={{ flexShrink: 0 }}>
+              <NavBar headerColor={headerColor} />
+              {currentHandle?.title && currentHandle?.subtitle && (
+                <SubNavBar
+                  title={t(currentHandle.title as TranslationKey)}
+                  subtitle={t(currentHandle.subtitle as TranslationKey)}
+                  headerColor={headerColor}
+                  backLabelKey={currentHandle.backLabelKey as TranslationKey | undefined}
+                  backTo={currentHandle.backTo}
+                />
+              )}
+            </Box>
+            <Box display="flex" flexDirection="column" flex={1} minHeight={0}>
+              <Outlet />
+            </Box>
           </Box>
-          <Box display="flex" flexDirection="column" flex={1} minHeight={0}>
-            <Outlet />
-          </Box>
-        </Box>
-      </ExperiencesDrawerProvider>
+        </ExperiencesDrawerProvider>
+      </RebuildProfileProvider>
     </UserProfileProvider>
   );
 };

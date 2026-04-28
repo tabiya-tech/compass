@@ -22,6 +22,7 @@ from app.users.sensitive_personal_data.routes import get_sensitive_personal_data
 from app.users.sensitive_personal_data.service import ISensitivePersonalDataService
 from app.users.sensitive_personal_data.types import SensitivePersonalDataRequirement
 from app.users.generate_session_id import generate_new_session_id
+from app.users.sessions import SessionsService
 from app.users.types import UserPreferencesUpdateRequest, UserPreferences, \
     CreateUserPreferencesRequest, UserPreferencesRepositoryUpdateRequest, UsersPreferencesResponse
 
@@ -157,6 +158,41 @@ async def _create_user_preferences(
             raise e
 
         raise HTTPException(status_code=500, detail="failed to create user preferences")
+
+
+async def _get_new_session(user_repository: UserPreferenceRepository,
+                           user_feedback_service: UserFeedbackService,
+                           sensitive_personal_data_service: ISensitivePersonalDataService,
+                           user_id: str,
+                           authed_user: UserInfo) -> UsersPreferencesResponse:
+    """
+    Get a new session for the user
+    :param user_id:  id of the user
+    :param authed_user: authenticated user
+    :return: UserPreferences - with the new session
+    """
+    try:
+        # Check if the user is the same as the authenticated user
+        if user_id != authed_user.user_id:
+            raise HTTPException(status_code=403, detail="forbidden")
+
+        session_service = SessionsService(user_repository)
+
+        updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
+            session_service.new_session(user_id),
+            user_feedback_service.get_answered_questions(user_id),
+            sensitive_personal_data_service.exists_by_user_id(user_id)
+        )
+
+        return UsersPreferencesResponse(
+            **updated_user_preferences.model_dump(),
+            has_sensitive_personal_data=has_sensitive_personal_data,
+            user_feedback_answered_questions=sessions_with_feedback
+        )
+
+    except Exception as e:
+        ErrorService.handle(__name__, e)
+        raise HTTPException(status_code=500, detail="Oops! something went wrong")
 
 
 async def _update_user_preferences(
@@ -333,6 +369,37 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
             request,
             user_info
         )
+
+    #########################
+    # GET /new-session - Get a new session for the user
+    #########################
+    @router.get("/new-session",
+                response_model=UsersPreferencesResponse,
+                status_code=201,
+                responses={403: {"model": HTTPErrorResponse}, 500: {"model": HTTPErrorResponse}},
+                description="""Endpoint for starting a new conversation session.""")
+    async def _get_new_session_handler(user_id: str, user_info: UserInfo = Depends(auth.get_user_info()),
+                                       user_preference_repository: UserPreferenceRepository = Depends(
+                                           get_user_preferences_repository),
+                                       sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
+                                           get_sensitive_personal_data_service),
+                                       user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
+                                       ) -> UsersPreferencesResponse:
+        """
+        Endpoint for starting a new conversation session.
+        The function creates a new session id and adds it to the user sessions on the top of the list.
+
+        :param user_info: UserInfo - The logged-in user information
+        :return: UserPreferences - The updated user preferences
+        """
+        # set the user id context variable.
+        user_id_ctx_var.set(user_id)
+
+        return await _get_new_session(user_preference_repository,
+                                      user_feedback_service,
+                                      sensitive_personal_data_service,
+                                      user_id,
+                                      user_info)
 
     #########################
     # Add the router to the users router

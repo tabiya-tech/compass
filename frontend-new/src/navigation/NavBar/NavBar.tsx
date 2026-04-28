@@ -25,6 +25,7 @@ import {
   Bug,
   LogOut,
   UserPlus,
+  RefreshCw,
 } from "lucide-react";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
@@ -37,6 +38,7 @@ import { parseEnvSupportedLocales } from "src/i18n/languageContextMenu/parseEnvS
 import { LocalesLabels } from "src/i18n/constants";
 import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
+import { useRebuildProfile } from "src/chat/RebuildProfileContext";
 
 const uniqueId = "c3a8f1d2-7b4e-4c9a-a5d6-8e3f2b1c0d9e";
 
@@ -63,6 +65,7 @@ export const MENU_ITEM_ID = {
   VIEW_EXPERIENCES: `navbar-view-experiences-${uniqueId}`,
   PATHWAYS: `navbar-mobile-pathways-${uniqueId}`,
   MOBILE_LANGUAGE: `navbar-mobile-language-${uniqueId}`,
+  REBUILD_PROFILE: `navbar-rebuild-profile-${uniqueId}`,
 };
 
 export interface NavBarProps {
@@ -95,6 +98,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   const isOnline = useContext(IsOnlineContext);
   const { sentryEnabled, openFeedbackForm } = useSentryFeedbackForm();
   const { openExperiencesDrawer } = useExperiencesDrawer();
+  const { triggerRebuildProfile } = useRebuildProfile();
 
   const user = authenticationStateService.getInstance().getUser();
   const isAnonymous = !user?.name || !user?.email;
@@ -207,6 +211,17 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
             },
           ]
         : []),
+      ...(triggerRebuildProfile
+        ? [
+            {
+              id: MENU_ITEM_ID.REBUILD_PROFILE,
+              text: t("common.buttons.rebuildProfile" as any),
+              icon: <RefreshCw size={18} />,
+              disabled: !isOnline,
+              action: triggerRebuildProfile,
+            },
+          ]
+        : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: t("common.buttons.logout"),
@@ -227,6 +242,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
       handleLogout,
       navigateToProfile,
       handleViewExperiences,
+      triggerRebuildProfile,
     ]
   );
 
@@ -309,6 +325,17 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
             },
           ]
         : []),
+      ...(triggerRebuildProfile
+        ? [
+            {
+              id: MENU_ITEM_ID.REBUILD_PROFILE,
+              text: t("common.buttons.rebuildProfile" as any).toLowerCase(),
+              icon: <RefreshCw size={18} />,
+              disabled: !isOnline,
+              action: triggerRebuildProfile,
+            },
+          ]
+        : []),
       {
         id: MENU_ITEM_ID.LOGOUT_BUTTON,
         text: t("common.buttons.logout").toLowerCase(),
@@ -333,6 +360,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     anchorEl,
     handleLogout,
     hasMultipleLocales,
+    triggerRebuildProfile,
   ]);
 
   const getNavLinkSx = (isActive: boolean, disabled = false) => ({

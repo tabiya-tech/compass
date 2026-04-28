@@ -186,6 +186,46 @@ export default class UserPreferencesService {
   }
 
   /**
+   * Gets a new session for the user
+   * @returns {Promise<UserPreference>} The user preferences object with the new session
+   * @throws {RestAPIError} If the new session could not be created
+   */
+  async getNewSession(userId: string): Promise<UserPreference> {
+    const serviceName = UserPreferencesService.serviceName;
+    const serviceFunction = "getNewSession";
+    const method = "GET";
+    const qualifiedURL = `${this.userPreferencesEndpointUrl}/new-session?user_id=${userId}`;
+    const errorFactory = getRestAPIErrorFactory("UserPreferencesService", "getNewSession", method, qualifiedURL);
+
+    const response = await customFetch(qualifiedURL, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      expectedStatusCode: [StatusCodes.CREATED],
+      serviceName: serviceName,
+      serviceFunction: serviceFunction,
+      failureMessage: `Failed to get new session for user with id ${userId}`,
+      expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
+    });
+
+    const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);
+
+    const clientId = this.getClientID();
+
+    // If the user preferences do not have a client_id, we will set it to the current client ID.
+    // Or if the client_id has changed.
+    // This can happen if the user is opening the app on a different device or browser.
+    // We will update the user preferences with the current client ID.
+    if (!userPreferences.client_id || userPreferences.client_id !== clientId) {
+      await this.updateUserPreferences({ user_id: userId, client_id: clientId });
+    }
+
+    return userPreferences;
+  }
+
+  /**
    * Gets the client ID. If it doesn't exist, it will be created.
    *
    * @returns {string} The client ID.

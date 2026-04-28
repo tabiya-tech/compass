@@ -22,7 +22,8 @@
       "yes": "Ndio",
       "no": "Hapana",
       "skip": "Ruka",
-      "yesExit": "Ndio, toka"
+      "yesExit": "Ndio, toka",
+      "rebuildProfile": "Jenga wasifu upya"
     },
     "fields": {
       "email": "Barua pepe",

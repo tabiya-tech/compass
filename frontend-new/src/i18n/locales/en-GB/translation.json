@@ -22,7 +22,8 @@
       "yes": "Yes",
       "no": "No",
       "skip": "Skip",
-      "yesExit": "Yes, exit"
+      "yesExit": "Yes, exit",
+      "rebuildProfile": "Rebuild Profile"
     },
     "fields": {
       "email": "Email",
