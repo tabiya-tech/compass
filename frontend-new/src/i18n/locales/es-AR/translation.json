@@ -909,6 +909,8 @@
     "quizFailedInline": "No aprobaste. Podés volver a hacer el quiz.",
     "quizCorrectAnswersSummary": "Respuestas correctas: {{answers}}",
     "quizPassedAgentMessage": "Obtuviste {{score}}/{{total}}. ¡Felicitaciones, aprobaste! Ahora podés seguir haciéndome preguntas de seguimiento sobre este tema.",
+    "quizShowAnswers": "Mostrar respuestas",
+    "quizHideAnswers": "Ocultar respuestas",
     "quizWrongAnswersTitle": "Revisá las respuestas incorrectas",
     "quizCorrectAnswer": "Respuesta correcta",
     "quizYourAnswer": "Tu respuesta",

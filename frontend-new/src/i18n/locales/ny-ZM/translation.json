@@ -854,6 +854,8 @@
     "quizFailedInline": "Munadana. Mungachitanso quiz.",
     "quizCorrectAnswersSummary": "Mayankho olondola: {{answers}}",
     "quizPassedAgentMessage": "Mwapeza {{score}}/{{total}}. Mwayamikirika, mwapasa! Tsopano mungapitirize kundifunsa mafunso ena okhudza mutu uwu.",
+    "quizShowAnswers": "Sonyeza mayankho",
+    "quizHideAnswers": "Bisa mayankho",
     "quizWrongAnswersTitle": "Onani mayankho olakwika",
     "quizCorrectAnswer": "Yankho lobwino",
     "quizYourAnswer": "Yankho lanu",

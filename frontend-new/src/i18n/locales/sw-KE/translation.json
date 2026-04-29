@@ -854,6 +854,8 @@
     "quizFailedInline": "Hukufaulu. Unaweza kuchukua jaribio tena.",
     "quizCorrectAnswersSummary": "Majibu sahihi: {{answers}}",
     "quizPassedAgentMessage": "Ulipata {{score}}/{{total}}. Hongera, umefaulu! Sasa unaweza kuendelea kuniuliza maswali ya kufuatilia kuhusu mada hii.",
+    "quizShowAnswers": "Onyesha majibu",
+    "quizHideAnswers": "Ficha majibu",
     "quizWrongAnswersTitle": "Kagua majibu yasiyo sahihi",
     "quizCorrectAnswer": "Jibu sahihi",
     "quizYourAnswer": "Jibu lako",

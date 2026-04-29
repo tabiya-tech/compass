@@ -1,5 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Card, FormControlLabel, LinearProgress, Radio, RadioGroup, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Card,
+  Collapse,
+  FormControlLabel,
+  LinearProgress,
+  Radio,
+  RadioGroup,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useTranslation } from "react-i18next";
 import ArrowBackIosNewOutlined from "@mui/icons-material/ArrowBackIosNewOutlined";
 import ArrowForwardIosOutlined from "@mui/icons-material/ArrowForwardIosOutlined";
@@ -70,6 +82,7 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
     return {};
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   useEffect(() => {
     if (initialAnswers && Object.keys(initialAnswers).length > 0) {
@@ -284,61 +297,72 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
 
                 {submissionResult.questionResults?.some((r) => !r.is_correct) && (
                   <Box>
-                    <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>
-                      {t("careerReadiness.quizWrongAnswersTitle")}
-                    </Typography>
-                    {submissionResult.questionResults
-                      .filter((r) => !r.is_correct)
-                      .map((r) => {
-                        const q = questions[r.question_index - 1];
-                        if (!q) return null;
-                        const userAnswer = lastAnswers?.[r.question_index];
-                        return (
-                          <Box key={r.question_index} sx={{ mb: 2 }}>
-                            <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
-                              {q.question}
-                            </Typography>
-                            {q.options.map((opt) => {
-                              const { key } = parseOption(opt);
-                              const isCorrect = key === r.correct_answer;
-                              const isWrong = key === userAnswer && !isCorrect;
-                              return (
-                                <Box
-                                  key={key}
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1,
-                                    px: 1,
-                                    py: 0.5,
-                                    my: 0.25,
-                                    borderRadius: 1,
-                                    bgcolor: isCorrect
-                                      ? theme.palette.success.light
-                                      : isWrong
-                                        ? theme.palette.error.light
-                                        : "transparent",
-                                  }}
-                                >
-                                  <Typography variant="body2" sx={{ flex: 1 }}>
-                                    {opt}
-                                  </Typography>
-                                  {isCorrect && (
-                                    <Typography variant="caption" color="success.dark" sx={{ whiteSpace: "nowrap" }}>
-                                      {t("careerReadiness.quizCorrectAnswer")}
+                    <PrimaryButton
+                      variant="text"
+                      size="small"
+                      onClick={() => setShowAnswers((prev) => !prev)}
+                      endIcon={showAnswers ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                      sx={{ mb: 1, px: 0 }}
+                    >
+                      {showAnswers ? t("careerReadiness.quizHideAnswers") : t("careerReadiness.quizShowAnswers")}
+                    </PrimaryButton>
+                    <Collapse in={showAnswers}>
+                      <Typography variant="body2" fontWeight="bold" sx={{ mb: 1 }}>
+                        {t("careerReadiness.quizWrongAnswersTitle")}
+                      </Typography>
+                      {submissionResult.questionResults
+                        .filter((r) => !r.is_correct)
+                        .map((r) => {
+                          const q = questions[r.question_index - 1];
+                          if (!q) return null;
+                          const userAnswer = lastAnswers?.[r.question_index];
+                          return (
+                            <Box key={r.question_index} sx={{ mb: 2 }}>
+                              <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
+                                {q.question}
+                              </Typography>
+                              {q.options.map((opt) => {
+                                const { key } = parseOption(opt);
+                                const isCorrect = key === r.correct_answer;
+                                const isWrong = key === userAnswer && !isCorrect;
+                                return (
+                                  <Box
+                                    key={key}
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 1,
+                                      px: 1,
+                                      py: 0.5,
+                                      my: 0.25,
+                                      borderRadius: 1,
+                                      bgcolor: isCorrect
+                                        ? theme.palette.success.light
+                                        : isWrong
+                                          ? theme.palette.error.light
+                                          : "transparent",
+                                    }}
+                                  >
+                                    <Typography variant="body2" sx={{ flex: 1 }}>
+                                      {opt}
                                     </Typography>
-                                  )}
-                                  {isWrong && (
-                                    <Typography variant="caption" color="error.dark" sx={{ whiteSpace: "nowrap" }}>
-                                      {t("careerReadiness.quizYourAnswer")}
-                                    </Typography>
-                                  )}
-                                </Box>
-                              );
-                            })}
-                          </Box>
-                        );
-                      })}
+                                    {isCorrect && (
+                                      <Typography variant="caption" color="success.dark" sx={{ whiteSpace: "nowrap" }}>
+                                        {t("careerReadiness.quizCorrectAnswer")}
+                                      </Typography>
+                                    )}
+                                    {isWrong && (
+                                      <Typography variant="caption" color="error.dark" sx={{ whiteSpace: "nowrap" }}>
+                                        {t("careerReadiness.quizYourAnswer")}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                );
+                              })}
+                            </Box>
+                          );
+                        })}
+                    </Collapse>
                   </Box>
                 )}
               </>

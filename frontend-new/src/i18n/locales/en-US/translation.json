@@ -848,6 +848,8 @@
     "quizFailedInline": "You failed. You can retake the quiz.",
     "quizCorrectAnswersSummary": "Correct answers: {{answers}}",
     "quizPassedAgentMessage": "You scored {{score}}/{{total}}. Congratulations, you passed! You can now continue to ask me any follow-up questions about this topic.",
+    "quizShowAnswers": "Show answers",
+    "quizHideAnswers": "Hide answers",
     "quizWrongAnswersTitle": "Review incorrect answers",
     "quizCorrectAnswer": "Correct answer",
     "quizYourAnswer": "Your answer",
