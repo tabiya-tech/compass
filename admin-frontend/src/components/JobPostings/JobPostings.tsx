@@ -204,16 +204,22 @@ const JobPostings: React.FC = () => {
             title={t("dashboard.jobPostings.stats.jobsSourced")}
             value={jobPostingStats.jobsSourced}
             subtitle={lastUpdatedSubtitle}
+            tooltip={t("dashboard.jobPostings.stats.jobsSourcedTooltip")}
           />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
-          <StatCard title={t("dashboard.jobPostings.stats.sectorsCovered")} value={jobPostingStats.sectorsCovered} />
+          <StatCard
+            title={t("dashboard.jobPostings.stats.sectorsCovered")}
+            value={jobPostingStats.sectorsCovered}
+            tooltip={t("dashboard.jobPostings.stats.sectorsCoveredTooltip")}
+          />
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <StatCard
             title={t("dashboard.jobPostings.stats.sourcePlatforms")}
             value={jobPostingStats.sourcePlatformsCount}
             subtitle={sourcePlatformsList}
+            tooltip={t("dashboard.jobPostings.stats.sourcePlatformsTooltip")}
           />
         </Grid>
       </Grid>

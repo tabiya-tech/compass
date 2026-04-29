@@ -142,6 +142,7 @@
     },
     "dailyAdoptionTrend": {
       "title": "Tendencia diaria de adopcion",
+      "titleTooltip": "New registrations and daily active users over the past 7 days. Helps track whether adoption is growing day to day.",
       "noData": "No hay datos disponibles",
       "newRegistrations": "Nuevos registros",
       "dailyActiveUsers": "Usuarios activos diarios"
@@ -150,16 +151,22 @@
       "institutionsActive": "Instituciones activas",
       "institutionsActiveSubtitle": "de {{total}} instituciones piloto",
       "institutionsActiveSubtitleNoTotal": "de instituciones piloto",
+      "institutionsActiveTooltip": "Pilot institutions that have at least one student registered on {{appName}}.",
       "totalStudentsRegistered": "Total de estudiantes registrados",
+      "totalStudentsRegisteredTooltip": "All students who have created a {{appName}} account to date, across every institution.",
       "activeStudents7Days": "Estudiantes activos (7 dias)",
       "activeStudents7DaysSubtitle": "{{pct}}% de los registrados",
-      "activeStudents7DaysSubtitleNoPct": "de los registrados"
+      "activeStudents7DaysSubtitleNoPct": "de los registrados",
+      "activeStudents7DaysTooltip": "Students who logged in or interacted with {{appName}} in the past 7 days."
     },
     "modules": {
       "titles": {
         "skillsDiscovery": "Construye tu perfil",
+        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
         "careerReadiness": "Preparación profesional",
-        "careerExplorer": "Rutas profesionales"
+        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerExplorer": "Rutas profesionales",
+        "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
       },
       "registeredStudents": "{{count}} estudiantes registrados",
       "started": "Iniciados",
@@ -204,9 +211,11 @@
     },
     "skillsAnalytics": {
       "supplyVsDemandTitle": "Skills Supply vs Labour Market Demand",
+      "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
       "topSkillsAmongStudents": "Top Skills Among Students",
       "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
       "gapBySectorTitle": "Skills Gap by Sector",
+      "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
       "avgGapLabel": "Avg. gap between student skills supply and labour market demand",
       "gapPp": "{{gap}}pp",
       "legend": {
@@ -228,8 +237,11 @@
     "jobPostings": {
       "stats": {
         "jobsSourced": "Empleos recopilados",
+        "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
         "sectorsCovered": "Sectores cubiertos",
+        "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
         "sourcePlatforms": "Plataformas de origen",
+        "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
         "lastUpdatedOn": "Actualizado el {{date}}"
       },
       "searchPlaceholder": "Buscar titulos de empleo...",
@@ -306,8 +318,10 @@
     },
     "stats": {
       "totalStudentsRegistered": "Total Students Registered",
+      "totalStudentsRegisteredTooltip": "Students from your institution who have created a {{appName}} account.",
       "activeStudents7Days": "Active Students (7 days)",
       "activeStudents7DaysSubtitle": "{{pct}}% of registered",
+      "activeStudents7DaysTooltip": "Students from your institution who logged in or interacted with {{appName}} in the past 7 days.",
       "avgProfileStrength": "Avg Profile Strength",
       "avgProfileStrengthSubtitle": "Up from 52% last week"
     },

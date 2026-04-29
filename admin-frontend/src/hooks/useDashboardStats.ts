@@ -21,11 +21,13 @@ function mapResponseToStats(data: DashboardStats): DashboardStatItem[] {
       titleKey: "dashboard.stats.institutionsActive",
       value: data.institutions_active,
       subtitleKey: "dashboard.stats.institutionsActiveSubtitle",
+      tooltipKey: "dashboard.stats.institutionsActiveTooltip",
     },
     {
       id: "totalStudentsRegistered",
       titleKey: "dashboard.stats.totalStudentsRegistered",
       value: data.total_students,
+      tooltipKey: "dashboard.stats.totalStudentsRegisteredTooltip",
     },
     {
       id: "activeStudents7Days",
@@ -33,6 +35,7 @@ function mapResponseToStats(data: DashboardStats): DashboardStatItem[] {
       value: data.active_students_7_days,
       subtitleKey: "dashboard.stats.activeStudents7DaysSubtitle",
       subtitleValues: pctOfRegistered === undefined ? undefined : { pct: pctOfRegistered },
+      tooltipKey: "dashboard.stats.activeStudents7DaysTooltip",
     },
   ];
 }

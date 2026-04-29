@@ -2,6 +2,7 @@ import React from "react";
 import { Box, LinearProgress, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { ModuleData } from "src/types";
+import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
 
 export interface ModuleCardProps {
   module: ModuleData;
@@ -33,9 +34,12 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
         gap={1}
         marginBottom={theme.fixedSpacing(theme.tabiyaSpacing.md)}
       >
-        <Typography variant="body1" sx={{ fontWeight: 700 }}>
-          {t(module.titleKey)}
-        </Typography>
+        <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+          <Typography variant="body1" sx={{ fontWeight: 700 }}>
+            {t(module.titleKey)}
+          </Typography>
+          {module.tooltipKey && <MetricInfoIcon title={t(module.tooltipKey)} />}
+        </Box>
         <Typography variant="body2" color="text.secondary">
           {t("dashboard.modules.registeredStudents", { count: module.totalStudents })}
         </Typography>

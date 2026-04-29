@@ -31,6 +31,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
     modules.push({
       id: "skills-discovery",
       titleKey: "dashboard.modules.titles.skillsDiscovery",
+      tooltipKey: "dashboard.modules.titles.skillsDiscoveryTooltip",
       totalStudents,
       summary: [
         {
@@ -70,6 +71,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
     modules.push({
       id: "career-readiness",
       titleKey: "dashboard.modules.titles.careerReadiness",
+      tooltipKey: "dashboard.modules.titles.careerReadinessTooltip",
       totalStudents,
       summary: [
         {
@@ -114,6 +116,7 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
     modules.push({
       id: "career-explorer",
       titleKey: "dashboard.modules.titles.careerExplorer",
+      tooltipKey: "dashboard.modules.titles.careerExplorerTooltip",
       totalStudents,
       summary: [
         {

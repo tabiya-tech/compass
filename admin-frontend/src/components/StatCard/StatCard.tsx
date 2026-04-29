@@ -1,13 +1,15 @@
 import React from "react";
 import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
+import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
 
 export interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
+  tooltip?: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, tooltip }) => {
   const theme = useTheme();
 
   return (
@@ -21,9 +23,12 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle }) => {
     >
       <CardContent sx={{ p: 2, "&:last-child": { p: 2 } }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="overline" color="text.secondary">
-            {title}
-          </Typography>
+          <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+            <Typography variant="overline" color="text.secondary">
+              {title}
+            </Typography>
+            {tooltip && <MetricInfoIcon title={tooltip} />}
+          </Box>
 
           <Typography variant="h6" component="div">
             {value}

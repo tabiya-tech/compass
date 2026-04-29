@@ -45,6 +45,7 @@ const InstructorDashboard: React.FC = () => {
       id: "totalStudentsRegistered",
       titleKey: "instructorDashboard.stats.totalStudentsRegistered",
       value: totalStudents?.value ?? 0,
+      tooltipKey: "instructorDashboard.stats.totalStudentsRegisteredTooltip",
     },
     {
       id: "activeStudents7Days",
@@ -52,6 +53,7 @@ const InstructorDashboard: React.FC = () => {
       value: activeStudents?.value ?? 0,
       subtitleKey: "instructorDashboard.stats.activeStudents7DaysSubtitle",
       subtitleValues: { pct },
+      tooltipKey: "instructorDashboard.stats.activeStudents7DaysTooltip",
     },
   ];
   const displayName = useMemo(
@@ -144,6 +146,7 @@ const InstructorDashboard: React.FC = () => {
                       title={t(stat.titleKey)}
                       value={stat.value}
                       subtitle={stat.subtitleKey ? t(stat.subtitleKey, stat.subtitleValues) : undefined}
+                      tooltip={stat.tooltipKey ? t(stat.tooltipKey) : undefined}
                     />
                   </Grid>
                 ))}

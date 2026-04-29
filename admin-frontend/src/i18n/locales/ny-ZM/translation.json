@@ -142,6 +142,7 @@
     },
     "dailyAdoptionTrend": {
       "title": "Mayendedwe a kugwiritsa ntchito tsiku ndi tsiku",
+      "titleTooltip": "New registrations and daily active users over the past 7 days. Helps track whether adoption is growing day to day.",
       "noData": "Palibe deta ilipo",
       "newRegistrations": "Olemba atsopano",
       "dailyActiveUsers": "Ogwiritsa ntchito a tsiku ndi tsiku"
@@ -150,16 +151,22 @@
       "institutionsActive": "Mabungwe ogwira ntchito",
       "institutionsActiveSubtitle": "mwa mabungwe oyesera {{total}}",
       "institutionsActiveSubtitleNoTotal": "mwa mabungwe oyesera",
+      "institutionsActiveTooltip": "Pilot institutions that have at least one student registered on {{appName}}.",
       "totalStudentsRegistered": "Chiwerengero cha ophunzira olembetsedwa",
+      "totalStudentsRegisteredTooltip": "All students who have created a {{appName}} account to date, across every institution.",
       "activeStudents7Days": "Ophunzira ogwira ntchito (masiku 7)",
       "activeStudents7DaysSubtitle": "{{pct}}% mwa olembetsedwa",
-      "activeStudents7DaysSubtitleNoPct": "mwa olembetsedwa"
+      "activeStudents7DaysSubtitleNoPct": "mwa olembetsedwa",
+      "activeStudents7DaysTooltip": "Students who logged in or interacted with {{appName}} in the past 7 days."
     },
     "modules": {
       "titles": {
         "skillsDiscovery": "Pangani mbiri yanu",
+        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
         "careerReadiness": "Kukonzekera Ntchito",
-        "careerExplorer": "Njira za ntchito"
+        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerExplorer": "Njira za ntchito",
+        "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
       },
       "registeredStudents": "{{count}} ophunzira olembetsedwa",
       "started": "Ayamba",
@@ -204,9 +211,11 @@
     },
     "skillsAnalytics": {
       "supplyVsDemandTitle": "Skills Supply vs Labour Market Demand",
+      "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
       "topSkillsAmongStudents": "Top Skills Among Students",
       "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
       "gapBySectorTitle": "Skills Gap by Sector",
+      "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
       "avgGapLabel": "Avg. gap between student skills supply and labour market demand",
       "gapPp": "{{gap}}pp",
       "legend": {
@@ -228,8 +237,11 @@
     "jobPostings": {
       "stats": {
         "jobsSourced": "Ntchito zosonkhanitsidwa",
+        "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
         "sectorsCovered": "Magawo ophimbidwa",
+        "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
         "sourcePlatforms": "Mapulatifomu oyambira",
+        "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
         "lastUpdatedOn": "Yasinthidwa pa {{date}}"
       },
       "searchPlaceholder": "Search job titles...",
@@ -306,8 +318,10 @@
     },
     "stats": {
       "totalStudentsRegistered": "Total Students Registered",
+      "totalStudentsRegisteredTooltip": "Students from your institution who have created a {{appName}} account.",
       "activeStudents7Days": "Active Students (7 days)",
       "activeStudents7DaysSubtitle": "{{pct}}% of registered",
+      "activeStudents7DaysTooltip": "Students from your institution who logged in or interacted with {{appName}} in the past 7 days.",
       "avgProfileStrength": "Avg Profile Strength",
       "avgProfileStrengthSubtitle": "Up from 52% last week"
     },

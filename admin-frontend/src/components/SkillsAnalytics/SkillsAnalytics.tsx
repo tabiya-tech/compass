@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { SkillsGapSectorData } from "src/types";
 import { useSkillGapStats } from "src/hooks/useSkillGapStats";
 import { useSkillsSupplyStats } from "src/hooks/useSkillsSupplyStats";
+import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
 
 interface SkillsAnalyticsProps {
   institution?: string;
@@ -75,9 +76,12 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
           flexWrap="wrap"
           gap={2}
         >
-          <Typography variant="body1" sx={{ fontWeight: 700 }}>
-            {t("dashboard.skillsAnalytics.supplyVsDemandTitle")}
-          </Typography>
+          <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+            <Typography variant="body1" sx={{ fontWeight: 700 }}>
+              {t("dashboard.skillsAnalytics.supplyVsDemandTitle")}
+            </Typography>
+            <MetricInfoIcon title={t("dashboard.skillsAnalytics.supplyVsDemandTitleTooltip")} />
+          </Box>
           <Box display="flex" gap={2}>
             <Select
               size="small"
@@ -240,9 +244,12 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
           gap={2}
         >
           <Box>
-            <Typography variant="body1" sx={{ fontWeight: 700, mb: 1 }}>
-              {t("dashboard.skillsAnalytics.gapBySectorTitle")}
-            </Typography>
+            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+              <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                {t("dashboard.skillsAnalytics.gapBySectorTitle")}
+              </Typography>
+              <MetricInfoIcon title={t("dashboard.skillsAnalytics.gapBySectorTitleTooltip")} />
+            </Box>
             <Box display="flex" gap={2}>
               <Box display="flex" alignItems="center" gap={0.5}>
                 <Box sx={{ width: 12, height: 12, borderRadius: 0.5, backgroundColor: theme.palette.secondary.main }} />

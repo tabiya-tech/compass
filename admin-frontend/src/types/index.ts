@@ -4,6 +4,7 @@ export interface DashboardStatItem {
   value: string | number;
   subtitleKey?: string;
   subtitleValues?: Record<string, string | number>;
+  tooltipKey?: string;
 }
 
 export interface InstitutionRow {
@@ -24,6 +25,7 @@ export interface InstructorDashboardStatItem {
   value: string | number;
   subtitleKey?: string;
   subtitleValues?: Record<string, string | number>;
+  tooltipKey?: string;
 }
 
 export interface InstructorStudentRow {
@@ -59,6 +61,7 @@ export interface ModuleBreakdownItem {
 export interface ModuleData {
   id: string;
   titleKey: string;
+  tooltipKey?: string;
   totalStudents: number;
   summary: ModuleSummaryRow[];
   breakdownType: "funnel" | "subModules" | "topSectors";

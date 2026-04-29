@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Skeleton, Typography, useTheme } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useTranslation } from "react-i18next";
+import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
 
 export interface DailyAdoptionTrendChartProps {
   labels?: string[];
@@ -30,16 +31,25 @@ const DailyAdoptionTrendChart: React.FC<DailyAdoptionTrendChartProps> = ({
         backgroundColor: theme.palette.background.paper,
       }}
     >
-      <Typography
-        variant="subtitle2"
+      <Box
         sx={{
-          fontWeight: 700,
-          color: theme.palette.text.secondary,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 0.5,
           marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
         }}
       >
-        {t("dashboard.dailyAdoptionTrend.title")}
-      </Typography>
+        <Typography
+          variant="subtitle2"
+          sx={{
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+          }}
+        >
+          {t("dashboard.dailyAdoptionTrend.title")}
+        </Typography>
+        <MetricInfoIcon title={t("dashboard.dailyAdoptionTrend.titleTooltip")} />
+      </Box>
 
       {loading ? (
         <Skeleton variant="rounded" width="100%" height={280} />

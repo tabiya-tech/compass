@@ -188,7 +188,12 @@ const Dashboard: React.FC = () => {
                     size={{ xs: 12, md: 4 }}
                     data-testid={DATA_TEST_ID.DASHBOARD_STAT_CARD}
                   >
-                    <StatCard title={t(stat.titleKey)} value={stat.value} subtitle={getStatSubtitle(stat)} />
+                    <StatCard
+                      title={t(stat.titleKey)}
+                      value={stat.value}
+                      subtitle={getStatSubtitle(stat)}
+                      tooltip={stat.tooltipKey ? t(stat.tooltipKey) : undefined}
+                    />
                   </Grid>
                 ))}
           </Grid>

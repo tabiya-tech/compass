@@ -23,3 +23,9 @@ export const ShownWithoutSubtitle: Story = {
     subtitle: undefined,
   },
 };
+
+export const WithTooltip: Story = {
+  args: {
+    tooltip: "Students who logged in or interacted with Compass in the past 7 days.",
+  },
+};
