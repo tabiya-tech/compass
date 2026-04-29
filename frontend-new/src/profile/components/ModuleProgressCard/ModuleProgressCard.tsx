@@ -10,22 +10,22 @@ export const DATA_TEST_ID = {
   MODULE_PROGRESS: (index: number) => `module-progress-${index}-${uniqueId}`,
 };
 
-export interface ModuleData {
-  id: string;
-  labelKey: string;
-  progress: number;
-}
-
 export interface ModuleProgressCardProps {
-  modules: ModuleData[];
+  overallProgress: number;
+  educationProgress: number;
+  workProgress: number;
 }
 
-export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules }) => {
+export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
+  overallProgress,
+  educationProgress,
+  workProgress,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
-
-  const module = modules[0];
-  const progress = module?.progress ?? 0;
+  const safeOverallProgress = Math.max(0, Math.min(100, overallProgress));
+  const safeEducationProgress = Math.max(0, Math.min(100, educationProgress));
+  const safeWorkProgress = Math.max(0, Math.min(100, workProgress));
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}>
@@ -56,11 +56,11 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
           {/* Main Giant Progress */}
           <Box>
             <Typography variant="h5" fontWeight="bold" color="primary.main">
-              {progress}%
+              {safeOverallProgress}%
             </Typography>
             <LinearProgress
               variant="determinate"
-              value={progress}
+              value={safeOverallProgress}
               aria-label="Profile strength progress"
               data-testid={DATA_TEST_ID.MODULE_PROGRESS(0)}
               sx={{
@@ -81,7 +81,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
               </Typography>
               <LinearProgress
                 variant="determinate"
-                value={progress}
+                value={safeEducationProgress}
                 aria-label="Education skills progress"
                 sx={{
                   flex: 1,
@@ -100,7 +100,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
                 fontWeight="bold"
                 sx={{ width: 40, textAlign: "right" }}
               >
-                {progress}%
+                {safeEducationProgress}%
               </Typography>
             </Box>
 
@@ -110,7 +110,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
               </Typography>
               <LinearProgress
                 variant="determinate"
-                value={progress}
+                value={safeWorkProgress}
                 aria-label="Work skills progress"
                 sx={{
                   flex: 1,
@@ -129,7 +129,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({ modules 
                 fontWeight="bold"
                 sx={{ width: 40, textAlign: "right" }}
               >
-                {progress}%
+                {safeWorkProgress}%
               </Typography>
             </Box>
           </Box>

@@ -42,6 +42,8 @@ const ProfileContainer: React.FC = () => {
         year={profileData.year}
         skills={profileData.skills}
         educationSkills={profileData.educationSkills}
+        totalExperiences={profileData.totalExperiences}
+        exploredExperiences={profileData.exploredExperiences}
         modules={profileData.modules}
         skillsInterestsProgress={profileData.skillsInterestsProgress}
         careerExplorerSectors={profileData.careerExplorerSectors}

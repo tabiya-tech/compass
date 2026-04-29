@@ -78,7 +78,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
-  const { profileData } = useUserProfileContext();
+  const { profileData, refreshProfileData } = useUserProfileContext();
 
   const profileDisplay = useMemo(
     () => ({
@@ -140,6 +140,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
   const handleExperienceSaved = async () => {
     await onExperiencesUpdated();
+    refreshProfileData();
     setEditingExperience(null);
   };
 
@@ -171,6 +172,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
       // Refresh the experiences
       await onExperiencesUpdated();
+      refreshProfileData();
 
       enqueueSnackbar(t("experiences.experiencesDrawer.deleteSuccess"), { variant: "success" });
     } catch (error) {
@@ -231,6 +233,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
 
       enqueueSnackbar(t("experiences.experiencesDrawer.restoreSuccess"), { variant: "success" });
       await onExperiencesUpdated();
+      refreshProfileData();
     } catch (error) {
       console.error(new ExperienceError("Failed to restore experience:", error));
       enqueueSnackbar(t("experiences.experiencesDrawer.restoreFailed"), { variant: "error" });
@@ -266,6 +269,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
       console.info("Deleted experience restored successfully", { experienceId: experience.UUID });
       enqueueSnackbar(t("experiences.experiencesDrawer.restoreSuccess"), { variant: "success" });
       await onExperiencesUpdated();
+      refreshProfileData();
     } catch (error) {
       console.error(new ExperienceError("Failed to restore experience:", error));
       enqueueSnackbar(t("experiences.experiencesDrawer.restoreFailed"), { variant: "error" });
@@ -297,7 +301,10 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           onClose={() => setShowRestoreDrawer(false)}
           onRestore={handleRestoreExperience}
           sessionId={UserPreferencesStateService.getInstance().getActiveSessionId() || 0}
-          onExperiencesRestored={onExperiencesUpdated}
+          onExperiencesRestored={async () => {
+            await onExperiencesUpdated();
+            refreshProfileData();
+          }}
           currentExperiences={experiences}
         />
       );

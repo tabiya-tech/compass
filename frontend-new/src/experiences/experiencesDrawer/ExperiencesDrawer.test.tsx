@@ -33,6 +33,7 @@ jest.mock("src/theme/CustomTextField/CustomTextField", () => {
 
 jest.mock("src/profile/UserProfileContext", () => ({
   useUserProfileContext: jest.fn(() => ({
+    refreshProfileData: jest.fn(),
     profileData: {
       name: "Jane Doe",
       email: "jane@example.com",

@@ -48,7 +48,15 @@ export const Fieldset: React.FC<FieldsetProps> = (props) => {
       >
         {props.label}
       </Typography>
-      <Typography variant="body2" data-testid={DATA_TEST_ID.VALUE} sx={{ color: "text.primary", fontWeight: 500 }}>
+      <Typography
+        variant="body2"
+        data-testid={DATA_TEST_ID.VALUE}
+        sx={{
+          color: "text.primary",
+          fontWeight: 500,
+          wordBreak: "break-word",
+        }}
+      >
         {isLoading ? (
           <Skeleton variant="text" sx={{ maxWidth: 220 }} data-testid={DATA_TEST_ID.SKELETON} />
         ) : (

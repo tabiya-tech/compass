@@ -22,7 +22,9 @@ jest.mock("src/userPreferences/UserPreferencesStateService", () => ({
   },
 }));
 jest.mock("./utils/fetchSkills", () => ({
-  fetchSkills: jest.fn(() => Promise.resolve({ workSkills: [], educationSkills: [] })),
+  fetchSkills: jest.fn(() =>
+    Promise.resolve({ workSkills: [], educationSkills: [], totalExperiences: 0, exploredExperiences: 0 })
+  ),
 }));
 
 const mockModules: ModuleSummary[] = [
@@ -62,11 +64,17 @@ const mockProgressResponse = {
 };
 
 describe("useUserProfile", () => {
+  let mockGetProfile: jest.Mock;
+  let mockGetProgress: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetProfile = jest.fn(() => Promise.resolve(mockProfileResponse));
+    mockGetProgress = jest.fn(() => Promise.resolve(mockProgressResponse));
+
     (UserMeService.getInstance as jest.Mock).mockReturnValue({
-      getProfile: jest.fn(() => Promise.resolve(mockProfileResponse)),
-      getProgress: jest.fn(() => Promise.resolve(mockProgressResponse)),
+      getProfile: mockGetProfile,
+      getProgress: mockGetProgress,
     });
   });
 

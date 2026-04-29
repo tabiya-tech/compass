@@ -77,6 +77,8 @@ const getDefaultProps = (overrides?: Partial<ProfileProps>): ProfileProps => ({
   year: null,
   skills: [],
   educationSkills: [],
+  totalExperiences: 0,
+  exploredExperiences: 0,
   modules: [],
   skillsInterestsProgress: 0,
   careerExplorerSectors: [],

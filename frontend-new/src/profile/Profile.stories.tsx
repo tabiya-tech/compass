@@ -77,6 +77,8 @@ const createProfileState = (overrides?: Partial<ProfileProps>): ProfileProps => 
         orderIndex: 1,
       },
     ],
+    totalExperiences: 2,
+    exploredExperiences: 1,
     modules: [
       makeModule("skills_discovery", "COMPLETED"),
       makeModule("career_discovery", "IN_PROGRESS"),

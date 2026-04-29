@@ -167,7 +167,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
           <Divider color="primary" sx={{ height: "0.2rem" }} />
           <Box
             display="flex"
-            justifyContent="flex-end"
+            justifyContent="flex-start"
             gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
             paddingY={theme.fixedSpacing(theme.tabiyaSpacing.md)}
           >

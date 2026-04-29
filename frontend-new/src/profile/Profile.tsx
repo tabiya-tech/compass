@@ -28,6 +28,8 @@ export interface ProfileProps {
   year: string | null;
   skills: Skill[];
   educationSkills: Skill[];
+  totalExperiences: number;
+  exploredExperiences: number;
   modules: ModuleSummary[];
   skillsInterestsProgress: number;
   careerExplorerSectors: UserSectorEngagementItem[];
@@ -49,8 +51,10 @@ export const Profile: React.FC<ProfileProps> = ({
   year,
   skills,
   educationSkills,
+  totalExperiences,
+  exploredExperiences,
   modules,
-  skillsInterestsProgress,
+  skillsInterestsProgress: _skillsInterestsProgress,
   careerExplorerSectors,
   isLoadingSecurity,
   isLoadingPreferences,
@@ -59,6 +63,17 @@ export const Profile: React.FC<ProfileProps> = ({
   isLoadingCareerExplorer,
 }) => {
   const theme = useTheme();
+  const clampPercentage = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+
+  // Education Skills are programme skills only
+  const educationProgress = clampPercentage(educationSkills.length > 0 ? 100 : 0);
+
+  // Work progress reflects explored experiences
+  const workProgress =
+    totalExperiences > 0 ? clampPercentage((exploredExperiences / totalExperiences) * 100) : clampPercentage(0);
+
+  // Overall Profile Strength equally weights Education Skills and Work & Other Skills
+  const overallProgress = clampPercentage((educationProgress + workProgress) / 2);
 
   return (
     <Box
@@ -91,9 +106,9 @@ export const Profile: React.FC<ProfileProps> = ({
         >
           <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
             <ModuleProgressCard
-              modules={[
-                { id: "skills_discovery", labelKey: "home.modules.skillsDiscovery", progress: skillsInterestsProgress },
-              ]}
+              overallProgress={overallProgress}
+              educationProgress={educationProgress}
+              workProgress={workProgress}
             />
             <CareerReadinessProgressBanner modules={modules} />
           </Stack>

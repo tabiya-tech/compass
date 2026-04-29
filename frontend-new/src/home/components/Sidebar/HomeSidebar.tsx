@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, useTheme } from "@mui/material";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import { useWorkSkills } from "src/experiences/hooks/useWorkSkills";
@@ -26,9 +26,14 @@ interface HomeSidebarProps {
 const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) => {
   const theme = useTheme();
   const { openExperiencesDrawer } = useExperiencesDrawer();
-  const workSkills = useWorkSkills();
+  const drawerWorkSkills = useWorkSkills();
   const { profileData } = useUserProfileContext();
   const programmeSkills = profileData.programmeSkills;
+  const workSkills = useMemo(() => {
+    const labels = profileData.skills.map((skill) => skill.preferredLabel).filter(Boolean);
+    const uniqueProfileSkills = Array.from(new Set(labels));
+    return drawerWorkSkills.length > 0 ? drawerWorkSkills : uniqueProfileSkills;
+  }, [profileData.skills, drawerWorkSkills]);
 
   const accentColor = theme.palette.primary.main;
   const tealBg = theme.palette.brandAccent.light;

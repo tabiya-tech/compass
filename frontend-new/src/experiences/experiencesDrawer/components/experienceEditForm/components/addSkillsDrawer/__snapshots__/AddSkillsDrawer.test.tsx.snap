@@ -132,7 +132,7 @@ exports[`AddSkillsDrawer should render component successfully 1`] = `
       color="primary"
     />
     <div
-      class="MuiBox-root css-xtegh"
+      class="MuiBox-root css-ebbk9p"
     >
       <button
         class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-12r53wk-MuiButtonBase-root-MuiButton-root"
