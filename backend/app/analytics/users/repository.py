@@ -24,12 +24,14 @@ class UsersRepository:
         application_db: AsyncIOMotorDatabase,
         userdata_db: AsyncIOMotorDatabase,
         metrics_db: AsyncIOMotorDatabase,
+        career_explorer_db: AsyncIOMotorDatabase,
     ):
         self._prefs_collection = application_db.get_collection(Collections.USER_PREFERENCES)
         self._plain_data_collection = userdata_db.get_collection(Collections.PLAIN_PERSONAL_DATA)
         self._metrics_collection = metrics_db.get_collection(Collections.COMPASS_METRICS)
         self._cr_collection = application_db.get_collection(Collections.CAREER_READINESS_CONVERSATIONS)
         self._sd_collection = application_db.get_collection(Collections.EXPLORE_EXPERIENCES_DIRECTOR_STATE)
+        self._ce_collection = career_explorer_db.get_collection(Collections.CAREER_EXPLORER_CONVERSATIONS)
 
     async def _get_user_ids_by_filters(
         self,
@@ -143,6 +145,66 @@ class UsersRepository:
 
         return result
 
+    async def _get_sd_status_by_user_ids(self, user_ids: list[str]) -> dict[str, str]:
+        """
+        Return per-user skills discovery status: "completed", "in_progress", or "not_started".
+
+        Completed: conversation_phase == "DIVE_IN" AND explored_experiences is non-empty.
+        In-progress: a session document exists but not completed.
+        Not started: no session document.
+        """
+        prefs_docs = await self._prefs_collection.find(
+            {"user_id": {"$in": user_ids}},
+            {"user_id": 1, "sessions": 1, "_id": 0}
+        ).to_list(length=None)
+
+        session_to_user: dict = {}
+        for doc in prefs_docs:
+            uid = doc.get("user_id")
+            if not uid:
+                continue
+            for s in doc.get("sessions", []):
+                session_to_user[s] = uid
+                session_to_user[str(s)] = uid
+
+        if not session_to_user:
+            return {}
+
+        session_ids = list(session_to_user.keys())
+        sd_docs = await self._sd_collection.find(
+            {"session_id": {"$in": session_ids}},
+            {"session_id": 1, "conversation_phase": 1, "explored_experiences": 1, "_id": 0}
+        ).to_list(length=None)
+
+        result: dict[str, str] = {}
+        for doc in sd_docs:
+            sid = doc.get("session_id")
+            uid = session_to_user.get(sid) or session_to_user.get(str(sid))
+            if not uid:
+                continue
+            # Don't downgrade a completed status
+            if result.get(uid) == "completed":
+                continue
+            phase = doc.get("conversation_phase")
+            explored = doc.get("explored_experiences")
+            has_explored = isinstance(explored, list) and len(explored) > 0
+            if phase == "DIVE_IN" and has_explored:
+                result[uid] = "completed"
+            else:
+                result[uid] = "in_progress"
+
+        return result
+
+    async def _get_ce_messages_by_user_ids(self, user_ids: list[str]) -> dict[str, int]:
+        """Return per-user count of career explorer messages sent."""
+        pipeline = [
+            {"$match": {"user_id": {"$in": user_ids}}},
+            {"$project": {"user_id": 1, "message_count": {"$size": {"$ifNull": ["$messages", []]}}}},
+            {"$group": {"_id": "$user_id", "total_messages": {"$sum": "$message_count"}}},
+        ]
+        docs = await self._ce_collection.aggregate(pipeline).to_list(length=None)
+        return {d["_id"]: d["total_messages"] for d in docs if d["_id"]}
+
     async def _get_last_login_by_user_ids(self, user_ids: list[str]) -> dict[str, str]:
         """
         Return per-user last login timestamp (ISO string) from metrics collection.
@@ -235,10 +297,12 @@ class UsersRepository:
         user_ids = [d["user_id"] for d in docs if d.get("user_id")]
 
         # Fetch all enrichment data in parallel
-        plain_data_map, cr_stats_map, sd_explored_map, last_login_map = await asyncio.gather(
+        plain_data_map, cr_stats_map, sd_explored_map, sd_status_map, ce_messages_map, last_login_map = await asyncio.gather(
             self._get_plain_data_by_user_ids(user_ids),
             self._get_cr_stats_by_user_ids(user_ids),
             self._get_sd_explored_by_user_ids(user_ids),
+            self._get_sd_status_by_user_ids(user_ids),
+            self._get_ce_messages_by_user_ids(user_ids),
             self._get_last_login_by_user_ids(user_ids),
         )
 
@@ -259,6 +323,8 @@ class UsersRepository:
                 modules_explored=cr[0] if cr else None,
                 career_readiness_modules_explored=cr[1] if cr else None,
                 skills_interests_explored=sd_explored_map.get(user_id),
+                skills_discovery_status=sd_status_map.get(user_id, "not_started"),
+                career_explorer_messages_sent=ce_messages_map.get(user_id),
                 last_login=last_login_map.get(user_id),
                 last_active_module=cr[2] if cr else None,
             ))
@@ -308,5 +374,6 @@ async def get_user_repository(
     application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
     userdata_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_userdata_db),
     metrics_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_metrics_db),
+    career_explorer_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_career_explorer_db),
 ) -> UsersRepository:
-    return UsersRepository(application_db, userdata_db, metrics_db)
+    return UsersRepository(application_db, userdata_db, metrics_db, career_explorer_db)

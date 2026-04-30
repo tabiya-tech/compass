@@ -12,7 +12,8 @@ export type StudentsSortKey =
   | "lastActiveModuleId"
   | "modulesExplored"
   | "careerReady"
-  | "skillsInterestsExplored";
+  | "skillsDiscoveryStatus"
+  | "careerExplorerMessagesSent";
 type SortDir = "asc" | "desc";
 
 type UseInstructorStudentsTableStateOptions = {
@@ -130,7 +131,11 @@ export function useInstructorStudentsTableState(
         const ratio = fracRatio(row.careerReady);
         return Number.isNaN(ratio) ? null : ratio;
       }
-      return row.skillsInterestsExplored;
+      if (key === "skillsDiscoveryStatus") {
+        const order: Record<string, number> = { not_started: 0, in_progress: 1, completed: 2 };
+        return order[row.skillsDiscoveryStatus] ?? 0;
+      }
+      return row.careerExplorerMessagesSent;
     };
 
     return [...filteredRows].sort((a, b) => {

@@ -71,16 +71,18 @@ async def three_dbs(
     in_memory_application_database: Awaitable[AsyncIOMotorDatabase],
     in_memory_userdata_database: Awaitable[AsyncIOMotorDatabase],
     in_memory_metrics_database: Awaitable[AsyncIOMotorDatabase],
-) -> tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]:
+    in_memory_career_explorer_database: Awaitable[AsyncIOMotorDatabase],
+) -> tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]:
     app_db = await in_memory_application_database
     userdata_db = await in_memory_userdata_database
     metrics_db = await in_memory_metrics_database
-    return app_db, userdata_db, metrics_db
+    ce_db = await in_memory_career_explorer_database
+    return app_db, userdata_db, metrics_db, ce_db
 
 
 @pytest.fixture(scope="function")
 async def populated_repository(
-    three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]],
+    three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]],
 ) -> UsersRepository:
     """
     Fixture that pre-populates the three DBs and returns a ready UsersRepository.
@@ -96,7 +98,7 @@ async def populated_repository(
                 CR: no activity; SD: session-c1 with 2 skills
                 metrics: no events
     """
-    app_db, userdata_db, metrics_db = await three_dbs
+    app_db, userdata_db, metrics_db, ce_db = await three_dbs
 
     # Use naive UTC datetimes — Motor/pymongo expects naive datetimes for storage
     t1 = datetime(2024, 1, 10)
@@ -137,7 +139,7 @@ async def populated_repository(
         _make_metric_event("user-b", t1),
     ])
 
-    return UsersRepository(app_db, userdata_db, metrics_db)
+    return UsersRepository(app_db, userdata_db, metrics_db, ce_db)
 
 
 class TestListUsersEnrichment:

@@ -29,6 +29,8 @@ export interface StudentApiItem {
   modules_explored: number | null;
   career_readiness_modules_explored: number | null;
   skills_interests_explored: number | null;
+  skills_discovery_status: "not_started" | "in_progress" | "completed" | null;
+  career_explorer_messages_sent: number | null;
   last_login: string | null;
   last_active_module: string | null;
 }

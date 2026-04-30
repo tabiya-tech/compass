@@ -336,6 +336,7 @@
         "modulesCompleted": "Career Readiness Modules Completed",
         "careerReady": "Career Readiness Completed",
         "skillsInterestsExplored": "Skills & Interests",
+        "careerExplorer": "Career Explorer",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"
@@ -347,6 +348,12 @@
         "today": "Today",
         "thisWeek": "This week",
         "older": "Older"
+      },
+      "statusLabels": {
+        "not_started": "Not Started",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "started": "Started"
       }
     }
   },

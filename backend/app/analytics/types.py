@@ -42,6 +42,8 @@ class User(BaseModel):
     modules_explored: Optional[int] = None
     career_readiness_modules_explored: Optional[int] = None
     skills_interests_explored: Optional[int] = None
+    skills_discovery_status: Optional[str] = None  # "not_started" | "in_progress" | "completed"
+    career_explorer_messages_sent: Optional[int] = None
     last_login: Optional[str] = None
     last_active_module: Optional[str] = None
 

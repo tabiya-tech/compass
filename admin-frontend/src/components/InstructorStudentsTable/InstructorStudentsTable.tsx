@@ -175,12 +175,39 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       minWidth: 130,
     },
     {
-      key: "skillsInterestsExplored",
+      key: "skillsDiscoveryStatus",
       label: t("instructorDashboard.studentsTable.headers.skillsInterestsExplored"),
+      sortable: true,
+      sortType: "text",
+      align: "center",
+      minWidth: 130,
+      render: (_val, row) => {
+        const labelKey = `instructorDashboard.studentsTable.statusLabels.${row.skillsDiscoveryStatus}`;
+        return (
+          <Typography variant="body2" sx={{ textAlign: "center", width: "100%" }}>
+            {t(labelKey)}
+          </Typography>
+        );
+      },
+    },
+    {
+      key: "careerExplorerMessagesSent",
+      label: t("instructorDashboard.studentsTable.headers.careerExplorer"),
       sortable: true,
       sortType: "number",
       align: "center",
       minWidth: 130,
+      render: (_val, row) => {
+        const label =
+          row.careerExplorerMessagesSent !== null && row.careerExplorerMessagesSent >= 2
+            ? t("instructorDashboard.studentsTable.statusLabels.started")
+            : t("instructorDashboard.studentsTable.statusLabels.not_started");
+        return (
+          <Typography variant="body2" sx={{ textAlign: "center", width: "100%" }}>
+            {label}
+          </Typography>
+        );
+      },
     },
     {
       key: "careerReady",
