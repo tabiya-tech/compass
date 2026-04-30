@@ -533,6 +533,23 @@ class SkillChangedEvent(ExperienceEntityChangedEvent):
 ------- Frontend only metrics -------
 """
 
+
+class VerifyEmailPageViewedEvent(AbstractCompassMetricEvent):
+    """
+    A Frontend only metric event representing a user landing on the verify email page after registration.
+    No user_id is available at this point since the user has been logged out.
+    """
+
+    def __init__(self, *, timestamp: str, client_id: str | None = None):
+        timestamp_argument = dict(timestamp=datetime.fromisoformat(timestamp).astimezone(timezone.utc)) if timestamp else {}
+        super().__init__(
+            event_type=EventType.VERIFY_EMAIL_PAGE_VIEWED,
+            **timestamp_argument
+        )
+
+    class Config:
+        extra = "forbid"
+
 CVFormatLiteral = Literal["PDF", "DOCX"]
 
 

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Container, Typography } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
 import { routerPaths } from "src/app/routerPaths";
 import { useNavigate } from "react-router-dom";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -20,6 +22,13 @@ export const DATA_TEST_ID = {
 const VerifyEmail: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    MetricsService.getInstance().sendMetricsEvent({
+      event_type: EventType.VERIFY_EMAIL_PAGE_VIEWED,
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
   /**
    * Handle when a user clicks back to login
    */

@@ -7,6 +7,13 @@ import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
 import { useNavigate } from "react-router-dom";
 import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 import * as Sentry from "@sentry/react";
+import MetricsService from "src/metrics/metricsService";
+import { EventType } from "src/metrics/types";
+
+jest.mock("src/metrics/metricsService", () => ({
+  __esModule: true,
+  default: { getInstance: jest.fn().mockReturnValue({ sendMetricsEvent: jest.fn() }) },
+}));
 
 // mock the router
 jest.mock("react-router-dom", () => {
@@ -71,6 +78,11 @@ describe("Testing Verify Email component", () => {
 
     // AND the back to login button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON)).toBeInTheDocument();
+
+    // AND the verify email page viewed metric event should have been sent
+    expect(MetricsService.getInstance().sendMetricsEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ event_type: EventType.VERIFY_EMAIL_PAGE_VIEWED })
+    );
 
     // AND the component should match the snapshot
     expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toMatchSnapshot();

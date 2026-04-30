@@ -9,6 +9,7 @@ export enum EventType {
   DEVICE_SPECIFICATION = 200004,
   NETWORK_INFORMATION = 200005,
   UI_INTERACTION = 200006,
+  VERIFY_EMAIL_PAGE_VIEWED = 200007,
 }
 
 interface BaseMetricsEvent {
@@ -67,13 +68,19 @@ export interface UIInteractionEvent extends BaseMetricsEvent {
   details: Record<string, any>; // Additional details about the interaction
 }
 
+export interface VerifyEmailPageViewedEvent extends BaseMetricsEvent {
+  event_type: EventType.VERIFY_EMAIL_PAGE_VIEWED;
+  timestamp: string;
+}
+
 export type MetricsEventUnion =
   | CVDownloadedEvent
   | DemographicsEvent
   | DeviceSpecificationEvent
   | UserLocationEvent
   | NetworkInformationEvent
-  | UIInteractionEvent;
+  | UIInteractionEvent
+  | VerifyEmailPageViewedEvent;
 
 export type SavableMetricsEventUnion = MetricsEventUnion & {
   client_id: string; // The client ID to associate with the event
