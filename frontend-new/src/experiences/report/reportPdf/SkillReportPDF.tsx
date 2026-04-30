@@ -59,20 +59,22 @@ const SkillReportPDF: React.FC<SkillReportProps> = ({
   const skillsList = getUniqueSkills(experiences);
 
   // Experience category
-  const ExperienceCategory = (title: string, icon: string, experiences: Experience[]) =>
-    experiences.length > 0 ? (
+  const ExperienceCategory = (title: string, icon: string, experiences: Experience[]) => {
+    if (experiences.length === 0) return null;
+
+    return (
       <View style={styles.categoryContainer}>
-        <View style={styles.categoryTitleContainer}>
-          <Image src={getBase64Image(icon)} style={styles.categoryIcon} source={undefined} />
-          <Text x={0} y={0} style={styles.categoryTitle}>
-            {title}
-          </Text>
-        </View>
-        {experiences.map((experience) => (
-          <ExperiencesReportContent key={experience.UUID} experience={experience} reportConfig={config.report} />
+        {experiences.map((experience, index) => (
+          <ExperiencesReportContent
+            key={experience.UUID}
+            experience={experience}
+            reportConfig={config.report}
+            categoryHeader={index === 0 ? { title, icon } : undefined}
+          />
         ))}
       </View>
-    ) : null;
+    );
+  };
 
   // personal info
   const renderPersonalInfo = (value: string | null, icon: string, dataTestId: string) => {

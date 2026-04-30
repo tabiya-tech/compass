@@ -5,6 +5,9 @@ import { ReportContent } from "src/experiences/report/reportContent";
 import { COLORS } from "src/experiences/report/util";
 import { ReportConfig } from "src/experiences/report/config/types";
 
+// Number of skills that must always stay on the same page as "Top Skills" title
+const PINNED_SKILLS_COUNT = 2;
+
 export const generateExperience = (experience: Experience, reportConfig: ReportConfig): Paragraph[] => {
   const { experienceDetails } = reportConfig;
   const paragraphs: Paragraph[] = [];
@@ -26,6 +29,7 @@ export const generateExperience = (experience: Experience, reportConfig: ReportC
           after: 100,
           before: 300,
         },
+        keepNext: true,
       })
     );
   }
@@ -105,6 +109,7 @@ export const generateExperience = (experience: Experience, reportConfig: ReportC
   }
 
   // Skills (always shown)
+  const skillsCount = experience.top_skills.length;
   paragraphs.push(
     new Paragraph({
       children: [
@@ -118,11 +123,12 @@ export const generateExperience = (experience: Experience, reportConfig: ReportC
       spacing: {
         after: 100,
       },
+      keepNext: skillsCount > 0,
     })
   );
 
   const skillsList = experience.top_skills.map(
-    (skill) =>
+    (skill, index) =>
       new Paragraph({
         children: [
           new TextRun({
@@ -134,6 +140,7 @@ export const generateExperience = (experience: Experience, reportConfig: ReportC
         spacing: {
           after: 100,
         },
+        keepNext: index < PINNED_SKILLS_COUNT - 1 && index + 1 < skillsCount,
       })
   );
 

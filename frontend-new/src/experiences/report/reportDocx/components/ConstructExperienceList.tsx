@@ -27,6 +27,7 @@ const createParagraphWithImageAndText = async (text: string, imageUrl: string) =
     heading: HeadingLevel.HEADING_6,
     alignment: AlignmentType.LEFT,
     spacing: { before: 300 },
+    keepNext: true,
   });
 };
 

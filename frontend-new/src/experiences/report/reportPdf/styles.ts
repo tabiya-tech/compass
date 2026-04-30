@@ -116,8 +116,7 @@ const styles = StyleSheet.create({
   },
   container: {
     display: "flex",
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: "column",
     marginBottom: 14,
   },
   experienceTitle: {
@@ -139,10 +138,6 @@ const styles = StyleSheet.create({
   location: {
     paddingLeft: 4,
     ...fontStyles.italic,
-  },
-  contentColumn: {
-    display: "flex",
-    flexDirection: "column",
   },
   divider: {
     marginHorizontal: 48,
@@ -187,9 +182,10 @@ const styles = StyleSheet.create({
   skillsContainer: {
     display: "flex",
     flexDirection: "column",
-    flexWrap: "wrap",
     alignItems: "flex-start",
-    gap: 4,
+  },
+  skillItem: {
+    marginBottom: 4,
   },
   skillDescriptionContainer: {
     display: "flex",
