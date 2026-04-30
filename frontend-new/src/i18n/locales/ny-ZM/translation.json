@@ -6,7 +6,7 @@
       "logout": "Tsekani",
       "submit": "Tumizani",
       "register": "Lembetsani",
-      "registerLink": "Lembetsani",
+      "registerLink": "Pangani akaunti",
       "startNewConversation": "Yambani nkhani yatsopano",
       "settings": "Zokonda",
       "cancel": "Lambani",
@@ -28,13 +28,15 @@
     "fields": {
       "email": "Imelo",
       "password": "Mawu achinsinsi",
-      "confirmEmail": "Tsinkaninani Imelo"
+      "confirmEmail": "Tsinkaninani Imelo",
+      "confirmPassword": "Tsimikizani mawu achinsinsi"
     },
     "validation": {
       "validEmailRequired": "Chonde lembani imelo yovomerezeka",
       "emailRequired": "Chonde lembani imelo yanu",
       "passwordRequired": "Chonde lembani mawu achinsinsi anu",
       "emailsDoNotMatch": "Imelo sizikugwirizana",
+      "passwordsDoNotMatch": "Mawu achinsinsi sakugwirizana",
       "passwordMinLength": "Mawu achinsinsi ayenera kukhala osachepera zilembo 8.",
       "passwordNeedLowercase": "Mawu achinsinsi ayenera kukhala ndi chilembo chimodzi chaching'ono.",
       "passwordNeedUppercase": "Mawu achinsinsi ayenera kukhala ndi chilembo chimodzi chachikulu.",
@@ -287,7 +289,7 @@
         "loginUsing": "Lowani pogwiritsa ntchito",
         "loggingYouIn": "Mukulowetsedwa...",
         "loggingInAria": "Kulowa",
-        "dontHaveAnAccount": "Mulibe akaunti?",
+        "dontHaveAnAccount": "Mwatsopano ku Njila?",
         "fillInEmailAndPassword": "Chonde lembani imelo ndi mawu achinsinsi",
         "orLoginToYourAccountToContinue": "Kapena lowani ku akaunti yanu kuti mupitilize",
         "or": "kapena",
@@ -298,7 +300,7 @@
           "skillsLine": "nzeru ndi mphamvu zanu",
           "subheadline": "Njira yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
           "signInTitle": "Lowani",
-          "cta": "Tiyeni",
+          "cta": "Lowani",
           "whatIsTitleBefore": "Ndi chani ",
           "whatIsTitleBrand": "{{appName}}",
           "feature1Title": "Senzani mphamvu zanu",
@@ -315,11 +317,11 @@
         }
       },
       "register": {
-        "signUpTitle": "Lembetsani",
+        "signUpTitle": "Pangani akaunti",
         "welcomeTitle": "Takulandilani ku {{appName}}!",
         "welcomeBack": "Mwalandilidwa!",
         "subtitle": "Tikufuna zobisika zina kuti tiyambe",
-        "registerWithGoogle": "Lembetsani ndi Google",
+        "registerWithGoogle": "Pitilizani ndi Google",
         "alreadyHaveAccount": "Mwadzakhala ndi akaunti?",
         "registeringYou": "Mukulembetsedwa...",
         "enterRegistrationCode": "Lembani code yanu yolembetsa",
@@ -394,7 +396,7 @@
       },
       "socialAuth": {
         "orContinueWith": "Kapena",
-        "loginWithGoogle": "Lowani ndi Google",
+        "loginWithGoogle": "Pitilizani ndi Google",
         "googleLoginIsNotAvailableWhenOffline": "Kulowa ndi Google sikulipo pamene simuli pa intaneti.",
         "accountNotRegistered": "Akauntiyi sinilembetsedwe. Chonde lumikizanani ndi omwe adapatsa chingwechi."
       }

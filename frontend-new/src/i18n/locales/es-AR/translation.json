@@ -6,7 +6,7 @@
       "logout": "Cerrar sesión",
       "submit": "Enviar",
       "register": "Registrarse",
-      "registerLink": "Registrarse",
+      "registerLink": "Crear cuenta",
       "startNewConversation": "Iniciar nueva conversación",
       "settings": "Configuración",
       "cancel": "Cancelar",
@@ -28,13 +28,15 @@
     "fields": {
       "email": "Correo electrónico",
       "password": "Contraseña",
-      "confirmEmail": "Confirmar correo"
+      "confirmEmail": "Confirmar correo",
+      "confirmPassword": "Confirmar contraseña"
     },
     "validation": {
       "validEmailRequired": "Por favor ingresa una dirección de correo válida",
       "emailRequired": "Por favor ingresá tu correo",
       "passwordRequired": "Por favor ingresá tu contraseña",
       "emailsDoNotMatch": "Los correos no coinciden",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
       "passwordMinLength": "La contraseña debe tener al menos 8 caracteres.",
       "passwordNeedLowercase": "La contraseña debe incluir al menos una letra minúscula.",
       "passwordNeedUppercase": "La contraseña debe incluir al menos una letra mayúscula.",
@@ -287,7 +289,7 @@
         "loginUsing": "Inicia sesión usando",
         "loggingYouIn": "Iniciando sesión...",
         "loggingInAria": "Iniciando sesión",
-        "dontHaveAnAccount": "¿No tienes una cuenta?",
+        "dontHaveAnAccount": "¿Nuevo en Njila?",
         "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
         "orLoginToYourAccountToContinue": "O inicia sesión en tu cuenta para continuar",
         "or": "o",
@@ -298,7 +300,7 @@
           "skillsLine": "habilidades y fortalezas",
           "subheadline": "Tu camino guiado desde las habilidades hasta tu primer trabajo — basado en lo que sabés, lo que hiciste y a dónde querés ir.",
           "signInTitle": "Iniciar sesión",
-          "cta": "Vamos",
+          "cta": "Iniciar sesión",
           "whatIsTitleBefore": "¿Qué es ",
           "whatIsTitleBrand": "{{appName}}",
           "feature1Title": "Descubrí tus fortalezas",
@@ -315,11 +317,11 @@
         }
       },
       "register": {
-        "signUpTitle": "Registrarse",
+        "signUpTitle": "Crear una cuenta",
         "welcomeTitle": "¡Bienvenido a {{appName}}!",
         "welcomeBack": "¡Bienvenido de nuevo!",
         "subtitle": "Necesitamos algo de información para comenzar",
-        "registerWithGoogle": "Registrarse con Google",
+        "registerWithGoogle": "Continuar con Google",
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
         "registeringYou": "Registrándote...",
         "enterRegistrationCode": "Ingresa tu código de registro",
@@ -394,7 +396,7 @@
       },
       "socialAuth": {
         "orContinueWith": "O",
-        "loginWithGoogle": "Inicia sesión con Google",
+        "loginWithGoogle": "Continuar con Google",
         "googleLoginIsNotAvailableWhenOffline": "El inicio de sesión con Google no funciona sin conexión a internet.",
         "accountNotRegistered": "Esta cuenta no está registrada. Por favor, contacta al proveedor de este enlace."
       }

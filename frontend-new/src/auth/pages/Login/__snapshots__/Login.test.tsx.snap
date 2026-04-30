@@ -12,7 +12,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       <h3
         class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
-        Sign In
+        Login
       </h3>
       <form
         class="MuiBox-root css-esqb5o"
@@ -30,7 +30,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Let's go
+          Login
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -68,7 +68,7 @@ exports[`Testing Login component Render tests should hide login code related ele
       <h3
         class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
-        Sign In
+        Login
       </h3>
       <form
         class="MuiBox-root css-esqb5o"
@@ -86,7 +86,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           tabindex="-1"
           type="submit"
         >
-          Let's go
+          Login
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -124,7 +124,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
       <h3
         class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
-        Sign In
+        Login
       </h3>
       <form
         class="MuiBox-root css-esqb5o"
@@ -166,7 +166,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
           tabindex="-1"
           type="submit"
         >
-          Let's go
+          Login
           <div
             class="MuiBox-root css-15jaqqs"
           >
@@ -203,7 +203,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
     <h3
       class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
-      Sign In
+      Login
     </h3>
     <form
       class="MuiBox-root css-esqb5o"
@@ -240,7 +240,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Let's go
+        Login
         <div
           class="MuiBox-root css-15jaqqs"
         >
@@ -279,7 +279,7 @@ exports[`Testing Login component should handle application login code 1`] = `
     <h3
       class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
-      Sign In
+      Login
     </h3>
     <form
       class="MuiBox-root css-esqb5o"
@@ -321,7 +321,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         tabindex="-1"
         type="submit"
       >
-        Let's go
+        Login
         <div
           class="MuiBox-root css-15jaqqs"
         >
@@ -358,7 +358,7 @@ exports[`Testing Login component should remove registration link if registration
       <h3
         class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
       >
-        Sign In
+        Login
       </h3>
       <form
         class="MuiBox-root css-esqb5o"
@@ -395,7 +395,7 @@ exports[`Testing Login component should remove registration link if registration
           tabindex="-1"
           type="submit"
         >
-          Let's go
+          Login
           <div
             class="MuiBox-root css-15jaqqs"
           >

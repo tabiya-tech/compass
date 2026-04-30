@@ -9,7 +9,7 @@ import { getDarkLogoUrl, getLogoUrl, getProductName, getRegistrationDisabled } f
 import { AuthPageProvider } from "src/auth/components/AuthLayout/AuthPageContext";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { routerPaths } from "src/app/routerPaths";
-import CustomLink from "src/theme/CustomLink/CustomLink";
+import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 
 const FeatureColumn: React.FC<{
   imageSrc: string;
@@ -191,7 +191,7 @@ const AuthLayout: React.FC = () => {
             objectFit: "contain",
             zIndex: 3,
             mx: { xs: "auto", md: 0 },
-            mr: { md: -8, lg: -2.8 },
+            mr: { md: -7, lg: -3.2 },
             mb: { xs: 2, md: 0 },
           }}
         />
@@ -213,31 +213,34 @@ const AuthLayout: React.FC = () => {
           <Outlet />
         </Box>
         {(showRegisterLink || showLoginLink) && (
-          <Typography
-            variant="body2"
+          <Box
             sx={{
               mt: 1.5,
-              display: "block",
               width: "100%",
-              textAlign: "center",
-              color: theme.palette.text.primary,
-              fontWeight: 500,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
             }}
           >
-            {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}{" "}
-            <CustomLink
-              onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
+            <Typography
+              variant="body1"
               sx={{
-                color: theme.palette.brandAction.main,
-                fontWeight: 700,
-                textDecorationColor: theme.palette.brandAction.main,
-                cursor: "pointer",
-                "&:hover": { color: theme.palette.brandAction.main, opacity: 0.75 },
+                textAlign: "center",
+                color: theme.palette.text.primary,
+                fontWeight: 500,
               }}
             >
+              {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}
+            </Typography>
+            <PrimaryButton
+              showCircle
+              onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
+              color="brandAction"
+            >
               {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink")}
-            </CustomLink>
-          </Typography>
+            </PrimaryButton>
+          </Box>
         )}
       </Box>
     </Box>

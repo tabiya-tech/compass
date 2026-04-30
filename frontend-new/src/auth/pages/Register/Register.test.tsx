@@ -202,7 +202,7 @@ describe("Testing Register component", () => {
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_CONTAINER)).toBeInTheDocument();
 
     // AND the sign-up heading should be rendered
-    expect(screen.getByText("Sign Up")).toBeInTheDocument();
+    expect(screen.getByText("Create an account")).toBeInTheDocument();
 
     // AND the request registration code link should be displayed
     expect(screen.getByTestId(REQUEST_INVITATION_CODE_DATA_TEST_ID.REQUEST_INVITATION_CODE_LINK)).toBeInTheDocument();
@@ -732,7 +732,7 @@ describe("Testing Register component", () => {
       {
         disabled: false,
         isLoading: false,
-        label: "Register with Google",
+        label: "Continue with Google",
         notifyOnLoading: expect.any(Function),
         postLoginHandler: expect.any(Function),
         registrationCode: givenApplicationRegistrationCode,

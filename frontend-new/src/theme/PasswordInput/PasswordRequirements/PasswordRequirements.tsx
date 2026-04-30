@@ -36,24 +36,29 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationR
     [validationResults, t]
   );
 
+  const unmetCriteria = useMemo(() => validationCriteria.filter((c) => !c.isValid), [validationCriteria]);
+
+  if (unmetCriteria.length === 0) {
+    return null;
+  }
+
   return (
     // we have to use a component that can be a child of a <p>
     // since this is going to be used in the helperText field of an mui TextField component
     <span data-testid={DATA_TEST_ID.PASSWORD_REQUIREMENTS}>
-      {validationCriteria.map((criteria, index) => (
-        <span key={index}>
+      {unmetCriteria.map((criteria, index) => (
+        <span key={criteria.label}>
           <Box
             component="span"
             sx={{
               typography: "caption",
-              color: criteria.isValid ? theme.palette.success.dark : theme.palette.warning.main,
-              fontWeight: criteria.isValid ? 500 : 700,
+              color: theme.palette.common.white,
+              fontWeight: 700,
             }}
           >
             * {criteria.label}
           </Box>
-          <br />
-          {/* we need a <br /> to arrange the password requirements in a column */}
+          {index < unmetCriteria.length - 1 ? <br /> : null}
         </span>
       ))}
     </span>

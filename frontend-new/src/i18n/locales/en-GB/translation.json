@@ -1,17 +1,17 @@
 {
   "common": {
     "buttons": {
-      "login": "Let's go",
-      "loginLink": "Sign In",
+      "login": "Login",
+      "loginLink": "Login",
       "logout": "Logout",
       "submit": "Submit",
-      "register": "Sign Up",
-      "registerLink": "Register here!",
+      "register": "Register",
+      "registerLink": "Create Account",
       "startNewConversation": "Start new conversation",
       "settings": "Settings",
       "cancel": "Cancel",
       "confirm": "Yes, I'm sure",
-      "backToLogin": "Back to Sign In",
+      "backToLogin": "Back to Login",
       "save": "Save",
       "goBack": "Go Back",
       "restore": "Restore",
@@ -28,11 +28,13 @@
     "fields": {
       "email": "Email",
       "password": "Password",
-      "confirmEmail": "Confirm Email"
+      "confirmEmail": "Confirm Email",
+      "confirmPassword": "Confirm Password"
     },
     "validation": {
       "validEmailRequired": "Please enter a valid email address",
       "emailsDoNotMatch": "Emails do not match",
+      "passwordsDoNotMatch": "Passwords do not match",
       "emailRequired": "Please enter your email",
       "passwordRequired": "Please enter your password",
       "passwordMinLength": "Password must be at least 8 characters long.",
@@ -287,7 +289,7 @@
         "loginUsing": "Login using",
         "loggingYouIn": "Logging you in...",
         "loggingInAria": "Logging in",
-        "dontHaveAnAccount": "Don't have an account?",
+        "dontHaveAnAccount": "New to Njila?",
         "fillInEmailAndPassword": "Please fill in the email and password fields",
         "orLoginToYourAccountToContinue": "Or login to your account to continue",
         "or": "or",
@@ -297,8 +299,8 @@
           "discoverLine": "Discover your",
           "skillsLine": "skills & strengths",
           "subheadline": "Your guided path from skills to your first job — built around what you know, what you've done, and where you want to go.",
-          "signInTitle": "Sign In",
-          "cta": "Let's go",
+          "signInTitle": "Login",
+          "cta": "Login",
           "whatIsTitleBefore": "What is ",
           "whatIsTitleBrand": "{{appName}}",
           "feature1Title": "Discover your strengths",
@@ -315,11 +317,11 @@
         }
       },
       "register": {
-        "signUpTitle": "Sign Up",
+        "signUpTitle": "Create an account",
         "welcomeTitle": "Welcome to {{appName}}!",
         "welcomeBack": "Welcome back!",
         "subtitle": "We need some information to get started",
-        "registerWithGoogle": "Register with Google",
+        "registerWithGoogle": "Continue with Google",
         "alreadyHaveAccount": "Already have an account?",
         "registeringYou": "Registering you...",
         "enterRegistrationCode": "Enter your registration code",
@@ -394,7 +396,7 @@
       },
       "socialAuth": {
         "orContinueWith": "Or",
-        "loginWithGoogle": "Login with Google",
+        "loginWithGoogle": "Continue with Google",
         "googleLoginIsNotAvailableWhenOffline": "Google login is not available when offline.",
         "accountNotRegistered": "This account isn’t registered. Please contact the provider of this link."
       }

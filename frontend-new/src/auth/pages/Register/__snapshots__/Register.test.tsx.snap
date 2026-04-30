@@ -11,7 +11,7 @@ exports[`Testing Register component it should show register form successfully 1`
     <h3
       class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
-      Sign Up
+      Create an account
     </h3>
     <h6
       class="MuiTypography-root MuiTypography-subtitle2 css-ogiz19-MuiTypography-root"
@@ -104,7 +104,7 @@ exports[`Testing Register component should handle application registration code 
     <h3
       class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
     >
-      Sign Up
+      Create an account
     </h3>
     <span
       data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"

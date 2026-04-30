@@ -1,4 +1,5 @@
 import { Box, CircularProgress, TextField, useTheme } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
@@ -13,6 +14,7 @@ export const DATA_TEST_ID = {
   USERNAME_INPUT: `register-username-input-${uniqueId}`,
   EMAIL_INPUT: `register-email-input-${uniqueId}`,
   PASSWORD_INPUT: `register-password-input-${uniqueId}`,
+  CONFIRM_PASSWORD_INPUT: `register-confirm-password-input-${uniqueId}`,
   REGISTER_BUTTON: `register-button-${uniqueId}`,
   REGISTER_BUTTON_CIRCULAR_PROGRESS: `register-button-circular-progress-${uniqueId}`,
 };
@@ -32,6 +34,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const handleEmailChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -42,12 +45,30 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
     setPassword(event.target.value);
   };
 
+  const handleConfirmPasswordChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    setConfirmPassword(event.target.value);
+  };
+
+  const passwordsDoNotMatch = Boolean(confirmPassword) && password !== confirmPassword;
+
   const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isPasswordValid) {
+    if (isPasswordValid && !passwordsDoNotMatch && confirmPassword) {
       notifyOnRegister(email, password);
     }
+  };
+
+  const confirmPasswordFieldSx: SxProps<Theme> = {
+    ...outlinedNoBorderSx,
+    "& .MuiFormHelperText-root": {
+      color: theme.palette.common.white,
+      fontWeight: 700,
+    },
+    "& .MuiFormHelperText-root.Mui-error": {
+      color: theme.palette.common.white,
+      fontWeight: 700,
+    },
   };
 
   return (
@@ -84,6 +105,20 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         inputProps={{ "data-testid": DATA_TEST_ID.PASSWORD_INPUT }}
         sx={outlinedNoBorderSx}
       />
+      <PasswordInput
+        fullWidth
+        placeholder={t("common.fields.confirmPassword")}
+        disabled={isRegistering || disabled}
+        variant="outlined"
+        required
+        shouldValidatePassword={false}
+        onChange={(e) => handleConfirmPasswordChange(e)}
+        value={confirmPassword}
+        error={passwordsDoNotMatch}
+        helperText={passwordsDoNotMatch ? t("common.validation.passwordsDoNotMatch") : ""}
+        inputProps={{ "data-testid": DATA_TEST_ID.CONFIRM_PASSWORD_INPUT }}
+        sx={confirmPasswordFieldSx}
+      />
       <PrimaryButton
         fullWidth
         variant="contained"
@@ -91,7 +126,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         showCircle
         style={{ marginTop: 8 }}
         type="submit"
-        disabled={isRegistering || disabled || !isPasswordValid || !email}
+        disabled={isRegistering || disabled || !isPasswordValid || !email || !confirmPassword || passwordsDoNotMatch}
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.REGISTER_BUTTON}
         sx={{

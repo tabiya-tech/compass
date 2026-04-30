@@ -18,7 +18,7 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
       tabindex="0"
       type="button"
     >
-      Back to Sign In
+      Back to Login
       <div
         class="MuiBox-root css-f2dt27"
       >

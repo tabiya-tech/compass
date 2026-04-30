@@ -63,8 +63,16 @@ describe("Testing Register Email Form component", () => {
     // AND the email input should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.EMAIL_INPUT)).toBeInTheDocument();
 
-    // AND the password input should be rendered
-    expect(screen.getByTestId(PASSWORD_INPUT_DATA_TEST_ID.TEXT_FIELD)).toBeInTheDocument();
+    // AND both password inputs should be rendered (password + confirm password)
+    expect(screen.getAllByTestId(PASSWORD_INPUT_DATA_TEST_ID.TEXT_FIELD)).toHaveLength(2);
+    expect(PasswordInput).toHaveBeenCalledWith(
+      expect.objectContaining({ inputProps: { "data-testid": DATA_TEST_ID.PASSWORD_INPUT } }),
+      expect.anything()
+    );
+    expect(PasswordInput).toHaveBeenCalledWith(
+      expect.objectContaining({ inputProps: { "data-testid": DATA_TEST_ID.CONFIRM_PASSWORD_INPUT } }),
+      expect.anything()
+    );
 
     // AND the register button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.REGISTER_BUTTON)).toBeInTheDocument();
@@ -94,6 +102,9 @@ describe("Testing Register Email Form component", () => {
       act(() => {
         (PasswordInput as jest.Mock).mock.calls[0][0].onChange({ target: { value: "Password123$" } });
         (PasswordInput as jest.Mock).mock.calls[0][0].onValidityChange(true);
+      });
+      act(() => {
+        (PasswordInput as jest.Mock).mock.calls[1][0].onChange({ target: { value: "Password123$" } });
       });
 
       // AND the form is submitted

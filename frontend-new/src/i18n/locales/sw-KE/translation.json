@@ -6,7 +6,7 @@
       "logout": "Toka",
       "submit": "Wasilisha",
       "register": "Jisajili",
-      "registerLink": "Jisajili",
+      "registerLink": "Unda akaunti",
       "startNewConversation": "Anza mazungumzo mapya",
       "settings": "Mipangilio",
       "cancel": "Ghairi",
@@ -28,13 +28,15 @@
     "fields": {
       "email": "Barua pepe",
       "password": "Nenosiri",
-      "confirmEmail": "Thibitisha barua pepe"
+      "confirmEmail": "Thibitisha barua pepe",
+      "confirmPassword": "Thibitisha nenosiri"
     },
     "validation": {
       "validEmailRequired": "Tafadhali ingiza anwani sahihi ya barua pepe",
       "emailRequired": "Tafadhali ingiza barua pepe yako",
       "passwordRequired": "Tafadhali ingiza nenosiri lako",
       "emailsDoNotMatch": "Barua pepe hazifanani",
+      "passwordsDoNotMatch": "Nenosiri hayafanani",
       "passwordMinLength": "Nenosiri lazima liwe na angalau herufi 8.",
       "passwordNeedLowercase": "Nenosiri lazima liwe na angalau herufi moja ndogo.",
       "passwordNeedUppercase": "Nenosiri lazima liwe na angalau herufi moja kubwa.",
@@ -287,7 +289,7 @@
         "loginUsing": "Ingia ukitumia",
         "loggingYouIn": "Tunakuingiza...",
         "loggingInAria": "Inaingia",
-        "dontHaveAnAccount": "Huna akaunti?",
+        "dontHaveAnAccount": "Mpya kwenye Njila?",
         "fillInEmailAndPassword": "Tafadhali jaza barua pepe na nenosiri",
         "orLoginToYourAccountToContinue": "Au ingia kwenye akaunti yako ili kuendelea",
         "or": "au",
@@ -298,7 +300,7 @@
           "skillsLine": "ujuzi na nguvu zako",
           "subheadline": "Njia yako iliyoongozwa kutoka kwa ujuzi hadi kazi yako ya kwanza — imejengwa kulingana na unachojua, ulichofanya, na unapotaka kwenda.",
           "signInTitle": "Ingia",
-          "cta": "Twende",
+          "cta": "Ingia",
           "whatIsTitleBefore": "Ni nini ",
           "whatIsTitleBrand": "{{appName}}",
           "feature1Title": "Gundua nguvu zako",
@@ -315,11 +317,11 @@
         }
       },
       "register": {
-        "signUpTitle": "Jisajili",
+        "signUpTitle": "Fungua akaunti",
         "welcomeTitle": "Karibu kwenye {{appName}}!",
         "welcomeBack": "Karibu tena!",
         "subtitle": "Tunahitaji taarifa fulani ili kuanza",
-        "registerWithGoogle": "Jisajili na Google",
+        "registerWithGoogle": "Endelea na Google",
         "alreadyHaveAccount": "Tayari una akaunti?",
         "registeringYou": "Tunakusajili...",
         "enterRegistrationCode": "Ingiza nambari yako ya usajili",
@@ -394,7 +396,7 @@
       },
       "socialAuth": {
         "orContinueWith": "Au",
-        "loginWithGoogle": "Ingia na Google",
+        "loginWithGoogle": "Endelea na Google",
         "googleLoginIsNotAvailableWhenOffline": "Kuingia na Google hakupatikani ukiwa nje ya mtandao.",
         "accountNotRegistered": "Akaunti hii haijasajiliwa. Tafadhali wasiliana na mtoa kiungo hiki."
       }

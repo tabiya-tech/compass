@@ -41,6 +41,9 @@ exports[`Testing Register Email Form component it should show register form 1`] 
   <div
     data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
   />
+  <div
+    data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
+  />
   <button
     class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
     data-testid="register-button-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
@@ -49,7 +52,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     tabindex="-1"
     type="submit"
   >
-    Sign Up
+    Register
     <div
       class="MuiBox-root css-15jaqqs"
     >
