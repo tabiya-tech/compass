@@ -169,6 +169,7 @@ export default class MetricsService {
         serviceName: "MetricsService",
         serviceFunction: "flushEvents",
         failureMessage: "Failed to send metrics events",
+        authRequired: false,
         headers: {
           "Content-Type": "application/json",
         },
