@@ -241,7 +241,6 @@ class SkillsDiscoveryAnalyticsRepository(ISkillsDiscoveryAnalyticsRepository):
                     identifying_count += 1
 
         in_progress_count = started_count - completed_count
-        funnel_total = in_progress_count if in_progress_count > 0 else 1
 
         return SkillsDiscoveryStatsResponse(
             total_registered_students=total_students,
@@ -255,8 +254,8 @@ class SkillsDiscoveryAnalyticsRepository(ISkillsDiscoveryAnalyticsRepository):
             ),
             in_progress_count=in_progress_count,
             funnel=[
-                FunnelStage(label="Sharing Experiences", count=sharing_count, total=funnel_total),
-                FunnelStage(label="Identifying Skills", count=identifying_count, total=funnel_total),
-                FunnelStage(label="Collecting Preferences", count=collecting_count, total=funnel_total),
+                FunnelStage(label="Sharing Experiences", count=sharing_count, total=started_count),
+                FunnelStage(label="Identifying Skills", count=identifying_count, total=started_count),
+                FunnelStage(label="Collecting Preferences", count=collecting_count, total=started_count),
             ],
         )
