@@ -89,6 +89,7 @@ describe("MetricsService", () => {
       await waitFor(() => {
         expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/metrics`, {
           method: "POST",
+          authRequired: false,
           headers: {
             "Content-Type": "application/json",
           },
@@ -164,6 +165,7 @@ describe("MetricsService", () => {
       await waitFor(() => {
         expect(fetchSpy).toHaveBeenCalledWith(`${givenApiServerUrl}/metrics`, {
           method: "POST",
+          authRequired: false,
           headers: {
             "Content-Type": "application/json",
           },
@@ -261,6 +263,7 @@ describe("MetricsService", () => {
       // THEN expect only the new event to be sent
       expect(fetchSpy).toHaveBeenLastCalledWith(`${givenApiServerUrl}/metrics`, {
         method: "POST",
+        authRequired: false,
         headers: {
           "Content-Type": "application/json",
         },
