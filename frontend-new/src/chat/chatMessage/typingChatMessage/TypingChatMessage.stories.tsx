@@ -32,3 +32,18 @@ export const ShownWhenThinking: Story = {
     waitBeforeThinking: 0,
   },
 };
+
+// Stories to verify the pulse animation on the loading text
+export const PulsingTypingState: Story = {
+  name: "Pulsing — Typing state",
+  args: {
+    waitBeforeThinking: WAIT_BEFORE_THINKING,
+  },
+};
+
+export const PulsingThinkingState: Story = {
+  name: "Pulsing — Thinking state (Please wait)",
+  args: {
+    waitBeforeThinking: 0,
+  },
+};

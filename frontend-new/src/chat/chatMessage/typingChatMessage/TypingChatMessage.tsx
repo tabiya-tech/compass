@@ -40,6 +40,15 @@ const dotAnimation = keyframes`
     }
 `;
 
+const textPulseAnimation = keyframes`
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 1;
+    }
+`;
+
 const textVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
@@ -86,7 +95,14 @@ const TypingChatMessage: React.FC<TypingChatMessageProps> = ({
           </Box>
           <ChatBubble message="" sender={ConversationMessageSender.COMPASS}>
             <Box display="flex" alignItems="baseline">
-              <Typography>{displayText}</Typography>
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  animation: `${textPulseAnimation} 2s infinite ease-in-out`,
+                }}
+              >
+                {displayText}
+              </Typography>
               <Box component="span" paddingLeft={"1px"}>
                 {[0, 1, 2].map((i) => (
                   <Typography

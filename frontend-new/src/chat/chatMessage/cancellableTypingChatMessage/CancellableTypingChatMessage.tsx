@@ -44,6 +44,15 @@ const dotAnimation = keyframes`
     }
 `;
 
+const textPulseAnimation = keyframes`
+    0%, 100% {
+        opacity: 0.4;
+    }
+    50% {
+        opacity: 1;
+    }
+`;
+
 const textVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: { opacity: 1, y: 0 },
@@ -118,7 +127,18 @@ const CancellableTypingChatMessage: React.FC<CancellableTypingChatMessageProps> 
               gap={theme.spacing(theme.tabiyaSpacing.md)}
             >
               <Box display="flex" alignItems="baseline">
-                <Typography>{displayText}</Typography>
+                <Typography
+                  sx={
+                    !disabled
+                      ? {
+                          color: "text.secondary",
+                          animation: `${textPulseAnimation} 2s infinite ease-in-out`,
+                        }
+                      : undefined
+                  }
+                >
+                  {displayText}
+                </Typography>
                 <Box component="span" paddingLeft={"1px"}>
                   {[0, 1, 2].map((i) => (
                     <Typography

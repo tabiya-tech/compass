@@ -54,3 +54,34 @@ export const WithCustomMessages: Story = {
     waitBeforeThinking: 2000,
   },
 };
+
+// Stories to verify pulse animation behaviour based on disabled state
+export const PulsingActiveLoading: Story = {
+  name: "Pulsing — Active loading (disabled=false)",
+  args: {
+    onCancel: asyncAction("cancel clicked"),
+    message: "Uploading your CV",
+    disabled: false,
+    waitBeforeThinking: 99999,
+  },
+};
+
+export const TerminalCancelled: Story = {
+  name: "No pulse — Cancelled (disabled=true)",
+  args: {
+    onCancel: asyncAction("cancel clicked"),
+    message: "Cancelled",
+    disabled: true,
+    waitBeforeThinking: 99999,
+  },
+};
+
+export const TerminalFailed: Story = {
+  name: "No pulse — Failed (disabled=true)",
+  args: {
+    onCancel: asyncAction("cancel clicked"),
+    message: "Upload failed",
+    disabled: true,
+    waitBeforeThinking: 99999,
+  },
+};
