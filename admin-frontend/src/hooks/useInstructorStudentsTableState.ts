@@ -8,7 +8,6 @@ export type StudentsSortKey =
   | "studentName"
   | "programme"
   | "year"
-  | "gender"
   | "lastLogin"
   | "lastActiveModuleId"
   | "modulesExplored"
@@ -23,7 +22,6 @@ type UseInstructorStudentsTableStateOptions = {
   onLoadMoreRows?: () => Promise<void>;
 };
 
-const KNOWN_GENDERS = ["Male", "Female"] as const;
 const DEFAULT_PAGE_SIZE = 20;
 
 const isMissingText = (value: string): boolean => {
@@ -87,7 +85,6 @@ export function useInstructorStudentsTableState(
   const [nameSearch, setNameSearch] = useState("");
   const [programme, setProgramme] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
-  const [gender, setGender] = useState("all");
   const [lastLoginFilter, setLastLoginFilter] = useState("all");
   const [lastModuleFilter, setLastModuleFilter] = useState("all");
   const [pageIndex, setPageIndex] = useState(0);
@@ -96,12 +93,6 @@ export function useInstructorStudentsTableState(
 
   const programmes = useMemo(() => ["all", ...MODULE_FILTER_PROGRAMMES], []);
   const years = useMemo(() => ["all", ...Array.from(new Set(rows.map((r) => r.year)))], [rows]);
-  const genders = useMemo(() => {
-    const dynamic = Array.from(new Set(rows.map((r) => r.gender).filter((g) => g !== PLACEHOLDER_SYMBOL)));
-    const merged = Array.from(new Set([...KNOWN_GENDERS, ...dynamic]));
-    return ["all", ...merged];
-  }, [rows]);
-
   const modules = useMemo(() => {
     const knownModuleIds = Object.keys(MODULE_ID_TO_I18N_KEY);
     const dynamic = Array.from(
@@ -116,13 +107,12 @@ export function useInstructorStudentsTableState(
       if (query && !row.studentName.toLowerCase().includes(query)) return false;
       if (programme !== "all" && row.programme !== programme) return false;
       if (yearFilter !== "all" && row.year !== yearFilter) return false;
-      if (gender !== "all" && row.gender !== gender) return false;
       if (lastModuleFilter !== "all" && row.lastActiveModuleId !== lastModuleFilter) return false;
 
       if (lastLoginFilter === "all") return true;
       return lastLoginDisplayMatchesFilter(row.lastLogin, lastLoginFilter);
     });
-  }, [debouncedNameSearch, gender, lastLoginFilter, lastModuleFilter, programme, rows, yearFilter]);
+  }, [debouncedNameSearch, lastLoginFilter, lastModuleFilter, programme, rows, yearFilter]);
 
   const sortedRows = useMemo(() => {
     if (!sortKey) {
@@ -133,7 +123,6 @@ export function useInstructorStudentsTableState(
       if (key === "studentName") return normalizeText(row.studentName);
       if (key === "programme") return normalizeText(row.programme);
       if (key === "year") return normalizeYear(row.year);
-      if (key === "gender") return normalizeText(row.gender);
       if (key === "lastLogin") return normalizeLastLogin(row.lastLogin);
       if (key === "lastActiveModuleId") return normalizeText(row.lastActiveModuleId);
       if (key === "modulesExplored") return row.modulesExplored;
@@ -164,7 +153,7 @@ export function useInstructorStudentsTableState(
 
   useEffect(() => {
     setPageIndex(0);
-  }, [debouncedNameSearch, programme, yearFilter, gender, lastLoginFilter, lastModuleFilter, sortKey, sortDir]);
+  }, [debouncedNameSearch, programme, yearFilter, lastLoginFilter, lastModuleFilter, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
   const safePageIndex = Math.min(pageIndex, totalPages - 1);
@@ -208,15 +197,12 @@ export function useInstructorStudentsTableState(
     setProgramme,
     yearFilter,
     setYearFilter,
-    gender,
-    setGender,
     lastLoginFilter,
     setLastLoginFilter,
     lastModuleFilter,
     setLastModuleFilter,
     programmes,
     years,
-    genders,
     modules,
     filteredRows,
     pagedRows,

@@ -36,7 +36,7 @@ export function useInstitutionOptions() {
 
       try {
         do {
-          const result = await AnalyticsService.getInstance().listInstitutions(500, cursor);
+          const result = await AnalyticsService.getInstance().listInstitutions(100, cursor);
           items.push(...result.data);
           cursor = result.meta.next_cursor ?? undefined;
         } while (cursor);

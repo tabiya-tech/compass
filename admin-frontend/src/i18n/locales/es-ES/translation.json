@@ -334,9 +334,9 @@
         "year": "Year",
         "gender": "Gender",
         "profileStrength": "Profile Strength",
-        "modulesExplored": "Modules Explored",
+        "modulesCompleted": "Career Readiness Modules Completed",
         "careerReady": "Preparación profesional",
-        "skillsInterestsExplored": "Construye tu perfil",
+        "skillsInterestsExplored": "Skills & Interests",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"

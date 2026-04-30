@@ -334,9 +334,9 @@
         "year": "Year",
         "gender": "Gender",
         "profileStrength": "Profile Strength",
-        "modulesExplored": "Modules Explored",
+        "modulesCompleted": "Career Readiness Modules Completed",
         "careerReady": "Kukonzekera Ntchito",
-        "skillsInterestsExplored": "Pangani mbiri yanu",
+        "skillsInterestsExplored": "Skills & Interests",
         "prioritySectorsExplored": "Priority Sectors Explored",
         "lastLogin": "Last Login",
         "lastActiveModule": "Last Active Module"
