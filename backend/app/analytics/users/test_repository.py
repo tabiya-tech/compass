@@ -526,8 +526,8 @@ class TestCountUsers:
         self, three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]]
     ):
         # GIVEN an empty database
-        app_db, userdata_db, metrics_db = await three_dbs
-        repo = UsersRepository(app_db, userdata_db, metrics_db)
+        app_db, userdata_db, metrics_db, ce_db = await three_dbs
+        repo = UsersRepository(app_db, userdata_db, metrics_db, ce_db)
 
         # WHEN counting users
         count = await repo.count_users()
@@ -543,7 +543,7 @@ class TestEdgeCases:
         three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]],
     ):
         # GIVEN user-x has two sessions with 1 and 5 explored experiences respectively
-        app_db, userdata_db, metrics_db = await three_dbs
+        app_db, userdata_db, metrics_db, ce_db = await three_dbs
 
         await app_db.get_collection(Collections.USER_PREFERENCES).insert_one(
             _make_prefs("user-x", accepted_tc="2024-01-01", sessions=["sess-x1", "sess-x2"])
@@ -553,7 +553,7 @@ class TestEdgeCases:
             _make_sd_state("sess-x2", ["s1", "s2", "s3", "s4", "s5"]),
         ])
 
-        repo = UsersRepository(app_db, userdata_db, metrics_db)
+        repo = UsersRepository(app_db, userdata_db, metrics_db, ce_db)
 
         # WHEN listing users
         users, _, _ = await repo.list_users(limit=10)
@@ -567,13 +567,13 @@ class TestEdgeCases:
         three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]],
     ):
         # GIVEN user-y exists in preferences but has no plain personal data
-        app_db, userdata_db, metrics_db = await three_dbs
+        app_db, userdata_db, metrics_db, ce_db = await three_dbs
 
         await app_db.get_collection(Collections.USER_PREFERENCES).insert_one(
             _make_prefs("user-y", accepted_tc="2024-01-01")
         )
 
-        repo = UsersRepository(app_db, userdata_db, metrics_db)
+        repo = UsersRepository(app_db, userdata_db, metrics_db, ce_db)
 
         # WHEN listing users
         users, _, _ = await repo.list_users(limit=10)
@@ -591,13 +591,13 @@ class TestEdgeCases:
         three_dbs: Awaitable[tuple[AsyncIOMotorDatabase, AsyncIOMotorDatabase, AsyncIOMotorDatabase]],
     ):
         # GIVEN user-z has no sessions list in preferences
-        app_db, userdata_db, metrics_db = await three_dbs
+        app_db, userdata_db, metrics_db, ce_db = await three_dbs
 
         await app_db.get_collection(Collections.USER_PREFERENCES).insert_one(
             {"user_id": "user-z", "accepted_tc": "2024-01-01"}
         )
 
-        repo = UsersRepository(app_db, userdata_db, metrics_db)
+        repo = UsersRepository(app_db, userdata_db, metrics_db, ce_db)
 
         # WHEN listing users
         users, _, _ = await repo.list_users(limit=10)
