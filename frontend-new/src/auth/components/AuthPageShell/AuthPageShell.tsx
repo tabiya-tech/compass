@@ -1,9 +1,20 @@
-import React from "react";
+import React, { startTransition, useCallback } from "react";
 import { Box, useTheme } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
+import { useLocation, useNavigate } from "react-router-dom";
+import { HelpCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import LanguageContextMenu from "src/i18n/languageContextMenu/LanguageContextMenu";
+import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
+import { routerPaths } from "src/app/routerPaths";
 
 export const shapesBackgroundUrl = `${process.env.PUBLIC_URL}/Shapes.svg`;
+
+const uniqueId = "9ad2f1c6-3e08-4b49-9f7d-4c8a1e3d5b27";
+
+export const DATA_TEST_ID = {
+  AUTH_PAGE_SHELL_FAQ_BUTTON: `auth-page-shell-faq-button-${uniqueId}`,
+};
 
 export type AuthPageShellProps = {
   logoUrl: string;
@@ -33,6 +44,16 @@ export const layoutContentColumnSx = {
 const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent, children, whiteContainerTestId }) => {
   const theme = useTheme();
   const cream = theme.palette.common.cream;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation();
+  const isOnFaqPage = location.pathname === routerPaths.FAQ;
+
+  const handleFaqClick = useCallback(() => {
+    startTransition(() => {
+      navigate(routerPaths.FAQ);
+    });
+  }, [navigate]);
 
   const pt = { xs: 4, md: 6 };
   const pb = { xs: 6, md: 2 };
@@ -96,7 +117,27 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
                 alt=""
                 sx={{ maxHeight: { xs: 36, md: 44 }, width: "auto", maxWidth: "min(200px, 45vw)" }}
               />
-              <LanguageContextMenu removeMargin />
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {!isOnFaqPage && (
+                  <SecondaryButton
+                    color="brandAction"
+                    onClick={handleFaqClick}
+                    startIcon={<HelpCircle size={18} />}
+                    aria-label={t("nav.faqAriaLabel")}
+                    data-testid={DATA_TEST_ID.AUTH_PAGE_SHELL_FAQ_BUTTON}
+                    sx={{
+                      alignSelf: "center",
+                      paddingY: 0.75,
+                      paddingX: 2,
+                      fontSize: "0.875rem",
+                      "& .MuiButton-startIcon": { marginRight: 0.75 },
+                    }}
+                  >
+                    {t("nav.faq")}
+                  </SecondaryButton>
+                )}
+                <LanguageContextMenu removeMargin />
+              </Box>
             </Box>
             {whiteBandContent}
           </Box>

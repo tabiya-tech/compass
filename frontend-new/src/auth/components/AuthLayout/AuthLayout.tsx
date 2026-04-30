@@ -202,7 +202,7 @@ const AuthLayout: React.FC = () => {
             borderRadius: 2,
             p: theme.fixedSpacing(4),
             width: "100%",
-            maxWidth: { xs: 420, md: 320, lg: 420 },
+            maxWidth: { xs: 420, md: 360, lg: 420 },
             overflowY: "auto",
             overflowX: "hidden",
             boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.12)}`,

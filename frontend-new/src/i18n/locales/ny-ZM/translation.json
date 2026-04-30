@@ -1079,6 +1079,18 @@
   "nav": {
     "search": "Sakani...",
     "dashboard": "Dashibodi",
-    "pathways": "Njira"
+    "pathways": "Njira",
+    "faq": "Mafunso",
+    "faqAriaLabel": "Thandizo ndi Mafunso"
+  },
+  "faq": {
+    "eyebrow": "Likulu Lothandiza la Njila",
+    "lede": "Mayankho ku mafunso wamba okhudza Njila — momwe imagwirira ntchito, momwe mungalembetsere, ndi momwe mungathetsere mavuto wamba.",
+    "searchPlaceholder": "Sakani mafunso…",
+    "searchAriaLabel": "Sakani mu Mafunso",
+    "clearSearch": "Chotsani kufufuza",
+    "tocLabel": "Patsamba lino",
+    "noResults": "Palibe mafunso amene akugwirizana ndi kufufuza kumeneko.",
+    "scrollProgressLabel": "Kupita patsogolo powerenga"
   }
 }

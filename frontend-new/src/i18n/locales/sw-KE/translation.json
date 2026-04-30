@@ -1079,6 +1079,18 @@
   "nav": {
     "search": "Tafuta...",
     "dashboard": "Dashibodi",
-    "pathways": "Njia"
+    "pathways": "Njia",
+    "faq": "Maswali",
+    "faqAriaLabel": "Msaada na Maswali"
+  },
+  "faq": {
+    "eyebrow": "Kituo cha Usaidizi cha Njila",
+    "lede": "Majibu ya maswali ya kawaida kuhusu Njila — jinsi inavyofanya kazi, jinsi ya kujiandikisha, na jinsi ya kutatua matatizo ya kawaida.",
+    "searchPlaceholder": "Tafuta maswali…",
+    "searchAriaLabel": "Tafuta katika Maswali",
+    "clearSearch": "Futa utafutaji",
+    "tocLabel": "Kwenye ukurasa huu",
+    "noResults": "Hakuna maswali yanayolingana na utafutaji huo.",
+    "scrollProgressLabel": "Maendeleo ya kusoma"
   }
 }

@@ -51,6 +51,7 @@ const LazyLoadedCareerReadinessModule = lazyWithPreload(
 
 const LazyLoadedProfile = lazyWithPreload(() => import("src/profile/ProfileContainer"));
 const LazyLoadedJobMatching = lazyWithPreload(() => import("src/jobMatching/pages/JobMatchingPage/JobMatchingPage"));
+const LazyLoadedFAQPage = lazyWithPreload(() => import("src/faq/pages/FAQPage"));
 
 // Wrap the createHashRouter function with Sentry to capture errors that occur during router initialization
 const sentryCreateBrowserRouter = Sentry.wrapCreateBrowserRouterV6(createHashRouter);
@@ -448,6 +449,10 @@ const App = () => {
             {
               path: routerPaths.TERMS_OF_USE,
               element: <LegalDocumentPage variant="terms" />,
+            },
+            {
+              path: routerPaths.FAQ,
+              element: <LazyLoadedFAQPage />,
             },
             {
               path: "*",

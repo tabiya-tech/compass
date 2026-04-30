@@ -1079,6 +1079,18 @@
   "nav": {
     "search": "Search...",
     "dashboard": "Dashboard",
-    "pathways": "Pathways"
+    "pathways": "Pathways",
+    "faq": "FAQ",
+    "faqAriaLabel": "Help and FAQ"
+  },
+  "faq": {
+    "eyebrow": "Njila Help Centre",
+    "lede": "Answers to common questions about Njila — how it works, how to sign up, and how to resolve common problems.",
+    "searchPlaceholder": "Search questions…",
+    "searchAriaLabel": "Search FAQ",
+    "clearSearch": "Clear search",
+    "tocLabel": "On this page",
+    "noResults": "No questions match that search.",
+    "scrollProgressLabel": "Reading progress"
   }
 }

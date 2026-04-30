@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render tests should render the Chat Bubble with a child if one is passed 1`] = `
+<div
+  class="MuiBox-root css-yi28at"
+  data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+>
+  <div
+    class="MuiBox-root css-1kxrhf3"
+    data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div>
+      Hello, I'm Compass
+    </div>
+  </div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div
+      data-testid="foo-footer"
+    >
+      foo child
+    </div>
+  </div>
+</div>
+`;
+
+exports[`render tests should render the Chat Bubble without a child if none is passed 1`] = `
+<div
+  class="MuiBox-root css-yi28at"
+  data-testid="chat-message-bubble-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+>
+  <div
+    class="MuiBox-root css-1kxrhf3"
+    data-testid="chat-message-bubble-message-text-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  >
+    <div>
+      Hello, I'm Compass
+    </div>
+  </div>
+  <div
+    class="MuiBox-root css-0"
+    data-testid="chat-message-bubble-message-footer-container-6e685eeb-2b54-432a-8b66-8a81633b3981"
+  />
+</div>
+`;

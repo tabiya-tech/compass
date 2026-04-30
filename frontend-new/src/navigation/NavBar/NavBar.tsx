@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   BookOpenText,
   Globe,
+  HelpCircle,
   Menu,
   ChevronRight,
   CircleUser,
@@ -51,6 +52,7 @@ export const DATA_TEST_ID = {
   NAVBAR_LINK_SEARCH: `navbar-link-search-${uniqueId}`,
   NAVBAR_LINK_DASHBOARD: `navbar-link-dashboard-${uniqueId}`,
   NAVBAR_LINK_PATHWAYS: `navbar-link-pathways-${uniqueId}`,
+  NAVBAR_LINK_FAQ: `navbar-link-faq-${uniqueId}`,
   NAVBAR_LANGUAGE_BUTTON: `navbar-language-button-${uniqueId}`,
   NAVBAR_USER_NAME: `navbar-user-name-${uniqueId}`,
   NAVBAR_USER_AVATAR: `navbar-user-avatar-${uniqueId}`,
@@ -64,6 +66,7 @@ export const MENU_ITEM_ID = {
   VIEW_PROFILE: `navbar-view-profile-${uniqueId}`,
   VIEW_EXPERIENCES: `navbar-view-experiences-${uniqueId}`,
   PATHWAYS: `navbar-mobile-pathways-${uniqueId}`,
+  FAQ: `navbar-mobile-faq-${uniqueId}`,
   MOBILE_LANGUAGE: `navbar-mobile-language-${uniqueId}`,
   REBUILD_PROFILE: `navbar-rebuild-profile-${uniqueId}`,
 };
@@ -117,6 +120,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   const currentPath = location.pathname;
   const isOnDashboard = currentPath === "/" || currentPath === "";
   const isOnPathways = currentPath.startsWith(routerPaths.KNOWLEDGE_HUB);
+  const isOnFaq = currentPath === routerPaths.FAQ;
 
   const handleReportBug = useCallback(() => {
     void openFeedbackForm();
@@ -170,6 +174,11 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   const navigateToPathways = useCallback(() => {
     setAnchorEl(null);
     navigateWithTransition(routerPaths.KNOWLEDGE_HUB);
+  }, [navigateWithTransition]);
+
+  const navigateToFaq = useCallback(() => {
+    setAnchorEl(null);
+    navigateWithTransition(routerPaths.FAQ);
   }, [navigateWithTransition]);
 
   const handleViewExperiences = useCallback(() => {
@@ -288,6 +297,13 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
         disabled: !isOnline,
         action: navigateToPathways,
       },
+      {
+        id: MENU_ITEM_ID.FAQ,
+        text: t("nav.faq" as TranslationKey).toLowerCase(),
+        icon: <HelpCircle size={18} />,
+        disabled: !isOnline,
+        action: navigateToFaq,
+      },
       ...(hasMultipleLocales
         ? [
             {
@@ -353,6 +369,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
     navigateToProfile,
     handleViewExperiences,
     navigateToPathways,
+    navigateToFaq,
     sentryEnabled,
     handleReportBug,
     isAnonymous,
@@ -491,6 +508,21 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
               >
                 <BookOpenText size={18} />
                 {t("nav.pathways" as TranslationKey)}
+              </Box>
+              <Box
+                component={NavLink}
+                to={routerPaths.FAQ}
+                onClick={(event: React.MouseEvent<HTMLElement>) => {
+                  event.preventDefault();
+                  navigateWithTransition(routerPaths.FAQ);
+                }}
+                aria-disabled={!isOnline}
+                aria-label={t("nav.faqAriaLabel" as TranslationKey)}
+                sx={getNavLinkSx(isOnFaq, !isOnline)}
+                data-testid={DATA_TEST_ID.NAVBAR_LINK_FAQ}
+              >
+                <HelpCircle size={18} />
+                {t("nav.faq" as TranslationKey)}
               </Box>
 
               {hasMultipleLocales && (
