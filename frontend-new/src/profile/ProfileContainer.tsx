@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { Profile } from "./Profile";
 import { useUserProfileContext } from "./UserProfileContext";
@@ -17,7 +17,12 @@ const ProfileContainer: React.FC = () => {
     isLoadingProfile,
     isLoadingSkills,
     isLoadingCareerExplorer,
+    refreshModules,
   } = useUserProfileContext();
+
+  useEffect(() => {
+    refreshModules();
+  }, [refreshModules]);
 
   return (
     <Box

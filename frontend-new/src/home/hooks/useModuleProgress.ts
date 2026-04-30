@@ -20,15 +20,14 @@ const TOTAL_MODULE_COUNT = MODULE_IDS.length;
 export const useModuleProgress = () => {
   const userPreferences = UserPreferencesStateService.getInstance().getUserPreferences();
   const sessions = userPreferences?.sessions;
-  const activeSessionId = useMemo(() => {
-    return UserPreferencesStateService.getInstance().getActiveSessionId();
-  }, []);
 
   const [chatHistory, setChatHistory] = useState<ConversationResponse | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
 
-  // Fetch chat history when the active session changes
+  // Fetch chat history on mount, reading the active session ID fresh from the singleton
+  // so we always get the session created during the current app session, not a stale snapshot.
   useEffect(() => {
+    const activeSessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     if (!activeSessionId) {
       setChatHistory(null);
       return;
@@ -56,7 +55,7 @@ export const useModuleProgress = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeSessionId]);
+  }, []);
 
   // Tracks whether the user has started at least one module.
   const isModuleStarted = useMemo(() => {
@@ -89,8 +88,8 @@ export const useModuleProgress = () => {
       return null;
     }
 
-    // Don't show badge if no active session or history is loading
-    if (!activeSessionId || isLoadingHistory || !chatHistory) {
+    // Don't show badge if history hasn't loaded yet
+    if (isLoadingHistory || !chatHistory) {
       return null;
     }
 

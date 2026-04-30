@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { fetchSkills } from "./utils/fetchSkills";
 import { Skill } from "src/experiences/experienceService/experiences.types";
@@ -98,8 +98,6 @@ export const useUserProfile = (): UseUserProfileResult => {
   const [modules, setModules] = useState<ModuleSummary[]>([]);
   const [skillsInterestsProgress, setSkillsInterestsProgress] = useState<number>(0);
   const [careerExplorerSectors, setCareerExplorerSectors] = useState<UserSectorEngagementItem[]>([]);
-
-  const activeSessionId = useMemo(() => UserPreferencesStateService.getInstance().getActiveSessionId(), []);
 
   // Individual error states
   const [errors, setErrors] = useState<{
@@ -253,40 +251,38 @@ export const useUserProfile = (): UseUserProfileResult => {
     fetchProfileAndSkills();
   }, [profileRefreshVersion, reconnectVersion]);
 
-  const fetchProgress = useCallback(
-    async (opts: { setLoading: boolean } = { setLoading: true }) => {
-      if (!authenticationStateService.getInstance().getUser()) {
-        console.warn("useUserProfile: no authenticated user, skipping progress fetch");
-        if (opts.setLoading) {
-          setIsLoadingModules(false);
-          setIsLoadingCareerExplorer(false);
-        }
-        return;
-      }
+  const fetchProgress = useCallback(async (opts: { setLoading: boolean } = { setLoading: true }) => {
+    if (!authenticationStateService.getInstance().getUser()) {
+      console.warn("useUserProfile: no authenticated user, skipping progress fetch");
       if (opts.setLoading) {
-        setIsLoadingModules(true);
-        setIsLoadingCareerExplorer(true);
-        setErrors((prev) => ({ ...prev, modules: null, careerExplorer: null }));
+        setIsLoadingModules(false);
+        setIsLoadingCareerExplorer(false);
       }
-      try {
-        const progressResponse = await UserMeService.getInstance().getProgress(activeSessionId);
-        setSkillsInterestsProgress(progressResponse.skills_interests_progress);
-        setModules(progressResponse.career_readiness_modules);
-        setCareerExplorerSectors(progressResponse.sector_engagement);
-      } catch (error) {
-        console.error("Error fetching user progress:", error);
-        if (opts.setLoading) {
-          setErrors((prev) => ({ ...prev, modules: error as Error, careerExplorer: error as Error }));
-        }
-      } finally {
-        if (opts.setLoading) {
-          setIsLoadingModules(false);
-          setIsLoadingCareerExplorer(false);
-        }
+      return;
+    }
+    if (opts.setLoading) {
+      setIsLoadingModules(true);
+      setIsLoadingCareerExplorer(true);
+      setErrors((prev) => ({ ...prev, modules: null, careerExplorer: null }));
+    }
+    try {
+      const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
+      const progressResponse = await UserMeService.getInstance().getProgress(sessionId);
+      setSkillsInterestsProgress(progressResponse.skills_interests_progress);
+      setModules(progressResponse.career_readiness_modules);
+      setCareerExplorerSectors(progressResponse.sector_engagement);
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+      if (opts.setLoading) {
+        setErrors((prev) => ({ ...prev, modules: error as Error, careerExplorer: error as Error }));
       }
-    },
-    [activeSessionId]
-  );
+    } finally {
+      if (opts.setLoading) {
+        setIsLoadingModules(false);
+        setIsLoadingCareerExplorer(false);
+      }
+    }
+  }, []);
 
   // Effect 5: GET /users/me/progress — chat progress % + modules + sector engagement (3 old calls → 1)
   // reconnectVersion triggers a re-fetch when the app comes back online
