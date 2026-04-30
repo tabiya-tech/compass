@@ -122,7 +122,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       <PrimaryButton
         fullWidth
         variant="contained"
-        color="brandAction"
+        color="primary"
         showCircle
         style={{ marginTop: 8 }}
         type="submit"
@@ -132,7 +132,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         sx={{
           textTransform: "uppercase",
           backgroundColor: theme.palette.common.cream,
-          color: theme.palette.brandAction.main,
+          color: theme.palette.primary.main,
         }}
       >
         {isRegistering ? (

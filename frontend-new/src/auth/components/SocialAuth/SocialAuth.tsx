@@ -225,7 +225,9 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <GoogleIcon disabled={socialAuthLoading} />
             </div>
-            <Typography variant="body2">{label ?? t("auth.components.socialAuth.loginWithGoogle")}</Typography>
+            <Typography variant="body2" fontWeight={600}>
+              {label ?? t("auth.components.socialAuth.loginWithGoogle")}
+            </Typography>
           </Button>
           {!isOnline && (
             <Typography

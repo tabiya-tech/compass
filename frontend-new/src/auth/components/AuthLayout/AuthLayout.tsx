@@ -86,8 +86,9 @@ const AuthLayout: React.FC = () => {
     loadingMessage: undefined as string | undefined,
   });
   const registrationDisabled = getRegistrationDisabled().toLowerCase() === "true";
+  const isRegisterRoute = location.pathname === routerPaths.REGISTER;
   const showRegisterLink = location.pathname === routerPaths.LOGIN && !registrationDisabled;
-  const showLoginLink = location.pathname === routerPaths.REGISTER;
+  const showLoginLink = isRegisterRoute;
 
   const handleStateChange = useCallback(
     ({ isLoading, loadingMessage }: { isLoading: boolean; loadingMessage?: string }) => {
@@ -197,7 +198,7 @@ const AuthLayout: React.FC = () => {
         />
         <Box
           sx={{
-            backgroundColor: theme.palette.brandAction.main,
+            backgroundColor: isRegisterRoute ? theme.palette.primary.main : theme.palette.brandAction.main,
             borderRadius: 2,
             p: theme.fixedSpacing(4),
             width: "100%",
@@ -236,7 +237,7 @@ const AuthLayout: React.FC = () => {
             <PrimaryButton
               showCircle
               onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
-              color="brandAction"
+              color={showRegisterLink ? "primary" : "brandAction"}
             >
               {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink")}
             </PrimaryButton>
