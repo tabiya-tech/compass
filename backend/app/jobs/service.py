@@ -45,10 +45,15 @@ class IJobService(ABC):
     ) -> PaginatedListResponse["JobDocument"]:
         pass
 
+    @abstractmethod
+    async def get_jobs_by_uuids(self, uuids: list[str]) -> dict[str, "JobDocument"]:
+        pass
+
 
 class JobDocument(BaseModel):
     model_config = {"extra": "ignore"}
 
+    uuid: Optional[str] = None
     title: Optional[str] = None
     employer: Optional[str] = None
     category: Optional[str] = None
@@ -59,6 +64,28 @@ class JobDocument(BaseModel):
     application_url: Optional[str] = None
     source_platform: Optional[str] = None
     skills: Optional[list[str]] = None
+
+
+class MatchedJobDocument(BaseModel):
+    """A job opportunity returned by the matching service for a specific user.
+
+    Field names mirror the matching service response shape (opportunity_title, contract_type, URL).
+    employer, category, and posted_date are enriched from the local jobs collection via the uuid.
+    """
+    model_config = {"extra": "ignore"}
+
+    uuid: Optional[str] = None
+    opportunity_title: Optional[str] = None
+    location: Optional[str] = None
+    contract_type: Optional[str] = None
+    URL: Optional[str] = None
+    final_score: Optional[float] = None
+    justification: Optional[str] = None
+    rank: Optional[int] = None
+    # Enriched from the jobs collection
+    employer: Optional[str] = None
+    category: Optional[str] = None
+    posted_date: Optional[str] = None
 
 
 class JobService(IJobService):
@@ -188,3 +215,9 @@ class JobService(IJobService):
             total=total if include_count else None,
         )
         return PaginatedListResponse(data=job_documents, meta=meta)
+
+    async def get_jobs_by_uuids(self, uuids: list[str]) -> dict[str, JobDocument]:
+        if not uuids:
+            return {}
+        docs = await self._repository.find_by_uuids(uuids)
+        return {doc["uuid"]: JobDocument.model_validate(doc) for doc in docs if doc.get("uuid")}

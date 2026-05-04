@@ -37,6 +37,9 @@ class _FakeJobRepository(IJobRepository):
     async def distinct_values(self, field: str, filter_query: Dict[str, Any]) -> List[str]:
         return []
 
+    async def find_by_uuids(self, uuids: List[str]) -> List[Dict[str, Any]]:
+        return [doc for doc in self._docs if doc.get("uuid") in uuids]
+
 
 class TestJobService:
     @pytest.mark.asyncio
@@ -209,3 +212,50 @@ class TestJobService:
         # THEN HTTP 400 is raised
         assert exc_info.value.status_code == HTTPStatus.BAD_REQUEST
         assert exc_info.value.detail == "Invalid page"
+
+    @pytest.mark.asyncio
+    async def test_get_jobs_by_uuids_returns_dict_keyed_by_uuid(self):
+        # GIVEN the repository contains docs with uuids
+        given_docs = [
+            {"uuid": "uuid-a", "title": "Job A", "employer": "Acme"},
+            {"uuid": "uuid-b", "title": "Job B", "employer": "Globex"},
+        ]
+        repo = _FakeJobRepository(docs=given_docs, total=2)
+        service = JobService(repository=repo)
+
+        # WHEN get_jobs_by_uuids is called with both uuids
+        actual_result = await service.get_jobs_by_uuids(["uuid-a", "uuid-b"])
+
+        # THEN the result is a dict keyed by uuid with JobDocument values
+        assert set(actual_result.keys()) == {"uuid-a", "uuid-b"}
+        assert actual_result["uuid-a"].title == "Job A"
+        assert actual_result["uuid-a"].employer == "Acme"
+        assert actual_result["uuid-b"].title == "Job B"
+
+    @pytest.mark.asyncio
+    async def test_get_jobs_by_uuids_skips_docs_without_uuid(self):
+        # GIVEN the repository returns a doc that lacks a uuid field
+        given_docs = [
+            {"uuid": "uuid-a", "title": "Job A"},
+            {"title": "Job B (no uuid)"},
+        ]
+        repo = _FakeJobRepository(docs=given_docs, total=2)
+        service = JobService(repository=repo)
+
+        # WHEN get_jobs_by_uuids is called
+        actual_result = await service.get_jobs_by_uuids(["uuid-a", "uuid-b"])
+
+        # THEN only the doc with a uuid appears in the result
+        assert list(actual_result.keys()) == ["uuid-a"]
+
+    @pytest.mark.asyncio
+    async def test_get_jobs_by_uuids_with_empty_list_returns_empty_dict(self):
+        # GIVEN any repository state
+        repo = _FakeJobRepository(docs=[{"uuid": "uuid-a"}], total=1)
+        service = JobService(repository=repo)
+
+        # WHEN get_jobs_by_uuids is called with an empty list
+        actual_result = await service.get_jobs_by_uuids([])
+
+        # THEN the result is an empty dict and no repository call was needed
+        assert actual_result == {}

@@ -7,6 +7,7 @@ import DataTable from "src/jobMatching/components/DataTable/DataTable";
 import type { ColumnDef } from "src/jobMatching/components/DataTable/DataTable";
 import JobDetailModal from "src/jobMatching/components/JobDetailModal/JobDetailModal";
 import { useJobs, PAGE_SIZE } from "src/jobMatching/hooks/useJobs";
+import { useMatchedJobs } from "src/jobMatching/hooks/useMatchedJobs";
 import JobService from "src/jobMatching/services/JobService";
 import type { JobFilters, JobRow, JobSortKey } from "src/jobMatching/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -75,6 +76,12 @@ const JobMatchingPage: React.FC = () => {
 
   const { jobs, loading, error, page, totalPages, totalItems, sortKey, sortDir, onSortChange, onSortClear, goToPage } =
     useJobs(queryFilters);
+  const {
+    jobs: matchedJobs,
+    loading: matchedLoading,
+    error: matchedError,
+    reload: reloadMatched,
+  } = useMatchedJobs(activeTab === 1);
 
   useEffect(() => {
     let cancelled = false;
@@ -268,28 +275,32 @@ const JobMatchingPage: React.FC = () => {
         label: "Match",
         align: "center",
         minWidth: 80,
-        render: (val) => (
-          <Chip
-            label={`${val}%`}
-            size="small"
-            sx={{
-              backgroundColor:
-                (val as number) >= 85
-                  ? theme.palette.success.light
-                  : (val as number) >= 70
-                    ? theme.palette.warning.light
-                    : theme.palette.grey[200],
-              color:
-                (val as number) >= 85
-                  ? theme.palette.success.dark
-                  : (val as number) >= 70
-                    ? theme.palette.warning.dark
-                    : theme.palette.text.secondary,
-              fontWeight: 600,
-              fontSize: "0.72rem",
-            }}
-          />
-        ),
+        render: (val) => {
+          if (val === undefined || val === null) return null;
+          const score = val as number;
+          return (
+            <Chip
+              label={`${score}%`}
+              size="small"
+              sx={{
+                backgroundColor:
+                  score >= 85
+                    ? theme.palette.success.light
+                    : score >= 70
+                      ? theme.palette.warning.light
+                      : theme.palette.grey[200],
+                color:
+                  score >= 85
+                    ? theme.palette.success.dark
+                    : score >= 70
+                      ? theme.palette.warning.dark
+                      : theme.palette.text.secondary,
+                fontWeight: 600,
+                fontSize: "0.72rem",
+              }}
+            />
+          );
+        },
       },
     ],
     [columns, theme]
@@ -299,6 +310,14 @@ const JobMatchingPage: React.FC = () => {
   const errorMessage = (() => {
     if (!hasError) return null;
     if (isConnectionFailure) return t("common.errors.api.serverConnectionError");
+    return t("common.errors.api.unableToProcessRequest");
+  })();
+
+  const hasMatchedError = Boolean(matchedError);
+  const isMatchedConnectionFailure = hasMatchedError && isConnectionError(matchedError);
+  const matchedErrorMessage = (() => {
+    if (!hasMatchedError) return null;
+    if (isMatchedConnectionFailure) return t("common.errors.api.serverConnectionError");
     return t("common.errors.api.unableToProcessRequest");
   })();
 
@@ -393,14 +412,36 @@ const JobMatchingPage: React.FC = () => {
 
         {/* Matched for You tab */}
         {activeTab === 1 && (
-          <DataTable<JobRow>
-            rows={[]}
-            columns={matchedColumns}
-            loading={false}
-            tableMinWidth={750}
-            ariaLabel="matched jobs table"
-            emptyMessage="Matched jobs are not available yet. Complete your skills profile to unlock personalised recommendations."
-          />
+          <>
+            {hasMatchedError && (
+              <Box
+                sx={{
+                  mb: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography variant="body1" color="error.main">
+                  {matchedErrorMessage}
+                </Typography>
+                <Box>
+                  <PrimaryButton onClick={reloadMatched}>{t("error.errorPage.refreshButton")}</PrimaryButton>
+                </Box>
+              </Box>
+            )}
+            <DataTable<JobRow>
+              rows={matchedJobs}
+              columns={matchedColumns}
+              loading={matchedLoading}
+              tableMinWidth={750}
+              ariaLabel="matched jobs table"
+              emptyMessage="No matched jobs available yet. Complete your Skills & Interests so we can match you to opportunities."
+              onRowClick={handleRowClick}
+            />
+          </>
         )}
       </Box>
 

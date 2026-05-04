@@ -428,7 +428,7 @@ add_user_invitations_routes(app)
 ############################################
 # Add the jobs routes
 ############################################
-add_jobs_routes(app)
+add_jobs_routes(app, auth)
 
 ############################################
 # Add the institutions routes

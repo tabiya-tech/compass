@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
-import type { JobsApiResponse } from "src/jobMatching/types";
+import type { JobsApiResponse, MatchedJobApiDocument } from "src/jobMatching/types";
 
 const SERVICE_NAME = "JobService";
 
@@ -73,5 +73,22 @@ export default class JobService {
     });
     const body = await response.text();
     return parseJson<JobsApiResponse>(body, errorFactory);
+  }
+
+  async getMatchedJobs(limit = 20): Promise<MatchedJobApiDocument[]> {
+    const url = `${this.baseUrl}/matched?limit=${limit}`;
+    const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getMatchedJobs", "GET", url);
+    const response = await customFetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: SERVICE_NAME,
+      serviceFunction: "getMatchedJobs",
+      failureMessage: "Failed to fetch matched jobs",
+      expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
+    });
+    const body = await response.text();
+    return parseJson<MatchedJobApiDocument[]>(body, errorFactory);
   }
 }
