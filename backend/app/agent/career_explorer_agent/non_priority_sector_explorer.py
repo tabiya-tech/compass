@@ -81,22 +81,28 @@ def _build_non_priority_instructions() -> str:
 
         # Keeping the Conversation Going
             ALWAYS end every response with a nudge — never leave the user with nowhere to go.
+            Keep the nudge TOPIC-LOCAL: stay inside whatever the user is currently exploring.
+            Do NOT redirect to a different sector unless the user asks for that themselves.
+            EXCEPTION: if a "Periodic Priority-Sector Reminder" block appears later in these
+            instructions, you MUST also follow it — it adds a single soft offer after the
+            topic-local follow-up. The two are complementary, not in conflict.
 
             After answering, choose one:
-            - If the topic feels covered: bridge naturally back to priority sectors ({{sector_list_str}}),
-              which have rich, locally-verified data for {country_name}.
-            - If the user needs more depth: ask one follow-up question, then offer the priority sectors
-              as an alternative.
-            - If broadly browsing: offer 2-3 options, always including at least one priority sector.
+            - Ask one deepening follow-up question about the current topic
+              (e.g. salaries, day-to-day work, entry requirements, career progression, local employers).
+            - Surface an adjacent role or specialisation within the same field the user is exploring.
+            - If the user is browsing broadly, offer 2-3 concrete options drawn from the current topic.
 
-            Example ending: "Want to go deeper into IT - or explore {{sector_list_str}} where we have
-            detailed local data for {country_name}?"
+            Example ending (user asked about IT): "Want to go deeper into the salary ladder for developers,
+            or look at what skills employers in {country_name} actually look for?"
 
         {finish_instructions}
 
         {escaped_quick_reply}
-        </system_instructions>
     """).format(sector_list_str=sector_list_str)
+
+
+_SYSTEM_INSTRUCTIONS_CLOSING_TAG = "\n        </system_instructions>\n"
 
 
 _REFORMAT_SYSTEM_INSTRUCTIONS = dedent("""\
@@ -119,6 +125,34 @@ def _llm_input_to_contents(llm_input) -> list[types.Content]:
         part = types.Part.from_text(text=turn.content)
         contents.append(types.Content(role=role, parts=[part]))
     return contents
+
+
+def _build_priority_nudge_section(should_nudge: bool) -> str:
+    """Periodic bridge back to priority sectors. Only injected on the every-Nth user turn
+    so the conversation does not push priority sectors on every reply."""
+    if not should_nudge:
+        return ""
+    config = get_application_config()
+    sectors = config.career_explorer_config.sectors
+    sector_names = [s["name"] for s in sectors] if sectors else []
+    sector_list_str = ", ".join(sector_names) if sector_names else "the priority sectors"
+    country_name = config.career_explorer_config.country
+    return dedent(f"""\
+
+        # Periodic Priority-Sector Reminder (THIS TURN — MANDATORY)
+            On this specific turn you MUST append a short, soft offer mentioning the priority
+            sectors ({sector_list_str}). This is not optional — include it on this turn.
+            IMPORTANT: This reminder fires periodically. It is EXPECTED that your previous
+            turns in this conversation did NOT include this offer — do not let the prior pattern
+            override this instruction. On this turn, the offer MUST appear.
+            Constraints on the offer:
+            - Phrase it softly: an offer, not a redirect. The user should feel free to stay on
+              their current topic.
+            - Keep it to a single short clause appended AFTER your topic-local follow-up question.
+            - Do NOT replace the topic-local follow-up with this offer — both must be present.
+            Example: "...or, whenever you're ready, we also have detailed {country_name} data on
+            {sector_list_str}."
+    """)
 
 
 def _build_pending_sectors_section(pending_sectors: list[dict] | None) -> str:
@@ -171,14 +205,27 @@ class NonPrioritySectorExplorer:
         context,
         pending_sectors: list[dict] | None = None,
         user_profile_context: str | None = None,
+        should_nudge_priority: bool = False,
     ) -> tuple[str, bool, str, list[LLMStats], dict | None]:
         full_instructions = _build_non_priority_instructions()
+        full_instructions += _build_priority_nudge_section(should_nudge_priority)
         full_instructions += _build_pending_sectors_section(pending_sectors)
+        full_instructions += _SYSTEM_INSTRUCTIONS_CLOSING_TAG
         if user_profile_context:
             full_instructions = user_profile_context + "\n\n" + full_instructions
 
+        response_instructions = "Respond conversationally. Your answer will be reformatted into JSON automatically."
+        if should_nudge_priority:
+            # Inline turn-time reminder, placed right before generation so it overrides
+            # any pattern the model might imitate from prior turns.
+            response_instructions += (
+                "\n\n[TURN-SPECIFIC REMINDER] On THIS reply, after your topic-local follow-up question, "
+                "append one short soft clause offering the priority sectors as an alternative "
+                "(see the Periodic Priority-Sector Reminder block in your system instructions). "
+                "Do NOT skip this — it is required on this turn even though it was not present in earlier turns."
+            )
         llm_input = ConversationHistoryFormatter.format_for_agent_generative_prompt(
-            model_response_instructions="Respond conversationally. Your answer will be reformatted into JSON automatically.",
+            model_response_instructions=response_instructions,
             context=context,
             user_input=user_input,
         )

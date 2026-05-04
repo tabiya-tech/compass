@@ -94,12 +94,19 @@ def _build_base_instructions(retrieved_content: str) -> str:
             didn't know to ask. ALWAYS end every response with a nudge — never leave the user
             with nowhere to go.
 
+            Keep the nudge TOPIC-LOCAL: stay inside the sector the user is currently exploring.
+            Do NOT cross-pitch other priority sectors unless the user signals they're done with this one.
+            EXCEPTION: if a "Periodic Cross-Sector Reminder" block appears later in these
+            instructions, you MUST also follow it — it adds a single soft offer after the
+            topic-local follow-up. The two are complementary, not in conflict.
+
             After answering, choose the right nudge:
             - If there is more depth on the current topic → ask a deepening question
               e.g. "Would you like to know about salaries for these roles?"
-            - If the current topic feels covered → suggest a related area or sector not yet explored
-              e.g. "We've covered Mining roles — want to explore Agriculture or Energy next?"
-            - If the user is browsing broadly → offer 2–3 concrete options to pick from
+            - If the current topic feels covered → suggest a related role, specialisation, or angle
+              within the same sector
+              e.g. "We've covered Driller/Blaster — want to look at the geology or supervisor track next?"
+            - If the user is browsing broadly → offer 2–3 concrete options drawn from the current sector
 
             NEVER end a response with only information. ALWAYS end with a question or invitation.
 
@@ -119,8 +126,10 @@ def _build_base_instructions(retrieved_content: str) -> str:
         {finish_instructions}
 
         {escaped_quick_reply}
-        </system_instructions>
     """)
+
+
+_SYSTEM_INSTRUCTIONS_CLOSING_TAG = "\n        </system_instructions>\n"
 
 
 def _format_chunks(chunks: list[SectorChunkEntity]) -> str:
@@ -134,6 +143,31 @@ def _format_chunks(chunks: list[SectorChunkEntity]) -> str:
     for c in chunks:
         parts.append(f"[{c.sector}]\n{c.text}")
     return "\n\n---\n\n".join(parts)
+
+
+def _build_priority_nudge_section(should_nudge: bool) -> str:
+    """Periodic cross-sector reminder. Only injected on the every-Nth user turn so the
+    conversation does not push other priority sectors on every reply."""
+    if not should_nudge:
+        return ""
+    config = get_application_config()
+    sectors = config.career_explorer_config.sectors
+    sector_names = [s["name"] for s in sectors] if sectors else []
+    sector_list_str = ", ".join(sector_names) if sector_names else "the priority sectors"
+    return dedent(f"""\
+
+        # Periodic Cross-Sector Reminder (THIS TURN — MANDATORY)
+            On this specific turn you MUST append a short, soft offer mentioning the other
+            priority sectors ({sector_list_str}). This is not optional — include it on this turn.
+            IMPORTANT: This reminder fires periodically. It is EXPECTED that your previous
+            turns in this conversation did NOT include this offer — do not let the prior pattern
+            override this instruction. On this turn, the offer MUST appear.
+            Constraints on the offer:
+            - Phrase it softly: an offer, not a redirect. The user should feel free to stay on
+              their current sector.
+            - Keep it to a single short clause appended AFTER your topic-local follow-up.
+            - Do NOT replace the topic-local follow-up with this offer — both must be present.
+    """)
 
 
 def _build_pending_sectors_section(pending_sectors: list[dict] | None) -> str:
@@ -171,11 +205,14 @@ class PrioritySectorExplorer:
         context,
         pending_sectors: list[dict] | None = None,
         user_profile_context: str | None = None,
+        should_nudge_priority: bool = False,
     ) -> tuple[str, bool, str, list[LLMStats], dict | None]:
         chunks = await self._sector_search.search(query=user_input, k=5)
         retrieved = _format_chunks(chunks)
         full_instructions = _build_base_instructions(retrieved)
+        full_instructions += _build_priority_nudge_section(should_nudge_priority)
         full_instructions += _build_pending_sectors_section(pending_sectors)
+        full_instructions += _SYSTEM_INSTRUCTIONS_CLOSING_TAG
         if user_profile_context:
             full_instructions = user_profile_context + "\n\n" + full_instructions
 
@@ -189,10 +226,18 @@ class PrioritySectorExplorer:
             self._logger.info("  Chunk %d [%s] (score=%.4f): %s", i + 1, chunk.sector, chunk.score, preview.replace("\n", " "))
 
         llm = GeminiGenerativeLLM(system_instructions=full_instructions, config=self._llm_config)
+        response_instructions = get_json_response_instructions()
+        if should_nudge_priority:
+            response_instructions += (
+                "\n\n[TURN-SPECIFIC REMINDER] On THIS reply, after your topic-local follow-up, "
+                "append one short soft clause offering the other priority sectors as an alternative "
+                "(see the Periodic Cross-Sector Reminder block in your system instructions). "
+                "Do NOT skip this — it is required on this turn even though it was not present in earlier turns."
+            )
         model_response, llm_stats = await self._llm_caller.call_llm(
             llm=llm,
             llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                model_response_instructions=get_json_response_instructions(),
+                model_response_instructions=response_instructions,
                 context=context,
                 user_input=user_input,
             ),

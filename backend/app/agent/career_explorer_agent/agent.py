@@ -107,13 +107,24 @@ class CareerExplorerAgent(Agent):
                 if s.sector_name != sector_name and s.sector_name not in existing_pending_names:
                     effective_pending.append({"sector_name": s.sector_name, "is_priority": s.is_priority})
 
+        # Periodic priority-sector nudge: only inject the bridge-back instruction every Nth user turn,
+        # so the assistant does not steer the user toward priority sectors on every reply.
+        # `context.all_history.turns` holds completed turns; the current user turn is len(...) + 1.
+        nudge_every_n = get_application_config().career_explorer_config.priority_nudge_every_n_turns
+        current_user_turn = len(context.all_history.turns) + 1
+        should_nudge_priority = nudge_every_n > 0 and (current_user_turn % nudge_every_n == 0)
+
         if relevance == SectorRelevance.PRIORITY_SECTOR:
             message, finished, reasoning, explorer_stats, metadata = await self._priority_explorer.explore(
-                msg, context, pending_sectors=effective_pending or None, user_profile_context=self._user_profile_context
+                msg, context, pending_sectors=effective_pending or None,
+                user_profile_context=self._user_profile_context,
+                should_nudge_priority=should_nudge_priority,
             )
         else:
             message, finished, reasoning, explorer_stats, metadata = await self._non_priority_explorer.explore(
-                msg, context, pending_sectors=effective_pending or None, user_profile_context=self._user_profile_context
+                msg, context, pending_sectors=effective_pending or None,
+                user_profile_context=self._user_profile_context,
+                should_nudge_priority=should_nudge_priority,
             )
 
         all_stats = classifier_stats + explorer_stats

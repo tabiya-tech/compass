@@ -107,7 +107,7 @@ async def test_rag_path_uses_retrieved_content():
     """
     explorer = PrioritySectorExplorer(sector_search_service=_FixedChunkSearchService(MINING_CHUNKS))
     user_input = "What roles are there in mining?"
-    message, finished, reasoning, _ = await explorer.explore(
+    message, finished, reasoning, _, _ = await explorer.explore(
         user_input=user_input,
         context=_make_context(user_input),
     )
@@ -133,7 +133,7 @@ async def test_rag_path_does_not_hedge_unnecessarily():
     """
     explorer = PrioritySectorExplorer(sector_search_service=_FixedChunkSearchService(MINING_CHUNKS))
     user_input = "What do miners earn in Zambia?"
-    message, _, _, _ = await explorer.explore(
+    message, _, _, _, _ = await explorer.explore(
         user_input=user_input,
         context=_make_context(user_input),
     )
@@ -157,7 +157,7 @@ async def test_no_rag_data_answers_with_general_knowledge():
     """
     explorer = PrioritySectorExplorer(sector_search_service=_EmptySearchService())
     user_input = "What soft skills do I need to advance in mining?"
-    message, _, _, _ = await explorer.explore(
+    message, _, _, _, _ = await explorer.explore(
         user_input=user_input,
         context=_make_context(user_input),
     )
@@ -188,7 +188,7 @@ async def test_no_rag_data_applies_hedging_language():
     """
     explorer = PrioritySectorExplorer(sector_search_service=_EmptySearchService())
     user_input = "How do I grow from entry-level to senior in agriculture?"
-    message, _, _, _ = await explorer.explore(
+    message, _, _, _, _ = await explorer.explore(
         user_input=user_input,
         context=_make_context(user_input),
     )
