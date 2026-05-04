@@ -409,7 +409,7 @@ function DataTable<T extends { id: string }>({
   return (
     <>
       {search && (
-        <Box mb={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
+        <Box mb={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
           <TextField
             size="small"
             placeholder={search.placeholder}

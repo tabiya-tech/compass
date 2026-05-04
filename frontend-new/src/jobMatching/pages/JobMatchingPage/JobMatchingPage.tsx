@@ -337,8 +337,7 @@ const JobMatchingPage: React.FC = () => {
           maxWidth: "var(--layout-content-max-width)",
           mx: "auto",
           px: "var(--layout-gutter-x)",
-          paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
-          paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+          paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xl),
         }}
       >
         {/* Tabs */}
@@ -347,7 +346,7 @@ const JobMatchingPage: React.FC = () => {
           onChange={(_, v) => setActiveTab(v)}
           data-testid={DATA_TEST_ID.JOB_MATCHING_TABS}
           sx={{
-            mb: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            mb: theme.fixedSpacing(theme.tabiyaSpacing.lg),
             borderBottom: `1px solid ${theme.palette.divider}`,
             "& .MuiTab-root": {
               textTransform: "none",

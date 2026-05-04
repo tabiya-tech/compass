@@ -110,7 +110,7 @@ const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshTo
   const sectors = data?.sectors ?? [];
 
   return (
-    <Sidebar title="Sectors Explored" width={300}>
+    <Sidebar title="Sectors Explored">
       {sectors.length === 0 ? (
         <Box
           data-testid={DATA_TEST_ID.CAREER_EXPLORER_SIDEBAR_EMPTY}

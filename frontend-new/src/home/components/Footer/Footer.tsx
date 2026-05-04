@@ -76,27 +76,36 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
             }}
             data-testid={DATA_TEST_ID.FOOTER_LOGOS_CONTAINER}
           >
-            <img
+            <Box
+              component="img"
               src={`${process.env.PUBLIC_URL}/world-bank-logo.svg`}
               alt="World Bank Group Logo"
-              style={{ height: 28, width: "auto", objectFit: "contain", marginRight: 10 }}
               data-testid={DATA_TEST_ID.FOOTER_WORLD_BANK_LOGO}
+              sx={{
+                height: 28,
+                width: "auto",
+                objectFit: "contain",
+                mr: { xs: 0, sm: theme.fixedSpacing(1.5) },
+                mb: { xs: theme.fixedSpacing(1), sm: 0 },
+              }}
             />
-            <img
+            <Box
+              component="img"
               src={`${process.env.PUBLIC_URL}/ministry-tech.png`}
               alt="Ministry of Technology Logo"
-              style={{
+              data-testid={DATA_TEST_ID.FOOTER_MINISTRY_TECH_LOGO}
+              sx={{
                 height: 36,
                 width: "auto",
                 objectFit: "contain",
               }}
-              data-testid={DATA_TEST_ID.FOOTER_MINISTRY_TECH_LOGO}
             />
-            <img
+            <Box
+              component="img"
               src={`${process.env.PUBLIC_URL}/tabiya-logo.svg`}
               alt="Tabiya Logo"
-              style={{ height: 46, width: "auto", objectFit: "contain" }}
               data-testid={DATA_TEST_ID.FOOTER_TABIYA_LOGO}
+              sx={{ height: 46, width: "auto", objectFit: "contain" }}
             />
           </Box>
 
@@ -106,7 +115,7 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: theme.spacing(theme.tabiyaSpacing.md),
+              gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
               flexWrap: "wrap",
             }}
           >

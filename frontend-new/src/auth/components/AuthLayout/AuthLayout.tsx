@@ -108,7 +108,7 @@ const AuthLayout: React.FC = () => {
         flexDirection: { xs: "column", md: "row" },
         alignItems: "center",
         gap: { xs: 3, md: 2, lg: 0 },
-        pt: { xs: 6, md: 2, lg: 1 },
+        pt: theme.fixedSpacing(2),
       }}
     >
       <Box
@@ -193,7 +193,7 @@ const AuthLayout: React.FC = () => {
             zIndex: 3,
             mx: { xs: "auto", md: 0 },
             mr: { md: -7, lg: -3.2 },
-            mb: { xs: 2, md: 0 },
+            my: { xs: theme.fixedSpacing(2), md: 0 },
           }}
         />
         <Box
@@ -257,7 +257,7 @@ const AuthLayout: React.FC = () => {
             pb: { xs: 3, md: 4 },
           }}
         >
-          <Typography variant="h2" sx={{ fontWeight: 700, textAlign: "start", mb: 3 }}>
+          <Typography variant="h2" sx={{ fontWeight: 700, textAlign: "start", mb: theme.fixedSpacing(4) }}>
             {t("auth.pages.login.appHero.whatIsTitleBefore")}{" "}
             <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
               {t("auth.pages.login.appHero.whatIsTitleBrand", { appName })}
@@ -269,8 +269,8 @@ const AuthLayout: React.FC = () => {
             sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-              gridTemplateRows: { xs: "repeat(9, auto)", md: "minmax(148px, auto) auto auto" },
-              rowGap: { xs: 4, md: 0 },
+              gridTemplateRows: { xs: "repeat(6, auto)", md: "minmax(148px, auto) auto auto" },
+              rowGap: { xs: theme.fixedSpacing(4), md: 0 },
               columnGap: { xs: 0, md: 1 },
             }}
           >

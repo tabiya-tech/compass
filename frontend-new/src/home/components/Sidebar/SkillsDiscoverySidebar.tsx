@@ -49,6 +49,8 @@ const tagSx = (bg: string, color: string) => ({
   backgroundColor: bg,
   color,
   cursor: "default" as const,
+  overflowWrap: "anywhere" as const,
+  wordBreak: "break-word" as const,
 });
 
 interface SkillsDiscoverySidebarProps {
@@ -87,7 +89,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
   const hasAnySkills = workSkills.length > 0 || programmeSkills.length > 0;
 
   return (
-    <Sidebar title="Skills Identified" width={300}>
+    <Sidebar title="Skills Identified" width="100%">
       {/* Progress bar */}
       <ChatProgressBar {...currentPhase} />
 
@@ -131,7 +133,15 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
           </Box>
-          Skills will appear here as you chat with Njila.
+          <Box
+            component="p"
+            sx={{
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
+            }}
+          >
+            Skills will appear here as you chat with Njila.
+          </Box>
         </Box>
       ) : (
         <>

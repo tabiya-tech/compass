@@ -29,6 +29,8 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280, disable
       data-testid={DATA_TEST_ID.SIDEBAR_CONTAINER}
       sx={{
         width,
+        maxWidth: "100%",
+        minWidth: 0,
         flexShrink: 0,
         display: "flex",
         flexDirection: "column",
@@ -48,6 +50,9 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280, disable
             fontWeight: 700,
             color: theme.palette.common.black,
             letterSpacing: "0.01em",
+            minWidth: 0,
+            maxWidth: "100%",
+            overflowWrap: "anywhere",
           }}
         >
           {title}
@@ -55,7 +60,13 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children, width = 280, disable
       )}
       <Box
         data-testid={DATA_TEST_ID.SIDEBAR_CONTENT}
-        sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.lg * 1.25) }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: theme.fixedSpacing(theme.tabiyaSpacing.lg * 1.25),
+          minWidth: 0,
+          maxWidth: "100%",
+        }}
       >
         {children}
       </Box>

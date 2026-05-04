@@ -33,13 +33,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ upNextModule, loading = false
           width: "100%",
           maxWidth: "var(--layout-content-max-width)",
           margin: "0 auto",
-          paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+          paddingTop: { xs: 0, sm: theme.fixedSpacing(theme.tabiyaSpacing.lg) },
           paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           paddingLeft: "var(--layout-gutter-x)",
           paddingRight: "var(--layout-gutter-x)",
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          alignItems: "center",
+          alignItems: { xs: "flex-start", sm: "center" },
         }}
       >
         <Box
@@ -47,9 +48,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ upNextModule, loading = false
           src="/thinkers.svg"
           alt=""
           sx={{
-            width: theme.fixedSpacing(theme.tabiyaSpacing.xl * 8),
+            width: {
+              xs: "100%",
+              sm: theme.fixedSpacing(theme.tabiyaSpacing.xl * 8),
+            },
+            maxWidth: { xs: theme.fixedSpacing(theme.tabiyaSpacing.xl * 8), sm: "none" },
+            alignSelf: { xs: "center", sm: "auto" },
             flexShrink: 0,
-            display: { xs: "none", sm: "block" },
+            display: "block",
             objectFit: "contain",
           }}
         />

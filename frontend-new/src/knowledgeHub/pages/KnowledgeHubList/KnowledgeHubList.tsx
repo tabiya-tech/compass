@@ -74,7 +74,7 @@ const KnowledgeHubList: React.FC = () => {
 
   const contentColumnSx = {
     width: "100%",
-    maxWidth: 640,
+    maxWidth: "var(--layout-content-max-width)",
     mx: "auto",
     textAlign: "left" as const,
     px: "var(--layout-gutter-x)",
@@ -86,7 +86,7 @@ const KnowledgeHubList: React.FC = () => {
       xs: "minmax(40px, 52px) minmax(0, 1fr)",
       sm: "minmax(48px, 56px) minmax(0, 1fr)",
     },
-    columnGap: { xs: 3, sm: 4 },
+    columnGap: { xs: theme.fixedSpacing(3), sm: theme.fixedSpacing(4) },
     alignItems: "flex-start",
     width: "100%",
   } as const;
@@ -110,7 +110,7 @@ const KnowledgeHubList: React.FC = () => {
             backgroundColor: theme.palette.common.white,
             overflow: "visible",
             pb: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-            pt: { xs: 4, md: 8 },
+            pt: { xs: theme.fixedSpacing(4), md: theme.fixedSpacing(8) },
             position: "relative",
             zIndex: 1,
           }}
@@ -132,7 +132,7 @@ const KnowledgeHubList: React.FC = () => {
                 ...contentColumnSx,
                 ...textAlignGrid,
                 gridTemplateColumns: { xs: "1fr", md: "minmax(48px, 56px) minmax(0, 1fr)" },
-                rowGap: { xs: 2, md: 0 },
+                rowGap: { xs: theme.fixedSpacing(2), md: 0 },
                 position: "relative",
                 overflow: "visible",
               }}
@@ -181,7 +181,7 @@ const KnowledgeHubList: React.FC = () => {
                   variant="h2"
                   sx={{
                     fontWeight: 800,
-                    mb: 1,
+                    mb: theme.fixedSpacing(1),
                     color: theme.palette.text.primary,
                   }}
                 >
@@ -226,7 +226,7 @@ const KnowledgeHubList: React.FC = () => {
             }}
           >
             <Stack
-              spacing={{ xs: 10, sm: 8, md: 5 }}
+              spacing={theme.fixedSpacing(6)}
               sx={contentColumnSx}
               data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_LIST}
             >

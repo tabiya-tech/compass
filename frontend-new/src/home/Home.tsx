@@ -56,10 +56,7 @@ const Home: React.FC = () => {
       >
         <Box
           sx={{
-            backgroundColor: theme.palette.common.white,
-            paddingTop: isMobile
-              ? theme.fixedSpacing(theme.tabiyaSpacing.lg)
-              : theme.fixedSpacing(theme.tabiyaSpacing.md),
+            paddingTop: theme.fixedSpacing(6),
             paddingBottom: { xs: theme.fixedSpacing(theme.tabiyaSpacing.sm), md: 0 },
             overflow: "visible",
           }}

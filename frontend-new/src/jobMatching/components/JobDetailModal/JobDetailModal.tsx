@@ -96,7 +96,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
               size="small"
               sx={{
                 backgroundColor: theme.palette.primary.light,
-                color: theme.palette.primary.contrastText,
+                color: theme.palette.common.black,
+                border: `1px solid ${theme.palette.primary.main}`,
                 fontWeight: 600,
                 fontSize: "0.75rem",
               }}

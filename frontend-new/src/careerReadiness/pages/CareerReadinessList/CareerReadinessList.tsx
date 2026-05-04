@@ -110,7 +110,7 @@ const CareerReadinessList: React.FC = () => {
                 lineHeight: 0.9,
                 letterSpacing: "-0.02em",
                 color: theme.palette.text.secondary,
-                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
               }}
             >
               {t("careerReadiness.modulesTitle")}

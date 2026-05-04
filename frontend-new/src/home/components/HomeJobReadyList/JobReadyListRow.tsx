@@ -194,13 +194,10 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
             flexDirection: "row",
             alignItems: "stretch",
             gap: {
-              xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
               sm: theme.fixedSpacing(theme.tabiyaSpacing.lg),
             },
-            py: {
-              xs: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-              sm: theme.fixedSpacing(theme.tabiyaSpacing.md),
-            },
+            py: theme.fixedSpacing(theme.tabiyaSpacing.md),
             cursor: "pointer",
             borderRadius: theme.rounding(theme.tabiyaRounding.sm),
           }}

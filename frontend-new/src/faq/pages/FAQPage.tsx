@@ -115,7 +115,6 @@ const FAQPage: React.FC = () => {
       sx={{
         minHeight: "100vh",
         backgroundColor: theme.palette.containerBackground.main,
-        "--faq-content-max-width": "calc(880px + 240px + 48px)",
       }}
     >
       <Box
@@ -127,12 +126,12 @@ const FAQPage: React.FC = () => {
       >
         <Box
           sx={{
-            maxWidth: "var(--faq-content-max-width)",
+            maxWidth: "var(--layout-content-max-width)",
             margin: "0 auto",
-            padding: { xs: "32px 20px 28px", md: "56px 32px 40px" },
+            padding: { xs: "32px 16px 28px", md: "56px 32px 40px" },
             display: "flex",
             flexDirection: "column",
-            gap: 2.5,
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <Box>
@@ -145,7 +144,7 @@ const FAQPage: React.FC = () => {
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
                 color: theme.palette.text.secondary,
-                marginBottom: "12px",
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
               }}
             >
               {t("faq.eyebrow")}
@@ -159,7 +158,7 @@ const FAQPage: React.FC = () => {
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
                 color: theme.palette.common.black,
-                marginBottom: "12px",
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
               }}
             >
               {title}
@@ -262,9 +261,9 @@ const FAQPage: React.FC = () => {
 
       <Box
         sx={{
-          maxWidth: "var(--faq-content-max-width)",
+          maxWidth: "var(--layout-content-max-width)",
           margin: "0 auto",
-          padding: { xs: "32px 20px 64px", md: "48px 32px 96px" },
+          padding: { xs: "32px 16px 64px", md: "48px 32px 96px" },
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "240px 1fr" },
           gap: { xs: 4, md: 7 },

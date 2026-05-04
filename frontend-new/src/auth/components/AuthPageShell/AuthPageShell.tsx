@@ -55,9 +55,6 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
     });
   }, [navigate]);
 
-  const pt = { xs: 4, md: 6 };
-  const pb = { xs: 6, md: 2 };
-
   return (
     <Box
       sx={(t) => ({
@@ -102,13 +99,19 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
             zIndex: 1,
           }}
         >
-          <Box sx={{ position: "relative", pt, pb }}>
+          <Box
+            sx={{
+              position: "relative",
+              pt: { xs: theme.fixedSpacing(4), md: theme.fixedSpacing(6) },
+              pb: { xs: theme.fixedSpacing(6), md: theme.fixedSpacing(2) },
+            }}
+          >
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                mb: whiteBandContent ? { xs: 2, md: 3 } : 0,
+                mb: whiteBandContent ? theme.fixedSpacing(3) : 0,
               }}
             >
               <Box

@@ -2,11 +2,11 @@
 
 exports[`Profile Component Rendering should render all profile sections with correct props 1`] = `
 <div
-  class="MuiBox-root css-1kxw3q2"
+  class="MuiBox-root css-rkfpev"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
-    class="MuiStack-root css-1sazv7p-MuiStack-root"
+    class="MuiStack-root css-v2woy3-MuiStack-root"
   >
     <div
       data-testid="profile-card"
@@ -26,10 +26,10 @@ exports[`Profile Component Rendering should render all profile sections with cor
       loaded
     </div>
     <div
-      class="MuiBox-root css-naj115"
+      class="MuiBox-root css-1ydy4ac"
     >
       <div
-        class="MuiStack-root css-1sazv7p-MuiStack-root"
+        class="MuiStack-root css-v2woy3-MuiStack-root"
       >
         <div
           class="MuiBox-root css-1821gv5"
@@ -144,7 +144,7 @@ exports[`Profile Component Rendering should render all profile sections with cor
         </div>
       </div>
       <div
-        class="MuiStack-root css-1vsdrxv-MuiStack-root"
+        class="MuiStack-root css-en3wmb-MuiStack-root"
       >
         <div
           data-testid="skills-discovered-card"
@@ -404,7 +404,7 @@ exports[`Profile Component Rendering should render all profile sections with cor
           </div>
         </div>
         <div
-          class="MuiBox-root css-c7fp9u"
+          class="MuiBox-root css-o4f5cz"
         >
           <div
             data-testid="security-card"
@@ -431,11 +431,11 @@ exports[`Profile Component Rendering should render all profile sections with cor
 
 exports[`Profile Component Rendering should render correctly with partial data 1`] = `
 <div
-  class="MuiBox-root css-1kxw3q2"
+  class="MuiBox-root css-rkfpev"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
-    class="MuiStack-root css-1sazv7p-MuiStack-root"
+    class="MuiStack-root css-v2woy3-MuiStack-root"
   >
     <div
       data-testid="profile-card"
@@ -455,10 +455,10 @@ exports[`Profile Component Rendering should render correctly with partial data 1
       loaded
     </div>
     <div
-      class="MuiBox-root css-naj115"
+      class="MuiBox-root css-1ydy4ac"
     >
       <div
-        class="MuiStack-root css-1sazv7p-MuiStack-root"
+        class="MuiStack-root css-v2woy3-MuiStack-root"
       >
         <div
           class="MuiBox-root css-1821gv5"
@@ -573,7 +573,7 @@ exports[`Profile Component Rendering should render correctly with partial data 1
         </div>
       </div>
       <div
-        class="MuiStack-root css-1vsdrxv-MuiStack-root"
+        class="MuiStack-root css-en3wmb-MuiStack-root"
       >
         <div
           data-testid="skills-discovered-card"
@@ -833,7 +833,7 @@ exports[`Profile Component Rendering should render correctly with partial data 1
           </div>
         </div>
         <div
-          class="MuiBox-root css-c7fp9u"
+          class="MuiBox-root css-o4f5cz"
         >
           <div
             data-testid="security-card"
@@ -860,11 +860,11 @@ exports[`Profile Component Rendering should render correctly with partial data 1
 
 exports[`Profile Component Rendering should render with null data showing 'Not available' 1`] = `
 <div
-  class="MuiBox-root css-1kxw3q2"
+  class="MuiBox-root css-rkfpev"
   data-testid="profile-content-a7f8e4b2-9c3d-4a1e-8f6b-2d3e4a5b6c7d"
 >
   <div
-    class="MuiStack-root css-1sazv7p-MuiStack-root"
+    class="MuiStack-root css-v2woy3-MuiStack-root"
   >
     <div
       data-testid="profile-card"
@@ -884,10 +884,10 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
       loaded
     </div>
     <div
-      class="MuiBox-root css-naj115"
+      class="MuiBox-root css-1ydy4ac"
     >
       <div
-        class="MuiStack-root css-1sazv7p-MuiStack-root"
+        class="MuiStack-root css-v2woy3-MuiStack-root"
       >
         <div
           class="MuiBox-root css-1821gv5"
@@ -1002,7 +1002,7 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
         </div>
       </div>
       <div
-        class="MuiStack-root css-1vsdrxv-MuiStack-root"
+        class="MuiStack-root css-en3wmb-MuiStack-root"
       >
         <div
           data-testid="skills-discovered-card"
@@ -1262,7 +1262,7 @@ exports[`Profile Component Rendering should render with null data showing 'Not a
           </div>
         </div>
         <div
-          class="MuiBox-root css-c7fp9u"
+          class="MuiBox-root css-o4f5cz"
         >
           <div
             data-testid="security-card"

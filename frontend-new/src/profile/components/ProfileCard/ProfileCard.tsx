@@ -180,7 +180,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
             flexDirection: { xs: "column", sm: "row" },
             flexWrap: { xs: "wrap", sm: "nowrap" },
             alignItems: "stretch",
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            gap: { xs: theme.fixedSpacing(theme.tabiyaSpacing.md), sm: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
             width: { xs: "100%", md: "auto" },
             flex: { xs: "1 1 auto", md: "0 0 auto" },
             minWidth: 0,

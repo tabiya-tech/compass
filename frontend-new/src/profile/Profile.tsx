@@ -78,14 +78,16 @@ export const Profile: React.FC<ProfileProps> = ({
   return (
     <Box
       sx={{
-        padding: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-        maxWidth: "var(--layout-content-max-width, 80rem)",
+        paddingY: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+        paddingX: "var(--layout-gutter-x)",
+        maxWidth: "var(--layout-content-max-width)",
         width: "100%",
         margin: "0 auto",
+        marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
       }}
       data-testid={DATA_TEST_ID.PROFILE_CONTENT}
     >
-      <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+      <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.lg)}>
         {/* Identity */}
         <ProfileCard
           name={name}
@@ -100,11 +102,11 @@ export const Profile: React.FC<ProfileProps> = ({
           sx={{
             display: "grid",
             gridTemplateColumns: { xs: "1fr", md: "420px 1fr" },
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.xl),
             alignItems: "start",
           }}
         >
-          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.lg)}>
             <ModuleProgressCard
               overallProgress={overallProgress}
               educationProgress={educationProgress}
@@ -113,7 +115,7 @@ export const Profile: React.FC<ProfileProps> = ({
             <CareerReadinessProgressBanner modules={modules} />
           </Stack>
 
-          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.md)} sx={{ minWidth: 0 }}>
+          <Stack spacing={theme.fixedSpacing(theme.tabiyaSpacing.lg)} sx={{ minWidth: 0 }}>
             <SkillsDiscoveredCard
               skills={skills}
               educationSkills={educationSkills}
@@ -128,7 +130,7 @@ export const Profile: React.FC<ProfileProps> = ({
               sx={{
                 display: "grid",
                 gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.lg),
               }}
             >
               <SecurityCard email={email} isLoading={isLoadingSecurity} />
