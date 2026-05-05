@@ -116,6 +116,10 @@ class _SentenceDecompositionLLM:
                                                                                                     ),
                                                                                                     logger=self.logger)
 
+        if not llm_second_pass_output:
+            self.logger.warning("The LLM did not return any output for sentence decomposition second pass, falling back to first pass output")
+            return _SentenceDecompositionResponse(decomposed_and_dereferenced=llm_first_pass_output.resolved_pronouns), llm_first_pass_stats + llm_second_pass_stats
+
         if len(llm_first_pass_output.resolved_pronouns) != len(llm_second_pass_output.decomposed_and_dereferenced):
             self.logger.warning("The number of sentences in the first pass (%d) does not match the number of sentences in the second pass (%d)",
                                 len(llm_first_pass_output.resolved_pronouns), len(llm_second_pass_output.decomposed_and_dereferenced))
