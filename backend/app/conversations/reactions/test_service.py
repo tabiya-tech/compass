@@ -143,6 +143,9 @@ def _mock_conversation_memory_manager() -> IConversationMemoryManager:
         async def update_history(self, user_input: AgentInput, agent_output: AgentOutput):
             raise NotImplementedError()
 
+        async def force_summarize_all(self) -> None:
+            raise NotImplementedError()
+
         async def is_user_message(self, message_id: str):
             raise NotImplementedError()
 
