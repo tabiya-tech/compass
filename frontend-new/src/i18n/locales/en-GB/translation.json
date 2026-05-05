@@ -1074,7 +1074,13 @@
   },
   "jobMatching": {
     "pageTitle": "Job Matching",
-    "pageDescription": "Explore real job openings and see how your skills match opportunities across Zambia."
+    "pageDescription": "Explore real job openings and see how your skills match opportunities across Zambia.",
+    "matched": {
+      "programmeBanner": "Get more personalised matches by completing the Skills & Interests chat.",
+      "emptyNoSkills": "Complete the Skills & Interests chat to see job matches tailored to you.",
+      "emptyProgrammeNoMatches": "No matches yet. Complete the Skills & Interests chat to find jobs that fit your skills.",
+      "emptySiNoMatches": "We don't have matches for you right now — check back later."
+    }
   },
   "nav": {
     "search": "Search...",

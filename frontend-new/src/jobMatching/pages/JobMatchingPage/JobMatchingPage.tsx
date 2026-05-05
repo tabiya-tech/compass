@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, Tabs, Tab, Typography, useTheme, Chip } from "@mui/material";
+import { Alert, Box, Tabs, Tab, Typography, useTheme, Chip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
@@ -81,6 +81,7 @@ const JobMatchingPage: React.FC = () => {
     loading: matchedLoading,
     error: matchedError,
     reload: reloadMatched,
+    skillsSource: matchedSkillsSource,
   } = useMatchedJobs(activeTab === 1);
 
   useEffect(() => {
@@ -432,13 +433,28 @@ const JobMatchingPage: React.FC = () => {
                 </Box>
               </Box>
             )}
+            {matchedSkillsSource === "programme" && matchedJobs.length > 0 && (
+              <Alert
+                severity="info"
+                data-testid="matched-jobs-programme-info-banner"
+                sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.sm) }}
+              >
+                {t("jobMatching.matched.programmeBanner")}
+              </Alert>
+            )}
             <DataTable<JobRow>
               rows={matchedJobs}
               columns={matchedColumns}
               loading={matchedLoading}
               tableMinWidth={750}
               ariaLabel="matched jobs table"
-              emptyMessage="No matched jobs available yet. Complete your Skills & Interests so we can match you to opportunities."
+              emptyMessage={
+                matchedSkillsSource === "programme"
+                  ? t("jobMatching.matched.emptyProgrammeNoMatches")
+                  : matchedSkillsSource === "s&i"
+                    ? t("jobMatching.matched.emptySiNoMatches")
+                    : t("jobMatching.matched.emptyNoSkills")
+              }
               onRowClick={handleRowClick}
             />
           </>

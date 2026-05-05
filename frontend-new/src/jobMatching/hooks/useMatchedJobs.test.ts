@@ -5,7 +5,7 @@ import { renderHook, waitFor } from "src/_test_utilities/test-utils";
 import { useMatchedJobs } from "src/jobMatching/hooks/useMatchedJobs";
 import JobService from "src/jobMatching/services/JobService";
 import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import type { MatchedJobApiDocument } from "src/jobMatching/types";
+import type { MatchedJobApiDocument, MatchedJobsApiResponse, SkillsSource } from "src/jobMatching/types";
 
 jest.mock("src/jobMatching/services/JobService");
 
@@ -25,6 +25,13 @@ function makeMatchedDoc(overrides: Partial<MatchedJobApiDocument> = {}): Matched
   };
 }
 
+function makeMatchedResponse(
+  matches: MatchedJobApiDocument[],
+  skills_source: SkillsSource = "s&i"
+): MatchedJobsApiResponse {
+  return { matches, skills_source };
+}
+
 describe("useMatchedJobs", () => {
   let mockGetMatchedJobs: jest.Mock;
 
@@ -38,7 +45,7 @@ describe("useMatchedJobs", () => {
 
   test("should return loading=true on activation and not fetch when inactive", async () => {
     // GIVEN the hook is rendered with active=false
-    mockGetMatchedJobs.mockResolvedValue([]);
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([]));
     const { result } = renderHook(() => useMatchedJobs(false));
 
     // THEN no fetch is triggered and loading is false
@@ -50,7 +57,7 @@ describe("useMatchedJobs", () => {
   test("should map MatchedJobApiDocument to JobRow with rounded matchScore (0-100)", async () => {
     // GIVEN the matching service returns one match with a fractional score
     const givenDoc = makeMatchedDoc({ final_score: 0.876 });
-    mockGetMatchedJobs.mockResolvedValue([givenDoc]);
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([givenDoc]));
 
     // WHEN the hook is rendered with active=true
     const { result } = renderHook(() => useMatchedJobs(true));
@@ -74,10 +81,12 @@ describe("useMatchedJobs", () => {
 
   test("should clamp matchScore to the [0, 100] range", async () => {
     // GIVEN the matching service returns scores outside the expected range
-    mockGetMatchedJobs.mockResolvedValue([
-      makeMatchedDoc({ uuid: "high", final_score: 1.5 }),
-      makeMatchedDoc({ uuid: "low", final_score: -0.2 }),
-    ]);
+    mockGetMatchedJobs.mockResolvedValue(
+      makeMatchedResponse([
+        makeMatchedDoc({ uuid: "high", final_score: 1.5 }),
+        makeMatchedDoc({ uuid: "low", final_score: -0.2 }),
+      ])
+    );
 
     // WHEN the hook is rendered with active=true
     const { result } = renderHook(() => useMatchedJobs(true));
@@ -93,7 +102,7 @@ describe("useMatchedJobs", () => {
 
   test("should set matchScore to undefined when final_score is missing", async () => {
     // GIVEN the matching service omits final_score
-    mockGetMatchedJobs.mockResolvedValue([makeMatchedDoc({ final_score: undefined })]);
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([makeMatchedDoc({ final_score: undefined })]));
 
     // WHEN the hook is rendered with active=true
     const { result } = renderHook(() => useMatchedJobs(true));
@@ -123,7 +132,7 @@ describe("useMatchedJobs", () => {
 
   test("should refetch when reconnectVersion changes", async () => {
     // GIVEN the hook is rendered inside a ReconnectVersionContext
-    mockGetMatchedJobs.mockResolvedValue([]);
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([]));
     let providerVersion = 0;
     const wrapper = ({ children }: { children?: React.ReactNode }) =>
       React.createElement(ReconnectVersionContext.Provider, { value: providerVersion }, children);
@@ -147,7 +156,7 @@ describe("useMatchedJobs", () => {
 
   test("reload() should trigger a refetch on demand", async () => {
     // GIVEN the hook is rendered with active=true
-    mockGetMatchedJobs.mockResolvedValue([]);
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([]));
     const { result } = renderHook(() => useMatchedJobs(true));
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -161,5 +170,20 @@ describe("useMatchedJobs", () => {
     await waitFor(() => {
       expect(mockGetMatchedJobs).toHaveBeenCalledTimes(2);
     });
+  });
+
+  test("should expose skills_source from the response so the page can pick the right empty/banner copy", async () => {
+    // GIVEN the matching service envelope reports skills_source=programme
+    mockGetMatchedJobs.mockResolvedValue(makeMatchedResponse([], "programme"));
+
+    // WHEN the hook is rendered with active=true
+    const { result } = renderHook(() => useMatchedJobs(true));
+
+    // THEN skillsSource is null until the first fetch completes, then mirrors the envelope
+    expect(result.current.skillsSource).toBeNull();
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(result.current.skillsSource).toBe("programme");
   });
 });

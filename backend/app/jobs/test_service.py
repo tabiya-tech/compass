@@ -37,8 +37,8 @@ class _FakeJobRepository(IJobRepository):
     async def distinct_values(self, field: str, filter_query: Dict[str, Any]) -> List[str]:
         return []
 
-    async def find_by_uuids(self, uuids: List[str]) -> List[Dict[str, Any]]:
-        return [doc for doc in self._docs if doc.get("uuid") in uuids]
+    async def find_by_application_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
+        return [doc for doc in self._docs if doc.get("application_url") in urls]
 
 
 class TestJobService:
@@ -214,48 +214,51 @@ class TestJobService:
         assert exc_info.value.detail == "Invalid page"
 
     @pytest.mark.asyncio
-    async def test_get_jobs_by_uuids_returns_dict_keyed_by_uuid(self):
-        # GIVEN the repository contains docs with uuids
+    async def test_get_jobs_by_application_urls_returns_dict_keyed_by_application_url(self):
+        # GIVEN the repository contains docs with application_url values
+        given_url_a = "https://example.com/jobs/a"
+        given_url_b = "https://example.com/jobs/b"
         given_docs = [
-            {"uuid": "uuid-a", "title": "Job A", "employer": "Acme"},
-            {"uuid": "uuid-b", "title": "Job B", "employer": "Globex"},
+            {"application_url": given_url_a, "title": "Job A", "employer": "Acme"},
+            {"application_url": given_url_b, "title": "Job B", "employer": "Globex"},
         ]
         repo = _FakeJobRepository(docs=given_docs, total=2)
         service = JobService(repository=repo)
 
-        # WHEN get_jobs_by_uuids is called with both uuids
-        actual_result = await service.get_jobs_by_uuids(["uuid-a", "uuid-b"])
+        # WHEN get_jobs_by_application_urls is called with both urls
+        actual_result = await service.get_jobs_by_application_urls([given_url_a, given_url_b])
 
-        # THEN the result is a dict keyed by uuid with JobDocument values
-        assert set(actual_result.keys()) == {"uuid-a", "uuid-b"}
-        assert actual_result["uuid-a"].title == "Job A"
-        assert actual_result["uuid-a"].employer == "Acme"
-        assert actual_result["uuid-b"].title == "Job B"
+        # THEN the result is a dict keyed by application_url with JobDocument values
+        assert set(actual_result.keys()) == {given_url_a, given_url_b}
+        assert actual_result[given_url_a].title == "Job A"
+        assert actual_result[given_url_a].employer == "Acme"
+        assert actual_result[given_url_b].title == "Job B"
 
     @pytest.mark.asyncio
-    async def test_get_jobs_by_uuids_skips_docs_without_uuid(self):
-        # GIVEN the repository returns a doc that lacks a uuid field
+    async def test_get_jobs_by_application_urls_skips_docs_without_url(self):
+        # GIVEN the repository returns a doc that lacks an application_url field
+        given_url_a = "https://example.com/jobs/a"
         given_docs = [
-            {"uuid": "uuid-a", "title": "Job A"},
-            {"title": "Job B (no uuid)"},
+            {"application_url": given_url_a, "title": "Job A"},
+            {"title": "Job B (no url)"},
         ]
         repo = _FakeJobRepository(docs=given_docs, total=2)
         service = JobService(repository=repo)
 
-        # WHEN get_jobs_by_uuids is called
-        actual_result = await service.get_jobs_by_uuids(["uuid-a", "uuid-b"])
+        # WHEN get_jobs_by_application_urls is called
+        actual_result = await service.get_jobs_by_application_urls([given_url_a, "https://example.com/jobs/b"])
 
-        # THEN only the doc with a uuid appears in the result
-        assert list(actual_result.keys()) == ["uuid-a"]
+        # THEN only the doc with an application_url appears in the result
+        assert list(actual_result.keys()) == [given_url_a]
 
     @pytest.mark.asyncio
-    async def test_get_jobs_by_uuids_with_empty_list_returns_empty_dict(self):
+    async def test_get_jobs_by_application_urls_with_empty_list_returns_empty_dict(self):
         # GIVEN any repository state
-        repo = _FakeJobRepository(docs=[{"uuid": "uuid-a"}], total=1)
+        repo = _FakeJobRepository(docs=[{"application_url": "https://example.com/jobs/a"}], total=1)
         service = JobService(repository=repo)
 
-        # WHEN get_jobs_by_uuids is called with an empty list
-        actual_result = await service.get_jobs_by_uuids([])
+        # WHEN get_jobs_by_application_urls is called with an empty list
+        actual_result = await service.get_jobs_by_application_urls([])
 
         # THEN the result is an empty dict and no repository call was needed
         assert actual_result == {}

@@ -33,7 +33,7 @@ class IJobRepository(ABC):
         pass
 
     @abstractmethod
-    async def find_by_uuids(self, uuids: List[str]) -> List[Dict[str, Any]]:
+    async def find_by_application_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
         pass
 
 
@@ -98,10 +98,10 @@ class JobRepository(IJobRepository):
         values = await self._collection.distinct(field, filter_query)
         return [str(v) for v in values if v]
 
-    async def find_by_uuids(self, uuids: List[str]) -> List[Dict[str, Any]]:
-        if not uuids:
+    async def find_by_application_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
+        if not urls:
             return []
-        query = self._collection.find({"uuid": {"$in": uuids}}, projection={"_id": 0})
+        query = self._collection.find({"application_url": {"$in": urls}}, projection={"_id": 0})
         docs: List[Dict[str, Any]] = []
         async for doc in query:
             docs.append(doc)

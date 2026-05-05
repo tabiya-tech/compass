@@ -1074,7 +1074,13 @@
   },
   "jobMatching": {
     "pageTitle": "Búsqueda de Empleo",
-    "pageDescription": "Explora ofertas de trabajo reales y descubre cómo tus habilidades se adaptan a las oportunidades."
+    "pageDescription": "Explora ofertas de trabajo reales y descubre cómo tus habilidades se adaptan a las oportunidades.",
+    "matched": {
+      "programmeBanner": "Obtené coincidencias más personalizadas completando el chat de Habilidades e Intereses.",
+      "emptyNoSkills": "Completá el chat de Habilidades e Intereses para ver ofertas pensadas para vos.",
+      "emptyProgrammeNoMatches": "Todavía no tenemos coincidencias. Completá el chat de Habilidades e Intereses para encontrar trabajos acordes a tus habilidades.",
+      "emptySiNoMatches": "Por ahora no tenemos coincidencias para vos — volvé a revisar más tarde."
+    }
   },
   "nav": {
     "search": "Buscar...",

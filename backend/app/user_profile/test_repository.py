@@ -158,6 +158,47 @@ class TestGetExploredExperiences:
         assert actual_experiences is None
 
 
+class TestGetExploredExperienceEntities:
+    @pytest.mark.asyncio
+    async def test_unwraps_tuple_format_skills(self):
+        # GIVEN explored_experiences stored with tuple-format top_skills/remaining_skills,
+        # the way upgrade_experience.py wraps them as (score, skill) before persisting.
+        given_session_id = 42
+        given_skill_dict = {
+            "id": "skill-1",
+            "UUID": "skill-uuid-1",
+            "modelId": "model-1",
+            "preferredLabel": "use food cutting tools",
+            "altLabels": [],
+            "description": "",
+            "skillType": "skill/competence",
+            "score": 0.9,
+        }
+        given_explored = [{
+            "experience_title": "cook",
+            "top_skills": [[0.9, given_skill_dict]],
+            "remaining_skills": [[0.4, {**given_skill_dict, "UUID": "skill-uuid-2", "preferredLabel": "supervise the work of staff"}]],
+        }]
+        mock_application_db, mock_collection = _create_mock_db()
+        mock_userdata_db, _ = _create_mock_db()
+        mock_collection.find_one = AsyncMock(return_value={"explored_experiences": given_explored})
+        repository = UserProfileRepository(application_db=mock_application_db, userdata_db=mock_userdata_db)
+
+        # WHEN get_explored_experience_entities is called
+        actual_entities = await repository.get_explored_experience_entities(given_session_id)
+
+        # THEN one ExperienceEntity is returned with plain SkillEntity skills (no tuple wrapping)
+        assert actual_entities is not None
+        assert len(actual_entities) == 1
+        actual = actual_entities[0]
+        assert actual.experience_title == "cook"
+        assert len(actual.top_skills) == 1
+        assert actual.top_skills[0].UUID == "skill-uuid-1"
+        assert actual.top_skills[0].preferredLabel == "use food cutting tools"
+        assert len(actual.remaining_skills) == 1
+        assert actual.remaining_skills[0].UUID == "skill-uuid-2"
+
+
 class TestGetPersonalData:
     @pytest.mark.asyncio
     async def test_returns_data_dict_when_user_found(self):

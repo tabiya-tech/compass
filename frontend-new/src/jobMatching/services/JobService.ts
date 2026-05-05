@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import { customFetch } from "src/utils/customFetch/customFetch";
 import { getBackendUrl } from "src/envService";
-import type { JobsApiResponse, MatchedJobApiDocument } from "src/jobMatching/types";
+import type { JobsApiResponse, MatchedJobsApiResponse } from "src/jobMatching/types";
 
 const SERVICE_NAME = "JobService";
 
@@ -75,7 +75,7 @@ export default class JobService {
     return parseJson<JobsApiResponse>(body, errorFactory);
   }
 
-  async getMatchedJobs(limit = 20): Promise<MatchedJobApiDocument[]> {
+  async getMatchedJobs(limit = 20): Promise<MatchedJobsApiResponse> {
     const url = `${this.baseUrl}/matched?limit=${limit}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getMatchedJobs", "GET", url);
     const response = await customFetch(url, {
@@ -89,6 +89,6 @@ export default class JobService {
       retryOnFailedToFetch: true,
     });
     const body = await response.text();
-    return parseJson<MatchedJobApiDocument[]>(body, errorFactory);
+    return parseJson<MatchedJobsApiResponse>(body, errorFactory);
   }
 }

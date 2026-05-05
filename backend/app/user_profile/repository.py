@@ -13,6 +13,7 @@ from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.agent.experience.experience_entity import ExperienceEntity
 from app.server_dependencies.database_collections import Collections
 
 
@@ -40,6 +41,17 @@ class IUserProfileRepository(ABC):
 
         :param session_id: session_id
         :return: The list of explored experiences or None if not found/empty
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    async def get_explored_experience_entities(self, session_id: int) -> Optional[list[ExperienceEntity]]:
+        """
+        Get explored experiences for a session as ExperienceEntity objects with
+        plain SkillEntity skills (tuple wrapping stripped).
+
+        :param session_id: session_id
+        :return: A list of ExperienceEntity, or None if no experiences exist
         """
         raise NotImplementedError()
 
@@ -102,6 +114,23 @@ class UserProfileRepository(IUserProfileRepository):
             return None
 
         return explored_experiences
+
+    async def get_explored_experience_entities(self, session_id: int) -> Optional[list[ExperienceEntity]]:
+        # The Mongo doc stores top_skills/remaining_skills as [(score, skill), ...] tuples
+        # (see app/agent/experience/upgrade_experience.py). Strip the tuple wrapping before
+        # validation so the entity matches its declared schema (list[SkillEntity]).
+        raw = await self.get_explored_experiences(session_id)
+        if not raw:
+            return None
+        entities: list[ExperienceEntity] = []
+        for exp_dict in raw:
+            normalized = {**exp_dict}
+            for key in ("top_skills", "remaining_skills"):
+                skills = normalized.get(key) or []
+                if skills and isinstance(skills[0], (list, tuple)):
+                    normalized[key] = [skill for _, skill in skills]
+            entities.append(ExperienceEntity.model_validate(normalized))
+        return entities
 
     async def get_personal_data(self, user_id: str) -> Optional[dict]:
         # Use $eq to prevent NoSQL injection

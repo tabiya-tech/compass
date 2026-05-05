@@ -16,9 +16,9 @@ export interface JobApiDocument {
 }
 
 /**
- * Raw document returned by GET /jobs/matched. Fields match the matching service response shape
- * (opportunity_title / contract_type / URL), enriched with employer/category/posted_date from
- * the local jobs collection when the uuid matches.
+ * Raw document returned by GET /jobs/matched (inside the envelope's `matches` field).
+ * Field names mirror the matching service response shape (opportunity_title / contract_type / URL),
+ * enriched with employer/category/posted_date from the local jobs collection when the URL matches.
  */
 export interface MatchedJobApiDocument {
   uuid?: string;
@@ -33,6 +33,20 @@ export interface MatchedJobApiDocument {
   employer?: string;
   category?: string;
   posted_date?: string;
+}
+
+/**
+ * Tells the frontend which path produced the matches:
+ *  - "s&i": user has S&I-extracted skills (matches reflect their explored experiences)
+ *  - "programme": user has a programme on file but no S&I skills yet (matches come from the programme catalog)
+ *  - "none": user has neither — `matches` will be empty; the frontend renders an explanatory empty state.
+ */
+export type SkillsSource = "s&i" | "programme" | "none";
+
+/** Envelope returned by GET /jobs/matched. */
+export interface MatchedJobsApiResponse {
+  matches: MatchedJobApiDocument[];
+  skills_source: SkillsSource;
 }
 
 export interface JobsApiMeta {

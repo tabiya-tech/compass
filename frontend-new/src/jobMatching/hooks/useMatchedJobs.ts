@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { ReconnectVersionContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import JobService from "src/jobMatching/services/JobService";
-import type { JobRow, MatchedJobApiDocument } from "src/jobMatching/types";
+import type { JobRow, MatchedJobApiDocument, SkillsSource } from "src/jobMatching/types";
 
 export const MATCHED_PAGE_SIZE = 20;
 
@@ -29,6 +29,8 @@ export interface UseMatchedJobsResult {
   loading: boolean;
   error: unknown;
   reload: () => void;
+  /** Source of the matches the backend produced, or null until the first fetch completes. */
+  skillsSource: SkillsSource | null;
 }
 
 /**
@@ -38,6 +40,9 @@ export interface UseMatchedJobsResult {
  *
  * Returns `loading=true` until the first fetch completes when active, so the table
  * shows a skeleton on activation rather than briefly flashing the empty state.
+ *
+ * Exposes `skillsSource` so the page can pick the right empty-state copy / info banner
+ * without a second round-trip.
  */
 export function useMatchedJobs(active: boolean): UseMatchedJobsResult {
   const reconnectVersion = useContext(ReconnectVersionContext);
@@ -46,6 +51,7 @@ export function useMatchedJobs(active: boolean): UseMatchedJobsResult {
   const [hasFetched, setHasFetched] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [reloadCounter, setReloadCounter] = useState(0);
+  const [skillsSource, setSkillsSource] = useState<SkillsSource | null>(null);
 
   useEffect(() => {
     if (!active) return;
@@ -57,12 +63,14 @@ export function useMatchedJobs(active: boolean): UseMatchedJobsResult {
       try {
         const data = await JobService.getInstance().getMatchedJobs(MATCHED_PAGE_SIZE);
         if (!cancelled) {
-          setJobs(data.map(mapMatchedDocToRow));
+          setJobs(data.matches.map(mapMatchedDocToRow));
+          setSkillsSource(data.skills_source);
         }
       } catch (e: unknown) {
         if (!cancelled) {
           setError(e);
           setJobs([]);
+          setSkillsSource(null);
         }
       } finally {
         if (!cancelled) {
@@ -87,5 +95,5 @@ export function useMatchedJobs(active: boolean): UseMatchedJobsResult {
   // empty-state from flashing between activation and the first fetch starting.
   const loading = isFetching || (active && !hasFetched && !error);
 
-  return { jobs, loading, error, reload };
+  return { jobs, loading, error, reload, skillsSource };
 }

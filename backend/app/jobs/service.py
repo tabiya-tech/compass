@@ -4,7 +4,7 @@ import re
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 from fastapi import HTTPException
 from app.analytics.types import PaginatedListMeta, PaginatedListResponse
@@ -46,7 +46,7 @@ class IJobService(ABC):
         pass
 
     @abstractmethod
-    async def get_jobs_by_uuids(self, uuids: list[str]) -> dict[str, "JobDocument"]:
+    async def get_jobs_by_application_urls(self, urls: list[str]) -> dict[str, "JobDocument"]:
         pass
 
 
@@ -70,7 +70,8 @@ class MatchedJobDocument(BaseModel):
     """A job opportunity returned by the matching service for a specific user.
 
     Field names mirror the matching service response shape (opportunity_title, contract_type, URL).
-    employer, category, and posted_date are enriched from the local jobs collection via the uuid.
+    employer, category, and posted_date are enriched from the local jobs collection by joining
+    on application_url (the matching service's `URL` field == our `application_url`).
     """
     model_config = {"extra": "ignore"}
 
@@ -86,6 +87,19 @@ class MatchedJobDocument(BaseModel):
     employer: Optional[str] = None
     category: Optional[str] = None
     posted_date: Optional[str] = None
+
+
+SkillsSource = Literal["s&i", "programme", "none"]
+
+
+class MatchedJobsResponse(BaseModel):
+    """Envelope returned by GET /jobs/matched.
+
+    `skills_source` tells the frontend which path produced the matches so it can pick
+    the right empty-state copy / info banner without a second round-trip.
+    """
+    matches: list[MatchedJobDocument]
+    skills_source: SkillsSource
 
 
 class JobService(IJobService):
@@ -216,8 +230,12 @@ class JobService(IJobService):
         )
         return PaginatedListResponse(data=job_documents, meta=meta)
 
-    async def get_jobs_by_uuids(self, uuids: list[str]) -> dict[str, JobDocument]:
-        if not uuids:
+    async def get_jobs_by_application_urls(self, urls: list[str]) -> dict[str, JobDocument]:
+        if not urls:
             return {}
-        docs = await self._repository.find_by_uuids(uuids)
-        return {doc["uuid"]: JobDocument.model_validate(doc) for doc in docs if doc.get("uuid")}
+        docs = await self._repository.find_by_application_urls(urls)
+        return {
+            doc["application_url"]: JobDocument.model_validate(doc)
+            for doc in docs
+            if doc.get("application_url")
+        }

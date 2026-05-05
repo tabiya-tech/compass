@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from http import HTTPStatus
-from typing import Annotated, Any, List, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -12,13 +12,21 @@ from app.agent.recommender_advisor_agent.matching_service_client import (
     MatchingServiceClient,
     MatchingServiceError,
 )
+from app.agent.recommender_advisor_agent.skills_extractor import SkillsExtractor
 from app.analytics.types import PaginatedListResponse
 from app.app_config import get_application_config
 from app.constants.errors import HTTPErrorResponse
 from app.job_preferences.get_job_preferences_service import get_job_preferences_service
 from app.job_preferences.service import IJobPreferencesService
 from app.jobs.get_job_service import get_job_service
-from app.jobs.service import IJobService, JobDocument, JobStats, MatchedJobDocument
+from app.jobs.service import (
+    IJobService,
+    JobDocument,
+    JobStats,
+    MatchedJobDocument,
+    MatchedJobsResponse,
+    SkillsSource,
+)
 from app.programme_skills.repository import ProgrammeSkillsRepository
 from app.server_dependencies.database_collections import Collections
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -109,6 +117,14 @@ def _build_skills_vector(programme_skills_doc) -> dict:
     }
 
 
+def _build_skills_vector_from_experiences(experiences) -> dict:
+    """Aggregate the user's S&I-extracted skills into a matching-service skills vector."""
+    if not experiences:
+        return {"skills": []}
+    extracted = SkillsExtractor().extract_skills_vector(experiences)
+    return {"skills": extracted.get("skills", [])}
+
+
 def _build_preference_vector(prefs) -> Optional[dict]:
     """Build the matching-service preference vector from the user's JobPreferences."""
     if prefs is None:
@@ -135,15 +151,20 @@ def _select_user_data(raw: Any) -> dict:
 
 def _enrich_matched_jobs(
     opportunity_recs: list,
-    jobs_by_uuid: dict,
+    jobs_by_url: dict,
 ) -> list[MatchedJobDocument]:
-    """Map matching-service opportunities to MatchedJobDocument and enrich with jobs-collection fields."""
+    """Map matching-service opportunities to MatchedJobDocument and enrich with jobs-collection fields.
+
+    Join key is `URL` (matching service) ↔ `application_url` (jobs collection). The matching
+    service's `uuid` is stored on the entity for use as a row key on the frontend, but is not
+    used for the join (see service.py docstring for the schema mismatch context).
+    """
     results: list[MatchedJobDocument] = []
     for opp in opportunity_recs:
         if not isinstance(opp, dict):
             continue
         doc = MatchedJobDocument.model_validate(opp)
-        job = jobs_by_uuid.get(doc.uuid or "")
+        job = jobs_by_url.get(doc.URL or "")
         if job:
             doc.employer = job.employer
             doc.category = job.category
@@ -241,14 +262,16 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
     if authentication is not None:
         @router.get(
             "/matched",
-            response_model=List[MatchedJobDocument],
+            response_model=MatchedJobsResponse,
             responses={
                 HTTPStatus.UNAUTHORIZED: {"model": HTTPErrorResponse},
                 HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse},
             },
             description=(
-                "Return jobs personalised for the authenticated user based on their skills and "
-                "preferences, using the external matching service."
+                "Return jobs personalised for the authenticated user. Prefers live S&I-extracted "
+                "skills; falls back to the user's programme catalog skills; returns an empty list "
+                "with skills_source=none when neither is available so the frontend can render an "
+                "explanatory empty state instead of generic fallback matches."
             ),
         )
         async def get_matched_jobs(
@@ -263,7 +286,7 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                 matching_client = await _get_matching_client()
                 if matching_client is None:
                     logger.warning("Matching service not configured; returning empty list")
-                    return []
+                    return MatchedJobsResponse(matches=[], skills_source="none")
 
                 # Fetch session id and personal data in parallel
                 session_id, personal_data = await asyncio.gather(
@@ -271,15 +294,37 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                     user_profile_repo.get_personal_data(user_info.user_id),
                 )
                 province = personal_data.get("province") if personal_data else None
-                programme_name = personal_data.get("programme_name") if personal_data else None
 
-                # Build skills + preference vectors for the matching service input
-                programme_skills_doc = (
-                    await programme_skills_repo.find_by_programme_name(programme_name)
-                    if programme_name
+                # Prefer live S&I-extracted skills; fall back to programme catalog skills.
+                experiences = (
+                    await user_profile_repo.get_explored_experience_entities(session_id)
+                    if session_id is not None
                     else None
                 )
-                skills_vector = _build_skills_vector(programme_skills_doc)
+                skills_source: SkillsSource
+                if experiences:
+                    skills_vector = _build_skills_vector_from_experiences(experiences)
+                    skills_source = "s&i"
+                else:
+                    programme_name = personal_data.get("programme_name") if personal_data else None
+                    programme_skills_doc = (
+                        await programme_skills_repo.find_by_programme_name(programme_name)
+                        if programme_name
+                        else None
+                    )
+                    skills_vector = _build_skills_vector(programme_skills_doc)
+                    skills_source = "programme" if skills_vector["skills"] else "none"
+
+                # Short-circuit: no skills to match on → don't call the matching service
+                # (it returns generic fallback junk for empty input). The frontend renders an
+                # explanatory empty state from skills_source=none.
+                if not skills_vector["skills"]:
+                    logger.info(
+                        "matched-jobs request user=%s skills_source=none — returning empty without calling matching service",
+                        user_info.user_id,
+                    )
+                    return MatchedJobsResponse(matches=[], skills_source="none")
+
                 prefs = (
                     await job_preferences_service.get_by_session(session_id)
                     if session_id is not None
@@ -288,10 +333,10 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                 preference_vector = _build_preference_vector(prefs)
 
                 logger.info(
-                    "Calling matching service for user %s (skills=%d, programme=%s, has_prefs=%s)",
+                    "matched-jobs request user=%s skills_source=%s skills_count=%d has_prefs=%s",
                     user_info.user_id,
+                    skills_source,
                     len(skills_vector["skills"]),
-                    programme_name,
                     preference_vector is not None,
                 )
 
@@ -308,23 +353,25 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                 raw_recs = user_data.get("opportunity_recommendations") or []
                 opportunity_recs = raw_recs[:limit] if isinstance(raw_recs, list) else []
 
-                # Enrich matched jobs with employer/category/posted_date from the jobs collection
-                matched_uuids: list[str] = []
+                # Enrich matched jobs with employer/category/posted_date from the jobs collection.
+                # Join key is application_url (matching service's `URL` == our `application_url`).
+                matched_urls: list[str] = []
                 for opp in opportunity_recs:
                     if not isinstance(opp, dict):
                         continue
-                    opp_uuid = opp.get("uuid")
-                    if isinstance(opp_uuid, str) and opp_uuid:
-                        matched_uuids.append(opp_uuid)
-                jobs_by_uuid = await job_service.get_jobs_by_uuids(matched_uuids)
-                results = _enrich_matched_jobs(opportunity_recs, jobs_by_uuid)
+                    opp_url = opp.get("URL")
+                    if isinstance(opp_url, str) and opp_url:
+                        matched_urls.append(opp_url)
+                jobs_by_url = await job_service.get_jobs_by_application_urls(matched_urls)
+                results = _enrich_matched_jobs(opportunity_recs, jobs_by_url)
 
                 logger.info(
-                    "Matching service returned %d opportunities for user %s",
-                    len(results),
+                    "matched-jobs response user=%s skills_source=%s matches_count=%d",
                     user_info.user_id,
+                    skills_source,
+                    len(results),
                 )
-                return results
+                return MatchedJobsResponse(matches=results, skills_source=skills_source)
 
             except HTTPException:
                 raise
