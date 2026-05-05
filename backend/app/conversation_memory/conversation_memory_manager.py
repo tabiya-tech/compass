@@ -43,6 +43,17 @@ class IConversationMemoryManager(ABC):
         raise NotImplementedError()
 
     @abstractmethod
+    async def force_summarize_all(self) -> None:
+        """
+        Immediately summarize all turns currently in the visible window
+        (to_be_summarized + unsummarized) into the summary, then clear both windows.
+
+        Use this to flush repeated turns out of the LLM's context so the model
+        no longer sees them verbatim. The information is preserved in the summary.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
     async def is_user_message(self, message_id: str) -> bool:
         """
         Utility method that checks if a message with a certain message_id comes from the user or not
@@ -103,6 +114,26 @@ class ConversationMemoryManager(IConversationMemoryManager):
         # If the to_be_summarized_history window is full, we perform summarization
         if len(self._state.to_be_summarized_history.turns) == self._to_be_summarized_window_size:
             await self._summarize()
+
+    async def force_summarize_all(self) -> None:
+        try:
+            combined_turns = (
+                self._state.to_be_summarized_history.turns
+                + self._state.unsummarized_history.turns
+            )
+            if not combined_turns:
+                return
+            self._logger.debug("Force-summarizing all %d visible turns due to repetition", len(combined_turns))
+            self._state.summary = await self._summarizer.summarize(ConversationContext(
+                all_history=ConversationHistory(turns=[]),
+                history=ConversationHistory(turns=combined_turns),
+                summary=self._state.summary,
+            ))
+            self._logger.debug("Post-force-summarize summary: %s", self._state.summary)
+            self._state.to_be_summarized_history.turns.clear()
+            self._state.unsummarized_history.turns.clear()
+        except Exception as e:
+            self._logger.error("Error in force_summarize_all: %s", e, exc_info=True)
 
     async def is_user_message(self, message_id: str) -> bool:
         # find out if the message_id of the message to react to is found an input message
