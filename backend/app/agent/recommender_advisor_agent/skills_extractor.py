@@ -96,6 +96,7 @@ class SkillAggregation:
             "uuid": self.skill_entity.UUID,
             "preferred_label": self.skill_entity.preferredLabel,
             "skill_type": self.skill_entity.skillType,
+            "origin_uuid": self.skill_entity.originUUID,
             "proficiency": self.calculate_proficiency(total_experiences),
             "frequency": self.frequency,
             "source_experiences": self.source_experiences,

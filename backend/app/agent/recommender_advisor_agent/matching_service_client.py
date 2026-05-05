@@ -89,8 +89,8 @@ class MatchingServiceClient:
             top_skills.append({
                 "skill_id": skill.get("skill_id"),
                 "uuid": skill.get("uuid"),
-                "originUUID": skill.get("uuid"),  # Required by matching service (same as uuid for now)
-                "preferred_label": skill.get("preferred_label"),
+                "originUUID": skill.get("origin_uuid"),  # Required by matching service (same as uuid for now)
+                "preferredLabel": skill.get("preferred_label"),
                 "skill_type": skill.get("skill_type"),
                 "proficiency": skill.get("proficiency", 0.5),
                 "score": skill.get("avg_score", 0.5)  # Use avg_score as score
