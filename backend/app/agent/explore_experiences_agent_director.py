@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Optional, Mapping, Any
-
+import logging
 import time
 from pydantic import BaseModel, field_serializer, field_validator, Field
 
@@ -13,8 +13,9 @@ from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.upgrade_experience import get_editable_experience
 from app.agent.linking_and_ranking_pipeline import ExperiencePipeline, ExperiencePipelineConfig
 from app.agent.linking_and_ranking_pipeline.experience_pipeline import ClusterPipelineResult
-from app.agent.skill_explorer_agent import SkillsExplorerAgent
-from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
+from app.agent.skill_explorer_agent import SkillsExplorerAgent, SkillsExplorerAgentState
+from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager, IConversationMemoryManager
+from app.server_config import REPETITION_SHORT_CIRCUIT_THRESHOLD
 from app.conversation_memory.conversation_memory_types import \
     ConversationContext
 from app.countries import Country
@@ -220,6 +221,14 @@ class ExploreExperiencesAgentDirector(Agent):
             agent_output: AgentOutput = await self._exploring_skills_agent.execute(user_input=user_input, context=context)
             # Update the conversation history
             await self._conversation_manager.update_history(user_input, agent_output)
+            # Detect consecutive repetition in the agent's question list and flush the
+            # visible window if the threshold is exceeded, so the LLM won't pattern-match
+            # to repeated verbatim turns on the next call.
+            await _flush_if_repeating(
+                self._exploring_skills_agent.state,
+                self._conversation_manager,
+                self.logger,
+            )
             # get the context again after updating the history
             context = await self._conversation_manager.get_conversation_context()
             if not agent_output.finished:
@@ -436,6 +445,50 @@ class ExploreExperiencesAgentDirector(Agent):
             llm_stats=pipline_result.llm_stats
         )
         return agent_output
+
+
+async def _flush_if_repeating(
+    state: SkillsExplorerAgentState | None,
+    conversation_manager: IConversationMemoryManager,
+    logger: logging.Logger,
+) -> None:
+    """
+    Detect REPETITION_SHORT_CIRCUIT_THRESHOLD consecutive identical trailing entries in
+    question_asked_until_now. If found, force-summarize the entire visible history so
+    the LLM no longer sees the repeated turns verbatim on the next call, and deduplicate
+    question_asked_until_now down to one copy of the repeated message.
+    Only consecutive repetition at the tail is considered — non-consecutive repetition
+    (e.g. the same transitional question asked legitimately for two different experiences
+    several turns apart) is left alone.
+    """
+    if state is None:
+        return
+    questions = state.question_asked_until_now
+    if len(questions) < REPETITION_SHORT_CIRCUIT_THRESHOLD:
+        return
+    last = questions[-1]
+    consecutive = 0
+    for q in reversed(questions):
+        if q == last:
+            consecutive += 1
+        else:
+            break
+    if consecutive < REPETITION_SHORT_CIRCUIT_THRESHOLD:
+        return
+
+    logger.warning(
+        "Detected %d consecutive identical agent messages in question_asked_until_now — "
+        "force-summarizing visible history to break the loop. Message: %r",
+        consecutive,
+        last[:120],
+    )
+    await conversation_manager.force_summarize_all()
+    # Deduplicate: keep one copy of the repeated question so the NEVER re-ask rule still fires
+    state.question_asked_until_now = questions[:-consecutive] + [last]
+    # Trim answers_provided to stay in sync with the new question list length
+    new_len = len(state.question_asked_until_now)
+    if len(state.answers_provided) > new_len:
+        state.answers_provided = state.answers_provided[:new_len]
 
 
 def _select_normalized_title(*,
