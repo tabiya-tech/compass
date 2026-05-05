@@ -207,7 +207,7 @@ class _ConversationLLM:
             turn_flow = dedent("""\
             TURN FLOW:
                 1. What tasks I can now complete because of this course/programme
-                2. Achievements or most challenging project during studies (REQUIRED before ending)
+                2. Achievements or most challenging project during studies — ask once if not already covered
                 3. Ask ONE of the following (do not combine them):
                    - What practical projects or assignments did I work on?
                    - {get_question_c}
@@ -217,7 +217,7 @@ class _ConversationLLM:
             turn_flow = dedent("""\
             TURN FLOW:
                 1. Typical day and key responsibilities
-                2. Achievements or challenges (REQUIRED before ending)
+                2. Achievements or challenges — ask once if not already covered
                 3. Ask ONE of the following (do not combine them):
                    - Tasks NOT part of my role
                    - {get_question_c}
@@ -296,10 +296,15 @@ class _ConversationLLM:
             Do not add anything before or after the <END_OF_CONVERSATION> message.
             
             IMPORTANT: Before ending:
-            - If you have NOT yet asked an achievement/challenge question (category b), ask ONE now.
-            - Then verify you have asked at least one achievement question from category (b).
-            
-            If I have not shared any meaningful information about my experience as {experience_title}{work_type}, 
+            - If I am still engaged AND category 2 (achievements/challenges) has NOT
+              been addressed at all in this conversation, ask ONE question now.
+            - If category 2 has already been asked — even if my answer was brief —
+              treat it as covered. Do NOT re-ask it. The NEVER re-ask rule takes
+              precedence: a short answer still counts as an answer.
+            - If I am giving disengagement signals, end immediately without pressing
+              for any more questions.
+
+            If I have not shared any meaningful information about my experience as {experience_title}{work_type},
             ask me once if I really want to stop. If I confirm, end the conversation.
         """)
 
