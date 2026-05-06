@@ -271,13 +271,14 @@ const AuthLayout: React.FC = () => {
               gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
               gridTemplateRows: { xs: "repeat(9, auto)", md: "minmax(148px, auto) auto auto" },
               rowGap: { xs: 4, md: 0 },
+              columnGap: { xs: 0, md: 1 },
             }}
           >
             <FeatureColumn
               imageSrc={`${process.env.PUBLIC_URL}/conversation.svg`}
               title={t("auth.pages.login.appHero.feature1Title")}
               body={t("auth.pages.login.appHero.feature1Body")}
-              imageMaxWidth={{ xs: 300, md: 350 }}
+              imageMaxWidth={{ xs: 220, md: 350 }}
             />
             <FeatureColumn
               imageSrc={`${process.env.PUBLIC_URL}/resume.svg`}
@@ -285,9 +286,10 @@ const AuthLayout: React.FC = () => {
               body={t("auth.pages.login.appHero.feature2Body")}
             />
             <FeatureColumn
-              imageSrc={`${process.env.PUBLIC_URL}/runner-v2.svg`}
+              imageSrc={`${process.env.PUBLIC_URL}/runner.svg`}
               title={t("auth.pages.login.appHero.feature3Title")}
               body={t("auth.pages.login.appHero.feature3Body")}
+              imageMaxWidth={{ xs: 220, md: 240 }}
             />
           </Box>
         </Box>

@@ -139,12 +139,13 @@ const KnowledgeHubList: React.FC = () => {
             >
               <Box
                 component="img"
-                src={`${process.env.PUBLIC_URL}/runner-v2.svg`}
+                src={`${process.env.PUBLIC_URL}/runner.svg`}
                 alt=""
                 sx={{
                   display: { xs: "block", md: "none" },
                   width: "auto",
                   height: "auto",
+                  maxWidth: { xs: 240 },
                   mx: "auto",
                 }}
               />
@@ -160,11 +161,11 @@ const KnowledgeHubList: React.FC = () => {
               >
                 <Box
                   component="img"
-                  src={`${process.env.PUBLIC_URL}/runner-v2.svg`}
+                  src={`${process.env.PUBLIC_URL}/runner.svg`}
                   alt=""
                   sx={{
                     position: "absolute",
-                    left: { md: -185 },
+                    left: { md: -190 },
                     top: { md: -20 },
                     width: { md: 250 },
                     height: { md: 290 },
