@@ -140,7 +140,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
               wordBreak: "break-word",
             }}
           >
-            Skills will appear here as you chat with Njila.
+            Skills will appear here as you complete the "Build Your Profile" chat
           </Box>
         </Box>
       ) : (
@@ -188,7 +188,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
           {/* Programme skills */}
           {programmeSkills.length > 0 && (
             <Box>
-              <Box sx={subsectionLabelSx}>From programme</Box>
+              <Box sx={subsectionLabelSx}>From TEVET programme</Box>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {programmeSkills.map((label, i) => (
                   <Box key={i} sx={tagSx(TOKEN.amberBg, TOKEN.amberText)}>

@@ -109,7 +109,7 @@
   },
   "chat": {
     "chatHeader": {
-      "viewExperiences": "My CV",
+      "viewExperiences": "My Skills Report",
       "feedbackMessage": "We'd love to hear your feedback on your experience so far!",
       "giveFeedback": "Give Feedback",
       "feedbackMessagePlaceholder": "We'd love to hear your thoughts! Please share any feedback or suggestions you have for improving {{appName}}.",
@@ -183,7 +183,7 @@
       },
       "conversationConclusionFooter": {
         "youCanNow": "You can now",
-        "viewAndDownloadCv": "View and Download your CV",
+        "viewAndDownloadCv": "View and Download your Skills Report",
         "here": "here.",
         "createAccountIntro": "If you would like to explore your skills and experiences in the future, you can",
         "createAccount": "Create an Account",
@@ -503,7 +503,7 @@
           "empty": "No deleted experiences found."
         },
         "downloadReportButton": {
-          "downloadCv": "Download CV",
+          "downloadCv": "Download Skills Report",
           "downloading": "Downloading",
           "helpTipBlockedMessage": "You cannot download the report until you finish exploring at least one experience."
         },
@@ -862,17 +862,17 @@
     "takes30Min": "Takes ~30 min",
     "approx30Min": "~30 min",
     "continue": "Continue",
-    "chat": "Chat",
+    "chat": "Start",
     "heroTitle": "Get Job Ready",
-    "heroDescription": "Six modules to get you ready for the job market — CV writing, interviews, workplace skills, and more. Work through them at your own pace.",
+    "heroDescription": "Six modules to get you ready for the job market — professional identity, CV writing, cover letters, interviews, workplace readiness, and entrepreneurship. Work through them at your own pace.",
     "illustration": "Illustration",
     "moduleTitles": {
-      "whoYouAre": "Who You Are as a Professional",
-      "buildingCv": "Building Your CV",
-      "coverLetters": "Cover Letters & Motivation Statements",
-      "interviewPreparation": "Interview Preparation",
-      "workplaceReadiness": "Workplace Readiness",
-      "entrepreneurship": "Entrepreneurship & Enterprise"
+      "professionalIdentity": "Understanding your professional identity",
+      "cvDevelopment": "How to write a CV?",
+      "coverLetterMotivation": "Drafting cover letters and motivation statements",
+      "interviewPreparation": "Preparing for job interviews",
+      "workplaceReadiness": "Preparing to start a new job: workplace readiness",
+      "entrepreneurship": "Entrepreneurship & Enterprise Development"
     }
   },
   "home": {
@@ -888,29 +888,29 @@
     "hero": {
       "headline1": "Let's discover",
       "headline2": "Your skills & strengths",
-      "body": "Your guided path from skills to your first job. Start by discovering what you bring to the table — then explore careers, build your CV, and find real opportunities in Zambia.",
+      "body": "Your guided path from skills to your first job. Start by discovering what you bring to the table — then explore careers, build career readiness, and find real opportunities in Zambia.",
       "illustrationAlt": "Person at a signpost on a path, exploring career directions"
     },
     "cta": {
-      "buildProfileTitle": "Build your profile",
-      "buildProfileDesc": "Your guided path from skills to your first job. Start by discovering what you bring to the table, build a CV, and find real opportunities.",
+      "buildProfileTitle": "Build Your Profile",
+      "buildProfileDesc": "Start by discovering what you bring to the table, build a comprehensive skills report and tell us what kind of work you're interested in",
       "buildProfileCta": "Start Profile Chat",
-      "explorePathsTitle": "Explore Career Paths",
-      "explorePathsDesc": "See which careers match your skills — salaries, qualifications, top employers.",
-      "explorePathsCta": "Explore Pathways",
+      "explorePathsTitle": "Career Explorer",
+      "explorePathsDesc": "Explore the sectors and careers you are interested in - salaries, qualifications pathways, training programs, top employers.",
+      "explorePathsCta": "Explore Career Paths",
       "jobMatchesTitle": "Job Matches",
       "jobMatchesDesc": "Real openings across Zambia, matched to what you can do right now.",
-      "jobMatchesCta": "See Your Matches"
+      "jobMatchesCta": "Browse your jobs"
     },
     "jobReadySection": {
       "title": "Get Job Ready",
       "description": "Need help job hunting? Work through these modules and build confidence for your CV, interviews, and everything in between.",
-      "seeFullCourse": "See full course →",
+      "seeFullCourse": "See full course list →",
       "startLearning": "START LEARNING",
       "continueLearning": "CONTINUE LEARNING",
-      "chat": "Chat",
-      "startChat": "Start Profile Chat",
-      "continueProfileChat": "Continue Profile Chat",
+      "chat": "Start",
+      "startChat": "Start learning",
+      "continueProfileChat": "Continue learning",
       "completedLearning": "COMPLETED",
       "viewModule": "View module",
       "locked": "Locked",
@@ -921,7 +921,7 @@
     },
     "myExperience": {
       "sectionTitle": "My experience",
-      "cardTitle": "View My CV",
+      "cardTitle": "View My Skills Report",
       "cardSubtitle": "Download and share your personalized CV."
     },
     "profile": {
@@ -931,12 +931,13 @@
       "security": "Security",
       "preferences": "Preferences",
       "profileSection": "Profile",
-      "skillsInterestsProgressTitle": "Skills & Interests Progress",
+      "skillsInterestsProgressTitle": "Build Your Profile",
       "skillsInterestsProgressDescription": "How far you have progressed in your skills discovery conversation",
       "moduleCompleted": "completed",
       "moduleRemaining": "remaining",
       "moduleProgress": "Module Progress",
-      "skillsDiscovered": "Skills Discovered",
+      "skillsDiscovered": "Build Your Profile",
+      "jobReadiness": "Job Readiness",
       "name": "Name",
       "email": "Email",
       "language": "Language",
@@ -947,7 +948,7 @@
       "year": "Year",
       "notProvided": "Not provided",
       "notAvailable": "Not available",
-      "viewMyCv": "View my CV",
+      "viewMyCv": "View my Skills Report",
       "share": "Share",
       "shareProfileUnavailable": "Sharing is not available on this device.",
       "linkCopied": "Profile link copied to clipboard",
@@ -955,7 +956,7 @@
       "workSkills": "Work & Other Skills",
       "educationSkills": "Education Skills",
       "noEducationSkillsYet": "No education skills discovered yet.",
-      "careerExplorer": "Career Paths",
+      "careerExplorer": "Career Explorer",
       "noSectorsYet": "No sectors explored yet. Start the Career Explorer to explore sectors!",
       "sectorsExplored": "You've explored {{count}} sector(s)",
       "profileStrength": "Profile Strength",
@@ -987,14 +988,14 @@
       }
     },
     "modules": {
-      "skillsDiscovery": "Build your profile",
+      "skillsDiscovery": "Build Your Profile",
       "skillsDiscoverySubtitle": "Chat with {{appName}} to discover your skills from work and life.",
       "jobReadiness": "Career Readiness",
-      "careerExplorer": "Career Paths",
+      "careerExplorer": "Career Explorer",
       "knowledgeHub": "Knowledge Hub",
       "jobMatching": "Job Matching",
       "skillsDiscoveryDesc": "Chat with {{appName}} to uncover your skills and interests — from your studies, work, and everyday life.",
-      "jobReadinessDesc": "Build essential workplace skills through guided AI modules — from CV writing to interview practice.",
+      "jobReadinessDesc": "Build job readiness through guided AI modules — from understanding your professional identity and CV writing to interviews, workplace readiness, and entrepreneurship.",
       "careerExplorerDesc": "Explore career pathways in Energy, Mining, Agriculture and more — with salary data and qualification routes.",
       "knowledgeHubDesc": "Explore sector profiles, salary benchmarks, and TEVET qualification pathways all in one place.",
       "jobMatchingDesc": "See how your skills match to real job openings and explore labour market insights across Zambia.",
@@ -1008,12 +1009,12 @@
       "termsOfUse": "Terms of Use",
       "accessibility": "Accessibility",
       "contact": "Contact",
-      "collaboration": "Njila is a free career guidance tool built in partnership between the World Bank Group and Tabiya."
+      "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya."
     }
   },
   "careerExplorer": {
-    "title": "Career Paths",
-    "subtitle": "Discover which sectors are hiring and what you can earn.",
+    "title": "Career Explorer",
+    "subtitle": "See which careers match your skills — salaries, qualifications, top employers.",
     "placeholder": "Ask about a sector...",
     "send": "Send"
   },
@@ -1076,9 +1077,9 @@
     "pageTitle": "Job Matching",
     "pageDescription": "Explore real job openings and see how your skills match opportunities across Zambia.",
     "matched": {
-      "programmeBanner": "Get more personalized matches by completing the Skills & Interests chat.",
-      "emptyNoSkills": "Complete the Skills & Interests chat to see job matches tailored to you.",
-      "emptyProgrammeNoMatches": "No matches yet. Complete the Skills & Interests chat to find jobs that fit your skills.",
+      "programmeBanner": "Get more personalized matches by completing the Build Your Profile chat.",
+      "emptyNoSkills": "Matched jobs are not available yet. Complete the \"Build Your Profile\" section to unlock personalised recommendations.",
+      "emptyProgrammeNoMatches": "No matches yet. Complete the Build Your Profile chat to find jobs that fit your skills.",
       "emptySiNoMatches": "We don't have matches for you right now — check back later."
     }
   },

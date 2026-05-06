@@ -5,6 +5,8 @@ import { getRestAPIErrorFactory } from "src/error/restAPIError/RestAPIError";
 import ErrorConstants from "src/error/restAPIError/RestAPIError.constants";
 import type { ModuleSummary } from "src/careerReadiness/types";
 import type { UserSectorEngagementItem } from "src/careerExplorer/services/CareerExplorerService";
+import i18n from "src/i18n/i18n";
+import type { TranslationKey } from "src/react-i18next";
 
 // ---------------------------------------------------------------------------
 // Response types matching backend /users/me/profile
@@ -32,6 +34,24 @@ export interface UserProgressResponse {
   skills_interests_progress: number;
   career_readiness_modules: ModuleSummary[];
   sector_engagement: UserSectorEngagementItem[];
+}
+
+const OVERRIDE_MODULE_TITLE_KEYS_BY_ORDER: Record<number, TranslationKey> = {
+  1: "careerReadiness.moduleTitles.professionalIdentity",
+  2: "careerReadiness.moduleTitles.cvDevelopment",
+  3: "careerReadiness.moduleTitles.coverLetterMotivation",
+  4: "careerReadiness.moduleTitles.interviewPreparation",
+  5: "careerReadiness.moduleTitles.workplaceReadiness",
+  6: "careerReadiness.moduleTitles.entrepreneurship",
+};
+
+function applyModuleTitleOverride<T extends ModuleSummary>(module: T): T {
+  const overrideTitleKey = OVERRIDE_MODULE_TITLE_KEYS_BY_ORDER[module.sort_order];
+  if (!overrideTitleKey) return module;
+  return {
+    ...module,
+    title: i18n.t(overrideTitleKey),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -123,6 +143,9 @@ export default class UserMeService {
         { error }
       );
     }
-    return data;
+    return {
+      ...data,
+      career_readiness_modules: data.career_readiness_modules.map((module) => applyModuleTitleOverride(module)),
+    };
   }
 }

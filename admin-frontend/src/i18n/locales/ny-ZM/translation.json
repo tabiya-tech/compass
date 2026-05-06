@@ -106,8 +106,8 @@
     }
   },
   "header": {
-    "logout": "Logout",
-    "user": "User"
+    "logout": "Tulukani",
+    "user": "Wogwiritsa"
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -119,30 +119,30 @@
     }
   },
   "footer": {
-    "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use",
-    "accessibility": "Accessibility",
+    "privacyPolicy": "mfundo zazinsinsi",
+    "termsOfUse": "Mgwirizano pazakagwiritsidwe",
+    "accessibility": "Kufikika",
     "contact": "Contact",
-    "collaboration": "{{appName}} ndi chida chaulere chothandiza ndi malangizo a ntchito chimene chinapangidwa m'magwirizano pakati pa World Bank Group ndi Tabiya."
+    "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya."
   },
   "dashboard": {
-    "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
+    "sectionTitle": "Dashboard yoyang'anira - kuyang'anira ndi kusanthula kwamagulu osiyanasiyana",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "school": "TEVETA — Technical Education, Vocational and Entrepreneurship Training Authority"
+      "welcome": "Takulandilani, {{name}}",
+      "school": "TEVETA - Ulamuliro wa Maphunziro aukadaulo, Maphunziro a Ntchito ndi Mabizinesi"
     },
     "tabs": {
-      "institutions": "Institutions",
-      "modules": "Modules",
+      "institutions": "Mabungwe",
+      "modules": "Ma modules",
       "skillsAnalytics": "Skills Analytics",
-      "jobPostings": "Job Postings"
+      "jobPostings": "Zolemba Ntchito"
     },
     "dataTable": {
-      "clearSorting": "Clear sorting"
+      "clearSorting": "Kusanja bwino"
     },
     "dailyAdoptionTrend": {
       "title": "Mayendedwe a kugwiritsa ntchito tsiku ndi tsiku",
-      "titleTooltip": "New registrations and daily active users over the past 7 days. Helps track whether adoption is growing day to day.",
+      "titleTooltip": "Olembetsa atsopano komanso ogwiritsa ntchito tsiku lililonse m'masiku 7 apitawa. Zimathandizira kudziwa ngati kulera kukukula tsiku ndi tsiku.",
       "noData": "Palibe deta ilipo",
       "newRegistrations": "Olemba atsopano",
       "dailyActiveUsers": "Ogwiritsa ntchito a tsiku ndi tsiku"
@@ -151,22 +151,22 @@
       "institutionsActive": "Mabungwe ogwira ntchito",
       "institutionsActiveSubtitle": "mwa mabungwe oyesera {{total}}",
       "institutionsActiveSubtitleNoTotal": "mwa mabungwe oyesera",
-      "institutionsActiveTooltip": "Pilot institutions that have at least one student registered on {{appName}}.",
+      "institutionsActiveTooltip": "Masukulu oyesa omwe ali ndi wophunzira osachepera m'modzi adalembetsa pa {{appName}}.",
       "totalStudentsRegistered": "Chiwerengero cha ophunzira olembetsedwa",
-      "totalStudentsRegisteredTooltip": "All students who have created a {{appName}} account to date, across every institution.",
+      "totalStudentsRegisteredTooltip": "Ophunzira onse omwe adapanga {{appName}} akaunti mpaka pano, kusukulu iliyonse.",
       "activeStudents7Days": "Ophunzira ogwira ntchito (masiku 7)",
       "activeStudents7DaysSubtitle": "{{pct}}% mwa olembetsedwa",
       "activeStudents7DaysSubtitleNoPct": "mwa olembetsedwa",
-      "activeStudents7DaysTooltip": "Students who logged in or interacted with {{appName}} in the past 7 days."
+      "activeStudents7DaysTooltip": "Ophunzira omwe adalowa kapena kucheza ndi {{appName}} m'masiku 7 apitawa."
     },
     "modules": {
       "titles": {
         "skillsDiscovery": "Pangani mbiri yanu",
-        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
+        "skillsDiscoveryTooltip": "Pangani mbiri yanu: ophunzira amagawana zomwe anakumana nazo kale ndipo {{appName}} imatulutsa mbiri ya maluso awo.",
         "careerReadiness": "Kukonzekera Ntchito",
-        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerReadinessTooltip": "Modulu ya Kukonzekera Ntchito: ophunzira amagwira ntchito pa CV, kalata yofunsira, kukonzekera mafunso a ntchito, ndi ma sub-modulu ena okonzekera ntchito.",
         "careerExplorer": "Njira za ntchito",
-        "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
+        "careerExplorerTooltip": "Modulu ya Kafukufuku wa Ntchito: ophunzira amafufuza ntchito zomwe zikugwirizana ndi maluso ndi zokonda zawo."
       },
       "registeredStudents": "{{count}} ophunzira olembetsedwa",
       "started": "Ayamba",
@@ -183,191 +183,191 @@
       "sharingExperiences": "Kugawana zochitika",
       "identifyingSkills": "Kupeza maluso anu",
       "collectingPreferences": "Kusonkhetsa zomwe mumakonda",
-      "professionalIdentity": "Inu muli ndani monga katswiri",
-      "cvDevelopment": "Kupanga CV yanu",
-      "coverLetterMotivation": "Makalata oyambira ndi mawu olimbikitsa",
-      "interviewPreparation": "Kukonzekera mafunso antchito",
-      "workplaceReadiness": "Kukonzekera malo a ntchito",
-      "entrepreneurship": "Kudzitangira ntchito ndi bizinesi",
+      "professionalIdentity": "Kumvetsa umunthu wanu wa ukatswiri",
+      "cvDevelopment": "Mmene mungalembere CV?",
+      "coverLetterMotivation": "Kulemba makalata oyambira ndi mawu olimbikitsa",
+      "interviewPreparation": "Kukonzekera mafunso a ntchito",
+      "workplaceReadiness": "Kukonzekera kuyamba ntchito yatsopano: kukonzekera malo a ntchito",
+      "entrepreneurship": "Kudzitangira ntchito ndi chitukuko cha bizinesi",
       "sectors": {
         "ict": "ICT",
-        "mining": "Mining",
-        "energy": "Energy",
-        "construction": "Construction",
-        "agriculture": "Agriculture",
-        "hospitality": "Hospitality",
-        "manufacturing": "Manufacturing",
-        "water": "Water",
+        "mining": "Migodi",
+        "energy": "Mphamvu",
+        "construction": "Zomangamanga",
+        "agriculture": "Ulimi",
+        "hospitality": "Kuchereza alendo",
+        "manufacturing": "Kupanga",
+        "water": "Madzi",
         "transport": "Transport",
-        "other": "Other"
+        "other": "Zina"
       },
       "filters": {
         "allLocations": "Mbiri zonse",
-        "allProvinces": "All Provinces",
-        "allInstitutions": "All Institutions",
-        "allQualifications": "All Qualifications",
-        "allYears": "All Years"
+        "allProvinces": "Zigawo Zonse",
+        "allInstitutions": "Mabungwe onse",
+        "allQualifications": "Ziyeneretso Zonse",
+        "allYears": "Zaka Zonse"
       }
     },
     "skillsAnalytics": {
-      "supplyVsDemandTitle": "Skills Supply vs Labour Market Demand",
-      "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
-      "topSkillsAmongStudents": "Top Skills Among Students",
-      "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
-      "gapBySectorTitle": "Skills Gap by Sector",
-      "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
-      "avgGapLabel": "Avg. gap between student skills supply and labour market demand",
-      "gapPp": "{{gap}}pp",
+      "supplyVsDemandTitle": "Skills Supply vs Labor Market Demand",
+      "supplyVsDemandTitleTooltip": "Maluso apamwamba omwe ophunzira ali nawo kale (opereka) motsutsana ndi luso lomwe olemba anzawo ntchito amafunsa nthawi zambiri polemba ntchito (zofuna).",
+      "topSkillsAmongStudents": "Maluso Apamwamba Pakati pa Ophunzira",
+      "topSkillsInDemand": "Maluso Apamwamba Omwe Akufunika (Zolemba Ntchito)",
+      "gapBySectorTitle": "Kusiyana kwa Maluso ndi Sector",
+      "gapBySectorTitleTooltip": "Kusiyana pakati pa luso lomwe ophunzira ali nalo ndi luso lomwe olemba anzawo ntchito amafunsa, zogawidwa malinga ndi magawo.",
+      "avgGapLabel": "Avg. kusiyana pakati pa kupezeka kwa luso la ophunzira ndi kufunikira kwa msika wa ntchito",
+      "gapPp": "_PH0__pp",
       "legend": {
-        "supply": "Supply",
-        "demand": "Demand",
-        "supplyStudents": "Supply (students)",
-        "demandEmployers": "Demand (employers)"
+        "supply": "Perekani",
+        "demand": "Kufuna",
+        "supplyStudents": "Perekani (ophunzira)",
+        "demandEmployers": "Kufuna (olemba ntchito)"
       },
       "aria": {
-        "supplyBar": "Supply for {{skill}}: {{value}}%",
-        "demandBar": "Demand for {{skill}}: {{value}}%",
-        "gapBar": "Skills gap for {{sector}}: supply {{supply}}%, demand {{demand}}%"
+        "supplyBar": "Zothandizira {{skill}}: {{value}}%",
+        "demandBar": "Kufuna kwa {{skill}}: {{value}}%",
+        "gapBar": "Kusiyana kwa luso pa {{sector}}: perekani {{supply}}%, funani {{demand}}%"
       },
       "filters": {
-        "allProvinces": "All Provinces",
-        "allSectors": "All Sectors"
+        "allProvinces": "Zigawo Zonse",
+        "allSectors": "Magawo Onse"
       }
     },
     "jobPostings": {
       "stats": {
         "jobsSourced": "Ntchito zosonkhanitsidwa",
-        "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
+        "jobsSourcedTooltip": "Zolemba zonse za ntchito zomwe zasonkhanitsidwa kuchokera kumapulatifomu othandizira ntchito.",
         "sectorsCovered": "Magawo ophimbidwa",
-        "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
+        "sectorsCoveredTooltip": "Chiwerengero cha magawo osiyanasiyana omwe akuyimiridwa pazolemba zomwe zasonkhanitsidwa.",
         "sourcePlatforms": "Mapulatifomu oyambira",
-        "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
+        "sourcePlatformsTooltip": "Chiwerengero cha mapulatifomu osiyanasiyana opangira ntchito omwe akudyetsa deta.",
         "lastUpdatedOn": "Yasinthidwa pa {{date}}"
       },
-      "searchPlaceholder": "Search job titles...",
-      "jobsCount": "{{count}} of {{total}} jobs",
-      "moreSkills": "+{{count}} more",
+      "searchPlaceholder": "Sakani mayina antchito...",
+      "jobsCount": "{{count}} mwa {{total}} ntchito",
+      "moreSkills": "+{{count}} zina",
       "filters": {
-        "allSectors": "All Sectors",
-        "allLocations": "All Locations",
-        "allPlatforms": "All Platforms",
-        "allZqfLevels": "All ZQF Levels"
+        "allSectors": "Magawo Onse",
+        "allLocations": "Malo Onse",
+        "allPlatforms": "Mapulatifomu Onse",
+        "allZqfLevels": "Magawo onse a ZQF"
       },
       "table": {
-        "jobTitle": "Job Title",
-        "sector": "Sector",
-        "location": "Location",
-        "zqf": "ZQF",
-        "platform": "Platform",
-        "skillsExtracted": "Skills Extracted",
-        "candidatePool": "Candidate Pool",
-        "candidatePoolSubheader": "50%+ skills match",
-        "link": "Link"
+        "jobTitle": "Mutu waudindo",
+        "sector": "Gawo",
+        "location": "Malo",
+        "zqf": "Mtengo ZQF",
+        "platform": "nsanja",
+        "skillsExtracted": "Maluso Ochotsedwa",
+        "candidatePool": "Phukusi la Candidate",
+        "candidatePoolSubheader": "50% + luso lofanana",
+        "link": "Lumikizani"
       },
       "aria": {
-        "search": "Search job titles",
-        "openJob": "Open job posting for {{title}}",
-        "table": "Job postings table",
-        "moreSkills": "Show {{count}} more skills",
-        "detailsDialog": "Job posting details dialog",
-        "closeDetailsDialog": "Close job posting details"
+        "search": "Sakani maudindo a ntchito",
+        "openJob": "Tsegulani kutumiza kwa {{title}}",
+        "table": "Tabu yoyika ntchito",
+        "moreSkills": "Onetsani {{count}} maluso ena",
+        "detailsDialog": "Nkhani yolemba ntchito",
+        "closeDetailsDialog": "Tsekani zambiri zoyika ntchito"
       },
       "modal": {
-        "platform": "Platform",
-        "candidatePool": "Candidate Pool",
-        "candidatePoolValue": "{{count}} students (50%+ match)",
-        "skillsExtracted": "Skills Extracted ({{count}})",
-        "viewOriginalPosting": "View Original Posting"
+        "platform": "nsanja",
+        "candidatePool": "Phukusi la Candidate",
+        "candidatePoolValue": "{{count}} ophunzira (50%+ machesi)",
+        "skillsExtracted": "Maluso Ochotsedwa ({{count}})",
+        "viewOriginalPosting": "Onani Zolemba Zoyambirira"
       }
     },
     "institutionsTable": {
       "headers": {
-        "institution": "Institution",
-        "students": "Students",
-        "active7Days": "Active (7D)",
+        "institution": "Bungwe",
+        "students": "Ophunzira",
+        "active7Days": "Yogwira (7D)",
         "skillsDiscovery": "Pangani mbiri yanu",
         "careerReadiness": "Career Readiness",
         "careerExplorer": "Career Explorer"
       },
       "subHeaders": {
-        "started": "Started",
-        "completed": "Completed",
-        "ofReg": "% of reg.",
-        "ofStarted": "% of started"
+        "started": "Anayamba",
+        "completed": "Zamalizidwa",
+        "ofReg": "% ya reg.",
+        "ofStarted": "% zoyambira"
       },
       "empty": "Palibe mabungwe apezeka.",
       "prevPage": "Tsamba lapita",
       "nextPage": "Tsamba lotsatira",
       "page": "Tsamba {{page}}"
     },
-    "comingSoon": "No data so far."
+    "comingSoon": "Palibe deta mpaka pano."
   },
   "instructorDashboard": {
-    "sectionTitle": "Instructor dashboard — monitor student engagement and progress",
+    "sectionTitle": "Dashboard ya Mlangizi - kuyang'anira zochitika za ophunzira ndi kupita patsogolo",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "institutionFallback": "Your Institution",
-      "defaultName": "Instructor",
+      "welcome": "Takulandilani, {{name}}",
+      "institutionFallback": "Bungwe Lanu",
+      "defaultName": "Mlangizi",
       "school": "Evelyn Hone College of Applied Art and Commerce"
     },
     "tabs": {
-      "ariaLabel": "Instructor dashboard tabs",
-      "students": "Students",
+      "ariaLabel": "Ma tabu a dashboard ya aphunzitsi",
+      "students": "Ophunzira",
       "modules": "Malo Anu a Ntchito",
       "skillsAnalytics": "Skills Analytics"
     },
     "stats": {
-      "totalStudentsRegistered": "Total Students Registered",
-      "totalStudentsRegisteredTooltip": "Students from your institution who have created a {{appName}} account.",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "{{pct}}% of registered",
-      "activeStudents7DaysTooltip": "Students from your institution who logged in or interacted with {{appName}} in the past 7 days.",
-      "avgProfileStrength": "Avg Profile Strength",
-      "avgProfileStrengthSubtitle": "Up from 52% last week"
+      "totalStudentsRegistered": "Ophunzira Onse Olembetsa",
+      "totalStudentsRegisteredTooltip": "Ophunzira ochokera kusukulu yanu omwe adapanga {{appName}} akaunti.",
+      "activeStudents7Days": "Ophunzira Achangu (masiku 7)",
+      "activeStudents7DaysSubtitle": "{{pct}}% ya olembetsa",
+      "activeStudents7DaysTooltip": "Ophunzira ochokera kusukulu yanu omwe adalowa kapena kucheza ndi {{appName}} m'masiku 7 apitawa.",
+      "avgProfileStrength": "Avg Mbiri Yamphamvu",
+      "avgProfileStrengthSubtitle": "Kuchokera pa 52% sabata yatha"
     },
     "studentsTable": {
-      "ariaLabel": "Instructor students table",
-      "empty": "No students match the current filters.",
+      "ariaLabel": "Gome la ophunzira a Mlangizi",
+      "empty": "Palibe ophunzira omwe akufanana ndi zosefera pano.",
       "headers": {
-        "studentName": "Student Name",
-        "programme": "Programme",
-        "year": "Year",
-        "gender": "Gender",
-        "profileStrength": "Profile Strength",
-        "modulesCompleted": "Career Readiness Modules Completed",
+        "studentName": "Dzina la Wophunzira",
+        "programme": "Pulogalamu",
+        "year": "Chaka",
+        "gender": "Jenda",
+        "profileStrength": "Mbiri Yamphamvu",
+        "modulesCompleted": "Ma module Okonzekera Ntchito Atsirizidwa",
         "careerReady": "Kukonzekera Ntchito",
-        "skillsInterestsExplored": "Skills & Interests",
+        "skillsInterestsExplored": "Maluso & Zokonda",
         "careerExplorer": "Career Explorer",
-        "prioritySectorsExplored": "Priority Sectors Explored",
-        "lastLogin": "Last Login",
+        "prioritySectorsExplored": "Magawo Ofunika Kwambiri Afufuzidwa",
+        "lastLogin": "Kulowa Komaliza",
         "lastActiveModule": "Last Active Module"
       },
       "filters": {
-        "all": "All",
-        "searchPlaceholder": "Search...",
-        "searchAriaLabel": "Search by student name",
-        "today": "Today",
-        "thisWeek": "This week",
-        "older": "Older"
+        "all": "Zonse",
+        "searchPlaceholder": "Sakani...",
+        "searchAriaLabel": "Sakani ndi dzina la ophunzira",
+        "today": "Lero",
+        "thisWeek": "Sabata ino",
+        "older": "Zakale"
       },
       "statusLabels": {
-        "not_started": "Not Started",
-        "in_progress": "In Progress",
-        "completed": "Completed",
-        "started": "Started"
+        "not_started": "Osayamba",
+        "in_progress": "Zili mkati",
+        "completed": "Zamalizidwa",
+        "started": "Anayamba"
       }
     }
   },
   "login": {
-    "title": "Admin Login",
-    "email": "Email",
-    "password": "Password",
-    "submit": "Sign In"
+    "title": "Admin Lowani",
+    "email": "Imelo",
+    "password": "Mawu achinsinsi",
+    "submit": "Lowani muakaunti"
   },
   "notFound": {
-    "message": "Page Not Found",
-    "description": "The page you are looking for might have been removed or is temporarily unavailable.",
-    "goHome": "Go to Dashboard"
+    "message": "Tsamba silinapezeke",
+    "description": "Tsamba lomwe mukuyang'ana litha kuchotsedwa kapena pakadali pano silikupezeka.",
+    "goHome": "Pitani ku Dashboard"
   },
   "users": {
     "title": "Ogwiritsa Ntchito",

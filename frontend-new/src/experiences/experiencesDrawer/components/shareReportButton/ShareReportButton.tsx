@@ -127,11 +127,13 @@ const ShareReportButton: React.FC<ShareReportButtonProps> = ({
   }
 
   return (
-    <Box data-testid={DATA_TEST_ID.SHARE_REPORT_BUTTON_CONTAINER}>
+    <Box data-testid={DATA_TEST_ID.SHARE_REPORT_BUTTON_CONTAINER} sx={{ width: { xs: "100%", sm: "auto" } }}>
       <SecondaryButton
         title={t("experiences.experiencesDrawer.components.shareReportButton.shareReport")}
         disabled={disabled || isSharing}
         onClick={handleShare}
+        fullWidth
+        sx={{ width: { xs: "100%", sm: "auto" }, alignSelf: { xs: "stretch", sm: "flex-start" } }}
         startIcon={
           isSharing ? (
             <CircularProgress

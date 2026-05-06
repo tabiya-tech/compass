@@ -334,12 +334,19 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xl)}>
             <ExperiencesDrawerHeader
               notifyOnClose={handleClose}
-              title="Your Njila CV"
+              title="Your Njila Skills Report"
               lastUpdated={conversationConductedAt}
             />
-            <Box display="flex" flexDirection="row" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)} width="100%">
+            <Box
+              display="flex"
+              flexDirection="row"
+              flexWrap="wrap"
+              whiteSpace="normal"
+              gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
+              width="100%"
+            >
               <Suspense fallback={<Skeleton variant="rectangular" height={40} width="100%" sx={{ borderRadius: 1 }} />}>
-                <Box flex={1}>
+                <Box sx={{ flex: { xs: "1 1 100%", sm: 1 }, minWidth: 0 }}>
                   <LazyLoadedDownloadDropdown
                     name={profileDisplay.name}
                     email={profileDisplay.email}
@@ -353,17 +360,19 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                   />
                 </Box>
               </Suspense>
-              <ShareReportButton
-                name={profileDisplay.name}
-                email={profileDisplay.email}
-                location={profileDisplay.location}
-                school={profileDisplay.school}
-                program={profileDisplay.program}
-                experiences={exploredExperiences}
-                conversationConductedAt={conversationConductedAt}
-                disabled={disableDownloadButton}
-                outputConfig={outputConfig}
-              />
+              <Box sx={{ flex: { xs: "1 1 100%", sm: "0 0 auto" }, minWidth: 0 }}>
+                <ShareReportButton
+                  name={profileDisplay.name}
+                  email={profileDisplay.email}
+                  location={profileDisplay.location}
+                  school={profileDisplay.school}
+                  program={profileDisplay.program}
+                  experiences={exploredExperiences}
+                  conversationConductedAt={conversationConductedAt}
+                  disabled={disableDownloadButton}
+                  outputConfig={outputConfig}
+                />
+              </Box>
             </Box>
           </Box>
           <Box display="flex" flexDirection="column" gap={0.5} data-testid={DATA_TEST_ID.PERSONAL_INFORMATION_TITLE}>
@@ -473,6 +482,8 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
                 display: "flex",
                 alignItems: "center",
                 gap: theme.fixedSpacing(theme.tabiyaSpacing.xs),
+                whiteSpace: "normal",
+                textAlign: "center",
               }}
             >
               <RestoreIcon color={theme.palette.text.primary} />

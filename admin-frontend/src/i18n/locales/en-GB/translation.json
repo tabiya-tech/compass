@@ -118,7 +118,7 @@
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a free career guidance tool built in partnership between the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya."
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -156,11 +156,11 @@
     },
     "modules": {
       "titles": {
-        "skillsDiscovery": "Build your profile",
-        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
+        "skillsDiscovery": "Build Your Profile",
+        "skillsDiscoveryTooltip": "Build Your Profile: students share past experiences and {{appName}} extracts a profile of their skills.",
         "careerReadiness": "Get Job Ready",
-        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
-        "careerExplorer": "Career Paths",
+        "careerReadinessTooltip": "Job Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerExplorer": "Career Explorer",
         "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
       },
       "registeredStudents": "{{count}} registered students",
@@ -178,12 +178,12 @@
       "sharingExperiences": "Sharing Experiences",
       "identifyingSkills": "Identifying Skills",
       "collectingPreferences": "Collecting Preferences",
-      "professionalIdentity": "Who You Are as a Professional",
-      "cvDevelopment": "Building Your CV",
-      "coverLetterMotivation": "Cover Letters & Motivation Statements",
-      "interviewPreparation": "Interview Preparation",
-      "workplaceReadiness": "Workplace Readiness",
-      "entrepreneurship": "Entrepreneurship & Enterprise",
+      "professionalIdentity": "Understanding your professional identity",
+      "cvDevelopment": "How to write a CV?",
+      "coverLetterMotivation": "Drafting cover letters and motivation statements",
+      "interviewPreparation": "Preparing for job interviews",
+      "workplaceReadiness": "Preparing to start a new job: workplace readiness",
+      "entrepreneurship": "Entrepreneurship & Enterprise Development",
       "sectors": {
         "ict": "ICT",
         "mining": "Mining",
@@ -284,9 +284,9 @@
         "institution": "Institution",
         "students": "Students",
         "active7Days": "Active (7D)",
-        "skillsDiscovery": "Build your profile",
+        "skillsDiscovery": "Build Your Profile",
         "careerReadiness": "Get Job Ready",
-        "careerExplorer": "Career Paths"
+        "careerExplorer": "Career Explorer"
       },
       "subHeaders": {
         "started": "Started",

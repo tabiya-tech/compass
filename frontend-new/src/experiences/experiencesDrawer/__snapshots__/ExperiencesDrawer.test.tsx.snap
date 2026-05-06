@@ -58,7 +58,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
               class="MuiTypography-root MuiTypography-h5 css-1qphcdc-MuiTypography-root"
               data-testid="experiences-drawer-header-title-4d3ec79b-1a39-4f4b-9c4a-354a5464a253"
             >
-              Your Njila CV
+              Your Njila Skills Report
             </h5>
             <span
               class="MuiTypography-root MuiTypography-caption css-mpr014-MuiTypography-root"
@@ -70,15 +70,19 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
           </div>
         </div>
         <div
-          class="MuiBox-root css-szjynw"
+          class="MuiBox-root css-149qhgm"
         >
           <span
             class="MuiSkeleton-root MuiSkeleton-rectangular MuiSkeleton-pulse css-1gy00qo-MuiSkeleton-root"
             style="width: 100%; height: 40px;"
           />
           <div
-            data-testid="mock-ShareReportButton"
-          />
+            class="MuiBox-root css-6ilrby"
+          >
+            <div
+              data-testid="mock-ShareReportButton"
+            />
+          </div>
         </div>
       </div>
       <div
@@ -468,7 +472,7 @@ exports[`ExperiencesDrawer should render ExperiencesDrawer correctly 1`] = `
       >
         <a
           aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1iokway-MuiTypography-root-MuiLink-root"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1duu85t-MuiTypography-root-MuiLink-root"
           data-testid="restore-deleted-experiences-link-df5ab5c0-a109-4b6d-ba3f-a46975e5511b"
         >
           <svg

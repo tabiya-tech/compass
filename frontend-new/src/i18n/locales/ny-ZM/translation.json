@@ -109,7 +109,7 @@
   },
   "chat": {
     "chatHeader": {
-      "viewExperiences": "Onani zochitika",
+      "viewExperiences": "Lipoti langa la maluso",
       "feedbackMessage": "Tikufuna kumva nkhani yanu pa chitukuko chanu mpaka pano!",
       "giveFeedback": "Perekani nkhani",
       "feedbackMessagePlaceholder": "Tikufuna kumva maganizo anu! Chonde gawani nkhani kapena malangizo omwe muli nawo okonza {{appName}}.",
@@ -183,7 +183,7 @@
       },
       "conversationConclusionFooter": {
         "youCanNow": "Tsopano mungathe",
-        "viewAndDownloadCv": "Onani ndi Tsitsani CV yanu",
+        "viewAndDownloadCv": "Onani ndi kutsitsa lipoti lanu la maluso",
         "here": "pano.",
         "createAccountIntro": "Ngati mukufuna kufufuza nzeru ndi zochitika zanu mtsogolo, mungathe",
         "createAccount": "Lembetsani Akaunti",
@@ -503,7 +503,7 @@
           "empty": "Palibe zochitika zachotsedwa zomwe zinapezeka."
         },
         "downloadReportButton": {
-          "downloadCv": "Tsitsani CV",
+          "downloadCv": "Tsitsani lipoti la maluso",
           "downloading": "Kutsitsa",
           "helpTipBlockedMessage": "Simungathe kutsitsa report mpaka mwatha kufufuza chitukuko chimodzi."
         },
@@ -823,8 +823,8 @@
     "previous": "Zomwe zidadza"
   },
   "careerExplorer": {
-    "title": "Njira za ntchito",
-    "subtitle": "Dziwani magawo amene akulemba ntchito komanso ndalama zimene mungapeze.",
+    "title": "Kafukufuku wa Ntchito",
+    "subtitle": "Onani ntchito zomwe zikugwirizana ndi maluso anu — malipiro, ziyeneretso, ndi olemba ntchito akuluakulu.",
     "placeholder": "Funsani za gawo...",
     "send": "Tumizani"
   },
@@ -868,17 +868,17 @@
     "takes30Min": "Imatenga ~30 mphindi",
     "approx30Min": "~30 mphindi",
     "continue": "Pitilizani",
-    "chat": "Yankhulani",
+    "chat": "Yambani",
     "heroTitle": "Konzekerani Kugwira Ntchito",
     "heroDescription": "Mamodule asanu ndi limodzi akukuthandizira kukonzekera msika wa ntchito — kulemba CV, zakuyankhula, luso la ntchito, ndi zambiri. Yendani mwachangu wanu.",
     "illustration": "Chithunzi",
     "moduleTitles": {
-      "whoYouAre": "Inu muli ndani monga katswiri",
-      "buildingCv": "Kupanga CV yanu",
-      "coverLetters": "Makalata oyambira ndi mawu olimbikitsa",
-      "interviewPreparation": "Kukonzekera mafunso antchito",
-      "workplaceReadiness": "Kukonzekera malo a ntchito",
-      "entrepreneurship": "Kudzitangira ntchito ndi bizinesi"
+      "professionalIdentity": "Kumvetsa umunthu wanu wa ukatswiri",
+      "cvDevelopment": "Mmene mungalembere CV?",
+      "coverLetterMotivation": "Kulemba makalata oyambira ndi mawu olimbikitsa",
+      "interviewPreparation": "Kukonzekera mafunso a ntchito",
+      "workplaceReadiness": "Kukonzekera kuyamba ntchito yatsopano: kukonzekera malo a ntchito",
+      "entrepreneurship": "Kudzitangira ntchito ndi chitukuko cha bizinesi"
     }
   },
   "home": {
@@ -892,42 +892,42 @@
     "whatToDo": "Mungakonde kuchita chiyani lero?",
     "whatToDoSubtitle": "Module iliyonse ndi kukambirana kotsogoleredwa ndi AI kapena chinthu chothandiza pa ulendo wanu wa ntchito.",
     "hero": {
-      "headline1": "Let's discover",
-      "headline2": "Your skills & strengths",
-      "body": "Your guided path from skills to your first job. Start by discovering what you bring to the table — then explore careers, build your CV, and find real opportunities in Zambia.",
-      "illustrationAlt": "Person at a signpost on a path, exploring career directions"
+      "headline1": "Tiyeni tipeze",
+      "headline2": "Maluso & mphamvu zanu",
+      "body": "Njira yanu yowongolera kuchokera ku luso kupita kuntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa - kenako fufuzani ntchito, konzekerani ntchito, ndikupeza mwayi weniweni ku Zambia.",
+      "illustrationAlt": "Munthu ali pachikwangwani panjira, kuyang'ana njira zantchito"
     },
     "cta": {
       "buildProfileTitle": "Pangani mbiri yanu",
-      "buildProfileDesc": "Njira yanu yotsogozedwa kuchokera ku luso mpaka ntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa, pangani CV, ndipo pezani mwayi weniweni.",
+      "buildProfileDesc": "Yambani pozindikira zomwe mumabweretsa, pangani lipoti lathunthu la maluso ndipo tiuzeni mtundu wa ntchito yomwe mukufuna",
       "buildProfileCta": "Yambani kucheza pa mbiri",
-      "explorePathsTitle": "Fufuzani njira za ntchito",
-      "explorePathsDesc": "Onani ntchito zomwe zikugwirizana ndi luso lanu — malipiro, ziyeneretso, ndi olemba ntchito akuluakulu.",
-      "explorePathsCta": "Fufuzani njira",
+      "explorePathsTitle": "Kafukufuku wa Ntchito",
+      "explorePathsDesc": "Fufuzani magawo ndi ntchito zomwe mukukondwera nazo - malipiro, njira za ziyeneretso, mapulogalamu a maphunziro, ndi olemba ntchito akuluakulu.",
+      "explorePathsCta": "Fufuzani njira za ntchito",
       "jobMatchesTitle": "Ntchito zogwirizana",
       "jobMatchesDesc": "Mwayi weniweni ku Zambia yonse, wogwirizana ndi zomwe mungathe kuchita pano.",
-      "jobMatchesCta": "Onani zogwirizana zanu"
+      "jobMatchesCta": "Fufuzani ntchito zanu"
     },
     "jobReadySection": {
-      "title": "Get Job Ready",
-      "description": "Need help job hunting? Work through these modules and build confidence for your CV, interviews, and everything in between.",
-      "seeFullCourse": "See full course →",
+      "title": "Konzekerani Ntchito",
+      "description": "Mukufuna thandizo posaka ntchito? Yendani m'mamodule awa ndikulimbitsa chidaliro pa CV yanu, mafunso a ntchito, ndi zonse zili pakati.",
+      "seeFullCourse": "Onani mndandanda wonse wa maphunziro →",
       "startLearning": "YAMBANI KUPHUNZIRA",
-      "continueLearning": "CONTINUE LEARNING",
-      "chat": "Chat",
-      "startChat": "Start Profile Chat",
-      "continueProfileChat": "Continue Profile Chat",
-      "completedLearning": "COMPLETED",
-      "viewModule": "View module",
-      "locked": "Locked",
-      "empty": "No course modules are available yet.",
-      "loadError": "We couldn't load your course progress. Try again later.",
-      "loading": "Loading course modules",
-      "durationHint": "Takes about 30–40 min"
+      "continueLearning": "PITIRIZANI KUPHUNZIRA",
+      "chat": "Yambani",
+      "startChat": "Yambani kuphunzira",
+      "continueProfileChat": "Pitilizani kuphunzira",
+      "completedLearning": "ZAMAMALIRIKA",
+      "viewModule": "Onani module",
+      "locked": "Zokhoma",
+      "empty": "Palibe ma module a maphunziro omwe alipo.",
+      "loadError": "Sitinathe kutsitsa maphunziro anu. Yesaninso nthawi ina.",
+      "loading": "Kutsegula ma module a maphunziro",
+      "durationHint": "Zimatenga pafupifupi 30-40 min"
     },
     "myExperience": {
-      "sectionTitle": "My experience",
-      "cardTitle": "Onani CV Yanga",
+      "sectionTitle": "Chondichitikira changa",
+      "cardTitle": "Onani lipoti langa la maluso",
       "cardSubtitle": "Tsitsani ndi kugawana CV yanu yokonzedwa payekha."
     },
     "profile": {
@@ -938,7 +938,7 @@
       "preferences": "Zosankha",
       "profileSection": "Mbiri",
       "moduleProgress": "Kupita Patsogolo kwa Module",
-      "skillsDiscovered": "Luso Lopezeka",
+      "skillsDiscovered": "Kupita kwa Pangani",
       "name": "Dzina",
       "email": "Imelo",
       "language": "Chilankhulo",
@@ -949,11 +949,12 @@
       "year": "Chaka",
       "notProvided": "Sichinaperekedwe",
       "notAvailable": "Sichipezeka",
-      "viewMyCv": "Onani CV yanga",
+      "viewMyCv": "Onani lipoti langa la maluso",
       "share": "Gawani",
       "shareProfileUnavailable": "Kugawana sikupeneka pa chipangizo ichi.",
       "linkCopied": "Linki la mbiri yanu likopedwa",
-      "skillsInterestsProgressTitle": "Kupita kwa Luso ndi Zokonda",
+      "skillsInterestsProgressTitle": "Kupita kwa Pangani",
+      "jobReadiness": "Kukonzekera Ntchito",
       "skillsInterestsProgressDescription": "Motali mwafika m'kukambirana kwanu kwa kupeza luso",
       "moduleCompleted": "yathera",
       "moduleRemaining": "yotsala",
@@ -961,7 +962,7 @@
       "workSkills": "Luso la Ntchito ndi Lina",
       "educationSkills": "Luso la Maphunziro",
       "noEducationSkillsYet": "Palibe luso la maphunziro lopezeka mpaka pano.",
-      "careerExplorer": "Njira za ntchito",
+      "careerExplorer": "Kafukufuku wa Ntchito",
       "noSectorsYet": "Palibe gawo lopezeka mpaka pano.",
       "sectorsExplored": "Mwafufuza magawo {{count}}",
       "profileStrength": "Kulimba kwa mbiri",
@@ -996,7 +997,7 @@
       "skillsDiscovery": "Pangani mbiri yanu",
       "skillsDiscoverySubtitle": "Chezani ndi {{appName}} kuti mudziwe luso lanu kuchokera kuntchito ndi pa moyo.",
       "jobReadiness": "Kukonzekera Ntchito",
-      "careerExplorer": "Njira za ntchito",
+      "careerExplorer": "Kafukufuku wa Ntchito",
       "knowledgeHub": "Malo Ophunzirira",
       "jobMatching": "Kufanana kwa Ntchito",
       "skillsDiscoveryDesc": "Lankhulani ndi {{appName}} kuti mupeze luso lanu ndi zomwe mumakonda — kuchokera ku maphunziro anu, ntchito, ndi moyo wa tsiku ndi tsiku.",
@@ -1014,7 +1015,7 @@
       "termsOfUse": "Malamulo a Ntchito",
       "accessibility": "Kufikira",
       "contact": "Lumikizani",
-      "collaboration": "{{appName}} ndi chida chosungira malangizo za ntchito chopanda malipiro, chapangidwa ndi mgwirizano pakati pa World Bank Group ndi Tabiya."
+      "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya."
     }
   },
   "knowledgeHub": {
@@ -1044,42 +1045,42 @@
     },
     "noDocumentsAvailable": "Palibe zikalata zomwe zilipo pakadali pano.",
     "careerPathwaysTitle": "Njira za Ntchito",
-    "prioritySector": "Priority Sector",
-    "avgMonthlyEarnings": "Avg monthly earnings (formal sector)",
-    "criticalOccupations": "Critical occupations identified",
-    "tevetProgrammes": "TEVET programmes offered",
-    "keyEmployers": "Key employers to look out for",
-    "tevetAccreditedProgrammes": "TEVET accredited programmes relevant to the {{sector}} sector",
-    "accreditedProgrammesCount": "{{count}} accredited programmes across {{institutions}} institutions. {{suffix}}",
-    "loadingProgrammes": "Loading programme data...",
-    "shortCoursesNote": "+ {{count}} short courses offered by sector employers and specialist training providers.",
-    "criticalSkillsLabel": "Critical {{sector}}-related skills specializations identified",
-    "filterAll": "All ({{count}})",
+    "prioritySector": "Gawo Lofunika Kwambiri",
+    "avgMonthlyEarnings": "Avg zopeza pamwezi (gawo lokhazikika)",
+    "criticalOccupations": "Ntchito zovuta zazindikiridwa",
+    "tevetProgrammes": "Mapulogalamu a TEVET amaperekedwa",
+    "keyEmployers": "Olemba ntchito ofunika kuyang'anira",
+    "tevetAccreditedProgrammes": "Mapulogalamu ovomerezeka a TEVET ogwirizana ndi gawo la {{sector}}",
+    "accreditedProgrammesCount": "{{count}} mapulogalamu ovomerezeka pa {{institutions}} mabungwe. _PH2__",
+    "loadingProgrammes": "Tikutsegula data ya pulogalamu...",
+    "shortCoursesNote": "+ {{count}} maphunziro achidule operekedwa ndi olemba anzawo ntchito komanso akatswiri ophunzitsa.",
+    "criticalSkillsLabel": "Maluso ofunikira {{sector}} azindikirika",
+    "filterAll": "Zonse ({{count}})",
     "filterZqf": "ZQF {{level}} ({{count}})",
-    "tableOccupation": "Occupation in demand",
-    "tableZqf": "ZQF",
-    "tableDuration": "Duration",
+    "tableOccupation": "Ntchito yofunidwa",
+    "tableZqf": "Mtengo ZQF",
+    "tableDuration": "Kutalika",
     "tableTevet": "TEVET",
-    "tableCountAll": "Showing all {{count}} occupations. Where no programme is listed, training is typically provided on-the-job by employers or curriculum is currently in development.",
-    "tableCountFiltered": "Showing {{count}} occupations at ZQF {{level}}. Where no programme is listed, training is typically provided on-the-job by employers or curriculum is currently in development.",
-    "newProgrammesDev": "New programmes in development",
-    "newProgrammesDevDesc": "Priority curriculum areas identified through the ILO/TEVETA Skills Development for Increased Employability Programme (SDEP) and sector consultations.",
-    "devOccupationsLabel": "Occupations without dedicated TEVET programmes",
-    "keepInMind": "Things to keep in mind",
-    "navWhereJobs": "Where the jobs are",
-    "navProgrammes": "Programmes",
-    "navCriticalSkills": "Critical skills",
-    "navInDevelopment": "In development",
-    "navKeepInMind": "Keep in mind"
+    "tableCountAll": "Kuwonetsa {{count}} ntchito zonse. Pomwe palibe pulogalamu yomwe yatchulidwa, maphunziro amaperekedwa kuntchito ndi olemba anzawo ntchito kapena maphunziro akutukuka.",
+    "tableCountFiltered": "Kuwonetsa {{count}} ntchito pa ZQF {{level}}. Pomwe palibe pulogalamu yomwe yatchulidwa, maphunziro amaperekedwa kuntchito ndi olemba anzawo ntchito kapena maphunziro akutukuka.",
+    "newProgrammesDev": "Mapulogalamu atsopano akutukuka",
+    "newProgrammesDevDesc": "Magawo ofunikira kwambiri a maphunziro omwe adadziwika kudzera mu ILO/TEVETA Skills Development for Increased Employability Programme (SDEP) ndi zokambirana zamagulu.",
+    "devOccupationsLabel": "Ntchito zopanda mapulogalamu odzipereka a TEVET",
+    "keepInMind": "Zinthu zoti muzikumbukira",
+    "navWhereJobs": "Kumene kuli ntchito",
+    "navProgrammes": "Mapulogalamu",
+    "navCriticalSkills": "Maluso ovuta",
+    "navInDevelopment": "Mu chitukuko",
+    "navKeepInMind": "Kumbukirani"
   },
   "jobMatching": {
     "pageTitle": "Kufunana Ntchito",
     "pageDescription": "Onani mwayi wa ntchito zenizeni ndikuona momwe luso lanu likugwirizana ndi mwayi uzambezi.",
     "matched": {
-      "programmeBanner": "Get more personalised matches by completing the Skills & Interests chat.",
-      "emptyNoSkills": "Complete the Skills & Interests chat to see job matches tailored to you.",
-      "emptyProgrammeNoMatches": "No matches yet. Complete the Skills & Interests chat to find jobs that fit your skills.",
-      "emptySiNoMatches": "We don't have matches for you right now — check back later."
+      "programmeBanner": "Pezani zofanana zokonzedwa mwamakonda ambiri pomaliza kucheza kwa Pangani mbiri yanu.",
+      "emptyNoSkills": "Ntchito zofanana sizinapezeke pano. Malizani gawo la \"Pangani mbiri yanu\" kuti mutsegule malingaliro opangidwa mwamakonda.",
+      "emptyProgrammeNoMatches": "Palibe zofanana pano. Malizani kucheza kwa Pangani mbiri yanu kuti mupeze ntchito zogwirizana ndi maluso anu.",
+      "emptySiNoMatches": "Pakali pano tilibe zofanana kwa inu — bwerani mudzayang'anenso mtsogolo."
     }
   },
   "nav": {

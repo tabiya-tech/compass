@@ -17,9 +17,9 @@ import type {
 
 const SERVICE_NAME = "CareerReadinessService";
 const OVERRIDE_MODULE_TITLE_KEYS_BY_ORDER: Record<number, TranslationKey> = {
-  1: "careerReadiness.moduleTitles.whoYouAre",
-  2: "careerReadiness.moduleTitles.buildingCv",
-  3: "careerReadiness.moduleTitles.coverLetters",
+  1: "careerReadiness.moduleTitles.professionalIdentity",
+  2: "careerReadiness.moduleTitles.cvDevelopment",
+  3: "careerReadiness.moduleTitles.coverLetterMotivation",
   4: "careerReadiness.moduleTitles.interviewPreparation",
   5: "careerReadiness.moduleTitles.workplaceReadiness",
   6: "careerReadiness.moduleTitles.entrepreneurship",

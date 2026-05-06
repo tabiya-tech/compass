@@ -106,8 +106,8 @@
     }
   },
   "header": {
-    "logout": "Logout",
-    "user": "User"
+    "logout": "Ondoka",
+    "user": "Mtumiaji"
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -119,30 +119,30 @@
     }
   },
   "footer": {
-    "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use",
-    "accessibility": "Accessibility",
-    "contact": "Contact",
-    "collaboration": "{{appName}} ni zana ya bure ya kuelekeza kazi iliyojengwa kwa ushirikiano kati ya Kundi la Benki ya Dunia na Tabiya."
+    "privacyPolicy": "Sera ya Faragha",
+    "termsOfUse": "Masharti ya Matumizi",
+    "accessibility": "Ufikivu",
+    "contact": "Wasiliana",
+    "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya."
   },
   "dashboard": {
-    "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
+    "sectionTitle": "Dashibodi ya msimamizi - ufuatiliaji na uchanganuzi wa taasisi mbalimbali",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "school": "TEVETA — Technical Education, Vocational and Entrepreneurship Training Authority"
+      "welcome": "Karibu, {{name}}",
+      "school": "TEVETA - Mamlaka ya Mafunzo ya Elimu ya Ufundi, Ufundi na Ujasiriamali"
     },
     "tabs": {
-      "institutions": "Institutions",
-      "modules": "Modules",
-      "skillsAnalytics": "Skills Analytics",
-      "jobPostings": "Job Postings"
+      "institutions": "Taasisi",
+      "modules": "Moduli",
+      "skillsAnalytics": "Uchambuzi wa Ujuzi",
+      "jobPostings": "Machapisho ya Kazi"
     },
     "dataTable": {
-      "clearSorting": "Clear sorting"
+      "clearSorting": "Upangaji wazi"
     },
     "dailyAdoptionTrend": {
       "title": "Mwenendo wa matumizi ya kila siku",
-      "titleTooltip": "New registrations and daily active users over the past 7 days. Helps track whether adoption is growing day to day.",
+      "titleTooltip": "Usajili mpya na watumiaji wanaotumika kila siku katika siku 7 zilizopita. Husaidia kufuatilia kama kuasili kunakua siku hadi siku.",
       "noData": "Hakuna data inayopatikana",
       "newRegistrations": "Usajili mpya",
       "dailyActiveUsers": "Watumiaji hai wa kila siku"
@@ -151,22 +151,22 @@
       "institutionsActive": "Taasisi zinazotumika",
       "institutionsActiveSubtitle": "kati ya taasisi za majaribio {{total}}",
       "institutionsActiveSubtitleNoTotal": "kati ya taasisi za majaribio",
-      "institutionsActiveTooltip": "Pilot institutions that have at least one student registered on {{appName}}.",
+      "institutionsActiveTooltip": "Taasisi za majaribio ambazo zina angalau mwanafunzi mmoja aliyesajiliwa kwenye {{appName}}.",
       "totalStudentsRegistered": "Jumla ya wanafunzi waliosajiliwa",
-      "totalStudentsRegisteredTooltip": "All students who have created a {{appName}} account to date, across every institution.",
+      "totalStudentsRegisteredTooltip": "Wanafunzi wote ambao wamefungua {{appName}} akaunti hadi sasa, katika kila taasisi.",
       "activeStudents7Days": "Wanafunzi amilifu (siku 7)",
       "activeStudents7DaysSubtitle": "{{pct}}% ya waliosajiliwa",
       "activeStudents7DaysSubtitleNoPct": "ya waliosajiliwa",
-      "activeStudents7DaysTooltip": "Students who logged in or interacted with {{appName}} in the past 7 days."
+      "activeStudents7DaysTooltip": "Wanafunzi walioingia au kuingiliana na {{appName}} katika siku 7 zilizopita."
     },
     "modules": {
       "titles": {
         "skillsDiscovery": "Jenga wasifu wako",
-        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
+        "skillsDiscoveryTooltip": "Jenga wasifu wako: wanafunzi hushiriki uzoefu wa awali na {{appName}} huunda wasifu wa ujuzi wao.",
         "careerReadiness": "Kujiandaa kwa Kazi",
-        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerReadinessTooltip": "Moduli ya Kujiandaa kwa Kazi: wanafunzi hupitia CV, barua ya maombi, maandalizi ya usaili, na moduli ndogo nyingine za kujiandaa kwa kazi.",
         "careerExplorer": "Njia za kazi",
-        "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
+        "careerExplorerTooltip": "Moduli ya Mchunguzi wa Kazi: wanafunzi huchunguza kazi zinazolingana na ujuzi na maslahi yao."
       },
       "registeredStudents": "{{count}} wanafunzi waliosajiliwa",
       "started": "Walianza",
@@ -183,46 +183,46 @@
       "sharingExperiences": "Kushiriki uzoefu",
       "identifyingSkills": "Kutambua ujuzi",
       "collectingPreferences": "Kukusanya mapendeleo",
-      "professionalIdentity": "Wewe ni nani kama mtaalamu",
-      "cvDevelopment": "Kutengeneza CV yako",
-      "coverLetterMotivation": "Barua za maombi na kauli za motisha",
-      "interviewPreparation": "Maandalizi ya mahojiano",
-      "workplaceReadiness": "Utayari wa mahali pa kazi",
-      "entrepreneurship": "Ujasiriamali na biashara",
+      "professionalIdentity": "Kuelewa utambulisho wako wa kitaaluma",
+      "cvDevelopment": "Jinsi ya kuandika CV?",
+      "coverLetterMotivation": "Kuandaa barua za maombi na taarifa za motisha",
+      "interviewPreparation": "Kujitayarisha kwa mahojiano ya kazi",
+      "workplaceReadiness": "Kujitayarisha kuanza kazi mpya: utayari wa mahali pa kazi",
+      "entrepreneurship": "Ujasiriamali na maendeleo ya biashara",
       "sectors": {
         "ict": "ICT",
-        "mining": "Mining",
-        "energy": "Energy",
-        "construction": "Construction",
-        "agriculture": "Agriculture",
-        "hospitality": "Hospitality",
-        "manufacturing": "Manufacturing",
-        "water": "Water",
-        "transport": "Transport",
-        "other": "Other"
+        "mining": "Uchimbaji madini",
+        "energy": "Nishati",
+        "construction": "Ujenzi",
+        "agriculture": "Kilimo",
+        "hospitality": "Ukarimu",
+        "manufacturing": "Utengenezaji",
+        "water": "Maji",
+        "transport": "Usafiri",
+        "other": "Nyingine"
       },
       "filters": {
         "allLocations": "Maeneo yote",
-        "allProvinces": "All Provinces",
-        "allInstitutions": "All Institutions",
-        "allQualifications": "All Qualifications",
-        "allYears": "All Years"
+        "allProvinces": "Mikoa Yote",
+        "allInstitutions": "Taasisi zote",
+        "allQualifications": "Sifa Zote",
+        "allYears": "Miaka Yote"
       }
     },
     "skillsAnalytics": {
-      "supplyVsDemandTitle": "Skills Supply vs Labour Market Demand",
-      "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
-      "topSkillsAmongStudents": "Top Skills Among Students",
-      "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
-      "gapBySectorTitle": "Skills Gap by Sector",
-      "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
-      "avgGapLabel": "Avg. gap between student skills supply and labour market demand",
-      "gapPp": "{{gap}}pp",
+      "supplyVsDemandTitle": "Ugavi wa Ujuzi dhidi ya Mahitaji ya Soko la Kazi",
+      "supplyVsDemandTitleTooltip": "Ustadi wa hali ya juu ambao wanafunzi wana (ugavi) dhidi ya ujuzi ambao waajiri mara nyingi huuliza katika machapisho ya kazi (mahitaji).",
+      "topSkillsAmongStudents": "Ujuzi Bora Miongoni mwa Wanafunzi",
+      "topSkillsInDemand": "Ujuzi Bora Unaohitajika (Machapisho ya Kazi)",
+      "gapBySectorTitle": "Pengo la Ujuzi kwa Sekta",
+      "gapBySectorTitleTooltip": "Tofauti kati ya ujuzi wanafunzi walio nao na ujuzi wanaoomba waajiri, ukigawanywa kulingana na sekta.",
+      "avgGapLabel": "Wastani. pengo kati ya ugavi wa ujuzi wa wanafunzi na mahitaji ya soko la ajira",
+      "gapPp": "{{gap}}p",
       "legend": {
-        "supply": "Supply",
-        "demand": "Demand",
-        "supplyStudents": "Supply (students)",
-        "demandEmployers": "Demand (employers)"
+        "supply": "Ugavi",
+        "demand": "Mahitaji",
+        "supplyStudents": "Ugavi (wanafunzi)",
+        "demandEmployers": "Mahitaji (waajiri)"
       },
       "aria": {
         "supplyBar": "Usambazaji wa {{skill}}: {{value}}%",
@@ -230,144 +230,144 @@
         "gapBar": "Pengo la ujuzi kwa {{sector}}: usambazaji {{supply}}%, mahitaji {{demand}}%"
       },
       "filters": {
-        "allProvinces": "All Provinces",
-        "allSectors": "All Sectors"
+        "allProvinces": "Mikoa Yote",
+        "allSectors": "Sekta Zote"
       }
     },
     "jobPostings": {
       "stats": {
         "jobsSourced": "Ajira zilizokusanywa",
-        "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
+        "jobsSourcedTooltip": "Jumla ya machapisho ya kazi yaliyokusanywa kutoka kwa mifumo ya kazi inayotumika.",
         "sectorsCovered": "Sekta zilizofunikwa",
-        "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
+        "sectorsCoveredTooltip": "Idadi ya sekta mahususi zilizowakilishwa katika machapisho ya kazi yaliyokusanywa.",
         "sourcePlatforms": "Majukwaa ya chanzo",
-        "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
+        "sourcePlatformsTooltip": "Idadi ya majukwaa mahususi ya bodi ya kazi inayolisha mkusanyiko wa data.",
         "lastUpdatedOn": "Imesasishwa tarehe {{date}}"
       },
-      "searchPlaceholder": "Search job titles...",
-      "jobsCount": "{{count}} of {{total}} jobs",
-      "moreSkills": "+{{count}} more",
+      "searchPlaceholder": "Tafuta majina ya kazi...",
+      "jobsCount": "{{count}} kati ya {{total}} kazi",
+      "moreSkills": "+{{count}} zaidi",
       "filters": {
-        "allSectors": "All Sectors",
-        "allLocations": "All Locations",
-        "allPlatforms": "All Platforms",
-        "allZqfLevels": "All ZQF Levels"
+        "allSectors": "Sekta Zote",
+        "allLocations": "Maeneo Yote",
+        "allPlatforms": "Majukwaa Yote",
+        "allZqfLevels": "Ngazi zote za ZQF"
       },
       "table": {
-        "jobTitle": "Job Title",
-        "sector": "Sector",
-        "location": "Location",
+        "jobTitle": "Jina la Kazi",
+        "sector": "Sekta",
+        "location": "Mahali",
         "zqf": "ZQF",
-        "platform": "Platform",
-        "skillsExtracted": "Skills Extracted",
-        "candidatePool": "Candidate Pool",
-        "candidatePoolSubheader": "50%+ skills match",
-        "link": "Link"
+        "platform": "Jukwaa",
+        "skillsExtracted": "Ujuzi Umetolewa",
+        "candidatePool": "Bwawa la Mgombea",
+        "candidatePoolSubheader": "50%+ ujuzi unalingana",
+        "link": "Kiungo"
       },
       "aria": {
-        "search": "Search job titles",
-        "openJob": "Open job posting for {{title}}",
-        "table": "Job postings table",
-        "moreSkills": "Show {{count}} more skills",
-        "detailsDialog": "Job posting details dialog",
-        "closeDetailsDialog": "Close job posting details"
+        "search": "Tafuta majina ya kazi",
+        "openJob": "Fungua uchapishaji wa kazi kwa {{title}}",
+        "table": "Jedwali la matangazo ya kazi",
+        "moreSkills": "Onyesha ujuzi {{count}} zaidi",
+        "detailsDialog": "Kidirisha cha maelezo ya uchapishaji wa kazi",
+        "closeDetailsDialog": "Funga maelezo ya uchapishaji wa kazi"
       },
       "modal": {
-        "platform": "Platform",
-        "candidatePool": "Candidate Pool",
-        "candidatePoolValue": "{{count}} students (50%+ match)",
-        "skillsExtracted": "Skills Extracted ({{count}})",
-        "viewOriginalPosting": "View Original Posting"
+        "platform": "Jukwaa",
+        "candidatePool": "Bwawa la Mgombea",
+        "candidatePoolValue": "Wanafunzi {{count}} (50%+ mechi)",
+        "skillsExtracted": "Ujuzi Umetolewa ({{count}})",
+        "viewOriginalPosting": "Tazama Chapisho Halisi"
       }
     },
     "institutionsTable": {
       "headers": {
-        "institution": "Institution",
-        "students": "Students",
-        "active7Days": "Active (7D)",
+        "institution": "Taasisi",
+        "students": "Wanafunzi",
+        "active7Days": "Inayotumika (7D)",
         "skillsDiscovery": "Jenga wasifu wako",
         "careerReadiness": "Kujiandaa kwa Kazi",
         "careerExplorer": "Njia za kazi"
       },
       "subHeaders": {
-        "started": "Started",
-        "completed": "Completed",
-        "ofReg": "% of reg.",
-        "ofStarted": "% of started"
+        "started": "Imeanza",
+        "completed": "Imekamilika",
+        "ofReg": "% ya reg.",
+        "ofStarted": "% ya kuanza"
       },
       "empty": "Hakuna taasisi zilizopatikana.",
       "prevPage": "Ukurasa uliopita",
       "nextPage": "Ukurasa unaofuata",
       "page": "Ukurasa {{page}}"
     },
-    "comingSoon": "No data so far."
+    "comingSoon": "Hakuna data hadi sasa."
   },
   "instructorDashboard": {
-    "sectionTitle": "Instructor dashboard — monitor student engagement and progress",
+    "sectionTitle": "Dashibodi ya mwalimu - fuatilia ushiriki wa wanafunzi na maendeleo",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "institutionFallback": "Your Institution",
-      "defaultName": "Instructor",
+      "welcome": "Karibu, {{name}}",
+      "institutionFallback": "Taasisi yako",
+      "defaultName": "Mwalimu",
       "school": "Evelyn Hone College of Applied Art and Commerce"
     },
     "tabs": {
-      "ariaLabel": "Instructor dashboard tabs",
-      "students": "Students",
+      "ariaLabel": "Vichupo vya dashibodi ya mwalimu",
+      "students": "Wanafunzi",
       "modules": "Kituo Chako cha Kazi",
-      "skillsAnalytics": "Skills Analytics"
+      "skillsAnalytics": "Uchambuzi wa Ujuzi"
     },
     "stats": {
-      "totalStudentsRegistered": "Total Students Registered",
-      "totalStudentsRegisteredTooltip": "Students from your institution who have created a {{appName}} account.",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "{{pct}}% of registered",
-      "activeStudents7DaysTooltip": "Students from your institution who logged in or interacted with {{appName}} in the past 7 days.",
-      "avgProfileStrength": "Avg Profile Strength",
-      "avgProfileStrengthSubtitle": "Up from 52% last week"
+      "totalStudentsRegistered": "Jumla ya Wanafunzi Waliosajiliwa",
+      "totalStudentsRegisteredTooltip": "Wanafunzi kutoka taasisi yako ambao wamefungua akaunti {{appName}}.",
+      "activeStudents7Days": "Wanafunzi walio hai (siku 7)",
+      "activeStudents7DaysSubtitle": "{{pct}}% ya waliosajiliwa",
+      "activeStudents7DaysTooltip": "Wanafunzi kutoka taasisi yako ambao waliingia au kuwasiliana na {{appName}} katika siku 7 zilizopita.",
+      "avgProfileStrength": "Wastani wa Nguvu ya Wasifu",
+      "avgProfileStrengthSubtitle": "Imeongezeka kutoka 52% wiki iliyopita"
     },
     "studentsTable": {
-      "ariaLabel": "Instructor students table",
-      "empty": "No students match the current filters.",
+      "ariaLabel": "Jedwali la wanafunzi wa mwalimu",
+      "empty": "Hakuna wanafunzi wanaolingana na vichujio vya sasa.",
       "headers": {
-        "studentName": "Student Name",
-        "programme": "Programme",
-        "year": "Year",
-        "gender": "Gender",
-        "profileStrength": "Profile Strength",
-        "modulesCompleted": "Career Readiness Modules Completed",
+        "studentName": "Jina la Mwanafunzi",
+        "programme": "Mpango",
+        "year": "Mwaka",
+        "gender": "Jinsia",
+        "profileStrength": "Nguvu ya Wasifu",
+        "modulesCompleted": "Moduli za Utayari wa Kazi Zimekamilika",
         "careerReady": "Kujiandaa kwa Kazi",
-        "skillsInterestsExplored": "Skills & Interests",
-        "careerExplorer": "Career Explorer",
-        "prioritySectorsExplored": "Priority Sectors Explored",
-        "lastLogin": "Last Login",
-        "lastActiveModule": "Last Active Module"
+        "skillsInterestsExplored": "Ujuzi na Maslahi",
+        "careerExplorer": "Mtafiti wa Kazi",
+        "prioritySectorsExplored": "Sekta za Kipaumbele Zilizogunduliwa",
+        "lastLogin": "Mwisho wa Kuingia",
+        "lastActiveModule": "Moduli Amilifu ya Mwisho"
       },
       "filters": {
-        "all": "All",
-        "searchPlaceholder": "Search...",
-        "searchAriaLabel": "Search by student name",
-        "today": "Today",
-        "thisWeek": "This week",
-        "older": "Older"
+        "all": "Wote",
+        "searchPlaceholder": "Tafuta...",
+        "searchAriaLabel": "Tafuta kwa jina la mwanafunzi",
+        "today": "Leo",
+        "thisWeek": "Wiki hii",
+        "older": "Mzee"
       },
       "statusLabels": {
-        "not_started": "Not Started",
-        "in_progress": "In Progress",
-        "completed": "Completed",
-        "started": "Started"
+        "not_started": "Haijaanza",
+        "in_progress": "Inaendelea",
+        "completed": "Imekamilika",
+        "started": "Imeanza"
       }
     }
   },
   "login": {
-    "title": "Admin Login",
-    "email": "Email",
-    "password": "Password",
-    "submit": "Sign In"
+    "title": "Kuingia kwa Msimamizi",
+    "email": "Barua pepe",
+    "password": "Nenosiri",
+    "submit": "Ingia"
   },
   "notFound": {
-    "message": "Page Not Found",
-    "description": "The page you are looking for might have been removed or is temporarily unavailable.",
-    "goHome": "Go to Dashboard"
+    "message": "Ukurasa Haujapatikana",
+    "description": "Ukurasa unaotafuta unaweza kuwa umeondolewa au haupatikani kwa muda.",
+    "goHome": "Nenda kwenye Dashibodi"
   },
   "users": {
     "title": "Watumiaji",

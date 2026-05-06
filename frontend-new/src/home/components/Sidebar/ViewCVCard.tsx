@@ -82,7 +82,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
             lineHeight: 1.3,
           }}
         >
-          View My CV
+          View my Skills Report
         </Box>
         <Box
           sx={{
@@ -92,7 +92,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
             marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           }}
         >
-          Download and share your personalized CV
+          Download and share your personalized Skills Report
         </Box>
       </Box>
       <ChevronRightIcon sx={{ color: theme.palette.text.secondary, fontSize: "18px", flexShrink: 0 }} />

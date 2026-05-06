@@ -12,7 +12,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
       class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1qsyn48-MuiButtonBase-root-MuiButton-root"
       data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
       tabindex="0"
-      title="Download CV"
+      title="Download Skills Report"
       type="button"
     >
       <span
@@ -30,7 +30,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
           />
         </svg>
       </span>
-      Download CV
+      Download Skills Report
     </button>
   </div>
 </div>
@@ -49,7 +49,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
       data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
       disabled=""
       tabindex="-1"
-      title="Download CV"
+      title="Download Skills Report"
       type="button"
     >
       <span
@@ -67,7 +67,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
           />
         </svg>
       </span>
-      Download CV
+      Download Skills Report
     </button>
   </div>
   <div
@@ -89,7 +89,7 @@ exports[`DownloadReportButton should render DownloadReportButton correctly when 
       data-testid="download-report-button-f5553dac-adb7-440f-9549-c3567b22dc76"
       disabled=""
       tabindex="-1"
-      title="Download CV"
+      title="Download Skills Report"
       type="button"
     >
       <span

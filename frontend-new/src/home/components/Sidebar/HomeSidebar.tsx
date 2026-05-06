@@ -50,14 +50,14 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
           chipBgColor={tealBg}
           chipTextColor={accentColor}
           accentColor={accentColor}
-          emptyText="Skills will appear here as you chat with Njila."
+          emptyText='Skills will appear here as you complete the "Build Your Profile" chat'
           emptyTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_EMPTY}
           chipTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_CHIP}
           expandButtonTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_EXPAND_BUTTON}
         />
       </Box>
       <Box>
-        <SectionTitle>Programme Skills</SectionTitle>
+        <SectionTitle>Skills from TEVET Program</SectionTitle>
         <ChipList
           chips={programmeSkills}
           chipBgColor={amberBg}

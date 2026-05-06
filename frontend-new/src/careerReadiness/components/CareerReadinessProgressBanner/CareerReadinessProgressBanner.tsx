@@ -56,7 +56,7 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
           fontWeight: 700,
         }}
       >
-        {t("careerReadiness.pageTitle")}
+        {t("home.profile.jobReadiness")}
       </Typography>
 
       <Box

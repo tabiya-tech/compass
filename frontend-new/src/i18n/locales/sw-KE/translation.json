@@ -109,7 +109,7 @@
   },
   "chat": {
     "chatHeader": {
-      "viewExperiences": "Tazama uzoefu",
+      "viewExperiences": "Ripoti yangu ya ujuzi",
       "feedbackMessage": "Tungependa kusikia maoni yako kuhusu uzoefu wako hadi sasa!",
       "giveFeedback": "Toa Maoni",
       "feedbackMessagePlaceholder": "Tungependa kusikia mawazo yako! Tafadhali shiriki maoni au mapendekezo yoyote unayoyaweka kwa kuboresha {{appName}}.",
@@ -183,7 +183,7 @@
       },
       "conversationConclusionFooter": {
         "youCanNow": "Sasa unaweza",
-        "viewAndDownloadCv": "Tazama na Pakua CV yako",
+        "viewAndDownloadCv": "Tazama na upakue ripoti yako ya ujuzi",
         "here": "hapa.",
         "createAccountIntro": "Ikiwa ungependa kuchunguza ujuzi na uzoefu wako baadaye, unaweza",
         "createAccount": "Unda Akaunti",
@@ -485,7 +485,7 @@
           "empty": "Hakuna uzoefu uliofutwa uliopatikana."
         },
         "downloadReportButton": {
-          "downloadCv": "Pakua CV",
+          "downloadCv": "Pakua ripoti ya ujuzi",
           "downloading": "Inapakua",
           "helpTipBlockedMessage": "Huwezi kupakua ripoti hadi umalize kuchunguza angalau uzoefu mmoja."
         },
@@ -823,8 +823,8 @@
     "previous": "Iliyotangulia"
   },
   "careerExplorer": {
-    "title": "Njia za kazi",
-    "subtitle": "Gundua ni sekta zipi zinaajiri na kiasi unachoweza kupata.",
+    "title": "Mchunguzi wa Kazi",
+    "subtitle": "Ona ni kazi zipi zinaendana na ujuzi wako — mishahara, sifa na waajiri wakuu.",
     "placeholder": "Uliza kuhusu sekta...",
     "send": "Tuma"
   },
@@ -868,17 +868,17 @@
     "takes30Min": "Inachukua ~dakika 30",
     "approx30Min": "~dakika 30",
     "continue": "Endelea",
-    "chat": "Zungumza",
+    "chat": "Anza",
     "heroTitle": "Jiandae Kupata Kazi",
     "heroDescription": "Moduli sita za kukusaidia kujiandaa kwa soko la kazi — kuandika CV, mahojiano, ujuzi wa mahali pa kazi, na zaidi. Fanya kwa kasi yako mwenyewe.",
     "illustration": "Mchoro",
     "moduleTitles": {
-      "whoYouAre": "Wewe ni nani kama mtaalamu",
-      "buildingCv": "Kutengeneza CV yako",
-      "coverLetters": "Barua za maombi na kauli za motisha",
-      "interviewPreparation": "Maandalizi ya mahojiano",
-      "workplaceReadiness": "Utayari wa mahali pa kazi",
-      "entrepreneurship": "Ujasiriamali na biashara"
+      "professionalIdentity": "Kuelewa utambulisho wako wa kitaaluma",
+      "cvDevelopment": "Jinsi ya kuandika CV?",
+      "coverLetterMotivation": "Kuandaa barua za maombi na taarifa za motisha",
+      "interviewPreparation": "Kujitayarisha kwa mahojiano ya kazi",
+      "workplaceReadiness": "Kujitayarisha kuanza kazi mpya: utayari wa mahali pa kazi",
+      "entrepreneurship": "Ujasiriamali na maendeleo ya biashara"
     }
   },
   "home": {
@@ -894,29 +894,29 @@
     "hero": {
       "headline1": "Hebu tugundue",
       "headline2": "Ujuzi wako na nguvu zako",
-      "body": "Njia yako iliyoongozwa kutoka kwa ujuzi hadi kazi yako ya kwanza. Anza kwa kugundua unachokileta — kisha chunguza kazi, unda CV yako, na upate fursa halisi nchini Zambia.",
+      "body": "Njia yako iliyoongozwa kutoka kwa ujuzi hadi kazi yako ya kwanza. Anza kwa kugundua unachokileta — kisha chunguza kazi, jenga utayari wa kazi, na upate fursa halisi nchini Zambia.",
       "illustrationAlt": "Mtu kwenye kigango cha njia, akichunguza mwelekeo wa kazi"
     },
     "cta": {
       "buildProfileTitle": "Jenga wasifu wako",
-      "buildProfileDesc": "Njia yako ya mwongozo kutoka kwenye ujuzi hadi kazi yako ya kwanza. Anza kwa kugundua kile unacholeta, tengeneza CV, na upate fursa halisi.",
+      "buildProfileDesc": "Anza kwa kugundua kile unacholeta, unda ripoti ya kina ya ujuzi na utuambie ni aina gani ya kazi unayovutiwa nayo",
       "buildProfileCta": "Anza mazungumzo ya wasifu",
-      "explorePathsTitle": "Chunguza njia za kazi",
-      "explorePathsDesc": "Ona ni kazi zipi zinaendana na ujuzi wako — mishahara, sifa na waajiri wakuu.",
-      "explorePathsCta": "Chunguza njia",
+      "explorePathsTitle": "Mchunguzi wa Kazi",
+      "explorePathsDesc": "Chunguza sekta na kazi unazovutiwa nazo - mishahara, njia za sifa, programu za mafunzo, waajiri wakuu.",
+      "explorePathsCta": "Chunguza njia za kazi",
       "jobMatchesTitle": "Kazi zinazolingana",
       "jobMatchesDesc": "Nafasi halisi kote Zambia, zinalingana na unachoweza kufanya sasa hivi.",
-      "jobMatchesCta": "Ona zinazokufaa"
+      "jobMatchesCta": "Vinjari kazi zako"
     },
     "jobReadySection": {
       "title": "Jiandae kwa ajira",
-      "description": "Unahitaji msaada kutafuta kazi? Kamilisha moduli hizi na ujenge ujasiri kwa CV yako, mahojiano, na mengineyo.",
-      "seeFullCourse": "Ona kozi kamili →",
+      "description": "Unahitaji msaada kutafuta kazi? Pitia moduli hizi na ujenge kujiamini kwa CV yako, mahojiano, na kila kitu kilicho katikati.",
+      "seeFullCourse": "Ona orodha kamili ya kozi →",
       "startLearning": "ANZA KUJIFUNZA",
       "continueLearning": "ENDELEA KUJIFUNZA",
-      "chat": "Mazungumzo",
-      "startChat": "Anza mazungumzo ya wasifu",
-      "continueProfileChat": "Endelea na mazungumzo ya wasifu",
+      "chat": "Anza",
+      "startChat": "Anza kujifunza",
+      "continueProfileChat": "Endelea kujifunza",
       "completedLearning": "IMEKAMILIKA",
       "viewModule": "Angalia moduli",
       "locked": "Imefungwa",
@@ -927,7 +927,7 @@
     },
     "myExperience": {
       "sectionTitle": "Uzoefu wangu",
-      "cardTitle": "Tazama CV Yangu",
+      "cardTitle": "Tazama ripoti yangu ya ujuzi",
       "cardSubtitle": "Pakua na ushiriki CV yako binafsi."
     },
     "profile": {
@@ -938,7 +938,7 @@
       "preferences": "Mapendeleo",
       "profileSection": "Wasifu",
       "moduleProgress": "Maendeleo ya Moduli",
-      "skillsDiscovered": "Ujuzi Uliogundulika",
+      "skillsDiscovered": "Maendeleo ya Jenga",
       "name": "Jina",
       "email": "Barua Pepe",
       "language": "Lugha",
@@ -949,11 +949,12 @@
       "year": "Mwaka",
       "notProvided": "Haijatolewa",
       "notAvailable": "Haipatikani",
-      "viewMyCv": "Tazama CV yangu",
+      "viewMyCv": "Tazama ripoti yangu ya ujuzi",
       "share": "Shiriki",
       "shareProfileUnavailable": "Kushiriki hakupatikani kwenye kifaa hiki.",
       "linkCopied": "Kiungo cha wasifu kimenakiliwa kwenye ubao wa kunakili",
-      "skillsInterestsProgressTitle": "Maendeleo ya Ujuzi na Maslahi",
+      "skillsInterestsProgressTitle": "Maendeleo ya Jenga",
+      "jobReadiness": "Kujiandaa kwa Kazi",
       "skillsInterestsProgressDescription": "Umbali uliofika katika mazungumzo yako ya kugundua ujuzi",
       "moduleCompleted": "imekamilika",
       "moduleRemaining": "imebaki",
@@ -961,7 +962,7 @@
       "workSkills": "Ujuzi wa Kazi na Mengineyo",
       "educationSkills": "Ujuzi wa Elimu",
       "noEducationSkillsYet": "Hakuna ujuzi wa elimu uliogundulika bado.",
-      "careerExplorer": "Njia za kazi",
+      "careerExplorer": "Mchunguzi wa Kazi",
       "noSectorsYet": "Hakuna sekta zilizochunguzwa bado.",
       "sectorsExplored": "Umechunguza sekta {{count}}",
       "profileStrength": "Nguvu ya wasifu",
@@ -996,7 +997,7 @@
       "skillsDiscovery": "Jenga wasifu wako",
       "skillsDiscoverySubtitle": "Zungumza na {{appName}} kugundua ujuzi wako kutoka kazini na maisha.",
       "jobReadiness": "Kujiandaa kwa Kazi",
-      "careerExplorer": "Njia za kazi",
+      "careerExplorer": "Mchunguzi wa Kazi",
       "knowledgeHub": "Kituo cha Maarifa",
       "jobMatching": "Kufanana kwa Kazi",
       "skillsDiscoveryDesc": "Zungumza na {{appName}} ili kugundua ujuzi na mapendeleo yako — kutoka masomo yako, kazi, na maisha ya kila siku.",
@@ -1014,7 +1015,7 @@
       "termsOfUse": "Sheria za Matumizi",
       "accessibility": "Ufikiaji",
       "contact": "Wasiliana",
-      "collaboration": "{{appName}} ni zana bila malipo ya kuongoza kazi iliyojengwa kwa ushirikiano kati ya Kundi la Benki ya Dunia na Tabiya."
+      "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya."
     }
   },
   "knowledgeHub": {
@@ -1044,42 +1045,42 @@
     },
     "noDocumentsAvailable": "Bado hakuna waraka zinazopatikana.",
     "careerPathwaysTitle": "Njia za Kazi",
-    "prioritySector": "Priority Sector",
-    "avgMonthlyEarnings": "Avg monthly earnings (formal sector)",
-    "criticalOccupations": "Critical occupations identified",
-    "tevetProgrammes": "TEVET programmes offered",
-    "keyEmployers": "Key employers to look out for",
-    "tevetAccreditedProgrammes": "TEVET accredited programmes relevant to the {{sector}} sector",
-    "accreditedProgrammesCount": "{{count}} accredited programmes across {{institutions}} institutions. {{suffix}}",
-    "loadingProgrammes": "Loading programme data...",
-    "shortCoursesNote": "+ {{count}} short courses offered by sector employers and specialist training providers.",
-    "criticalSkillsLabel": "Critical {{sector}}-related skills specializations identified",
-    "filterAll": "All ({{count}})",
+    "prioritySector": "Sekta ya Kipaumbele",
+    "avgMonthlyEarnings": "Wastani wa mapato ya kila mwezi (sekta rasmi)",
+    "criticalOccupations": "Kazi muhimu zimetambuliwa",
+    "tevetProgrammes": "Programu za TEVET zinazotolewa",
+    "keyEmployers": "Waajiri wakuu wa kuwaangalia",
+    "tevetAccreditedProgrammes": "Programu zilizoidhinishwa na TEVET zinazohusiana na sekta ya {{sector}}",
+    "accreditedProgrammesCount": "{{count}} programu zilizoidhinishwa kote {{institutions}} taasisi. {{suffix}}",
+    "loadingProgrammes": "Inapakia data ya programu...",
+    "shortCoursesNote": "+ {{count}} kozi fupi zinazotolewa na waajiri wa sekta na watoa mafunzo maalum.",
+    "criticalSkillsLabel": "Utaalam muhimu unaohusiana na {{sector}} umetambuliwa",
+    "filterAll": "Zote ({{count}})",
     "filterZqf": "ZQF {{level}} ({{count}})",
-    "tableOccupation": "Occupation in demand",
+    "tableOccupation": "Kazi katika mahitaji",
     "tableZqf": "ZQF",
-    "tableDuration": "Duration",
+    "tableDuration": "Muda",
     "tableTevet": "TEVET",
-    "tableCountAll": "Showing all {{count}} occupations. Where no programme is listed, training is typically provided on-the-job by employers or curriculum is currently in development.",
-    "tableCountFiltered": "Showing {{count}} occupations at ZQF {{level}}. Where no programme is listed, training is typically provided on-the-job by employers or curriculum is currently in development.",
-    "newProgrammesDev": "New programmes in development",
-    "newProgrammesDevDesc": "Priority curriculum areas identified through the ILO/TEVETA Skills Development for Increased Employability Programme (SDEP) and sector consultations.",
-    "devOccupationsLabel": "Occupations without dedicated TEVET programmes",
-    "keepInMind": "Things to keep in mind",
-    "navWhereJobs": "Where the jobs are",
-    "navProgrammes": "Programmes",
-    "navCriticalSkills": "Critical skills",
-    "navInDevelopment": "In development",
-    "navKeepInMind": "Keep in mind"
+    "tableCountAll": "Inaonyesha kazi {{count}} zote. Ambapo hakuna programu iliyoorodheshwa, mafunzo kwa kawaida hutolewa kazini na waajiri au mtaala unaandaliwa kwa sasa.",
+    "tableCountFiltered": "Inaonyesha {{count}} kazi katika ZQF {{level}}. Ambapo hakuna programu iliyoorodheshwa, mafunzo kwa kawaida hutolewa kazini na waajiri au mtaala unaandaliwa kwa sasa.",
+    "newProgrammesDev": "Programu mpya katika maendeleo",
+    "newProgrammesDevDesc": "Maeneo ya kipaumbele ya mtaala yaliyoainishwa kupitia Mpango wa Kukuza Ujuzi wa ILO/TEVETA kwa Ongezeko la Ajira (SDEP) na mashauriano ya kisekta.",
+    "devOccupationsLabel": "Kazi bila programu maalum za TEVET",
+    "keepInMind": "Mambo ya kuzingatia",
+    "navWhereJobs": "Ajira ziko wapi",
+    "navProgrammes": "Mipango",
+    "navCriticalSkills": "Ujuzi muhimu",
+    "navInDevelopment": "Katika maendeleo",
+    "navKeepInMind": "Kumbuka"
   },
   "jobMatching": {
     "pageTitle": "Kuoanisha Kazi",
     "pageDescription": "Gundua nafasi za kazi halisi na uone jinsi ujuzi wako unavyooanisha fursa nchini Zambia.",
     "matched": {
-      "programmeBanner": "Get more personalised matches by completing the Skills & Interests chat.",
-      "emptyNoSkills": "Complete the Skills & Interests chat to see job matches tailored to you.",
-      "emptyProgrammeNoMatches": "No matches yet. Complete the Skills & Interests chat to find jobs that fit your skills.",
-      "emptySiNoMatches": "We don't have matches for you right now — check back later."
+      "programmeBanner": "Pata uoanifu uliobinafsishwa zaidi kwa kukamilisha gumzo la Jenga Wasifu Wako.",
+      "emptyNoSkills": "Kazi zinazooana bado hazipatikani. Kamilisha sehemu ya \"Jenga Wasifu Wako\" ili kufungua mapendekezo yaliyobinafsishwa.",
+      "emptyProgrammeNoMatches": "Bado hakuna uoanifu. Kamilisha gumzo la Jenga Wasifu Wako ili kupata kazi zinazolingana na ujuzi wako.",
+      "emptySiNoMatches": "Kwa sasa hatuna uoanifu kwa ajili yako — rudi uangalie baadaye."
     }
   },
   "nav": {

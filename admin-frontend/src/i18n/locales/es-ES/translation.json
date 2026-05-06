@@ -106,8 +106,8 @@
     }
   },
   "header": {
-    "logout": "Logout",
-    "user": "User"
+    "logout": "Cerrar sesión",
+    "user": "Usuario"
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -119,30 +119,30 @@
     }
   },
   "footer": {
-    "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use",
-    "accessibility": "Accessibility",
-    "contact": "Contact",
-    "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional desarrollada en colaboración entre el Grupo del Banco Mundial y Tabiya."
+    "privacyPolicy": "política de privacidad",
+    "termsOfUse": "Condiciones de uso",
+    "accessibility": "Accesibilidad",
+    "contact": "Contacto",
+    "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional ofrecida por el Ministerio de Tecnología y Ciencia de Zambia, desarrollada en colaboración con el Grupo del Banco Mundial y Tabiya."
   },
   "dashboard": {
-    "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
+    "sectionTitle": "Panel de administrador: seguimiento y análisis interinstitucionales",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "school": "TEVETA — Technical Education, Vocational and Entrepreneurship Training Authority"
+      "welcome": "Bienvenido, {{name}}",
+      "school": "TEVETA — Autoridad de Educación Técnica, Formación Profesional y Emprendimiento"
     },
     "tabs": {
-      "institutions": "Institutions",
-      "modules": "Modules",
-      "skillsAnalytics": "Skills Analytics",
-      "jobPostings": "Job Postings"
+      "institutions": "Instituciones",
+      "modules": "Módulos",
+      "skillsAnalytics": "Análisis de habilidades",
+      "jobPostings": "Ofertas de empleo"
     },
     "dataTable": {
       "clearSorting": "Quitar ordenación"
     },
     "dailyAdoptionTrend": {
       "title": "Tendencia diaria de adopcion",
-      "titleTooltip": "New registrations and daily active users over the past 7 days. Helps track whether adoption is growing day to day.",
+      "titleTooltip": "Nuevos registros y usuarios activos diarios durante los últimos 7 días. Ayuda a rastrear si la adopción crece día a día.",
       "noData": "No hay datos disponibles",
       "newRegistrations": "Nuevos registros",
       "dailyActiveUsers": "Usuarios activos diarios"
@@ -151,22 +151,22 @@
       "institutionsActive": "Instituciones activas",
       "institutionsActiveSubtitle": "de {{total}} instituciones piloto",
       "institutionsActiveSubtitleNoTotal": "de instituciones piloto",
-      "institutionsActiveTooltip": "Pilot institutions that have at least one student registered on {{appName}}.",
+      "institutionsActiveTooltip": "Instituciones piloto que tienen al menos un estudiante registrado el {{appName}}.",
       "totalStudentsRegistered": "Total de estudiantes registrados",
-      "totalStudentsRegisteredTooltip": "All students who have created a {{appName}} account to date, across every institution.",
+      "totalStudentsRegisteredTooltip": "Todos los estudiantes que han creado una cuenta {{appName}} hasta la fecha, en todas las instituciones.",
       "activeStudents7Days": "Estudiantes activos (7 dias)",
       "activeStudents7DaysSubtitle": "{{pct}}% de los registrados",
       "activeStudents7DaysSubtitleNoPct": "de los registrados",
-      "activeStudents7DaysTooltip": "Students who logged in or interacted with {{appName}} in the past 7 days."
+      "activeStudents7DaysTooltip": "Estudiantes que iniciaron sesión o interactuaron con {{appName}} en los últimos 7 días."
     },
     "modules": {
       "titles": {
         "skillsDiscovery": "Construye tu perfil",
-        "skillsDiscoveryTooltip": "Skills & Interests module: students share past experiences and {{appName}} extracts a profile of their skills.",
+        "skillsDiscoveryTooltip": "Construye tu perfil: los estudiantes comparten experiencias pasadas y {{appName}} extrae un perfil de sus habilidades.",
         "careerReadiness": "Preparación profesional",
-        "careerReadinessTooltip": "Career Readiness module: students work through CV, cover letter, interview prep, and other job-readiness sub-modules.",
+        "careerReadinessTooltip": "Módulo de Preparación profesional: los estudiantes trabajan CV, carta de presentación, preparación para entrevistas y otros submódulos de preparación laboral.",
         "careerExplorer": "Rutas profesionales",
-        "careerExplorerTooltip": "Career Explorer module: students browse occupations matched to their skills and interests."
+        "careerExplorerTooltip": "Módulo Explorador de carreras: los estudiantes exploran ocupaciones que encajan con sus habilidades e intereses."
       },
       "registeredStudents": "{{count}} estudiantes registrados",
       "started": "Iniciados",
@@ -183,46 +183,46 @@
       "sharingExperiences": "Compartir experiencias",
       "identifyingSkills": "Identificación de habilidades",
       "collectingPreferences": "Recogida de preferencias",
-      "professionalIdentity": "Quién eres como profesional",
-      "cvDevelopment": "Construcción de tu CV",
-      "coverLetterMotivation": "Cartas de presentación y declaraciones de motivación",
-      "interviewPreparation": "Preparación para entrevistas",
-      "workplaceReadiness": "Preparación para el entorno laboral",
-      "entrepreneurship": "Emprendimiento y empresa",
+      "professionalIdentity": "Comprender tu identidad profesional",
+      "cvDevelopment": "¿Cómo escribir un CV?",
+      "coverLetterMotivation": "Redactar cartas de presentación y declaraciones de motivación",
+      "interviewPreparation": "Prepararse para entrevistas de trabajo",
+      "workplaceReadiness": "Prepararse para empezar un nuevo trabajo: preparación para el entorno laboral",
+      "entrepreneurship": "Emprendimiento y desarrollo empresarial",
       "sectors": {
-        "ict": "ICT",
-        "mining": "Mining",
-        "energy": "Energy",
-        "construction": "Construction",
-        "agriculture": "Agriculture",
-        "hospitality": "Hospitality",
-        "manufacturing": "Manufacturing",
-        "water": "Water",
-        "transport": "Transport",
-        "other": "Other"
+        "ict": "TIC",
+        "mining": "Minería",
+        "energy": "Energía",
+        "construction": "Construcción",
+        "agriculture": "Agricultura",
+        "hospitality": "Hospitalidad",
+        "manufacturing": "Fabricación",
+        "water": "Agua",
+        "transport": "Transporte",
+        "other": "Otro"
       },
       "filters": {
         "allLocations": "Todas las ubicaciones",
-        "allProvinces": "All Provinces",
-        "allInstitutions": "All Institutions",
-        "allQualifications": "All Qualifications",
-        "allYears": "All Years"
+        "allProvinces": "Todas las provincias",
+        "allInstitutions": "Todas las instituciones",
+        "allQualifications": "Todas las calificaciones",
+        "allYears": "Todos los años"
       }
     },
     "skillsAnalytics": {
-      "supplyVsDemandTitle": "Skills Supply vs Labour Market Demand",
-      "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
-      "topSkillsAmongStudents": "Top Skills Among Students",
-      "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
-      "gapBySectorTitle": "Skills Gap by Sector",
-      "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
-      "avgGapLabel": "Avg. gap between student skills supply and labour market demand",
+      "supplyVsDemandTitle": "Oferta de habilidades versus demanda del mercado laboral",
+      "supplyVsDemandTitleTooltip": "Las principales habilidades que los estudiantes ya tienen (oferta) versus las habilidades que los empleadores solicitan con mayor frecuencia en las ofertas de trabajo (demanda).",
+      "topSkillsAmongStudents": "Principales habilidades entre los estudiantes",
+      "topSkillsInDemand": "Principales habilidades en demanda (publicaciones de trabajo)",
+      "gapBySectorTitle": "Brecha de habilidades por sector",
+      "gapBySectorTitleTooltip": "Diferencia entre las habilidades que tienen los estudiantes y las que demandan los empleadores, desglosada por sector.",
+      "avgGapLabel": "Promedio brecha entre la oferta de habilidades de los estudiantes y la demanda del mercado laboral",
       "gapPp": "{{gap}}pp",
       "legend": {
-        "supply": "Supply",
-        "demand": "Demand",
-        "supplyStudents": "Supply (students)",
-        "demandEmployers": "Demand (employers)"
+        "supply": "Suministrar",
+        "demand": "Demanda",
+        "supplyStudents": "Oferta (estudiantes)",
+        "demandEmployers": "Demanda (empleadores)"
       },
       "aria": {
         "supplyBar": "Oferta para {{skill}}: {{value}}%",
@@ -230,18 +230,18 @@
         "gapBar": "Brecha de habilidades para {{sector}}: oferta {{supply}}%, demanda {{demand}}%"
       },
       "filters": {
-        "allProvinces": "All Provinces",
-        "allSectors": "All Sectors"
+        "allProvinces": "Todas las provincias",
+        "allSectors": "Todos los sectores"
       }
     },
     "jobPostings": {
       "stats": {
         "jobsSourced": "Empleos recopilados",
-        "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
+        "jobsSourcedTooltip": "Total de ofertas de trabajo recopiladas de las plataformas de empleo admitidas.",
         "sectorsCovered": "Sectores cubiertos",
-        "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
+        "sectorsCoveredTooltip": "Número de sectores distintos representados en las ofertas de trabajo recopiladas.",
         "sourcePlatforms": "Plataformas de origen",
-        "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
+        "sourcePlatformsTooltip": "Número de plataformas de bolsa de trabajo distintas que alimentan el conjunto de datos.",
         "lastUpdatedOn": "Actualizado el {{date}}"
       },
       "searchPlaceholder": "Buscar titulos de empleo...",
@@ -282,92 +282,92 @@
     },
     "institutionsTable": {
       "headers": {
-        "institution": "Institution",
-        "students": "Students",
-        "active7Days": "Active (7D)",
+        "institution": "Institución",
+        "students": "Estudiantes",
+        "active7Days": "Activo (7D)",
         "skillsDiscovery": "Construye tu perfil",
         "careerReadiness": "Preparación profesional",
         "careerExplorer": "Rutas profesionales"
       },
       "subHeaders": {
-        "started": "Started",
-        "completed": "Completed",
-        "ofReg": "% of reg.",
-        "ofStarted": "% of started"
+        "started": "Comenzó",
+        "completed": "Terminado",
+        "ofReg": "% del reg.",
+        "ofStarted": "% de iniciados"
       },
       "empty": "No se encontraron instituciones.",
       "prevPage": "Página anterior",
       "nextPage": "Página siguiente",
       "page": "Página {{page}}"
     },
-    "comingSoon": "No data so far."
+    "comingSoon": "No hay datos hasta el momento."
   },
   "instructorDashboard": {
-    "sectionTitle": "Instructor dashboard — monitor student engagement and progress",
+    "sectionTitle": "Panel del instructor: supervise la participación y el progreso de los estudiantes",
     "header": {
-      "welcome": "Welcome, {{name}}",
-      "institutionFallback": "Your Institution",
+      "welcome": "Bienvenido, {{name}}",
+      "institutionFallback": "Tu Institución",
       "defaultName": "Instructor",
       "school": "Evelyn Hone College of Applied Art and Commerce"
     },
     "tabs": {
-      "ariaLabel": "Instructor dashboard tabs",
-      "students": "Students",
+      "ariaLabel": "Pestañas del panel del instructor",
+      "students": "Estudiantes",
       "modules": "Tu Centro de Carrera",
-      "skillsAnalytics": "Skills Analytics"
+      "skillsAnalytics": "Análisis de habilidades"
     },
     "stats": {
-      "totalStudentsRegistered": "Total Students Registered",
-      "totalStudentsRegisteredTooltip": "Students from your institution who have created a {{appName}} account.",
-      "activeStudents7Days": "Active Students (7 days)",
-      "activeStudents7DaysSubtitle": "{{pct}}% of registered",
-      "activeStudents7DaysTooltip": "Students from your institution who logged in or interacted with {{appName}} in the past 7 days.",
-      "avgProfileStrength": "Avg Profile Strength",
-      "avgProfileStrengthSubtitle": "Up from 52% last week"
+      "totalStudentsRegistered": "Total de estudiantes registrados",
+      "totalStudentsRegisteredTooltip": "Estudiantes de su institución que hayan creado una cuenta {{appName}}.",
+      "activeStudents7Days": "Estudiantes Activos (7 días)",
+      "activeStudents7DaysSubtitle": "{{pct}}% de registrados",
+      "activeStudents7DaysTooltip": "Estudiantes de su institución que iniciaron sesión o interactuaron con {{appName}} en los últimos 7 días.",
+      "avgProfileStrength": "Fuerza promedio del perfil",
+      "avgProfileStrengthSubtitle": "En comparación con el 52 % la semana pasada"
     },
     "studentsTable": {
-      "ariaLabel": "Instructor students table",
-      "empty": "No students match the current filters.",
+      "ariaLabel": "Mesa de alumnos instructores",
+      "empty": "Ningún estudiante coincide con los filtros actuales.",
       "headers": {
-        "studentName": "Student Name",
-        "programme": "Programme",
-        "year": "Year",
-        "gender": "Gender",
-        "profileStrength": "Profile Strength",
-        "modulesCompleted": "Career Readiness Modules Completed",
+        "studentName": "Nombre del estudiante",
+        "programme": "Programa",
+        "year": "Año",
+        "gender": "Género",
+        "profileStrength": "Fuerza del perfil",
+        "modulesCompleted": "Módulos de preparación profesional completados",
         "careerReady": "Preparación profesional",
-        "skillsInterestsExplored": "Skills & Interests",
-        "careerExplorer": "Career Explorer",
-        "prioritySectorsExplored": "Priority Sectors Explored",
-        "lastLogin": "Last Login",
-        "lastActiveModule": "Last Active Module"
+        "skillsInterestsExplored": "Habilidades e intereses",
+        "careerExplorer": "Explorador de carrera",
+        "prioritySectorsExplored": "Sectores prioritarios explorados",
+        "lastLogin": "Último inicio de sesión",
+        "lastActiveModule": "Último módulo activo"
       },
       "filters": {
-        "all": "All",
-        "searchPlaceholder": "Search...",
-        "searchAriaLabel": "Search by student name",
-        "today": "Today",
-        "thisWeek": "This week",
-        "older": "Older"
+        "all": "Todo",
+        "searchPlaceholder": "Buscar...",
+        "searchAriaLabel": "Buscar por nombre de estudiante",
+        "today": "Hoy",
+        "thisWeek": "Esta semana",
+        "older": "Más viejo"
       },
       "statusLabels": {
-        "not_started": "Not Started",
-        "in_progress": "In Progress",
-        "completed": "Completed",
-        "started": "Started"
+        "not_started": "No iniciado",
+        "in_progress": "En curso",
+        "completed": "Terminado",
+        "started": "Comenzó"
       }
     }
   },
   "login": {
-    "title": "Admin Login",
-    "email": "Email",
-    "password": "Password",
-    "submit": "Sign In"
+    "title": "Inicio de sesión de administrador",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión"
   },
   "notFound": {
-    "message": "Page Not Found",
-    "description": "The page you are looking for might have been removed or is temporarily unavailable.",
-    "goHome": "Go to Dashboard"
+    "message": "Página no encontrada",
+    "description": "Es posible que la página que estás buscando se haya eliminado o no esté disponible temporalmente.",
+    "goHome": "Ir al panel"
   },
   "users": {
     "title": "Usuarios",
