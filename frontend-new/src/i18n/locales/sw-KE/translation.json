@@ -165,7 +165,8 @@
         "aiTyping": "AI inaandika..., subiri ikamilishe.",
         "offline": "Hauko mtandaoni. Tafadhali unganisha kwenye mtandao ili kutuma ujumbe.",
         "default": "Andika ujumbe wako...",
-        "uploading": "Inapakia CV..."
+        "uploading": "Inapakia CV...",
+        "bws": "Tumia vitufe vilivyo hapo juu kuchagua unachopendelea zaidi na usichopendelea."
       }
     },
     "chatMessage": {

@@ -117,7 +117,8 @@
         "aiTyping": "AI is typing..., wait for it to finish.",
         "offline": "You are offline. Please connect to the internet to send a message.",
         "default": "Type your message...",
-        "uploading": "Uploading CV..."
+        "uploading": "Uploading CV...",
+        "bws": "Use the buttons above to choose your most and least preferred."
       },
       "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Max {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} chars max",

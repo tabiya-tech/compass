@@ -2,6 +2,7 @@ import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } fr
 import { useTranslation } from "react-i18next";
 import ChatService from "src/chat/ChatService/ChatService";
 import { IChatMessage } from "src/chat/Chat.types";
+import { BWS_TASK_MESSAGE_TYPE } from "src/chat/chatMessage/bwsTaskMessage/BWSTaskMessage";
 import {
   CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE,
   generateBWSTaskMessage,
@@ -264,6 +265,11 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     },
     [currentUserId]
   );
+
+  const isAwaitingBWSResponse = useMemo(() => {
+    if (messages.length === 0) return false;
+    return messages[messages.length - 1].type === BWS_TASK_MESSAGE_TYPE;
+  }, [messages]);
 
   const timeUntilFeedbackNotification: number | null = useMemo(() => {
     // If there are no messages, we can't calculate the time
@@ -1189,6 +1195,8 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 failedSendDraft,
                 cvUploadError,
                 fillColor: theme.palette.primary.main,
+                isInputDisabled: isAwaitingBWSResponse,
+                placeholderKey: isAwaitingBWSResponse ? "chat.chatMessageField.placeholders.bws" : undefined,
               },
               children: showBackdrop ? <InactiveBackdrop isShown={showBackdrop} /> : undefined,
             }}

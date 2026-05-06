@@ -165,7 +165,8 @@
         "aiTyping": "AI ikulemba..., dikirani imalize.",
         "offline": "Simuli pa intaneti. Chonde lumikizani pa intaneti kuti mutume uthenga.",
         "default": "Lembani uthenga wanu...",
-        "uploading": "Kukena CV..."
+        "uploading": "Kukena CV...",
+        "bws": "Gwiritsani ntchito mabatani omwe ali pamwambapo kusankha chimene mumakonda kwambiri ndi chimene simumakonda."
       }
     },
     "chatMessage": {

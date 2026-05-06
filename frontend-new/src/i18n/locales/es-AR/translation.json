@@ -117,7 +117,8 @@
         "aiTyping": "La IA está escribiendo..., espera a que termine.",
         "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
         "default": "Escribe tu mensaje...",
-        "uploading": "Subiendo CV..."
+        "uploading": "Subiendo CV...",
+        "bws": "Usá los botones de arriba para elegir lo que más y lo que menos preferís."
       },
       "uploadCvIntro": "Podés subir tu CV tan pronto como empecemos a explorar tus experiencias",
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
