@@ -368,6 +368,106 @@ describe("Chat", () => {
     });
   });
 
+  describe("BWS task input lock", () => {
+    function getMockBWSConversationMessage(): ConversationMessage {
+      return {
+        message_id: nanoid(),
+        message: "",
+        sent_at: new Date().toISOString(),
+        sender: ConversationMessageSender.COMPASS,
+        reaction: null,
+        message_type: "BWS_TASK",
+        metadata: {
+          task_id: "task-1",
+          task_number: 2, // not 1, to avoid the bws-transition preface message
+          total_tasks: 5,
+          alternatives: [
+            { wa_id: "wa-A", label: "A" },
+            { wa_id: "wa-B", label: "B" },
+            { wa_id: "wa-C", label: "C" },
+            { wa_id: "wa-D", label: "D" },
+          ],
+        },
+      };
+    }
+
+    test("disables input and uses BWS placeholder when the latest message is a BWS task", async () => {
+      // GIVEN a logged-in user with an active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 456;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+      // AND the conversation history's last message is a BWS task card
+      const givenChatHistoryResponse = getMockConversationResponse(
+        [getMockBWSConversationMessage()],
+        ConversationPhase.PREFERENCE_ELICITATION,
+        80
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
+
+      // WHEN the Chat component is rendered
+      render(<Chat />);
+
+      // THEN the chat initializes
+      await assertChatInitialized();
+      // AND ChatMessageField receives isInputDisabled=true with the BWS placeholder key
+      await waitFor(() => {
+        expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            isInputDisabled: true,
+            placeholderKey: "chat.chatMessageField.placeholders.bws",
+          }),
+          {}
+        );
+      });
+    });
+
+    test("re-enables input when a non-BWS message follows the BWS task", async () => {
+      // GIVEN a logged-in user with an active session
+      const givenUser = getMockUser();
+      AuthenticationStateService.getInstance().setUser(givenUser);
+      const givenActiveSessionId = 789;
+      UserPreferencesStateService.getInstance().setUserPreferences(
+        getMockUserPreferences(givenUser, givenActiveSessionId)
+      );
+      // AND the conversation history ends with a BWS task followed by a regular text message
+      const givenChatHistoryResponse = getMockConversationResponse(
+        [
+          getMockBWSConversationMessage(),
+          {
+            message_id: nanoid(),
+            message: "Thanks — moving on.",
+            sent_at: new Date().toISOString(),
+            sender: ConversationMessageSender.COMPASS,
+            reaction: null,
+            message_type: "TEXT",
+          },
+        ],
+        ConversationPhase.PREFERENCE_ELICITATION,
+        90
+      );
+      jest.spyOn(ChatService.getInstance(), "getChatHistory").mockResolvedValueOnce(givenChatHistoryResponse);
+
+      // WHEN the Chat component is rendered
+      render(<Chat />);
+
+      // THEN the chat initializes
+      await assertChatInitialized();
+      // AND ChatMessageField is NOT locked (last message isn't a BWS card)
+      await waitFor(() => {
+        expect(ChatMessageField as jest.Mock).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            isInputDisabled: false,
+            placeholderKey: undefined,
+          }),
+          {}
+        );
+      });
+    });
+  });
+
   describe("chat initialization", () => {
     describe("should initialize chat for a user with an active session", () => {
       test("should initialize chat and fetch history on mount when the user has an existing conversation that is not concluded", async () => {

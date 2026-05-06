@@ -60,6 +60,16 @@ export const ChatIsClosed: Story = {
   },
 };
 
+export const DisabledForBWS: Story = {
+  render: (args) => <ChatMessageFieldWrapper {...args} />,
+  args: {
+    handleSend: action("Message sent"),
+    isInputDisabled: true,
+    placeholderKey: "chat.chatMessageField.placeholders.bws",
+    currentPhase: ConversationPhase.PREFERENCE_ELICITATION,
+  },
+};
+
 export const PlusBadgeAppearsOnPhaseTransition: Story = {
   render: (args) => <ChatMessageFieldWrapper {...args} />,
   args: {
