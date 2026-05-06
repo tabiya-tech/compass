@@ -147,14 +147,23 @@ class LLMAgentDirector(AbstractAgentDirector):
 
                 # Perform the task
                 agent_output = await agent_for_task.execute(clean_input, context)
+
+                # Determine if a phase transition is about to happen so we can decide
+                # whether to save this agent's response to history.
+                new_phase = self._get_new_phase(agent_output)
+                _will_transition = self._state.current_phase != new_phase
+
                 if not agent_for_task.is_responsible_for_conversation_history():
-                    await self._conversation_manager.update_history(clean_input, agent_output)
+                    # Don't save the outgoing agent's final response when transitioning —
+                    # the next agent will produce the response the user actually sees.
+                    if not _will_transition:
+                        await self._conversation_manager.update_history(clean_input, agent_output)
+                    context = await self._conversation_manager.get_conversation_context()
 
                 # Update the conversation phase
-                new_phase = self._get_new_phase(agent_output)
                 self._logger.debug("Transitioned phase from %s --to-> %s", self._state.current_phase, new_phase)
 
-                transitioned_to_new_phase = self._state.current_phase != new_phase
+                transitioned_to_new_phase = _will_transition
                 if transitioned_to_new_phase:
                     user_input = AgentInput(
                         message="(silence)",
