@@ -245,9 +245,23 @@ class LLMAgentDirector(AbstractAgentDirector):
 
                 # Perform the task
                 agent_output = await agent_for_task.execute(clean_input, context)
-                
+
+                # Determine if a phase transition is about to happen so we can decide
+                # whether to save this agent's response to history.
+                new_phase = self._get_new_phase(agent_output)
+                _will_transition = self._state.current_phase != new_phase
+                _will_transition_to_preference = (
+                    agent_output.finished
+                    and agent_output.agent_type == AgentType.EXPLORE_EXPERIENCES_AGENT
+                    and self._state.counseling_sub_phase == CounselingSubPhase.PREFERENCE_ELICITATION
+                )
+                _transitioning = _will_transition or _will_transition_to_preference
+
                 if not agent_for_task.is_responsible_for_conversation_history():
-                    await self._conversation_manager.update_history(clean_input, agent_output)
+                    # Don't save the outgoing agent's final response when transitioning —
+                    # the next agent will produce the response the user actually sees.
+                    if not _transitioning:
+                        await self._conversation_manager.update_history(clean_input, agent_output)
                     context = await self._conversation_manager.get_conversation_context()
 
                 # Reset sticky state when agent finishes
@@ -261,17 +275,15 @@ class LLMAgentDirector(AbstractAgentDirector):
                     self._logger.info("Step-skip: target agent finished, clearing skip_to_phase")
 
                 # Update the conversation phase (and counseling sub-phase when applicable)
-                new_phase = self._get_new_phase(agent_output)
+                # new_phase was already computed above for the history-saving decision; reuse it here.
                 self._logger.debug("Transitioned phase from %s --to-> %s", self._state.current_phase, new_phase)
 
-                transitioned_to_new_phase = self._state.current_phase != new_phase
+                transitioned_to_new_phase = _will_transition
                 if transitioned_to_new_phase:
                     self._state.current_phase = new_phase
                     phase_ctx_var.set(new_phase.value if new_phase else ":none:")
 
-                if (agent_output.finished
-                        and agent_output.agent_type == AgentType.EXPLORE_EXPERIENCES_AGENT
-                        and self._state.counseling_sub_phase == CounselingSubPhase.PREFERENCE_ELICITATION):
+                if _will_transition_to_preference:
                     transitioned_to_new_phase = True
                     user_input = AgentInput(message="", is_artificial=True)
                 elif transitioned_to_new_phase:

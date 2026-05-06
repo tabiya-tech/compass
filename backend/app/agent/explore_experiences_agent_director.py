@@ -316,9 +316,6 @@ class ExploreExperiencesAgentDirector(Agent):
         # First collect all the experiences from the user
         if state.conversation_phase == ConversationPhase.COLLECT_EXPERIENCES:
             agent_output = await self._collect_experiences_agent.execute(user_input, context)
-            await self._conversation_manager.update_history(user_input, agent_output)
-            # get the context again after updating the history
-            context = await self._conversation_manager.get_conversation_context()
 
             # The experiences are still being collected, but we can already store them so that we can
             # present them to the user even if data collection has not finished.
@@ -330,9 +327,15 @@ class ExploreExperiencesAgentDirector(Agent):
 
             # If collecting is not finished then return the output to the user to continue collecting
             if not agent_output.finished:
+                # Only save to history when not transitioning, so the next agent's
+                # opening message is the first thing the user sees on transition.
+                await self._conversation_manager.update_history(user_input, agent_output)
+                # get the context again after updating the history
+                context = await self._conversation_manager.get_conversation_context()
                 return agent_output
 
-            # and transition to the next phase
+            # and transition to the next phase — do NOT save the outgoing agent's final response;
+            # the dive-in agent will produce the first message the user sees.
             state.conversation_phase = ConversationPhase.DIVE_IN
             transitioned_between_states = True
 
