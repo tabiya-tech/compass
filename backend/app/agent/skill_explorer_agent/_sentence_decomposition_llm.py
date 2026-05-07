@@ -238,6 +238,7 @@ class _SentenceDecompositionLLM:
             Your task is to review each sentence and fix it to ensure that it is grammatically correct, clear, concise and sounds natural.
             Pay attention to awkward phrasing, grammatical errors, and any other issues that may affect the clarity and readability of the sentence.
             Do not change the meaning of the sentence or add any new information.
+            Do not change the grammatical person of the sentence. If a sentence uses first person ("I", "my", "me"), keep it in first person. Do not convert first-person sentences to third person ("The user", "he", "she", "they").
             Both the input and the fixed sentence should be interpreted in a different way review independently. 
             Each sentence from the input must fixed and added to the output in the decomposed_and_dereferenced list.
                        
