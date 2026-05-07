@@ -44,7 +44,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
           width={"auto"}
           justifyContent="center"
           alignItems="center"
-          padding={theme.spacing(theme.tabiyaSpacing.md)}
+          padding={theme.fixedSpacing(theme.tabiyaSpacing.md)}
         >
           {props.message && (
             <Grid>

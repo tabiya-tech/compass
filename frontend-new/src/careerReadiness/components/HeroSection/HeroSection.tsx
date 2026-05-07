@@ -33,7 +33,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ upNextModule, loading = false
           width: "100%",
           maxWidth: "var(--layout-content-max-width)",
           margin: "0 auto",
-          paddingTop: { xs: 0, sm: theme.fixedSpacing(theme.tabiyaSpacing.lg) },
+          paddingTop: { xs: 0, sm: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
           paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           paddingLeft: "var(--layout-gutter-x)",
           paddingRight: "var(--layout-gutter-x)",

@@ -114,10 +114,10 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
           disabled={isLoading || cooldownSeconds > 0 || !isOnline}
           data-testid={DATA_TEST_ID.RESET_LINK}
           sx={{
-            textDecoration: "None",
+            textDecoration: "Underline",
+            fontWeight: 600,
             "&:hover": {
               color: theme.palette.common.white,
-              textDecoration: "Underline",
               opacity: 0.75,
             },
           }}

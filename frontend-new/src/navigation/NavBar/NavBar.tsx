@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState, startTransition } from "react";
 import { Avatar, Box, Typography, useTheme, useMediaQuery } from "@mui/material";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import type { PaletteColor, Theme } from "@mui/material/styles";
 import { alpha } from "@mui/material/styles";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -299,7 +300,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
       },
       {
         id: MENU_ITEM_ID.FAQ,
-        text: t("nav.faq" as TranslationKey).toLowerCase(),
+        text: t("nav.needHelp" as TranslationKey).toLowerCase(),
         icon: <HelpCircle size={18} />,
         disabled: !isOnline,
         action: navigateToFaq,
@@ -522,7 +523,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                 data-testid={DATA_TEST_ID.NAVBAR_LINK_FAQ}
               >
                 <HelpCircle size={18} />
-                {t("nav.faq" as TranslationKey)}
+                {t("nav.needHelp" as TranslationKey)}
               </Box>
 
               {hasMultipleLocales && (
@@ -553,7 +554,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                   }}
                   data-testid={DATA_TEST_ID.NAVBAR_USER_NAME}
                 >
-                  {userName || t("chat.chatHeader.userInfo")}
+                  {userName || t("home.profile.myAccount")}
                 </Typography>
                 <Avatar
                   sx={{
@@ -566,7 +567,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
                   }}
                   data-testid={DATA_TEST_ID.NAVBAR_USER_AVATAR}
                 >
-                  {userName ? getInitials(userName) : "?"}
+                  {userName ? getInitials(userName) : <PersonOutlineOutlinedIcon />}
                 </Avatar>
               </Box>
             </>

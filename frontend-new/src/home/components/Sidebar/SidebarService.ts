@@ -63,7 +63,7 @@ const getSectorEmoji = (sectorName: string): string => {
   for (const [word, emoji] of Object.entries(SECTOR_EMOJI_MAP)) {
     if (key.includes(word)) return emoji;
   }
-  return "🏢";
+  return "🏷️";
 };
 
 export const moduleStatusToObjectiveStatus = (status: ModuleStatus): ObjectiveStatus => {

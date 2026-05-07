@@ -2,7 +2,7 @@
 
 exports[`Testing LoginWithEmailForm component it should show login form 1`] = `
 <div
-  class="MuiBox-root css-6qz4l6"
+  class="MuiBox-root css-1bvm6ey"
   data-testid="login-form-8ab76120-a0d3-47b1-aac0-42d0169e0a58"
 >
   <div

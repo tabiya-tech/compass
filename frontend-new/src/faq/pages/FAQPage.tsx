@@ -1,23 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { startTransition, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Box, InputAdornment, TextField, Typography, useTheme } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { getFaqDocument, type FaqSection } from "src/faq/faqDocumentLoader";
 import HighlightedMarkdown from "src/faq/components/HighlightedMarkdown";
 import FaqAccordionItem from "src/faq/components/FaqAccordionItem";
 import FaqTableOfContents from "src/faq/components/FaqTableOfContents";
 import FaqChecklist from "src/faq/components/FaqChecklist";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { routerPaths } from "src/app/routerPaths";
+import BackLink from "src/navigation/BackLink/BackLink";
+import authenticationStateService from "src/auth/services/AuthenticationState.service";
 
 const uniqueId = "f6b1d3a8-9c47-4e5f-a2d1-7b9e8c4f2a13";
 
 export const DATA_TEST_ID = {
   FAQ_PAGE_CONTAINER: `faq-page-container-${uniqueId}`,
-  FAQ_PAGE_EYEBROW: `faq-page-eyebrow-${uniqueId}`,
   FAQ_PAGE_TITLE: `faq-page-title-${uniqueId}`,
   FAQ_PAGE_LEDE: `faq-page-lede-${uniqueId}`,
   FAQ_PAGE_SEARCH: `faq-page-search-${uniqueId}`,
+  FAQ_PAGE_BACK_LINK: `faq-page-back-link-${uniqueId}`,
   FAQ_PAGE_SECTION: `faq-page-section-${uniqueId}`,
   FAQ_PAGE_NO_RESULTS: `faq-page-no-results-${uniqueId}`,
   FAQ_PAGE_PROGRESS_BAR: `faq-page-progress-bar-${uniqueId}`,
@@ -30,6 +35,9 @@ const isChecklistSection = (section: FaqSection): boolean => section.isStatic &&
 const FAQPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
+  const user = authenticationStateService.getInstance().getUser();
 
   const { title, sections } = useMemo(() => getFaqDocument(), []);
 
@@ -128,27 +136,28 @@ const FAQPage: React.FC = () => {
           sx={{
             maxWidth: "var(--layout-content-max-width)",
             margin: "0 auto",
-            padding: { xs: "32px 16px 28px", md: "56px 32px 40px" },
+            padding: { xs: "28px 16px 28px", md: "36px 32px 36px" },
             display: "flex",
             flexDirection: "column",
             gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
           }}
         >
           <Box>
-            <Typography
-              data-testid={DATA_TEST_ID.FAQ_PAGE_EYEBROW}
-              sx={{
-                fontFamily: theme.typography.h4.fontFamily,
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: theme.palette.text.secondary,
-                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            <BackLink
+              label={user ? t("home.backToDashboard") : t("common.buttons.goBack")}
+              isOnline={isOnline}
+              onClick={() => {
+                startTransition(() => {
+                  navigate(routerPaths.ROOT);
+                });
               }}
-            >
-              {t("faq.eyebrow")}
-            </Typography>
+              dataTestId={DATA_TEST_ID.FAQ_PAGE_BACK_LINK}
+              color={theme.palette.brandAction.main}
+              sx={{
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                opacity: isOnline ? 1 : 0.5,
+              }}
+            />
             <Typography
               variant="h1"
               data-testid={DATA_TEST_ID.FAQ_PAGE_TITLE}

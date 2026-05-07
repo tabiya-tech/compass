@@ -7,6 +7,7 @@ import { getAllDocuments } from "src/knowledgeHub/documentLoader";
 import { routerPaths } from "src/app/routerPaths";
 import Footer from "src/home/components/Footer/Footer";
 import type { DocumentMetadata } from "src/knowledgeHub/types";
+import BackLink from "src/navigation/BackLink/BackLink";
 
 const uniqueId = "b3d4e5f6-7890-abcd-ef12-345678901234";
 
@@ -16,6 +17,7 @@ export const DATA_TEST_ID = {
   KNOWLEDGE_HUB_HERO: `knowledge-hub-hero-${uniqueId}`,
   KNOWLEDGE_HUB_SECTOR_LIST: `knowledge-hub-sector-list-${uniqueId}`,
   KNOWLEDGE_HUB_SECTOR_ITEM: `knowledge-hub-sector-item-${uniqueId}`,
+  KNOWLEDGE_HUB_BACK_LINK: `knowledge-hub-back-link-${uniqueId}`,
 };
 
 const ICON_BY_SECTOR: Record<string, string> = {
@@ -109,8 +111,8 @@ const KnowledgeHubList: React.FC = () => {
             width: "100%",
             backgroundColor: theme.palette.common.white,
             overflow: "visible",
+            pt: theme.fixedSpacing(theme.tabiyaSpacing.lg),
             pb: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-            pt: { xs: theme.fixedSpacing(4), md: theme.fixedSpacing(8) },
             position: "relative",
             zIndex: 1,
           }}
@@ -126,6 +128,28 @@ const KnowledgeHubList: React.FC = () => {
               pl: { xs: 0, md: 20 },
             }}
           >
+            <Box
+              sx={{
+                ...contentColumnSx,
+                mb: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+              }}
+            >
+              <BackLink
+                label={t("home.backToDashboard")}
+                isOnline={isOnline}
+                onClick={() => {
+                  startTransition(() => {
+                    navigate(routerPaths.ROOT);
+                  });
+                }}
+                dataTestId={DATA_TEST_ID.KNOWLEDGE_HUB_BACK_LINK}
+                color={theme.palette.brandAction.main}
+                sx={{
+                  opacity: isOnline ? 1 : 0.5,
+                  ml: { xs: 0, md: "-165px" },
+                }}
+              />
+            </Box>
             <Box
               data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_HERO}
               sx={{

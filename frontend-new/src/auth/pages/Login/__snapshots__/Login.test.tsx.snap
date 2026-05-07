@@ -7,13 +7,26 @@ exports[`Testing Login component Render tests should hide login code related ele
     data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
   >
     <div
-      class="MuiBox-root css-1hvnxas"
+      class="MuiBox-root css-38s0oi"
     >
-      <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+      <div
+        class="MuiBox-root css-1difu8q"
       >
-        Login
-      </h3>
+        <h3
+          class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+        >
+          Login
+        </h3>
+        <div
+          class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+        >
+          If you already have a Njila account, enter your 
+          <strong>
+            email
+          </strong>
+           and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+        </div>
+      </div>
       <form
         class="MuiBox-root css-esqb5o"
         data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
@@ -23,10 +36,10 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
-          style="margin-top: 8px;"
+          style="margin-top: 26.4px;"
           tabindex="-1"
           type="submit"
         >
@@ -63,13 +76,26 @@ exports[`Testing Login component Render tests should hide login code related ele
     data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
   >
     <div
-      class="MuiBox-root css-1hvnxas"
+      class="MuiBox-root css-38s0oi"
     >
-      <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+      <div
+        class="MuiBox-root css-1difu8q"
       >
-        Login
-      </h3>
+        <h3
+          class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+        >
+          Login
+        </h3>
+        <div
+          class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+        >
+          If you already have a Njila account, enter your 
+          <strong>
+            email
+          </strong>
+           and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+        </div>
+      </div>
       <form
         class="MuiBox-root css-esqb5o"
         data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
@@ -79,10 +105,10 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
-          style="margin-top: 8px;"
+          style="margin-top: 26.4px;"
           tabindex="-1"
           type="submit"
         >
@@ -119,19 +145,32 @@ exports[`Testing Login component Render tests should show continue as guest if l
     data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
   >
     <div
-      class="MuiBox-root css-1hvnxas"
+      class="MuiBox-root css-38s0oi"
     >
-      <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+      <div
+        class="MuiBox-root css-1difu8q"
       >
-        Login
-      </h3>
+        <h3
+          class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+        >
+          Login
+        </h3>
+        <div
+          class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+        >
+          If you already have a Njila account, enter your 
+          <strong>
+            email
+          </strong>
+           and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+        </div>
+      </div>
       <form
         class="MuiBox-root css-esqb5o"
         data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-tkmmo2-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-569vpd-MuiButtonBase-root-MuiButton-root"
           data-testid="login-start-new-conversation-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           tabindex="0"
           type="button"
@@ -159,10 +198,10 @@ exports[`Testing Login component Render tests should show continue as guest if l
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
-          style="margin-top: 8px;"
+          style="margin-top: 26.4px;"
           tabindex="-1"
           type="submit"
         >
@@ -198,13 +237,26 @@ exports[`Testing Login component it should show login form successfully 1`] = `
   data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
 >
   <div
-    class="MuiBox-root css-1hvnxas"
+    class="MuiBox-root css-38s0oi"
   >
-    <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+    <div
+      class="MuiBox-root css-1difu8q"
     >
-      Login
-    </h3>
+      <h3
+        class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+      >
+        Login
+      </h3>
+      <div
+        class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+      >
+        If you already have a Njila account, enter your 
+        <strong>
+          email
+        </strong>
+         and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+      </div>
+    </div>
     <form
       class="MuiBox-root css-esqb5o"
       data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
@@ -233,10 +285,10 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
-        style="margin-top: 8px;"
+        style="margin-top: 26.4px;"
         tabindex="-1"
         type="submit"
       >
@@ -274,19 +326,32 @@ exports[`Testing Login component should handle application login code 1`] = `
   data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
 >
   <div
-    class="MuiBox-root css-1hvnxas"
+    class="MuiBox-root css-38s0oi"
   >
-    <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+    <div
+      class="MuiBox-root css-1difu8q"
     >
-      Login
-    </h3>
+      <h3
+        class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+      >
+        Login
+      </h3>
+      <div
+        class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+      >
+        If you already have a Njila account, enter your 
+        <strong>
+          email
+        </strong>
+         and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+      </div>
+    </div>
     <form
       class="MuiBox-root css-esqb5o"
       data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-tkmmo2-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-569vpd-MuiButtonBase-root-MuiButton-root"
         data-testid="login-start-new-conversation-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         tabindex="0"
         type="button"
@@ -314,10 +379,10 @@ exports[`Testing Login component should handle application login code 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
-        style="margin-top: 8px;"
+        style="margin-top: 26.4px;"
         tabindex="-1"
         type="submit"
       >
@@ -353,13 +418,26 @@ exports[`Testing Login component should remove registration link if registration
     data-testid="login-container-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
   >
     <div
-      class="MuiBox-root css-1hvnxas"
+      class="MuiBox-root css-38s0oi"
     >
-      <h3
-        class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+      <div
+        class="MuiBox-root css-1difu8q"
       >
-        Login
-      </h3>
+        <h3
+          class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+        >
+          Login
+        </h3>
+        <div
+          class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+        >
+          If you already have a Njila account, enter your 
+          <strong>
+            email
+          </strong>
+           and &lt;1&gt;password&lt;/1&gt; to access it, or choose &lt;2&gt;Google&lt;/2&gt; to log in.
+        </div>
+      </div>
       <form
         class="MuiBox-root css-esqb5o"
         data-testid="login-form-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
@@ -388,10 +466,10 @@ exports[`Testing Login component should remove registration link if registration
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-nnlmse-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-x4yg8e-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
-          style="margin-top: 8px;"
+          style="margin-top: 26.4px;"
           tabindex="-1"
           type="submit"
         >

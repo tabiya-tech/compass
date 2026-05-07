@@ -6,13 +6,26 @@ exports[`Testing Register component it should show register form successfully 1`
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div
-    class="MuiBox-root css-1hvnxas"
+    class="MuiBox-root css-38s0oi"
   >
-    <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+    <div
+      class="MuiBox-root css-1difu8q"
     >
-      Create an account
-    </h3>
+      <h3
+        class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+      >
+        Create an account
+      </h3>
+      <div
+        class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+      >
+        To create a Njila account, enter your 
+        <strong>
+          email address
+        </strong>
+         and create a &lt;1&gt;password&lt;/1&gt;. You can also register with your &lt;2&gt;Google&lt;/2&gt; account.
+      </div>
+    </div>
     <h6
       class="MuiTypography-root MuiTypography-subtitle2 css-ogiz19-MuiTypography-root"
     >
@@ -99,13 +112,26 @@ exports[`Testing Register component should handle application registration code 
   data-testid="register-container-ab02918f-d559-47ba-9662-ea6b3a3606d0"
 >
   <div
-    class="MuiBox-root css-1hvnxas"
+    class="MuiBox-root css-38s0oi"
   >
-    <h3
-      class="MuiTypography-root MuiTypography-h3 MuiTypography-gutterBottom css-1tbe4vd-MuiTypography-root"
+    <div
+      class="MuiBox-root css-1difu8q"
     >
-      Create an account
-    </h3>
+      <h3
+        class="MuiTypography-root MuiTypography-h3 css-5xirf-MuiTypography-root"
+      >
+        Create an account
+      </h3>
+      <div
+        class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
+      >
+        To create a Njila account, enter your 
+        <strong>
+          email address
+        </strong>
+         and create a &lt;1&gt;password&lt;/1&gt;. You can also register with your &lt;2&gt;Google&lt;/2&gt; account.
+      </div>
+    </div>
     <span
       data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
     />

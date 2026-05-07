@@ -130,13 +130,13 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
                     data-testid={DATA_TEST_ID.AUTH_PAGE_SHELL_FAQ_BUTTON}
                     sx={{
                       alignSelf: "center",
-                      paddingY: 0.75,
-                      paddingX: 2,
-                      fontSize: "0.875rem",
-                      "& .MuiButton-startIcon": { marginRight: 0.75 },
+                      paddingY: theme.fixedSpacing(0.75),
+                      paddingX: theme.fixedSpacing(2),
+                      fontSize: theme.typography.body2.fontSize,
+                      "& .MuiButton-startIcon": { marginRight: theme.fixedSpacing(0.2) },
                     }}
                   >
-                    {t("nav.faq")}
+                    {t("auth.pages.login.needHelp")}
                   </SecondaryButton>
                 )}
                 <LanguageContextMenu removeMargin />

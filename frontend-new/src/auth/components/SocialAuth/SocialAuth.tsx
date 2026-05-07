@@ -185,41 +185,36 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
       width="100%"
       data-testid={DATA_TEST_ID.FIREBASE_AUTH_CONTAINER}
     >
-      <Divider
-        textAlign="center"
-        sx={{
-          width: "100%",
-          paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-        }}
-      >
+      <Divider textAlign="center" sx={{ width: "100%", paddingBottom: theme.fixedSpacing(2.2) }}>
         <Typography
           variant="subtitle2"
-          padding={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+          paddingX={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
           data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE}
         >
           {t("auth.components.socialAuth.orContinueWith")}
         </Typography>
       </Divider>
-      <Box width="100%">
-        <div data-test_id={DATA_TEST_ID.FIREBASE_AUTH}>
+      <Box width="100%" display="flex" justifyContent="center">
+        <Box data-test_id={DATA_TEST_ID.FIREBASE_AUTH} width={{ xs: "90%", sm: "75%" }} maxWidth={420}>
           <Button
             variant="text"
             size={"medium"}
             disabled={socialAuthLoading}
-            fullWidth
             id={"firebaseui-auth-container"}
             data-testid={DATA_TEST_ID.CONTINUE_WITH_GOOGLE_BUTTON}
             onClick={loginWithPopup}
             sx={{
-              paddingX: 4,
+              width: "100%",
               display: "flex",
-              justifyItems: "center",
-              alignContent: "center",
-              gap: 2,
+              paddingX: theme.fixedSpacing(3),
+              paddingY: theme.fixedSpacing(1.2),
+              justifyContent: "center",
+              alignItems: "center",
+              gap: theme.fixedSpacing(1),
               color: (theme) => theme.palette.tabiyaBlue.light,
               borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.xl),
               border: "2px solid",
-              borderColor: (theme) => theme.palette.common.cream,
+              borderColor: (theme) => theme.palette.common.white,
             }}
           >
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -238,7 +233,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
               {t("auth.components.socialAuth.googleLoginIsNotAvailableWhenOffline")}
             </Typography>
           )}
-        </div>
+        </Box>
       </Box>
       <RegistrationCodeFormModal
         modalState={showRegistrationCodeForm}

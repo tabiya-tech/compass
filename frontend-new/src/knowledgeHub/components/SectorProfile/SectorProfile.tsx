@@ -71,11 +71,12 @@ const WHITE = "#ffffff";
 
 interface SectorProfileProps {
   staticData: SectorStaticData;
+  topContent?: React.ReactNode;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
+const SectorProfile: React.FC<SectorProfileProps> = ({ staticData, topContent }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [data, setData] = useState<SectorData | null>(null);
@@ -248,8 +249,9 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
           sx={{
             fontFamily: "'DM Sans', system-ui, sans-serif",
             color: BLACK,
-            py: theme.fixedSpacing(5),
             px: "var(--layout-gutter-x)",
+            pt: theme.fixedSpacing(3),
+            pb: theme.fixedSpacing(5),
             pr: { md: "calc(min(20rem, 25%) + 32px)" },
             lineHeight: 1.5,
             boxSizing: "border-box",
@@ -258,6 +260,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData }) => {
             width: "100%",
           }}
         >
+          {topContent && <Box>{topContent}</Box>}
           {/* Loading skeleton */}
           {loading ? (
             <>

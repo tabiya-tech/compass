@@ -84,7 +84,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         ...outlinedHoverSx,
         ...containedOverrideHoverSx,
         "&.Mui-disabled": {
-          opacity: hasBackgroundOverride ? 0.7 : 0.38,
+          opacity: 0.4,
           color: isOutlined ? paletteColor.main : hasBackgroundOverride ? paletteColor.main : paletteColor.contrastText,
           backgroundColor: isOutlined ? "transparent" : hasBackgroundOverride ? cream : paletteColor.main,
           ...(isOutlined && { border: `2px solid ${paletteColor.main}` }),

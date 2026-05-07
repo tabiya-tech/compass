@@ -47,7 +47,7 @@ const LoginWithEmailForm: React.FC<Readonly<LoginFormProps>> = ({
       flexDirection="column"
       width={"100%"}
       justifyContent={"space-evenly"}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       data-testid={DATA_TEST_ID.EMAIL_LOGIN_FORM_CONTAINER}
     >
       <TextField

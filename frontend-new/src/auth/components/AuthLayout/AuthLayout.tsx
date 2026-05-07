@@ -216,12 +216,13 @@ const AuthLayout: React.FC = () => {
         {(showRegisterLink || showLoginLink) && (
           <Box
             sx={{
-              mt: 1.5,
+              mt: theme.fixedSpacing(1.5),
               width: "100%",
+              maxWidth: { xs: 420, md: 360, lg: 420 },
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 1,
+              gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             }}
           >
             <Typography
@@ -230,6 +231,9 @@ const AuthLayout: React.FC = () => {
                 textAlign: "center",
                 color: theme.palette.text.primary,
                 fontWeight: 500,
+                width: "100%",
+                maxWidth: "100%",
+                px: theme.fixedSpacing(theme.tabiyaSpacing.sm),
               }}
             >
               {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}

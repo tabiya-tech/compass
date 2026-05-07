@@ -12,7 +12,7 @@ exports[`Backdrop render tests should be shown 1`] = `
     style="--Paper-shadow: var(--mui-shadows-24);"
   >
     <div
-      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-14t0h3l-MuiGrid-root"
+      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-r4xq4e-MuiGrid-root"
     >
       <div
         class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
@@ -66,7 +66,7 @@ exports[`Backdrop render tests should rendered without message and not show any 
     style="--Paper-shadow: var(--mui-shadows-24);"
   >
     <div
-      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-14t0h3l-MuiGrid-root"
+      class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-r4xq4e-MuiGrid-root"
     >
       <div
         class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"

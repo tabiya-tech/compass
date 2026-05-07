@@ -2,7 +2,7 @@
 
 exports[`Testing Register Email Form component it should show register form 1`] = `
 <form
-  class="MuiBox-root css-6qz4l6"
+  class="MuiBox-root css-1bvm6ey"
   data-testid="register-form-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
 >
   <div
@@ -16,7 +16,7 @@ exports[`Testing Register Email Form component it should show register form 1`] 
         class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
         data-testid="register-email-input-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
         id=":r1:"
-        placeholder="Email"
+        placeholder="Your email address"
         required=""
         type="email"
         value=""
@@ -45,10 +45,10 @@ exports[`Testing Register Email Form component it should show register form 1`] 
     data-testid="b7499b01-8082-4209-8667-c7d559a70cag-text-field"
   />
   <button
-    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-9rrnti-MuiButtonBase-root-MuiButton-root"
+    class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-14d3noo-MuiButtonBase-root-MuiButton-root"
     data-testid="register-button-6cf1a0fa-8d75-4342-bf6b-1203d5b114d7"
     disabled=""
-    style="margin-top: 8px;"
+    style="margin-top: 28px;"
     tabindex="-1"
     type="submit"
   >

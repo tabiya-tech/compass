@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, CircularProgress, Divider, Typography, useTheme } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -444,7 +444,7 @@ const Login: React.FC = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent={"space-evenly"}
-        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
         width={"100%"}
         sx={{
           color: theme.palette.common.white,
@@ -452,9 +452,21 @@ const Login: React.FC = () => {
           "& .MuiLink-root": { color: theme.palette.common.white },
         }}
       >
-        <Typography variant="h3" alignSelf="flex-start" textAlign="center" gutterBottom>
-          {t("auth.pages.login.appHero.signInTitle")}
-        </Typography>
+        <Box display="flex" flexDirection="column" alignItems="center" gap={theme.fixedSpacing(1.5)}>
+          <Typography variant="h3" alignSelf="flex-start" textAlign="center">
+            {t("auth.pages.login.appHero.signInTitle")}
+          </Typography>
+          <Typography variant="body2" alignSelf="flex-start" component="div">
+            <Trans
+              i18nKey="auth.pages.login.signInDescription"
+              components={[
+                <strong key="sign-in-desc-0" />,
+                <strong key="sign-in-desc-1" />,
+                <strong key="sign-in-desc-2" />,
+              ]}
+            />
+          </Typography>
+        </Box>
         <Box
           component="form"
           onSubmit={handleLoginSubmit}
@@ -483,11 +495,10 @@ const Login: React.FC = () => {
             !showResendVerification && <PasswordReset />
           }
           <PrimaryButton
-            fullWidth
             variant="contained"
             color="brandAction"
             showCircle
-            style={{ marginTop: 8 }}
+            style={{ marginTop: theme.fixedSpacing(3.3) }}
             type="submit"
             disabled={isLoginButtonDisabled}
             disableWhenOffline={true}
@@ -496,6 +507,9 @@ const Login: React.FC = () => {
               textTransform: "uppercase",
               backgroundColor: theme.palette.common.cream,
               color: theme.palette.brandAction.main,
+              alignSelf: "center",
+              width: { xs: "90%", sm: "75%" },
+              maxWidth: 420,
             }}
           >
             {isLoading ? (

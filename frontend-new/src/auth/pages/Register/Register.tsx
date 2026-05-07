@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { Box, Divider, TextField, Typography, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -201,7 +201,7 @@ const Register: React.FC = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent={"space-evenly"}
-        gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
+        gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
         width={"100%"}
         sx={{
           color: theme.palette.common.white,
@@ -209,9 +209,21 @@ const Register: React.FC = () => {
           "& .MuiLink-root": { color: theme.palette.common.white },
         }}
       >
-        <Typography variant="h3" alignSelf="flex-start" textAlign="center" gutterBottom>
-          {t("auth.pages.register.signUpTitle")}
-        </Typography>
+        <Box display="flex" flexDirection="column" alignItems="center" gap={theme.fixedSpacing(1.5)}>
+          <Typography variant="h3" alignSelf="flex-start" textAlign="center">
+            {t("auth.pages.register.signUpTitle")}
+          </Typography>
+          <Typography variant="body2" alignSelf="flex-start" component="div">
+            <Trans
+              i18nKey="auth.pages.register.signUpDescription"
+              components={[
+                <strong key="sign-up-desc-0" />,
+                <strong key="sign-up-desc-1" />,
+                <strong key="sign-up-desc-2" />,
+              ]}
+            />
+          </Typography>
+        </Box>
         {!applicationRegistrationCode && !registrationCodeDisabled && (
           <React.Fragment>
             <Typography variant="subtitle2">{t("auth.pages.register.enterRegistrationCode")}</Typography>

@@ -3,12 +3,12 @@ import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import type { PaletteColor, Theme } from "@mui/material/styles";
 import type { SxProps } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { useTranslation } from "react-i18next";
 import type { TranslationKey } from "src/react-i18next";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import BackLink from "src/navigation/BackLink/BackLink";
 
 const uniqueId = "a7b3e9f1-2d4c-4a8b-b6e5-1f0c3d9a8b7e";
 
@@ -47,18 +47,9 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
   const textColor = paletteColor?.contrastText ?? theme.palette.primary.contrastText;
 
   const backLinkSx = {
-    display: "flex",
-    alignItems: "center",
+    display: "inline-flex",
     justifyContent: "flex-start",
-    color: "white",
-    opacity: isOnline ? 0.85 : 0.5,
-    fontSize: "0.9rem",
-    fontWeight: 500,
-    textDecoration: "none",
-    cursor: isOnline ? "pointer" : "default",
-    "&:hover": {
-      textDecoration: isOnline ? "underline" : "none",
-    },
+    gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
   };
 
   const headingVariant = isMobile ? "h5" : "h4";
@@ -105,7 +96,16 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
             {bottomText}
           </Typography>
         </Box>
-        <Box
+        <BackLink
+          label={t(backLabelKey)}
+          isOnline={isOnline}
+          onClick={() => {
+            startTransition(() => {
+              navigate(backTo);
+            });
+          }}
+          dataTestId={DATA_TEST_ID.SUB_NAVBAR_BACK_LINK}
+          color={theme.palette.common.white}
           sx={{
             ...backLinkSx,
             ...(isMobile && {
@@ -121,18 +121,7 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
               justifyContent: "flex-start",
             }),
           }}
-          onClick={() => {
-            if (!isOnline) return;
-            startTransition(() => {
-              navigate(backTo);
-            });
-          }}
-          aria-disabled={!isOnline}
-          data-testid={DATA_TEST_ID.SUB_NAVBAR_BACK_LINK}
-        >
-          <ArrowBackIcon sx={{ fontSize: "1rem" }} />
-          {t(backLabelKey)}
-        </Box>
+        />
       </Box>
     </Box>
   );

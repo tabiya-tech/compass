@@ -1,7 +1,10 @@
-import React from "react";
+import React, { startTransition, useContext } from "react";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { Theme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import { routerPaths } from "src/app/routerPaths";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
 import HomeSidebar from "src/home/components/Sidebar/HomeSidebar";
@@ -10,6 +13,7 @@ import ModuleRow from "src/careerReadiness/components/ModuleRow/ModuleRow";
 import ModuleRowSkeleton from "src/careerReadiness/components/ModuleRowSkeleton/ModuleRowSkeleton";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import BackLink from "src/navigation/BackLink/BackLink";
 
 const uniqueId = "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a";
 
@@ -18,12 +22,15 @@ export const DATA_TEST_ID = {
   CAREER_READINESS_LIST_CONTENT: `career-readiness-list-content-${uniqueId}`,
   CAREER_READINESS_MODULES_LIST: `career-readiness-modules-list-${uniqueId}`,
   CAREER_READINESS_LIST_EMPTY: `career-readiness-list-empty-${uniqueId}`,
+  CAREER_READINESS_BACK_LINK: `career-readiness-back-link-${uniqueId}`,
 };
 
 const CareerReadinessList: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
 
   // Read modules from shared context — already fetched by UserProfileProvider on layout mount
   const { profileData, isLoadingModules, errors } = useUserProfileContext();
@@ -72,6 +79,28 @@ const CareerReadinessList: React.FC = () => {
 
   return (
     <Box display="flex" flexDirection="column" flex={1} data-testid={DATA_TEST_ID.CAREER_READINESS_LIST_CONTAINER}>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "var(--layout-content-max-width)",
+          mx: "auto",
+          px: "var(--layout-gutter-x)",
+          pt: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+        }}
+      >
+        <BackLink
+          label={t("home.backToDashboard")}
+          isOnline={isOnline}
+          onClick={() => {
+            startTransition(() => {
+              navigate(routerPaths.ROOT);
+            });
+          }}
+          dataTestId={DATA_TEST_ID.CAREER_READINESS_BACK_LINK}
+          color={theme.palette.brandAction.main}
+          sx={{ opacity: isOnline ? 1 : 0.5 }}
+        />
+      </Box>
       <HeroSection upNextModule={upNextModule} loading={loading} />
 
       <Box

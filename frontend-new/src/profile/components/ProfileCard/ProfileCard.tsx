@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { Box, Divider, Skeleton, Typography, useTheme } from "@mui/material";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { useTranslation } from "react-i18next";
 import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -132,7 +133,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
                   fontFamily: theme.typography.body2.fontFamily,
                 }}
               >
-                {profileInitials(name)}
+                {name?.trim() ? profileInitials(name) : <PersonOutlineOutlinedIcon />}
               </Typography>
             </Box>
           )}
@@ -154,7 +155,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
                   }}
                   data-testid={DATA_TEST_ID.PROFILE_TITLE}
                 >
-                  {name || t("home.profile.notAvailable")}
+                  {name?.trim() || t("home.profile.myProfile")}
                 </Typography>
                 {subtitle ? (
                   <Typography

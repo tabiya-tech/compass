@@ -21,6 +21,8 @@ interface SectorCardProps {
 
 const SectorCard: React.FC<SectorCardProps> = ({ sector, accentColor }) => {
   const theme = useTheme();
+  const salaryRange = sector.salaryRange?.trim();
+  const shouldShowSalaryRange = Boolean(salaryRange && salaryRange !== "—");
 
   return (
     <Box
@@ -50,7 +52,7 @@ const SectorCard: React.FC<SectorCardProps> = ({ sector, accentColor }) => {
         >
           {sector.name}
         </Box>
-        {sector.salaryRange && (
+        {shouldShowSalaryRange && (
           <Box
             component="span"
             data-testid={DATA_TEST_ID.CAREER_EXPLORER_SIDEBAR_SECTOR_SALARY}
@@ -65,7 +67,7 @@ const SectorCard: React.FC<SectorCardProps> = ({ sector, accentColor }) => {
               whiteSpace: "nowrap",
             }}
           >
-            {sector.salaryRange}
+            {salaryRange}
           </Box>
         )}
       </Box>

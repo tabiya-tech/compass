@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { startTransition, useContext, useEffect, useMemo, useState } from "react";
 import { Alert, Box, Tabs, Tab, Typography, useTheme, Chip } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
+import { routerPaths } from "src/app/routerPaths";
 import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
 import DataTable from "src/jobMatching/components/DataTable/DataTable";
@@ -11,6 +14,7 @@ import { useMatchedJobs } from "src/jobMatching/hooks/useMatchedJobs";
 import JobService from "src/jobMatching/services/JobService";
 import type { JobFilters, JobRow, JobSortKey } from "src/jobMatching/types";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import BackLink from "src/navigation/BackLink/BackLink";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -51,11 +55,14 @@ const uniqueId = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 export const DATA_TEST_ID = {
   JOB_MATCHING_CONTAINER: `job-matching-container-${uniqueId}`,
   JOB_MATCHING_TABS: `job-matching-tabs-${uniqueId}`,
+  JOB_MATCHING_BACK_LINK: `job-matching-back-link-${uniqueId}`,
 };
 
 const JobMatchingPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isOnline = useContext(IsOnlineContext);
 
   const [activeTab, setActiveTab] = useState(0);
   const [browseFilters, setBrowseFilters] = useState<JobFilters>(EMPTY_FILTERS);
@@ -337,9 +344,22 @@ const JobMatchingPage: React.FC = () => {
           maxWidth: "var(--layout-content-max-width)",
           mx: "auto",
           px: "var(--layout-gutter-x)",
-          paddingY: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+          paddingBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+          paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.lg),
         }}
       >
+        <BackLink
+          label={t("home.backToDashboard")}
+          isOnline={isOnline}
+          onClick={() => {
+            startTransition(() => {
+              navigate(routerPaths.ROOT);
+            });
+          }}
+          dataTestId={DATA_TEST_ID.JOB_MATCHING_BACK_LINK}
+          color={theme.palette.brandAction.main}
+          sx={{ marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md), opacity: isOnline ? 1 : 0.5 }}
+        />
         {/* Tabs */}
         <Tabs
           value={activeTab}

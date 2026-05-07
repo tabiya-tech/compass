@@ -77,14 +77,14 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       flexDirection="column"
       width={"100%"}
       justifyContent={"space-evenly"}
-      gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
+      gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       component="form"
       onSubmit={handleRegister}
       data-testid={DATA_TEST_ID.FORM}
     >
       <TextField
         fullWidth
-        placeholder={t("common.fields.email")}
+        placeholder={t("auth.pages.register.emailPlaceholder")}
         type="email"
         disabled={isRegistering || disabled}
         variant="outlined"
@@ -95,7 +95,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        placeholder={t("common.fields.password")}
+        placeholder={t("auth.pages.register.passwordPlaceholder")}
         disabled={isRegistering || disabled}
         variant="outlined"
         required
@@ -107,7 +107,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PasswordInput
         fullWidth
-        placeholder={t("common.fields.confirmPassword")}
+        placeholder={t("auth.pages.register.confirmPasswordPlaceholder")}
         disabled={isRegistering || disabled}
         variant="outlined"
         required
@@ -120,11 +120,10 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         sx={confirmPasswordFieldSx}
       />
       <PrimaryButton
-        fullWidth
         variant="contained"
         color="primary"
         showCircle
-        style={{ marginTop: 8 }}
+        style={{ marginTop: theme.fixedSpacing(3.5) }}
         type="submit"
         disabled={isRegistering || disabled || !isPasswordValid || !email || !confirmPassword || passwordsDoNotMatch}
         disableWhenOffline={true}
@@ -133,6 +132,9 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
           textTransform: "uppercase",
           backgroundColor: theme.palette.common.cream,
           color: theme.palette.primary.main,
+          alignSelf: "center",
+          width: { xs: "90%", sm: "75%" },
+          maxWidth: 420,
         }}
       >
         {isRegistering ? (

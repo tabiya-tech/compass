@@ -17,7 +17,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
       class="MuiBox-root css-1rf73am"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-12r53wk-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-mcyfwo-MuiButtonBase-root-MuiButton-root"
         data-testid="experience-edit-form-cancel-button-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         tabindex="0"
         type="button"
@@ -25,7 +25,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
         Cancel
       </button>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-b3s09g-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-x7x9b9-MuiButtonBase-root-MuiButton-root"
         data-testid="experience-edit-form-save-button-0ddc6b92-eca6-472b-8e5f-fdce9abfec3b"
         disabled=""
         tabindex="-1"
@@ -382,7 +382,7 @@ exports[`ExperienceEditForm should render ExperienceEditForm correctly 1`] = `
       style="--Paper-shadow: var(--mui-shadows-24);"
     >
       <div
-        class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-14t0h3l-MuiGrid-root"
+        class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-r4xq4e-MuiGrid-root"
       >
         <div
           class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
