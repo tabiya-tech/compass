@@ -121,6 +121,18 @@ class UsersService:
             institution_id=request.institution_id,
         )
 
+        # Step 3: Generate a password reset link so the new user can sign in.
+        # We log the link rather than email it directly — the dev team forwards it
+        # until SMTP / Firebase email templates are wired up.
+        try:
+            reset_link = self._firebase.generate_password_reset_link(
+                tenant_id=tenant_id,
+                email=firebase_user.email,
+            )
+            logger.info("Password reset link for %s: %s", firebase_user.email, reset_link)
+        except Exception as e:  # pylint: disable=broad-except
+            logger.warning("Failed to generate password reset link for %s: %s", firebase_user.email, e)
+
         logger.info("Created user with UID: %s for tenant: %s", firebase_user.uid, tenant_id)
 
         return CreateUserResponse(

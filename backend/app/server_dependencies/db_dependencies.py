@@ -281,6 +281,20 @@ class CompassDBProvider:
                 [("location.province", 1)]
             )
 
+            # Admin registrations:
+            # - unique partial index on email where status is pending or approved (allows
+            #   rejected rows to be overwritten on resubmit while blocking duplicate active rows)
+            # - status + submitted_at index for the dashboard list
+            await application_db.get_collection(Collections.ADMIN_REGISTRATIONS).create_index(
+                [("email", 1)],
+                unique=True,
+                partialFilterExpression={"status": {"$in": ["pending", "approved"]}},
+                name="email_active_unique",
+            )
+            await application_db.get_collection(Collections.ADMIN_REGISTRATIONS).create_index(
+                [("status", 1), ("submitted_at", -1)],
+            )
+
             # Pilot whitelisting indexes
             await application_db.get_collection(Collections.PILOT_WHITELIST).create_index(
                 [("institution_name", 1)], unique=True

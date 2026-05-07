@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 class Role(str, Enum):
+    SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     INSTITUTION_STAFF = "institution_staff"
 
@@ -230,8 +231,11 @@ def parse_args() -> Arguments:
     if role == Role.INSTITUTION_STAFF and not parsed.institution_id:
         parser.error("--institution-id is required when role is institution_staff")
 
+    if role == Role.SUPER_ADMIN and parsed.institution_id:
+        parser.error("--institution-id must not be provided when role is super_admin")
+
     if role == Role.ADMIN and parsed.institution_id:
-        logger.warning("Institution ID provided but role is admin, ignoring institution ID")
+        logger.warning("Institution ID provided but role is %s, ignoring institution ID", role.value)
 
     return Arguments(
         name=parsed.name,

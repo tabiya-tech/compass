@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, startTransition } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Badge, Box, useMediaQuery, useTheme } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import { getDarkLogoUrl } from "src/envService";
 import StdFirebaseAuthenticationService from "src/auth/services/FirebaseAuthenticationService/StdFirebaseAuthenticationService";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
 import UserStateService from "src/userState/UserStateService";
+import { usePendingCount } from "./usePendingCount";
 
 const uniqueId = "795432d7-a55d-47a2-93cf-85aeb3de2bde";
 
@@ -31,6 +32,10 @@ const Header: React.FC = () => {
 
   const preferredLogoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const [logoSrc, setLogoSrc] = useState(preferredLogoSrc);
+
+  const isSuperAdmin = UserStateService.getInstance().isSuperAdmin();
+  const pendingCount = usePendingCount(isSuperAdmin);
+  const usersHref = isSuperAdmin && pendingCount > 0 ? `${routerPaths.USERS}?tab=pending` : routerPaths.USERS;
 
   useEffect(() => {
     setLogoSrc(preferredLogoSrc);
@@ -120,10 +125,17 @@ const Header: React.FC = () => {
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: theme.spacing(theme.tabiyaSpacing.md) }}>
           <NavLink
-            to={routerPaths.USERS}
+            to={usersHref}
             style={({ isActive }) => ({ fontWeight: isActive ? 600 : 400, textDecoration: "none", color: "inherit" })}
           >
-            {t("header.users", "Users")}
+            <Badge
+              badgeContent={isSuperAdmin ? pendingCount : 0}
+              color="warning"
+              overlap="rectangular"
+              sx={{ pr: pendingCount > 0 ? 1.5 : 0 }}
+            >
+              {t("header.users", "Users")}
+            </Badge>
           </NavLink>
           <LanguageContextMenu removeMargin={true} />
           <PrimaryIconButton

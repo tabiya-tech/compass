@@ -4,6 +4,7 @@ Provides a unified interface for Firebase Admin SDK operations.
 """
 
 import logging
+import os
 import secrets
 import string
 from functools import cache
@@ -56,7 +57,12 @@ class FirebaseService:
         self._db = None
 
         cred = credentials.ApplicationDefault()
-        firebase_admin.initialize_app(cred)
+        # Identity Platform tenants live in the admin Firebase project, which may differ from
+        # GOOGLE_CLOUD_PROJECT (the backend's default project). Pass projectId explicitly when
+        # ADMIN_FIREBASE_PROJECT_ID is set so tenant lookups target the right project.
+        admin_project_id = os.getenv("ADMIN_FIREBASE_PROJECT_ID")
+        init_options = {"projectId": admin_project_id} if admin_project_id else None
+        firebase_admin.initialize_app(cred, options=init_options)
         firebase_admin.get_app()
 
         self._db = firestore_async.client()
@@ -162,6 +168,11 @@ class FirebaseService:
         user = auth_client.update_user(user_id, **kwargs)
         self._logger.info("Updated Firebase user with UID: %s", user.uid)
         return user
+
+    def generate_password_reset_link(self, tenant_id: str, email: str) -> str:
+        """Generate a password reset link for an existing Firebase user."""
+        auth_client = self._auth_clients.get_auth_client(tenant_id)
+        return auth_client.generate_password_reset_link(email)
 
     def delete_user(self, tenant_id: str, user_id: str) -> None:
         """

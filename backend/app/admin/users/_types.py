@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr, field_validator, Field
 
 class Role(str, Enum):
     """User role enumeration."""
+    SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     INSTITUTION_STAFF = "institution_staff"
 
@@ -46,10 +47,12 @@ class CreateUserRequest(BaseModel):
     @field_validator("institution_id")
     @classmethod
     def validate_institution_id(cls, v, info):
-        """Validate that institution_id is provided for an institution_staff role."""
+        """Validate institution_id presence matches the role."""
         role = info.data.get("role")
         if role == Role.INSTITUTION_STAFF and not v:
             raise ValueError("institution_id is required for institution_staff role")
+        if role in (Role.ADMIN, Role.SUPER_ADMIN) and v:
+            raise ValueError(f"institution_id must not be provided for {role.value} role")
         return v
 
 
@@ -74,10 +77,12 @@ class UpdateRoleRequest(BaseModel):
     @field_validator("institution_id")
     @classmethod
     def validate_institution_id(cls, v, info):
-        """Validate that institution_id is provided for an institution_staff role."""
+        """Validate institution_id presence matches the role."""
         role = info.data.get("role")
         if role == Role.INSTITUTION_STAFF and not v:
             raise ValueError("institution_id is required for institution_staff role")
+        if role in (Role.ADMIN, Role.SUPER_ADMIN) and v:
+            raise ValueError(f"institution_id must not be provided for {role.value} role")
         return v
 
 

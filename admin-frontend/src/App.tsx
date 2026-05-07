@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import { routerPaths } from "src/app/routerPaths";
 import ProtectedRoute from "src/app/ProtectedRoute/ProtectedRoute";
 import Login from "src/pages/Login";
+import Register from "src/pages/Register";
+import ForgotPassword from "src/pages/ForgotPassword";
 import Dashboard from "src/pages/Dashboard";
 import Users from "src/pages/Users";
 import Profile from "src/pages/Profile";
@@ -37,6 +39,14 @@ const router = sentryCreateHashRouter([
         <Login />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: routerPaths.REGISTER,
+    element: <Register />,
+  },
+  {
+    path: routerPaths.FORGOT_PASSWORD,
+    element: <ForgotPassword />,
   },
   {
     path: routerPaths.INSTRUCTOR,

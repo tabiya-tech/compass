@@ -489,6 +489,10 @@ BACKEND_FEATURES='{}'
 #   ...
 # }
 BACKEND_EXPERIENCE_PIPELINE_CONFIG='{}'
+
+# Admin user management (Identity Platform tenant for super_admin / admin / instructor accounts).
+# Required for the /admin/users and /admin-registrations endpoints to work.
+ADMIN_FIREBASE_TENANT_ID=<ADMIN_FIREBASE_TENANT_ID>
 ```  
 
 - **For the final `.env` file structure**, refer to the [env.template](/iac/templates/env.template).

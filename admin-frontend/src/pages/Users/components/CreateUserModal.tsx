@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { usersService, Role, CreateUserRequest, HttpError } from "../usersService";
 import { useUsersContext } from "../UsersContext";
 import InstitutionAutocomplete, { useInstitutionOptions } from "./InstitutionAutocomplete";
+import UserStateService from "src/userState/UserStateService";
 
 const uniqueId = "create-user-modal-3a5c7e9f-1b2d-4f6a-8c0e-2d4f6a8b0c1e";
 
@@ -31,6 +32,7 @@ export const DATA_TEST_ID = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
+  [Role.SUPER_ADMIN]: "Super Admin",
   [Role.ADMIN]: "Admin",
   [Role.INSTITUTION_STAFF]: "Institution Staff",
 };
@@ -51,6 +53,7 @@ const CreateUserModal: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const isSuperAdmin = UserStateService.getInstance().isSuperAdmin();
 
   const handleClose = () => {
     setEmail("");
@@ -140,6 +143,7 @@ const CreateUserModal: React.FC = () => {
             disabled={loading}
             data-testid={DATA_TEST_ID.CREATE_USER_MODAL_ROLE}
           >
+            {isSuperAdmin && <MenuItem value={Role.SUPER_ADMIN}>{ROLE_LABELS[Role.SUPER_ADMIN]}</MenuItem>}
             <MenuItem value={Role.ADMIN}>{ROLE_LABELS[Role.ADMIN]}</MenuItem>
             <MenuItem value={Role.INSTITUTION_STAFF}>{ROLE_LABELS[Role.INSTITUTION_STAFF]}</MenuItem>
           </Select>

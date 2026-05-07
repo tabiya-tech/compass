@@ -14,6 +14,15 @@ function getMockAdminUserState(): UserState {
   };
 }
 
+function getMockSuperAdminUserState(): UserState {
+  return {
+    id: `super-admin-user-${Math.random().toString(36).substring(7)}`,
+    name: "Super Admin User",
+    email: "super@example.com",
+    accessRole: { role: Role.SUPER_ADMIN },
+  };
+}
+
 function getMockInstitutionStaffUserState(): UserState {
   return {
     id: `staff-user-${Math.random().toString(36).substring(7)}`,
@@ -380,6 +389,43 @@ describe("UserStateService", () => {
 
         // THEN expected null
         expect(actualInstitutionId).toBeNull();
+      });
+    });
+
+    describe("isSuperAdmin", () => {
+      test("should return true for super admin user", () => {
+        // GIVEN a super admin user state is set
+        const givenUserState: UserState = getMockSuperAdminUserState();
+        service.setUserState(givenUserState);
+
+        // WHEN isSuperAdmin is called
+        const actualIsSuperAdmin = service.isSuperAdmin();
+
+        // THEN expected true
+        expect(actualIsSuperAdmin).toBe(true);
+      });
+
+      test("should return false for admin user", () => {
+        // GIVEN an admin (not super admin) user state is set
+        const givenUserState: UserState = getMockAdminUserState();
+        service.setUserState(givenUserState);
+
+        // WHEN isSuperAdmin is called
+        const actualIsSuperAdmin = service.isSuperAdmin();
+
+        // THEN expected false
+        expect(actualIsSuperAdmin).toBe(false);
+      });
+
+      test("should return false when no user state is set", () => {
+        // GIVEN no user state is set
+        service.clearUserState();
+
+        // WHEN isSuperAdmin is called
+        const actualIsSuperAdmin = service.isSuperAdmin();
+
+        // THEN expected false
+        expect(actualIsSuperAdmin).toBe(false);
       });
     });
 

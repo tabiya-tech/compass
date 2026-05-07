@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Container, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, Container, Link, TextField, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -9,6 +9,7 @@ import { FirebaseErrorCodes } from "src/error/FirebaseError/firebaseError.consta
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { getDarkLogoUrl } from "src/envService";
 import UserStateService from "src/userState/UserStateService";
+import { registrationsService, RegistrationStatus } from "src/pages/Register/registrationsService";
 
 const uniqueId = "login-page-5a8f3b2c-1d4e-4f6a-9b8c-7e2d1f0a3b5c";
 
@@ -80,6 +81,41 @@ const Login: React.FC<LoginProps> = () => {
       navigate(redirectPath);
     } catch (error) {
       console.error("Login error:", error);
+      const isInvalidCredential =
+        error instanceof FirebaseError &&
+        (error.code === FirebaseErrorCodes.USER_NOT_FOUND || error.code === FirebaseErrorCodes.INVALID_CREDENTIAL);
+
+      // If the credentials look invalid, see if the email matches a pending/rejected
+      // registration so we can give a more helpful message.
+      if (isInvalidCredential) {
+        try {
+          const status = await registrationsService.getStatus(email);
+          if (status.status === RegistrationStatus.PENDING) {
+            enqueueSnackbar(
+              t(
+                "login.errors.registrationPending",
+                "Your registration is still pending approval. You will receive an email once approved."
+              ),
+              { variant: "info" }
+            );
+            return;
+          }
+          if (status.status === RegistrationStatus.REJECTED) {
+            enqueueSnackbar(
+              t(
+                "login.errors.registrationRejected",
+                "Your registration was not approved. Please contact your administrator."
+              ),
+              { variant: "warning" }
+            );
+            return;
+          }
+        } catch (lookupError) {
+          // Best effort — fall through to the generic Firebase error.
+          console.warn("Failed to look up registration status:", lookupError);
+        }
+      }
+
       if (error instanceof FirebaseError) {
         enqueueSnackbar(getErrorMessage(error), { variant: "error" });
       } else {
@@ -193,6 +229,14 @@ const Login: React.FC<LoginProps> = () => {
                 t("login.submit", "Sign In")
               )}
             </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+              <Link component="button" type="button" onClick={() => navigate(routerPaths.FORGOT_PASSWORD)}>
+                {t("login.forgotPassword", "Forgot password?")}
+              </Link>
+              <Link component="button" type="button" onClick={() => navigate(routerPaths.REGISTER)}>
+                {t("login.requestAccess", "Request access")}
+              </Link>
+            </Box>
           </Box>
         </Box>
       </Box>

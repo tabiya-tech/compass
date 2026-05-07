@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class AccessRoleValue(str, Enum):
+    SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
     INSTITUTION_STAFF = "institution_staff"
 
@@ -19,6 +20,10 @@ class AccessRole:
     def __init__(self, role: AccessRoleValue, institution_id: Optional[str] = None):
         self.role = role
         self.institution_id = institution_id
+
+    @property
+    def is_super_admin(self) -> bool:
+        return self.role == AccessRoleValue.SUPER_ADMIN
 
     @property
     def is_admin(self) -> bool:
@@ -56,5 +61,20 @@ def get_access_role_dependency(auth: "Authentication"):
 
         institution_id = user_info.institution_id if role == AccessRoleValue.INSTITUTION_STAFF else None
         return AccessRole(role=role, institution_id=institution_id)
+
+    return _dependency
+
+
+def get_super_admin_dependency(auth: "Authentication"):
+    """
+    Factory returning a FastAPI dependency that 403s unless the caller is super_admin.
+    Returns the resolved AccessRole on success.
+    """
+    base_dependency = get_access_role_dependency(auth)
+
+    def _dependency(access_role: AccessRole = Depends(base_dependency)) -> AccessRole:
+        if not access_role.is_super_admin:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+        return access_role
 
     return _dependency

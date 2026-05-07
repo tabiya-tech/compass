@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.admin.password_reset import add_password_reset_routes
+from app.admin.registrations import add_admin_registrations_routes
 from app.admin.routes import get_admin_routes
 from app.conversations.routes import add_conversation_routes
 from app.countries import Country, get_country_from_string
@@ -426,6 +428,16 @@ add_users_routes(app, auth)
 add_user_invitations_routes(app)
 
 ############################################
+# Add admin self-service registration routes
+############################################
+add_admin_registrations_routes(app, auth)
+
+############################################
+# Add public password-reset (forgot-password) route
+############################################
+add_password_reset_routes(app)
+
+############################################
 # Add the jobs routes
 ############################################
 add_jobs_routes(app, auth)
@@ -483,7 +495,7 @@ add_poc_routes(app, auth)
 ############################################
 # Add admin user management routes
 ############################################
-admin_routes = get_admin_routes()
+admin_routes = get_admin_routes(auth)
 app.include_router(admin_routes, prefix="/admin", tags=["Admin"])
 
 ############################################

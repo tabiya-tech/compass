@@ -1,9 +1,13 @@
 export enum Role {
+  SUPER_ADMIN = "super_admin",
   ADMIN = "admin",
   INSTITUTION_STAFF = "institution_staff",
 }
 
 export type AccessRole =
+  | {
+      role: Role.SUPER_ADMIN;
+    }
   | {
       role: Role.ADMIN;
     }
@@ -37,7 +41,17 @@ export function buildAccessRole(input: object): AccessRole | null {
     return { role: Role.ADMIN };
   }
 
+  // If super_admin and has institution id, log warning and return { role: super_admin } only
+  if (role === Role.SUPER_ADMIN && institutionId) {
+    console.warn("Super admin role does not require institution ID, ignoring it");
+    return { role: Role.SUPER_ADMIN };
+  }
+
   // Return appropriate role
+  if (role === Role.SUPER_ADMIN) {
+    return { role: Role.SUPER_ADMIN };
+  }
+
   if (role === Role.ADMIN) {
     return { role: Role.ADMIN };
   }

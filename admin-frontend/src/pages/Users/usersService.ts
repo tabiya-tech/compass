@@ -1,6 +1,7 @@
 import { getBackendUrl } from "src/envService";
 
 export enum Role {
+  SUPER_ADMIN = "super_admin",
   ADMIN = "admin",
   INSTITUTION_STAFF = "institution_staff",
 }
@@ -80,7 +81,7 @@ function getAuthToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-function getHeaders(): HeadersInit {
+export function getAuthHeaders(): HeadersInit {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -91,7 +92,7 @@ function getHeaders(): HeadersInit {
   return headers;
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
+export async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let detail = response.statusText;
     try {
@@ -112,7 +113,7 @@ export const usersService = {
     if (pageToken) params.set("page_token", pageToken);
     const response = await fetch(`${base}/admin/users?${params}`, {
       method: "GET",
-      headers: getHeaders(),
+      headers: getAuthHeaders(),
     });
     return handleResponse<ListUsersResponse>(response);
   },
@@ -121,7 +122,7 @@ export const usersService = {
     const base = getBackendUrl();
     const response = await fetch(`${base}/admin/users`, {
       method: "POST",
-      headers: getHeaders(),
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     return handleResponse<CreateUserResponse>(response);
@@ -131,7 +132,7 @@ export const usersService = {
     const base = getBackendUrl();
     const response = await fetch(`${base}/admin/users/${encodeURIComponent(userId)}`, {
       method: "DELETE",
-      headers: getHeaders(),
+      headers: getAuthHeaders(),
     });
     return handleResponse<DeleteUserResponse>(response);
   },
@@ -140,7 +141,7 @@ export const usersService = {
     const base = getBackendUrl();
     const response = await fetch(`${base}/admin/users/${encodeURIComponent(userId)}/role`, {
       method: "PATCH",
-      headers: getHeaders(),
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     return handleResponse<UpdateRoleResponse>(response);
@@ -150,7 +151,7 @@ export const usersService = {
     const base = getBackendUrl();
     const response = await fetch(`${base}/admin/users/${encodeURIComponent(userId)}/profile`, {
       method: "PATCH",
-      headers: getHeaders(),
+      headers: getAuthHeaders(),
       body: JSON.stringify(request),
     });
     return handleResponse<UpdateProfileResponse>(response);

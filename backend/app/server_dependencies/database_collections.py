@@ -3,6 +3,7 @@ class Collections:
     SENSITIVE_PERSONAL_DATA: str = "sensitive_personal_data"
     PLAIN_PERSONAL_DATA: str = "plain_personal_data"
     USER_INVITATIONS: str = "user_invitations"
+    ADMIN_REGISTRATIONS: str = "admin_registrations"
     AGENT_DIRECTOR_STATE = "agent_director_state"
     WELCOME_AGENT_STATE = "welcome_agent_state"
     EXPLORE_EXPERIENCES_DIRECTOR_STATE = "explore_experiences_director_state"

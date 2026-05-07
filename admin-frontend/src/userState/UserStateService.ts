@@ -121,6 +121,15 @@ export default class UserStateService {
   }
 
   /**
+   * Checks if the current user is a super admin.
+   *
+   * @returns {boolean} True if the user is a super admin, false otherwise.
+   */
+  public isSuperAdmin(): boolean {
+    return this.userState?.accessRole.role === Role.SUPER_ADMIN;
+  }
+
+  /**
    * Checks if the current user is an admin.
    *
    * @returns {boolean} True if the user is an admin, false otherwise.

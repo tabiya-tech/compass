@@ -18,6 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Role } from "../usersService";
 import { useUsersContext } from "../UsersContext";
+import UserStateService from "src/userState/UserStateService";
 
 const uniqueId = "users-table-6d8e0a2c-4f5b-7c9d-1e3f-5a7b9c0d2e4f";
 
@@ -32,6 +33,7 @@ export const DATA_TEST_ID = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
+  [Role.SUPER_ADMIN]: "Super Admin",
   [Role.ADMIN]: "Admin",
   [Role.INSTITUTION_STAFF]: "Institution Staff",
 };
@@ -102,6 +104,7 @@ const UsersTable: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { users, setUpdateUser, setDeleteUser } = useUsersContext();
+  const canManage = UserStateService.getInstance().isSuperAdmin();
 
   return (
     <TableContainer
@@ -122,14 +125,14 @@ const UsersTable: React.FC = () => {
             <TableCell>{t("users.table.role", "Role")}</TableCell>
             <TableCell>{t("users.table.institutionId", "Institution ID")}</TableCell>
             <TableCell>{t("users.table.status", "Status")}</TableCell>
-            <TableCell align="right">{t("users.table.actions", "Actions")}</TableCell>
+            {canManage && <TableCell align="right">{t("users.table.actions", "Actions")}</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={6}
+                colSpan={canManage ? 6 : 5}
                 align="center"
                 sx={{ py: 4, color: "text.secondary" }}
                 data-testid={DATA_TEST_ID.USERS_TABLE_EMPTY}
@@ -160,26 +163,28 @@ const UsersTable: React.FC = () => {
                     {user.disabled ? t("users.status.inactive", "Inactive") : t("users.status.active", "Active")}
                   </Box>
                 </TableCell>
-                <TableCell align="right">
-                  <Tooltip title={t("users.actions.editRole", "Edit Role")}>
-                    <IconButton
-                      size="small"
-                      onClick={() => setUpdateUser(user)}
-                      data-testid={DATA_TEST_ID.USERS_TABLE_EDIT_BUTTON}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title={t("users.actions.delete", "Delete User")}>
-                    <IconButton
-                      size="small"
-                      onClick={() => setDeleteUser(user)}
-                      data-testid={DATA_TEST_ID.USERS_TABLE_DELETE_BUTTON}
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
+                {canManage && (
+                  <TableCell align="right">
+                    <Tooltip title={t("users.actions.editRole", "Edit Role")}>
+                      <IconButton
+                        size="small"
+                        onClick={() => setUpdateUser(user)}
+                        data-testid={DATA_TEST_ID.USERS_TABLE_EDIT_BUTTON}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t("users.actions.delete", "Delete User")}>
+                      <IconButton
+                        size="small"
+                        onClick={() => setDeleteUser(user)}
+                        data-testid={DATA_TEST_ID.USERS_TABLE_DELETE_BUTTON}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                )}
               </TableRow>
             ))
           )}
