@@ -2,7 +2,7 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.experience_entity import ResponsibilitiesData
@@ -16,13 +16,20 @@ from common_libs.llm.schema_builder import with_response_schema
 _TAGS_TO_FILTER = ["system instructions", "user's last input", "conversation history"]
 
 
-class ResponsibilitiesExtractionResponse(ResponsibilitiesData):
+class ResponsibilitiesExtractionResponse(BaseModel):
+    # extracted_entities MUST come first so the model reasons before classifying.
+    # The JSON schema is generated in field-declaration order, and the model fills
+    # fields left-to-right — if classification fields appear first the model outputs
+    # empty buckets before it has done any reasoning.
     extracted_entities: list[str] = Field(default_factory=list)
     """
     The extracted entities from the user's input.
     This acts as a "reasoning" field and should be predicted before the classes.
     """
 
+    other_peoples_responsibilities: list[str] = Field(default_factory=list)
+    non_responsibilities: list[str] = Field(default_factory=list)
+    responsibilities: list[str] = Field(default_factory=list)
     irrelevant_entities: Optional[list[str]] = Field(default_factory=list)
     """
     The irrelevant entities from the user's input.
@@ -109,8 +116,11 @@ class _ResponsibilitiesExtractionLLM:
             
             
             You will collect and place the entities into the 'extracted_entities' list of output.
-        
+
         # Classification instructions
+            Every entity in 'extracted_entities' MUST appear in exactly one of the four classification lists below.
+            Do not leave any extracted entity unclassified.
+
             Classify the named entities into one of the following four classes:
                 - other_peoples_responsibilities: What other people are responsible for.
                 - non_responsibilities: What the user is not responsible for.
@@ -126,10 +136,12 @@ class _ResponsibilitiesExtractionLLM:
             When extracting non_responsibilities, normalize the entity text by removing any negation and convert to the positive form. The fact that it is classified as non_responsibilities already indicates it is something the user does not do.
             
             There are two criteria and both must be met for a named entity to be in responsibilities:
-                1. The named entity must be something that the user is directly responsible for,
-                 possesses, does, performs, takes, exhibits, engages in, or knows.
-                 AND
-                2. At least one of the subjects or the subject pronouns of the named entity must be referring to the user.
+                1. At least one of the subjects or the subject pronouns of the named entity must be referring to the user.
+                   AND
+                2. The entity is NOT in non_responsibilities (i.e. the user is not explicitly saying they do NOT do it).
+
+            When in doubt, classify a first-person entity as responsibilities. Any action, task, activity, or behavior the user describes doing — including work tasks, interactions, and processes — belongs in responsibilities.
+            Only exclude from responsibilities if the user explicitly says they do NOT do it (→ non_responsibilities), or if the subject is clearly someone other than the user (→ other_peoples_responsibilities), or if the entity is completely unrelated to any work or experience (→ irrelevant_entities).
             
             For other_peoples_responsibilities, extract ALL actions, responsibilities, and behaviors performed by people other than the user. This includes actions performed by named individuals (like "John", "Mary", "my boss") and actions performed by third-person pronouns (like "he", "she", "they") when they clearly refer to someone other than the user. You MUST extract these entities even when they appear in the same sentence as the user's actions. If you see "John uses his senses" or "John does X", you must extract it as other_peoples_responsibilities. Do not omit entities for other people.
             
