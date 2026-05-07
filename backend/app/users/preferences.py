@@ -163,6 +163,7 @@ async def _create_user_preferences(
 async def _get_new_session(user_repository: UserPreferenceRepository,
                            user_feedback_service: UserFeedbackService,
                            sensitive_personal_data_service: ISensitivePersonalDataService,
+                           plain_personal_data_service: IPlainPersonalDataService,
                            user_id: str,
                            authed_user: UserInfo) -> UsersPreferencesResponse:
     """
@@ -178,15 +179,16 @@ async def _get_new_session(user_repository: UserPreferenceRepository,
 
         session_service = SessionsService(user_repository)
 
-        updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data = await asyncio.gather(
+        updated_user_preferences, sessions_with_feedback, has_sensitive_personal_data, plain_personal_data = await asyncio.gather(
             session_service.new_session(user_id),
             user_feedback_service.get_answered_questions(user_id),
-            sensitive_personal_data_service.exists_by_user_id(user_id)
+            sensitive_personal_data_service.exists_by_user_id(user_id),
+            plain_personal_data_service.get(user_id)
         )
 
         return UsersPreferencesResponse(
             **updated_user_preferences.model_dump(),
-            has_sensitive_personal_data=has_sensitive_personal_data,
+            has_sensitive_personal_data=has_sensitive_personal_data or plain_personal_data is not None,
             user_feedback_answered_questions=sessions_with_feedback
         )
 
@@ -383,6 +385,8 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
                                            get_user_preferences_repository),
                                        sensitive_personal_data_service: ISensitivePersonalDataService = Depends(
                                            get_sensitive_personal_data_service),
+                                       plain_personal_data_service: IPlainPersonalDataService = Depends(
+                                           get_plain_personal_data_service),
                                        user_feedback_service: UserFeedbackService = Depends(_get_user_feedback_service)
                                        ) -> UsersPreferencesResponse:
         """
@@ -398,6 +402,7 @@ def add_user_preference_routes(users_router: APIRouter, auth: Authentication):
         return await _get_new_session(user_preference_repository,
                                       user_feedback_service,
                                       sensitive_personal_data_service,
+                                      plain_personal_data_service,
                                       user_id,
                                       user_info)
 
