@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, LinearProgress, Typography, useTheme } from "@mui/material";
+import { BarChart } from "@mui/x-charts/BarChart";
 import { useTranslation } from "react-i18next";
 import type { ModuleData } from "src/types";
 import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
@@ -179,103 +180,48 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
             </Box>
           )}
 
-          {module.breakdownType === "subModules" && (
-            <Box>
-              <Box display="flex" gap={2} marginBottom={1} alignItems="center">
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <Box
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 0.5,
-                      backgroundColor: barColorStart,
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {t("dashboard.modules.startedLegend")}
-                  </Typography>
-                </Box>
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <Box
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 0.5,
-                      backgroundColor: barColorComplete,
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {t("dashboard.modules.completedLegend")}
-                  </Typography>
-                </Box>
-              </Box>
-              <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
-                {module.breakdownItems.map((item, idx) => {
-                  const globalMax = Math.max(...module.breakdownItems.map((i) => i.total ?? 0), 1);
-                  const completed = item.value ?? 0;
-                  const started = item.total ?? 0;
-                  const completedPct = (completed / globalMax) * 100;
-                  const startedOnlyPct = (Math.max(0, started - completed) / globalMax) * 100;
-                  return (
-                    <Box key={item.labelKey}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={0.5}>
-                        <Typography variant="body1">
-                          {idx + 1}. {t(item.labelKey)}
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                          {item.value}{" "}
-                          <Box component="span" sx={{ fontWeight: 400 }}>
-                            / {item.total}
-                          </Box>
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          height: 16,
-                          borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-                          backgroundColor: theme.palette.divider,
-                          marginTop: 0.5,
-                          overflow: "hidden",
-                          position: "relative",
-                        }}
-                      >
-                        {/* started bar (orange) — drawn first, wider */}
-                        <LinearProgress
-                          variant="determinate"
-                          value={Math.min(100, completedPct + startedOnlyPct)}
-                          aria-label={t(item.labelKey)}
-                          sx={{
-                            position: "absolute",
-                            inset: 0,
-                            height: "100%",
-                            backgroundColor: "transparent",
-                            "& .MuiLinearProgress-bar": {
-                              backgroundColor: barColorStart,
-                            },
-                          }}
-                        />
-                        {/* completed bar (green) — drawn on top, narrower */}
-                        <LinearProgress
-                          variant="determinate"
-                          value={completedPct}
-                          aria-label={t(item.labelKey)}
-                          sx={{
-                            position: "absolute",
-                            inset: 0,
-                            height: "100%",
-                            backgroundColor: "transparent",
-                            "& .MuiLinearProgress-bar": {
-                              backgroundColor: barColorComplete,
-                            },
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-          )}
+          {module.breakdownType === "subModules" &&
+            (() => {
+              const labels = module.breakdownItems.map((item, idx) => `${idx + 1}. ${t(item.labelKey)}`);
+              // ~5.5px per char at 10px font size, +8px padding
+              const yAxisWidth = Math.max(60, Math.max(...labels.map((l) => l.length)) * 5.5 + 8);
+              return (
+                <BarChart
+                  height={Math.max(200, module.breakdownItems.length * 60)}
+                  layout="horizontal"
+                  yAxis={[
+                    {
+                      scaleType: "band",
+                      data: labels,
+                      width: yAxisWidth,
+                      categoryGapRatio: 0.4,
+                      barGapRatio: 0.2,
+                      tickLabelStyle: { fontSize: 10 },
+                    },
+                  ]}
+                  series={[
+                    {
+                      data: module.breakdownItems.map((item) => item.total ?? 0),
+                      label: t("dashboard.modules.startedLegend"),
+                      color: barColorStart,
+                    },
+                    {
+                      data: module.breakdownItems.map((item) => item.value ?? 0),
+                      label: t("dashboard.modules.completedLegend"),
+                      color: barColorComplete,
+                    },
+                  ]}
+                  grid={{ vertical: true }}
+                  slotProps={{
+                    legend: {
+                      direction: "horizontal",
+                      position: { vertical: "bottom", horizontal: "start" },
+                    },
+                  }}
+                  margin={{ left: 8, right: 16, top: 8, bottom: 60 }}
+                />
+              );
+            })()}
 
           {module.breakdownType === "topSectors" && (
             <Box
