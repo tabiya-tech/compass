@@ -1,11 +1,9 @@
 import React from "react";
 import { Box, Skeleton, Typography, useTheme, Select, MenuItem, LinearProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import type { SkillsGapSectorData } from "src/types";
 import { useSkillGapStats } from "src/hooks/useSkillGapStats";
 import { useSkillsSupplyStats } from "src/hooks/useSkillsSupplyStats";
 import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
-
 interface SkillsAnalyticsProps {
   institution?: string;
 }
@@ -13,8 +11,8 @@ interface SkillsAnalyticsProps {
 const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { data: skillGapData, loading: skillGapLoading } = useSkillGapStats(5, institution);
-  const { data: skillSupplyData, loading: skillSupplyLoading } = useSkillsSupplyStats(5, institution);
+  const { data: skillGapData, loading: skillGapLoading } = useSkillGapStats(10, institution);
+  const { data: skillSupplyData, loading: skillSupplyLoading } = useSkillsSupplyStats(10, institution);
 
   // Supply: top skills students actually have, as % of students with that skill vs total with any skill
   const supplyTotal = skillSupplyData?.total_students_with_skills ?? 0;
@@ -29,17 +27,15 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
     skillName: entry.skill_label,
     demandPct: demandTotal > 0 ? Math.round((entry.students_with_gap_count / demandTotal) * 100) : 0,
   }));
-  const skillsGapSector: SkillsGapSectorData[] = [];
-
   const renderSimpleBar = (label: string, value: number, barColor: string, ariaLabel: string) => (
     <Box
       display="grid"
-      gridTemplateColumns="160px 1fr 36px"
+      gridTemplateColumns="minmax(100px, 160px) 1fr 36px"
       gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
       alignItems="center"
       mb={0.5}
     >
-      <Typography variant="caption" color="text.secondary" noWrap>
+      <Typography variant="caption" color="text.secondary">
         {label}
       </Typography>
       <LinearProgress
@@ -147,7 +143,7 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
             </Box>
             <Box>
               {skillSupplyLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
+                Array.from({ length: 10 }).map((_, i) => (
                   <Skeleton key={i} variant="text" height={28} sx={{ mb: 0.5 }} />
                 ))
               ) : supplyData.length === 0 ? (
@@ -204,7 +200,7 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
             </Box>
             <Box>
               {skillGapLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
+                Array.from({ length: 10 }).map((_, i) => (
                   <Skeleton key={i} variant="text" height={28} sx={{ mb: 0.5 }} />
                 ))
               ) : demandData.length === 0 ? (
@@ -223,114 +219,6 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
               )}
             </Box>
           </Box>
-        </Box>
-      </Box>
-
-      {/* Gap Section */}
-      <Box
-        sx={{
-          p: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          borderRadius: theme.rounding(theme.tabiyaRounding.sm),
-          border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper,
-        }}
-      >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          mb={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-          flexWrap="wrap"
-          gap={2}
-        >
-          <Box>
-            <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                {t("dashboard.skillsAnalytics.gapBySectorTitle")}
-              </Typography>
-              <MetricInfoIcon title={t("dashboard.skillsAnalytics.gapBySectorTitleTooltip")} />
-            </Box>
-            <Box display="flex" gap={2}>
-              <Box display="flex" alignItems="center" gap={0.5}>
-                <Box sx={{ width: 12, height: 12, borderRadius: 0.5, backgroundColor: theme.palette.secondary.main }} />
-                <Typography variant="caption" color="text.secondary">
-                  {t("dashboard.skillsAnalytics.legend.supplyStudents")}
-                </Typography>
-              </Box>
-              <Box display="flex" alignItems="center" gap={0.5}>
-                <Box sx={{ width: 12, height: 12, borderRadius: 0.5, backgroundColor: theme.palette.primary.main }} />
-                <Typography variant="caption" color="text.secondary">
-                  {t("dashboard.skillsAnalytics.legend.demandEmployers")}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            {t("dashboard.skillsAnalytics.avgGapLabel")}
-          </Typography>
-        </Box>
-
-        <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
-          {skillsGapSector.map((row) => {
-            const gap = row.supplyPct - row.demandPct;
-            const formattedGap = gap > 0 ? `+${gap}` : `${gap}`;
-            const containerPct = Math.max(row.supplyPct, row.demandPct, 1);
-
-            return (
-              <Box
-                key={row.sector}
-                display="grid"
-                gridTemplateColumns="140px 1fr 44px 44px 44px"
-                gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}
-                alignItems="center"
-              >
-                <Typography variant="caption" color="text.primary">
-                  {row.sector}
-                </Typography>
-
-                <LinearProgress
-                  variant="determinate"
-                  value={(row.supplyPct / containerPct) * 100}
-                  aria-label={t("dashboard.skillsAnalytics.aria.gapBar", {
-                    sector: row.sector,
-                    supply: row.supplyPct,
-                    demand: row.demandPct,
-                  })}
-                  sx={{
-                    height: 24,
-                    width: `${containerPct}%`,
-                    borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.xs),
-                    backgroundColor: theme.palette.primary.main,
-                    boxShadow: "none",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: theme.palette.secondary.main,
-                      backgroundImage: "none",
-                      boxShadow: "none",
-                      borderRadius: "inherit",
-                    },
-                  }}
-                />
-
-                <Box
-                  display="grid"
-                  gridTemplateColumns="44px 44px 44px"
-                  gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
-                  textAlign="right"
-                  alignItems="center"
-                >
-                  <Typography variant="caption" sx={{ color: theme.palette.secondary.main }}>
-                    {row.supplyPct}%
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.primary.main }}>
-                    {row.demandPct}%
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.error.main }}>
-                    {t("dashboard.skillsAnalytics.gapPp", { gap: formattedGap })}
-                  </Typography>
-                </Box>
-              </Box>
-            );
-          })}
         </Box>
       </Box>
     </Box>
