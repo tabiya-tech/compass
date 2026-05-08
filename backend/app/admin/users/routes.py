@@ -193,7 +193,9 @@ def get_admin_users_routes(auth: Authentication) -> APIRouter:
         - **institution_id**: Required if a role is institution_staff
         """
         try:
+            tenant_id = get_application_config().admin_firebase_tenant_id
             return await users_service.update_role(
+                tenant_id=tenant_id,
                 user_id=user_id,
                 request=request,
             )

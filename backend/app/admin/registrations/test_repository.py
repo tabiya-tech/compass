@@ -178,6 +178,61 @@ class TestCountPending:
         assert pending.id is not None  # silence unused
 
 
+class TestDeleteByEmail:
+    @pytest.mark.asyncio
+    async def test_deletes_all_rows_for_a_matching_email(
+        self, get_repository: Awaitable[AdminRegistrationRepository]
+    ):
+        repository = await get_repository
+        # GIVEN one approved row for the target email
+        target_email = "delete.me@school.edu"
+        approved = await repository.create_or_replace_pending(_instructor_request(target_email))
+        await repository.mark_decided(
+            approved.id,
+            status=RegistrationStatus.APPROVED,
+            decided_by="super-1",
+            decided_at=get_now(),
+        )
+        # AND an unrelated pending row for a different email
+        await repository.create_or_replace_pending(_admin_request("keep.me@org.edu"))
+
+        # WHEN delete_by_email is called for the target email
+        actual_deleted = await repository.delete_by_email(target_email)
+
+        # THEN the matching row is removed and the unrelated row remains
+        assert actual_deleted == 1
+        assert await repository.get_by_email(target_email) is None
+        assert await repository.get_by_email("keep.me@org.edu") is not None
+
+    @pytest.mark.asyncio
+    async def test_lowercases_the_lookup_email(
+        self, get_repository: Awaitable[AdminRegistrationRepository]
+    ):
+        repository = await get_repository
+        # GIVEN a row stored under the lowercased email
+        await repository.create_or_replace_pending(_instructor_request("Alice@School.edu"))
+
+        # WHEN delete_by_email is called with a mixed-case variant of the same address
+        actual_deleted = await repository.delete_by_email("ALICE@school.edu")
+
+        # THEN the row is matched and deleted (lookup is case-insensitive)
+        assert actual_deleted == 1
+
+    @pytest.mark.asyncio
+    async def test_returns_zero_when_no_row_matches(
+        self, get_repository: Awaitable[AdminRegistrationRepository]
+    ):
+        repository = await get_repository
+        # GIVEN a populated collection that doesn't include the target email
+        await repository.create_or_replace_pending(_admin_request("someone.else@org.edu"))
+
+        # WHEN delete_by_email is called for a non-matching email
+        actual_deleted = await repository.delete_by_email("nobody@nowhere.io")
+
+        # THEN nothing is deleted
+        assert actual_deleted == 0
+
+
 class TestMarkDecided:
     @pytest.mark.asyncio
     async def test_persists_decided_by_and_at(

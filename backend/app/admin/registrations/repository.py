@@ -115,6 +115,11 @@ class AdminRegistrationRepository:
     async def count_pending(self) -> int:
         return await self._collection.count_documents({"status": RegistrationStatus.PENDING.value})
 
+    async def delete_by_email(self, email: str) -> int:
+        """Delete all registration rows for a given email. Returns the deleted count."""
+        result = await self._collection.delete_many({"email": {"$eq": email.lower()}})
+        return result.deleted_count
+
     async def mark_decided(
         self,
         registration_id: str,

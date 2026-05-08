@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getBackendUrl } from "src/envService";
 import type { InstitutionApiItem } from "src/analytics/AnalyticsService.types";
+import { encodeInstitutionId } from "src/utils/institutionUtils";
 
 interface PublicInstitution {
   id?: string;
@@ -41,9 +42,11 @@ export function usePublicInstitutionOptions() {
           }
           const body = (await response.json()) as PublicInstitutionsResponse;
           for (const inst of body.data) {
-            const id = inst.id ?? inst.reg_no ?? inst.name;
+            // The id MUST be the base64url-encoded institution name — it lands in
+            // Firebase token claims and is later decoded server-side and client-side
+            // to render the institution name in the instructor dashboard.
             items.push({
-              id,
+              id: encodeInstitutionId(inst.name),
               name: inst.name,
               active: true,
               students: null,

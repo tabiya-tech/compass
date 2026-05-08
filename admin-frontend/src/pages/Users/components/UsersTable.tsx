@@ -19,6 +19,16 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Role } from "../usersService";
 import { useUsersContext } from "../UsersContext";
 import UserStateService from "src/userState/UserStateService";
+import { decodeInstitutionId } from "src/utils/institutionUtils";
+
+function institutionDisplay(institutionId: string | null | undefined): string {
+  if (!institutionId) return "—";
+  try {
+    return decodeInstitutionId(institutionId);
+  } catch {
+    return institutionId;
+  }
+}
 
 const uniqueId = "users-table-6d8e0a2c-4f5b-7c9d-1e3f-5a7b9c0d2e4f";
 
@@ -146,7 +156,7 @@ const UsersTable: React.FC = () => {
                 <TableCell>{user.email ?? "\u2014"}</TableCell>
                 <TableCell>{user.display_name ?? "\u2014"}</TableCell>
                 <TableCell>{user.role ? (ROLE_LABELS[user.role] ?? user.role) : "\u2014"}</TableCell>
-                <TableCell>{user.institution_id ?? "\u2014"}</TableCell>
+                <TableCell>{institutionDisplay(user.institution_id)}</TableCell>
                 <TableCell>
                   <Box
                     component="span"

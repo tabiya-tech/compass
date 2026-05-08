@@ -16,6 +16,16 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslation } from "react-i18next";
 import { AdminRegistration, RegistrationRoleRequest } from "src/pages/Register/registrationsService";
+import { decodeInstitutionId } from "src/utils/institutionUtils";
+
+function institutionDisplay(institutionId: string | null | undefined): string {
+  if (!institutionId) return "—";
+  try {
+    return decodeInstitutionId(institutionId);
+  } catch {
+    return institutionId;
+  }
+}
 
 const uniqueId = "registrations-table-4d6f8a0b-2c1e-3f4a-5b6c-7d8e9f0a1b2c";
 
@@ -83,7 +93,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, 
                 <TableCell>{registration.email}</TableCell>
                 <TableCell>{registration.name}</TableCell>
                 <TableCell>{ROLE_LABELS[registration.requested_role] ?? registration.requested_role}</TableCell>
-                <TableCell>{registration.institution_id ?? "—"}</TableCell>
+                <TableCell>{institutionDisplay(registration.institution_id)}</TableCell>
                 <TableCell>{new Date(registration.submitted_at).toLocaleString()}</TableCell>
                 <TableCell align="right">
                   <Box sx={{ display: "inline-flex", gap: 0.5 }}>

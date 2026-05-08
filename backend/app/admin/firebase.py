@@ -143,6 +143,14 @@ class FirebaseService:
         self._logger.info("Created Firebase user with UID: %s", user.uid)
         return user
 
+    def get_user(self, tenant_id: str, user_id: str) -> Optional[auth.UserRecord]:
+        """Look up a Firebase user by UID; returns None if the user doesn't exist."""
+        auth_client = self._auth_clients.get_auth_client(tenant_id)
+        try:
+            return auth_client.get_user(user_id)
+        except auth.UserNotFoundError:
+            return None
+
     def update_user(
         self,
         tenant_id: str,
@@ -173,6 +181,25 @@ class FirebaseService:
         """Generate a password reset link for an existing Firebase user."""
         auth_client = self._auth_clients.get_auth_client(tenant_id)
         return auth_client.generate_password_reset_link(email)
+
+    def set_custom_claims(
+        self,
+        tenant_id: str,
+        user_id: str,
+        role: str,
+        institution_id: Optional[str] = None,
+    ) -> None:
+        """Set custom claims (role + optional institutionId) on a Firebase user.
+
+        The admin frontend reads role from token custom claims, so any role
+        change must be mirrored here in addition to the Firestore access_roles doc.
+        """
+        claims: dict = {"role": role}
+        if institution_id:
+            claims["institutionId"] = institution_id
+        auth_client = self._auth_clients.get_auth_client(tenant_id)
+        auth_client.set_custom_user_claims(user_id, claims)
+        self._logger.info("Set custom claims on user %s: %s", user_id, claims)
 
     def delete_user(self, tenant_id: str, user_id: str) -> None:
         """

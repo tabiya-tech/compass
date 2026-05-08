@@ -1,11 +1,13 @@
 import logging
-from functools import cache
 from typing import Optional
 
 from fastapi import Depends
 from firebase_admin import auth
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.admin.firebase import FirebaseService, get_firebase_service
+from app.admin.registrations.repository import AdminRegistrationRepository
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.admin.users._types import (
     UserRecord,
     ListUsersResponse,
@@ -48,8 +50,13 @@ def _convert_firebase_user_to_record(
 class UsersService:
     """Service for admin user management operations."""
 
-    def __init__(self, firebase_service: FirebaseService):
+    def __init__(
+        self,
+        firebase_service: FirebaseService,
+        registrations_repo: AdminRegistrationRepository,
+    ):
         self._firebase = firebase_service
+        self._registrations_repo = registrations_repo
 
     async def list_users(
             self,
@@ -121,7 +128,17 @@ class UsersService:
             institution_id=request.institution_id,
         )
 
-        # Step 3: Generate a password reset link so the new user can sign in.
+        # Step 3: Mirror the role into Firebase custom claims. The admin frontend
+        # reads role from token claims (not the Firestore doc), so without this
+        # the user's first sign-in fails with USER_ACCESS_DISABLED.
+        self._firebase.set_custom_claims(
+            tenant_id=tenant_id,
+            user_id=firebase_user.uid,
+            role=request.role.value,
+            institution_id=request.institution_id,
+        )
+
+        # Step 4: Generate a password reset link so the new user can sign in.
         # We log the link rather than email it directly — the dev team forwards it
         # until SMTP / Firebase email templates are wired up.
         try:
@@ -157,11 +174,23 @@ class UsersService:
         """
         logger.info("Deleting user: %s for tenant: %s", user_id, tenant_id)
 
+        # Look up the email *before* deleting the Firebase user, so we can
+        # cascade-delete the corresponding admin_registrations row by email.
+        firebase_user = self._firebase.get_user(tenant_id=tenant_id, user_id=user_id)
+        email = firebase_user.email if firebase_user else None
+
         # Step 1: Delete user from Firebase Auth
         self._firebase.delete_user(tenant_id=tenant_id, user_id=user_id)
 
         # Step 2: Delete access role document from Firestore
         await self._firebase.delete_access_role(user_id=user_id)
+
+        # Step 3: Cascade-delete the registration row so a fresh signup with the
+        # same email isn't blocked by an orphaned approved/rejected row.
+        if email:
+            deleted = await self._registrations_repo.delete_by_email(email)
+            if deleted:
+                logger.info("Cascade-deleted %d registration row(s) for email: %s", deleted, email)
 
         logger.info("Deleted user with UID: %s for tenant: %s", user_id, tenant_id)
 
@@ -169,12 +198,14 @@ class UsersService:
 
     async def update_role(
             self,
+            tenant_id: str,
             user_id: str,
             request: UpdateRoleRequest,
     ) -> UpdateRoleResponse:
         """
         Update a user's role in Firestore.
 
+        :param tenant_id: The Firebase tenant ID (needed to update custom claims).
         :param user_id: The user ID to update.
         :param request: UpdateRoleRequest containing the new role.
         :return: UpdateRoleResponse with the updated role details.
@@ -183,6 +214,15 @@ class UsersService:
 
         # Update access role document in Firestore
         await self._firebase.update_access_role(
+            user_id=user_id,
+            role=request.role.value,
+            institution_id=request.institution_id,
+        )
+
+        # Mirror the role change in Firebase custom claims, otherwise the frontend
+        # (which reads role from the ID token) would still see the old role.
+        self._firebase.set_custom_claims(
+            tenant_id=tenant_id,
             user_id=user_id,
             role=request.role.value,
             institution_id=request.institution_id,
@@ -229,14 +269,10 @@ class UsersService:
         )
 
 
-@cache
 def get_users_service(
         firebase_service: FirebaseService = Depends(get_firebase_service),
+        application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
 ) -> UsersService:
-    """
-    Get a cached instance of the users service.
-
-    :param firebase_service: Firebase service (injected by FastAPI).
-    :return: UsersService instance.
-    """
-    return UsersService(firebase_service)
+    """Build a UsersService for FastAPI request scope."""
+    registrations_repo = AdminRegistrationRepository(application_db)
+    return UsersService(firebase_service, registrations_repo)
