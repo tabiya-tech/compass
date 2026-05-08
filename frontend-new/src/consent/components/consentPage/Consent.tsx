@@ -11,7 +11,7 @@ import { routerPaths } from "src/app/routerPaths";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import authStateService from "src/auth/services/AuthenticationState.service";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
-import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import AuthPageShell from "src/auth/components/AuthPageShell/AuthPageShell";
 import { AuthenticationError } from "src/error/commonErrors";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { Theme } from "@mui/material/styles";
@@ -22,11 +22,14 @@ import { DeviceSpecificationEvent, EventType, UserLocationEvent } from "src/metr
 import { browserName, deviceType, osName, browserVersion } from "react-device-detect";
 import { getCoordinates } from "src/metrics/utils/getUserLocation";
 import MetricsService from "src/metrics/metricsService";
+import { getDarkLogoUrl } from "src/envService";
 
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
 export const HighlightedSpan = styled("span")(({ theme }) => ({
-  backgroundColor: theme.palette.tabiyaYellow.light,
+  backgroundColor: theme.palette.common.cream,
+  padding: "0 0.2em",
+  borderRadius: "0.2em",
 }));
 
 export const DATA_TEST_ID = {
@@ -50,6 +53,7 @@ export const DATA_TEST_ID = {
 const Consent: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const logoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const [isAccepting, setIsAccepting] = useState(false);
@@ -210,117 +214,153 @@ const Consent: React.FC = () => {
     window.open(`${window.location.origin}/#${routePath}`, "_blank", "noopener,noreferrer");
   };
 
-  return (
+  const whiteBandContent = (
     <Container
-      maxWidth="xs"
-      sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
+      maxWidth="sm"
+      disableGutters
+      sx={{
+        pt: { xs: theme.fixedSpacing(theme.tabiyaSpacing.xl), md: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
+        pb: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+      }}
       data-testid={DATA_TEST_ID.CONSENT_CONTAINER}
     >
-      <Backdrop isShown={isLoggingOut} message={t("common.backdrop.loggingYouOut")} />
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
-        <AuthHeader title={t("consent.components.consentPage.beforeWeBeginTitle")} subtitle={<></>} />
-        <Box
-          display={"flex"}
-          flexDirection={"column"}
-          textAlign={"start"}
-          width={"100%"}
-          gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-        >
-          <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
-            {t("consent.components.consentPage.introPart1")}
-            <br />
-            <br />
-            <HighlightedSpan>{t("consent.components.consentPage.introHighlightResponsibly")}</HighlightedSpan>
-            <br />
-            <br />
-            {t("consent.components.consentPage.introPart2")}
-            <br />
-            <br />
-            {t("consent.components.consentPage.introPart3")}
-            <br />
-            <br />
-            {t("consent.components.consentPage.introPart4")}
+      <Box
+        sx={{
+          backgroundColor: "common.white",
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 4,
+          width: "100%",
+          maxWidth: 560,
+          mx: "auto",
+          padding: {
+            xs: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+            md: theme.fixedSpacing(theme.tabiyaSpacing.xl * 1.25),
+          },
+        }}
+      >
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
+          <Typography variant="h1" color="primary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
+            {t("consent.components.consentPage.beforeWeBeginTitle")}
           </Typography>
-          <Box display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.lg}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={isTCAccepted}
-                  onChange={handleTCChange}
-                  inputProps={{
-                    "aria-label": termsAndConditionsLabel,
-                  }}
-                  data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER}
-                />
-              }
-              sx={{ alignItems: "flex-start" }}
-              label={
-                <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
-                  <Trans
-                    i18nKey="consent.components.consentPage.checkboxTermsAndConditions"
-                    values={{ terms_and_conditions: termsAndConditionsLabel }}
-                    components={[<CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.TERMS_OF_USE)} />]}
-                  />
-                </Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={isDPAccepted}
-                  onChange={handleDPAChange}
-                  inputProps={{
-                    "aria-label": privacyPolicyLabel,
-                  }}
-                  data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER}
-                />
-              }
-              sx={{ alignItems: "flex-start" }}
-              label={
-                <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
-                  <Trans
-                    i18nKey="consent.components.consentPage.checkboxPrivacyPolicy"
-                    values={{ privacy_policy: privacyPolicyLabel }}
-                    components={[<CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.PRIVACY_POLICY)} />]}
-                  />
-                </Typography>
-              }
-            />
-          </Box>
-          <Typography>
-            {t("consent.components.consentPage.areYouReady")}
-            <br />
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: theme.spacing(2),
-            gap: theme.tabiyaSpacing.xl,
-          }}
-        >
-          <CustomLink data-testid={DATA_TEST_ID.REJECT_BUTTON} onClick={() => setShowRejectModal(true)}>
-            {t("common.buttons.noThankYou")}
-          </CustomLink>
-          <PrimaryButton
-            fullWidth
-            variant="contained"
-            showCircle
-            color="primary"
-            disabled={isAccepting || !isTCAccepted || !isDPAccepted || isRejecting}
-            disableWhenOffline={true}
-            data-testid={DATA_TEST_ID.ACCEPT_BUTTON}
-            onClick={handleAcceptedDPA}
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            textAlign={"start"}
+            width={"100%"}
+            gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
           >
-            {t("consent.components.consentPage.acceptButton")}
-          </PrimaryButton>
+            <Typography variant="body2" gutterBottom data-testid={DATA_TEST_ID.AGREEMENT_BODY}>
+              {t("consent.components.consentPage.introPart1")}
+              <br />
+              <br />
+              <HighlightedSpan>{t("consent.components.consentPage.introHighlightResponsibly")}</HighlightedSpan>
+              <br />
+              <br />
+              {t("consent.components.consentPage.introPart2")}
+              <br />
+              <br />
+              {t("consent.components.consentPage.introPart3")}
+              <br />
+              <br />
+              {t("consent.components.consentPage.introPart4")}
+            </Typography>
+            <Box display={"flex"} flexDirection={"column"} gap={theme.tabiyaSpacing.lg}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isTCAccepted}
+                    onChange={handleTCChange}
+                    inputProps={{
+                      "aria-label": termsAndConditionsLabel,
+                    }}
+                    data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_CHECKBOX_CONTAINER}
+                  />
+                }
+                sx={{ alignItems: "center" }}
+                label={
+                  <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_TERMS_AND_CONDITIONS_TEXT}>
+                    <Trans
+                      i18nKey="consent.components.consentPage.checkboxTermsAndConditions"
+                      values={{ terms_and_conditions: termsAndConditionsLabel }}
+                      components={[<CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.TERMS_OF_USE)} />]}
+                    />
+                  </Typography>
+                }
+              />
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isDPAccepted}
+                    onChange={handleDPAChange}
+                    inputProps={{
+                      "aria-label": privacyPolicyLabel,
+                    }}
+                    data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_CONTAINER}
+                  />
+                }
+                sx={{ alignItems: "center" }}
+                label={
+                  <Typography variant="body2" data-testid={DATA_TEST_ID.ACCEPT_CHECKBOX_TEXT}>
+                    <Trans
+                      i18nKey="consent.components.consentPage.checkboxPrivacyPolicy"
+                      values={{ privacy_policy: privacyPolicyLabel }}
+                      components={[
+                        <CustomLink onClick={() => openLegalDocumentInNewTab(routerPaths.PRIVACY_POLICY)} />,
+                      ]}
+                    />
+                  </Typography>
+                }
+              />
+            </Box>
+            <Typography>
+              {t("consent.components.consentPage.areYouReady")}
+              <br />
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: { xs: "column-reverse", sm: "row" },
+              justifyContent: { xs: "center", sm: "space-between" },
+              alignItems: "center",
+              marginTop: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+            }}
+          >
+            <CustomLink
+              data-testid={DATA_TEST_ID.REJECT_BUTTON}
+              onClick={() => setShowRejectModal(true)}
+              sx={{ alignSelf: { xs: "center", sm: "auto" }, textAlign: "center" }}
+            >
+              {t("common.buttons.noThankYou")}
+            </CustomLink>
+            <PrimaryButton
+              variant="contained"
+              showCircle
+              color="primary"
+              disabled={isAccepting || !isTCAccepted || !isDPAccepted || isRejecting}
+              disableWhenOffline={true}
+              data-testid={DATA_TEST_ID.ACCEPT_BUTTON}
+              onClick={handleAcceptedDPA}
+            >
+              {t("consent.components.consentPage.acceptButton")}
+            </PrimaryButton>
+          </Box>
         </Box>
       </Box>
+    </Container>
+  );
+
+  return (
+    <>
+      <AuthPageShell
+        logoUrl={logoSrc}
+        whiteBandContent={whiteBandContent}
+        whiteBandBackgroundColor={theme.palette.containerBackground.main}
+      />
+      <Backdrop isShown={isLoggingOut} message={t("common.backdrop.loggingYouOut")} />
       <ConfirmModalDialog
         isOpen={showRejectModal}
         title={t("common.modal.areYouSure")}
@@ -351,7 +391,7 @@ const Consent: React.FC = () => {
         cancelButtonText={t("consent.components.consentPage.modalYesExit")}
         confirmButtonText={t("common.buttons.iWantToStay")}
       />
-    </Container>
+    </>
   );
 };
 

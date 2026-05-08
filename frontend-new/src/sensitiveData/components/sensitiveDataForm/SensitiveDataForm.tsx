@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
-import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import AuthPageShell from "src/auth/components/AuthPageShell/AuthPageShell";
 import { SensitivePersonalData } from "src/sensitiveData/types";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import AuthenticationServiceFactory from "src/auth/services/Authentication.service.factory";
@@ -43,6 +43,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { extractPersonalInfo } from "./config/utils";
 import SensitiveDataFormSkeleton from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataFormSkeleton";
 import InstitutionService, { InstitutionSummary, Programme } from "src/institutions/services/InstitutionService";
+import { getDarkLogoUrl } from "src/envService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -133,6 +134,7 @@ const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const logoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const { enqueueSnackbar } = useSnackbar();
 
   const [isSavingSensitiveData, setIsSavingSensitiveData] = useState(false);
@@ -369,276 +371,304 @@ const SensitiveDataForm: React.FC = () => {
     }
   }, [enqueueSnackbar, userPreferences, t]);
 
+  const whiteBandContent = (
+    <Container
+      maxWidth="sm"
+      disableGutters
+      sx={{
+        pt: { xs: theme.fixedSpacing(theme.tabiyaSpacing.xl), md: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
+        pb: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+      }}
+      data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}
+    >
+      <Box
+        sx={{
+          backgroundColor: "common.white",
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 4,
+          width: "100%",
+          maxWidth: 560,
+          mx: "auto",
+          padding: {
+            xs: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+            md: theme.fixedSpacing(theme.tabiyaSpacing.xl * 1.25),
+          },
+        }}
+      >
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="space-evenly"
+          gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+          width={"100%"}
+        >
+          <Box>
+            <Typography variant="h1" color="primary.main" gutterBottom>
+              {t("sensitiveData.components.sensitiveDataForm.title")}
+            </Typography>
+            <Typography variant="body2">
+              {t("sensitiveData.components.sensitiveDataForm.subtitle")}
+              {isPIIRequired
+                ? " " + t("sensitiveData.components.sensitiveDataForm.unskippableSubtitle")
+                : " " + t("sensitiveData.components.sensitiveDataForm.skippableSubtitle")}
+            </Typography>
+          </Box>
+
+          <Box
+            width={"100%"}
+            display={"flex"}
+            flexDirection={"column"}
+            gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
+          >
+            <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
+              {/* First Name */}
+              <TextField
+                fullWidth
+                required
+                label="First Name"
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => {
+                  const val = e.target.value.trimStart();
+                  setFirstName(val);
+                  setFieldValid("firstName", val.trim().length > 0);
+                }}
+                inputRef={firstNameRef}
+                error={showFieldErrors && !validationErrors.firstName}
+                helperText={
+                  showFieldErrors && !validationErrors.firstName
+                    ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                    : ""
+                }
+              />
+
+              {/* Last Name */}
+              <TextField
+                fullWidth
+                required
+                label="Last Name"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => {
+                  const val = e.target.value.trimStart();
+                  setLastName(val);
+                  setFieldValid("lastName", val.trim().length > 0);
+                }}
+                inputRef={lastNameRef}
+                error={showFieldErrors && !validationErrors.lastName}
+                helperText={
+                  showFieldErrors && !validationErrors.lastName
+                    ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                    : ""
+                }
+              />
+
+              {/* Institution — type-to-search autocomplete, shows province on the right */}
+              <Autocomplete
+                options={institutionOptions}
+                getOptionLabel={(option) => option.name}
+                loading={institutionLoading}
+                inputValue={institutionInputValue}
+                value={selectedInstitution}
+                filterOptions={(x) => x}
+                isOptionEqualToValue={(option, value) => option.name === value.name}
+                onInputChange={handleInstitutionInputChange}
+                onChange={handleInstitutionSelect}
+                noOptionsText={
+                  institutionInputValue.length < INSTITUTION_SEARCH_MIN_CHARS
+                    ? "Type at least 2 characters to search"
+                    : institutionLoading
+                      ? "Searching..."
+                      : "No institutions found"
+                }
+                renderOption={(props, option) => (
+                  <li {...props} key={option.name}>
+                    <Box display="flex" justifyContent="space-between" width="100%">
+                      <Typography variant="body2">{option.name}</Typography>
+                      {option.province && (
+                        <Typography variant="body2" color="text.secondary" sx={{ ml: 2, flexShrink: 0 }}>
+                          {option.province}
+                        </Typography>
+                      )}
+                    </Box>
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    label="Institution"
+                    placeholder="Start typing to search..."
+                    inputRef={institutionRef}
+                    error={showFieldErrors && !validationErrors.institution}
+                    helperText={
+                      showFieldErrors && !validationErrors.institution
+                        ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                        : ""
+                    }
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {institutionLoading ? <CircularProgress color="inherit" size={16} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+
+              {/* Programme — searchable autocomplete, disabled until institution is chosen */}
+              <Autocomplete
+                options={programmes}
+                getOptionLabel={(option) => option.name}
+                disabled={!selectedInstitution || programmesLoading}
+                loading={programmesLoading}
+                value={programmes.find((p) => p.name === selectedProgramme) ?? null}
+                onChange={(_event, programme) => {
+                  const val = programme?.name ?? "";
+                  setSelectedProgramme(val);
+                  setFieldValid("programme", !!val);
+                }}
+                noOptionsText={
+                  !selectedInstitution
+                    ? "Select an institution first"
+                    : programmesLoading
+                      ? "Loading programmes..."
+                      : "No programmes available"
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    label="Programme"
+                    placeholder={selectedInstitution ? "Select programme" : "Select an institution first"}
+                    inputRef={programmeRef}
+                    error={showFieldErrors && !validationErrors.programme}
+                    helperText={
+                      showFieldErrors && !validationErrors.programme
+                        ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                        : ""
+                    }
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {programmesLoading ? <CircularProgress color="inherit" size={16} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+
+              {/* School Year */}
+              <FormControl fullWidth required error={showFieldErrors && !validationErrors.schoolYear}>
+                <InputLabel id="school-year-label">School Year</InputLabel>
+                <Select
+                  value={schoolYear}
+                  label="School Year"
+                  labelId="school-year-label"
+                  inputRef={schoolYearRef}
+                  SelectDisplayProps={
+                    {
+                      "data-testid": DATA_TEST_ID.SENSITIVE_DATA_SCHOOL_YEAR_SELECT,
+                    } as React.HTMLAttributes<HTMLDivElement>
+                  }
+                  onChange={(e) => {
+                    setSchoolYear(e.target.value);
+                    setFieldValid("schoolYear", !!e.target.value);
+                  }}
+                >
+                  {["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].map((yr) => (
+                    <MenuItem key={yr} value={yr}>
+                      {yr}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {showFieldErrors && !validationErrors.schoolYear && (
+                  <Typography variant="caption" color="error" sx={{ marginLeft: 1.75, marginTop: 0.5 }}>
+                    {t("sensitiveData.components.sensitiveDataForm.fieldRequired")}
+                  </Typography>
+                )}
+              </FormControl>
+            </Box>
+
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: { xs: "column-reverse", sm: "row" },
+                justifyContent: { xs: "center", sm: "space-between" },
+                alignItems: "center",
+                gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              }}
+            >
+              {isPIIRequired ? (
+                <CustomLink
+                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
+                  disabled={isRejecting}
+                  onClick={() => setConfirmingReject(true)}
+                  sx={{ alignSelf: { xs: "center", sm: "auto" }, textAlign: "center" }}
+                >
+                  {t("common.buttons.noThankYou")}
+                </CustomLink>
+              ) : (
+                <CustomLink
+                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
+                  disabled={isSkipping}
+                  disableWhenOffline
+                  onClick={() => setConfirmingSkip(true)}
+                  sx={{ alignSelf: { xs: "center", sm: "auto" }, textAlign: "center" }}
+                >
+                  {t("common.buttons.skip")}
+                </CustomLink>
+              )}
+
+              <PrimaryButton
+                showCircle
+                variant="contained"
+                color="primary"
+                disabled={!isSubmitButtonEnabled || isSkipping}
+                disableWhenOffline={true}
+                onClick={handleSaveSensitivePersonalData}
+                data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON}
+              >
+                {isSavingSensitiveData ? (
+                  <CircularProgress
+                    title={"Saving"}
+                    color={"secondary"}
+                    size={theme.typography.h5.fontSize}
+                    sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
+                    aria-label={"Saving"}
+                    data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
+                  />
+                ) : (
+                  t("sensitiveData.components.sensitiveDataForm.startConversation")
+                )}
+              </PrimaryButton>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Container>
+  );
+
   return (
     <Suspense fallback={<SensitiveDataFormSkeleton />}>
       <>
-        <Container
-          maxWidth="xs"
-          sx={{ height: "100%", padding: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}
-          data-testid={DATA_TEST_ID.SENSITIVE_DATA_CONTAINER}
-        >
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="space-evenly"
-            gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-            width={"100%"}
-          >
-            <AuthHeader
-              title={t("sensitiveData.components.sensitiveDataForm.title")}
-              subtitle={
-                <>
-                  {t("sensitiveData.components.sensitiveDataForm.subtitle")}
-                  {isPIIRequired
-                    ? " " + t("sensitiveData.components.sensitiveDataForm.unskippableSubtitle")
-                    : " " + t("sensitiveData.components.sensitiveDataForm.skippableSubtitle")}
-                </>
-              }
-            />
-
-            <Box
-              width={"100%"}
-              display={"flex"}
-              flexDirection={"column"}
-              gap={theme.fixedSpacing(theme.tabiyaSpacing.lg)}
-            >
-              <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
-                {/* First Name */}
-                <TextField
-                  fullWidth
-                  required
-                  label="First Name"
-                  autoComplete="given-name"
-                  value={firstName}
-                  onChange={(e) => {
-                    const val = e.target.value.trimStart();
-                    setFirstName(val);
-                    setFieldValid("firstName", val.trim().length > 0);
-                  }}
-                  inputRef={firstNameRef}
-                  error={showFieldErrors && !validationErrors.firstName}
-                  helperText={
-                    showFieldErrors && !validationErrors.firstName
-                      ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
-                      : ""
-                  }
-                />
-
-                {/* Last Name */}
-                <TextField
-                  fullWidth
-                  required
-                  label="Last Name"
-                  autoComplete="family-name"
-                  value={lastName}
-                  onChange={(e) => {
-                    const val = e.target.value.trimStart();
-                    setLastName(val);
-                    setFieldValid("lastName", val.trim().length > 0);
-                  }}
-                  inputRef={lastNameRef}
-                  error={showFieldErrors && !validationErrors.lastName}
-                  helperText={
-                    showFieldErrors && !validationErrors.lastName
-                      ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
-                      : ""
-                  }
-                />
-
-                {/* Institution — type-to-search autocomplete, shows province on the right */}
-                <Autocomplete
-                  options={institutionOptions}
-                  getOptionLabel={(option) => option.name}
-                  loading={institutionLoading}
-                  inputValue={institutionInputValue}
-                  value={selectedInstitution}
-                  filterOptions={(x) => x}
-                  isOptionEqualToValue={(option, value) => option.name === value.name}
-                  onInputChange={handleInstitutionInputChange}
-                  onChange={handleInstitutionSelect}
-                  noOptionsText={
-                    institutionInputValue.length < INSTITUTION_SEARCH_MIN_CHARS
-                      ? "Type at least 2 characters to search"
-                      : institutionLoading
-                        ? "Searching..."
-                        : "No institutions found"
-                  }
-                  renderOption={(props, option) => (
-                    <li {...props} key={option.name}>
-                      <Box display="flex" justifyContent="space-between" width="100%">
-                        <Typography variant="body2">{option.name}</Typography>
-                        {option.province && (
-                          <Typography variant="body2" color="text.secondary" sx={{ ml: 2, flexShrink: 0 }}>
-                            {option.province}
-                          </Typography>
-                        )}
-                      </Box>
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      required
-                      label="Institution"
-                      placeholder="Start typing to search..."
-                      inputRef={institutionRef}
-                      error={showFieldErrors && !validationErrors.institution}
-                      helperText={
-                        showFieldErrors && !validationErrors.institution
-                          ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
-                          : ""
-                      }
-                      slotProps={{
-                        input: {
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {institutionLoading ? <CircularProgress color="inherit" size={16} /> : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                {/* Programme — searchable autocomplete, disabled until institution is chosen */}
-                <Autocomplete
-                  options={programmes}
-                  getOptionLabel={(option) => option.name}
-                  disabled={!selectedInstitution || programmesLoading}
-                  loading={programmesLoading}
-                  value={programmes.find((p) => p.name === selectedProgramme) ?? null}
-                  onChange={(_event, programme) => {
-                    const val = programme?.name ?? "";
-                    setSelectedProgramme(val);
-                    setFieldValid("programme", !!val);
-                  }}
-                  noOptionsText={
-                    !selectedInstitution
-                      ? "Select an institution first"
-                      : programmesLoading
-                        ? "Loading programmes..."
-                        : "No programmes available"
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      required
-                      label="Programme"
-                      placeholder={selectedInstitution ? "Select programme" : "Select an institution first"}
-                      inputRef={programmeRef}
-                      error={showFieldErrors && !validationErrors.programme}
-                      helperText={
-                        showFieldErrors && !validationErrors.programme
-                          ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
-                          : ""
-                      }
-                      slotProps={{
-                        input: {
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {programmesLoading ? <CircularProgress color="inherit" size={16} /> : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        },
-                      }}
-                    />
-                  )}
-                />
-
-                {/* School Year */}
-                <FormControl fullWidth required error={showFieldErrors && !validationErrors.schoolYear}>
-                  <InputLabel id="school-year-label">School Year</InputLabel>
-                  <Select
-                    value={schoolYear}
-                    label="School Year"
-                    labelId="school-year-label"
-                    inputRef={schoolYearRef}
-                    SelectDisplayProps={
-                      {
-                        "data-testid": DATA_TEST_ID.SENSITIVE_DATA_SCHOOL_YEAR_SELECT,
-                      } as React.HTMLAttributes<HTMLDivElement>
-                    }
-                    onChange={(e) => {
-                      setSchoolYear(e.target.value);
-                      setFieldValid("schoolYear", !!e.target.value);
-                    }}
-                  >
-                    {["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].map((yr) => (
-                      <MenuItem key={yr} value={yr}>
-                        {yr}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {showFieldErrors && !validationErrors.schoolYear && (
-                    <Typography variant="caption" color="error" sx={{ marginLeft: 1.75, marginTop: 0.5 }}>
-                      {t("sensitiveData.components.sensitiveDataForm.fieldRequired")}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Box>
-
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: theme.tabiyaSpacing.xl,
-                }}
-              >
-                {isPIIRequired ? (
-                  <CustomLink
-                    data-testid={DATA_TEST_ID.SENSITIVE_DATA_REJECT_BUTTON}
-                    disabled={isRejecting}
-                    onClick={() => setConfirmingReject(true)}
-                  >
-                    {t("common.buttons.noThankYou")}
-                  </CustomLink>
-                ) : (
-                  <CustomLink
-                    data-testid={DATA_TEST_ID.SENSITIVE_DATA_SKIP_BUTTON}
-                    disabled={isSkipping}
-                    disableWhenOffline
-                    onClick={() => setConfirmingSkip(true)}
-                  >
-                    {t("common.buttons.skip")}
-                  </CustomLink>
-                )}
-
-                <PrimaryButton
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  disabled={!isSubmitButtonEnabled || isSkipping}
-                  disableWhenOffline={true}
-                  onClick={handleSaveSensitivePersonalData}
-                  data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON}
-                >
-                  {isSavingSensitiveData ? (
-                    <CircularProgress
-                      title={"Saving"}
-                      color={"secondary"}
-                      size={theme.typography.h5.fontSize}
-                      sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
-                      aria-label={"Saving"}
-                      data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
-                    />
-                  ) : (
-                    t("sensitiveData.components.sensitiveDataForm.startConversation")
-                  )}
-                </PrimaryButton>
-              </Box>
-            </Box>
-          </Box>
-        </Container>
-
+        <AuthPageShell
+          logoUrl={logoSrc}
+          whiteBandContent={whiteBandContent}
+          whiteBandBackgroundColor={theme.palette.containerBackground.main}
+        />
         <TextConfirmModalDialog
           isOpen={confirmingReject}
           title={t("common.modal.areYouSure")}

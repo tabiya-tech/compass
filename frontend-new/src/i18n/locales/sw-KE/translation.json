@@ -352,7 +352,8 @@
       },
       "verifyEmail": {
         "registrationThankYou": "Asante kwa kujisajili kwenye {{appName}}.",
-        "verificationEmailSentMessage": "Barua pepe ya uthibitisho imetumwa kwenye anwani yako ya barua pepe. Ili kuendelea, tafadhali thibitisha anwani yako ya barua pepe kwanza."
+        "verificationEmailSentMessage": "Barua pepe ya uthibitisho imetumwa kwenye anwani yako ya barua pepe. Ili kuendelea, tafadhali thibitisha anwani yako ya barua pepe kwanza.",
+        "verificationEmailSentBadge": "Barua pepe ya uthibitisho imetumwa"
       },
       "authHandler": {
         "processing": "Subiri kidogo, tunashughulikia ombi lako...",

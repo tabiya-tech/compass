@@ -5,7 +5,6 @@ import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";
 import { useNavigate } from "react-router-dom";
-import { DATA_TEST_ID as AUTH_HEADER_DATA_TEST_ID } from "src/auth/components/AuthHeader/AuthHeader";
 import * as Sentry from "@sentry/react";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
@@ -28,15 +27,10 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-// mock the AuthHeader component
-jest.mock("src/auth/components/AuthHeader/AuthHeader", () => {
-  const actual = jest.requireActual("src/auth/components/AuthHeader/AuthHeader");
+jest.mock("src/i18n/languageContextMenu/parseEnvSupportedLocales", () => {
+  const constants = require("src/i18n/constants");
   return {
-    ...actual,
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => {
-      return <span data-testid={actual.DATA_TEST_ID.AUTH_HEADER_CONTAINER}></span>;
-    }),
+    parseEnvSupportedLocales: jest.fn().mockReturnValue(constants.SupportedLocales),
   };
 });
 
@@ -73,8 +67,10 @@ describe("Testing Verify Email component", () => {
     // AND the component should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.VERIFY_EMAIL_CONTAINER)).toBeInTheDocument();
 
-    // AND the header component should be rendered
-    expect(screen.getByTestId(AUTH_HEADER_DATA_TEST_ID.AUTH_HEADER_CONTAINER)).toBeInTheDocument();
+    // AND the verify email specific elements should be rendered
+    expect(screen.getByTestId(DATA_TEST_ID.VERIFICATION_SENT_BADGE)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.TITLE)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.VERIFICATION_BODY)).toBeInTheDocument();
 
     // AND the back to login button should be rendered
     expect(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON)).toBeInTheDocument();
@@ -103,7 +99,7 @@ describe("Testing Verify Email component", () => {
     // AND WHEN the accept button is clicked
     fireEvent.click(screen.getByTestId(DATA_TEST_ID.BACK_TO_LOGIN_BUTTON));
 
-    // THEN expect the user to be redirected to the root path
+    // THEN expect the user to be redirected to the login page
     expect(useNavigate).toHaveBeenCalled();
   });
 });

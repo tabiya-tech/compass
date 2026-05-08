@@ -352,7 +352,8 @@
       },
       "verifyEmail": {
         "registrationThankYou": "Zikomo chifukwa cha kulembetsa ku {{appName}}.",
-        "verificationEmailSentMessage": "Imelo yotsimikiza yatumizidwa kwa imelo yanu. Kuti mupitilize, chonde tsimikizani imelo yanu koyamba."
+        "verificationEmailSentMessage": "Imelo yotsimikiza yatumizidwa kwa imelo yanu. Kuti mupitilize, chonde tsimikizani imelo yanu koyamba.",
+        "verificationEmailSentBadge": "Imelo yotsimikiza yatumizidwa"
       },
       "authHandler": {
         "processing": "Dikirani pang'ono, tikukonza pempho lanu...",

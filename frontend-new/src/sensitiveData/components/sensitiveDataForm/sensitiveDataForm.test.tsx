@@ -31,6 +31,7 @@ import { mockBrowserIsOnLine } from "src/_test_utilities/mockBrowserIsOnline";
 import { UserPreferenceError } from "src/error/commonErrors";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import InstitutionService from "src/institutions/services/InstitutionService";
+import { typeDebouncedInput } from "src/_test_utilities/userEventFakeTimer";
 
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom");
@@ -209,7 +210,7 @@ describe("Sensitive Data Form", () => {
 
       // AND an institution is searched and selected
       const institutionInput = screen.getByLabelText(/Institution/i);
-      await user.type(institutionInput, "Univ");
+      await typeDebouncedInput(institutionInput, "Univ");
 
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const option = await screen.findByText("University of Zambia");
@@ -294,7 +295,7 @@ describe("Sensitive Data Form", () => {
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
 
       const institutionInput = screen.getByLabelText(/Institution/i);
-      await user.type(institutionInput, "Univ");
+      await typeDebouncedInput(institutionInput, "Univ");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("University of Zambia");
       await user.click(institutionOption);
@@ -621,12 +622,11 @@ describe("Sensitive Data Form", () => {
   describe("Institution search", () => {
     it("should search institutions when user types at least 2 characters", async () => {
       // GIVEN a form is rendered
-      const user = userEvent.setup({ delay: null });
       componentRender();
 
       // WHEN the user types in the institution field
       const institutionInput = screen.getByLabelText(/Institution/i);
-      await user.type(institutionInput, "Un");
+      await typeDebouncedInput(institutionInput, "Un");
 
       // THEN the institution service should be called
       await waitFor(() => {
@@ -636,7 +636,7 @@ describe("Sensitive Data Form", () => {
 
     it("should not search institutions when user types fewer than 2 characters", async () => {
       // GIVEN a form is rendered
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup();
       componentRender();
 
       // WHEN the user types only 1 character
@@ -649,12 +649,12 @@ describe("Sensitive Data Form", () => {
 
     it("should load programmes when an institution is selected", async () => {
       // GIVEN a form is rendered
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup();
       componentRender();
 
       // WHEN the user searches and selects an institution
       const institutionInput = screen.getByLabelText(/Institution/i);
-      await user.type(institutionInput, "Univ");
+      await typeDebouncedInput(institutionInput, "Univ");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("University of Zambia");
       await user.click(institutionOption);
@@ -701,7 +701,7 @@ describe("Sensitive Data Form", () => {
 
     it("should allow empty values for non-required fields (province is not required)", async () => {
       // GIVEN a form with all required fields filled
-      const user = userEvent.setup({ delay: null });
+      const user = userEvent.setup();
       // AND an institution with no province
       mockSearchInstitutions.mockResolvedValue({
         data: [{ name: "No Province Uni", reg_no: "REG002", province: null }],
@@ -714,7 +714,7 @@ describe("Sensitive Data Form", () => {
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
 
       const institutionInput = screen.getByLabelText(/Institution/i);
-      await user.type(institutionInput, "No Pro");
+      await typeDebouncedInput(institutionInput, "No Pro");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("No Province Uni");
       await user.click(institutionOption);

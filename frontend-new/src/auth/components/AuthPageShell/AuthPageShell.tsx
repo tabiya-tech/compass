@@ -18,9 +18,10 @@ export const DATA_TEST_ID = {
 
 export type AuthPageShellProps = {
   logoUrl: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   whiteBandContent?: React.ReactNode;
   whiteContainerTestId?: string;
+  whiteBandBackgroundColor?: string;
 };
 
 const layoutCssVarsSx = (theme: Theme) => ({
@@ -41,13 +42,26 @@ export const layoutContentColumnSx = {
   boxSizing: "border-box",
 } as const;
 
-const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent, children, whiteContainerTestId }) => {
+const AuthPageShell: React.FC<AuthPageShellProps> = ({
+  logoUrl,
+  whiteBandContent,
+  children,
+  whiteContainerTestId,
+  whiteBandBackgroundColor,
+}) => {
   const theme = useTheme();
   const cream = theme.palette.common.cream;
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const isOnFaqPage = location.pathname === routerPaths.FAQ;
+  const hasBodyContent = React.Children.toArray(children).some((child) => {
+    if (child == null) return false;
+    if (React.isValidElement(child) && child.type === React.Fragment) {
+      return React.Children.toArray(child.props.children).length > 0;
+    }
+    return true;
+  });
 
   const handleFaqClick = useCallback(() => {
     startTransition(() => {
@@ -58,7 +72,7 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
   return (
     <Box
       sx={(t) => ({
-        minHeight: "100%",
+        minHeight: hasBodyContent ? "100%" : "100vh",
         display: "flex",
         flexDirection: "column",
         width: "100%",
@@ -69,10 +83,10 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
       <Box
         sx={{
           width: "100%",
-          flexShrink: 0,
+          flex: hasBodyContent ? "0 0 auto" : "1 1 auto",
           position: "relative",
           zIndex: 2,
-          backgroundColor: theme.palette.common.white,
+          backgroundColor: whiteBandBackgroundColor ?? theme.palette.common.white,
           overflow: "visible",
         }}
       >
@@ -147,21 +161,23 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({ logoUrl, whiteBandContent
         </Box>
       </Box>
 
-      <Box
-        sx={{
-          width: "100%",
-          flex: 1,
-          minHeight: 0,
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: cream,
-          zIndex: 1,
-          overflow: "visible",
-          position: "relative",
-        }}
-      >
-        {children}
-      </Box>
+      {hasBodyContent && (
+        <Box
+          sx={{
+            width: "100%",
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+            backgroundColor: cream,
+            zIndex: 1,
+            overflow: "visible",
+            position: "relative",
+          }}
+        >
+          {children}
+        </Box>
+      )}
     </Box>
   );
 };

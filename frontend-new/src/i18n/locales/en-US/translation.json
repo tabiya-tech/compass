@@ -352,7 +352,8 @@
       },
       "verifyEmail": {
         "registrationThankYou": "Thank you for registering to {{appName}}.",
-        "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first."
+        "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first.",
+        "verificationEmailSentBadge": "Verification email sent"
       },
       "authHandler": {
         "processing": "Just a moment, we're handling your request...",
