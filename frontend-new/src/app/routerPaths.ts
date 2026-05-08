@@ -7,6 +7,7 @@ export const routerPaths = {
   LOGIN: "/login",
   FORGOT_PASSWORD: "/reset",
   VERIFY_EMAIL: "/verify-email",
+  AUTH_HANDLER: "/auth-handler",
   PRIVACY_POLICY: "/privacy-policy",
   TERMS_OF_USE: "/terms-of-use",
   CONSENT: "/consent",

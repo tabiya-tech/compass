@@ -6,6 +6,7 @@ import AuthLayout from "src/auth/components/AuthLayout/AuthLayout";
 import ErrorPage from "src/error/errorPage/ErrorPage";
 import Register from "src/auth/pages/Register/Register";
 import VerifyEmail from "src/auth/pages/VerifyEmail/VerifyEmail";
+import AuthHandler from "src/auth/pages/AuthHandler/AuthHandler";
 import Consent from "src/consent/components/consentPage/Consent";
 import Landing from "src/auth/pages/Landing/Landing";
 
@@ -416,6 +417,10 @@ const App = () => {
                         ),
                       },
                     ]),
+                {
+                  path: routerPaths.AUTH_HANDLER,
+                  element: <AuthHandler />,
+                },
               ],
             },
             {

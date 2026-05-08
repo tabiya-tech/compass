@@ -346,6 +346,29 @@
       "verifyEmail": {
         "registrationThankYou": "Gracias por registrarte en {{appName}}.",
         "verificationEmailSentMessage": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico."
+      },
+      "authHandler": {
+        "processing": "Un momento, estamos procesando tu solicitud...",
+        "savingPassword": "Guardando tu nueva contraseña...",
+        "savePassword": "Guardar contraseña",
+        "passwordRequirementsNotMet": "Asegurate de que tu contraseña cumpla con todos los requisitos.",
+        "verifyEmailTitle": "Verificando tu correo electrónico",
+        "verifyEmailSuccess": "¡Correo verificado!",
+        "verifyEmailSuccessRedirect": "Tu correo electrónico fue verificado. En breve serás redirigido a la página de inicio de sesión.",
+        "resetPasswordTitle": "Restablecé tu contraseña",
+        "resetPasswordSubtitle": "Ingresá una nueva contraseña para {{email}}.",
+        "newPasswordPlaceholder": "Nueva contraseña",
+        "passwordResetSuccess": "Tu contraseña fue actualizada.",
+        "passwordResetSuccessFull": "Tu contraseña fue actualizada con éxito. Ahora podés iniciar sesión con tu nueva contraseña.",
+        "recoverEmailTitle": "Restaurando tu correo electrónico",
+        "recoverEmailSuccess": "Tu dirección de correo electrónico fue restaurada.",
+        "recoverEmailSuccessWithEmail": "Tu dirección de correo electrónico fue restaurada a {{email}}. También enviamos un enlace para restablecer la contraseña a esa dirección como medida de precaución.",
+        "errors": {
+          "title": "Algo salió mal",
+          "invalidLink": "Este enlace no contiene la información requerida. Puede estar mal formado o incompleto.",
+          "linkInvalidOrExpired": "Este enlace no es válido o ha expirado. Por favor solicitá uno nuevo.",
+          "unknownMode": "No pudimos reconocer la acción solicitada por este enlace."
+        }
       }
     },
     "components": {

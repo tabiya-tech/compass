@@ -178,7 +178,9 @@ def _setup_identity_platform(
         get_resource_name(resource="identity-platform", resource_type="default-config"),
         notification_config=NotificationConfigArgs(
             send_email=SendEmailArgs(
-                callback_uri=auth_domain.apply(lambda s: f"https://{s}/__/auth/action"),
+                # Custom email-action handler hosted by the frontend at /#/auth-handler.
+                # Handles resetPassword, recoverEmail, and verifyEmail Firebase action modes.
+                callback_uri=frontend_domain.apply(lambda s: f"https://{s}/#/auth-handler"),
                 dns_info=DNSInfoArgs(
                     custom_domain=firebase_custom_domain,
                     use_custom_domain=True,

@@ -346,6 +346,29 @@
       "verifyEmail": {
         "registrationThankYou": "Asante kwa kujisajili kwenye {{appName}}.",
         "verificationEmailSentMessage": "Barua pepe ya uthibitisho imetumwa kwenye anwani yako ya barua pepe. Ili kuendelea, tafadhali thibitisha anwani yako ya barua pepe kwanza."
+      },
+      "authHandler": {
+        "processing": "Subiri kidogo, tunashughulikia ombi lako...",
+        "savingPassword": "Tunahifadhi nenosiri lako jipya...",
+        "savePassword": "Hifadhi nenosiri",
+        "passwordRequirementsNotMet": "Tafadhali hakikisha nenosiri lako linakidhi mahitaji yote.",
+        "verifyEmailTitle": "Tunathibitisha barua pepe yako",
+        "verifyEmailSuccess": "Barua pepe imethibitishwa!",
+        "verifyEmailSuccessRedirect": "Barua pepe yako imethibitishwa. Utaelekezwa kwenye ukurasa wa kuingia hivi karibuni.",
+        "resetPasswordTitle": "Weka upya nenosiri lako",
+        "resetPasswordSubtitle": "Weka nenosiri jipya kwa {{email}}.",
+        "newPasswordPlaceholder": "Nenosiri jipya",
+        "passwordResetSuccess": "Nenosiri lako limesasishwa.",
+        "passwordResetSuccessFull": "Nenosiri lako limesasishwa kwa mafanikio. Sasa unaweza kuingia na nenosiri lako jipya.",
+        "recoverEmailTitle": "Tunarejesha barua pepe yako",
+        "recoverEmailSuccess": "Anwani ya barua pepe yako imerejeshwa.",
+        "recoverEmailSuccessWithEmail": "Anwani ya barua pepe yako imerejeshwa kuwa {{email}}. Pia tumetuma kiungo cha kuweka upya nenosiri kwa anwani hiyo kama hatua ya tahadhari.",
+        "errors": {
+          "title": "Kuna tatizo limetokea",
+          "invalidLink": "Kiungo hiki hakina taarifa zinazohitajika. Inawezekana kimeharibiwa au hakijakamilika.",
+          "linkInvalidOrExpired": "Kiungo hiki si halali au kimeisha muda. Tafadhali omba kingine kipya.",
+          "unknownMode": "Hatuwezi kutambua kitendo kinachoombwa na kiungo hiki."
+        }
       }
     },
     "components": {

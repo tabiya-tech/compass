@@ -346,6 +346,29 @@
       "verifyEmail": {
         "registrationThankYou": "Gracias por registrarte en {{appName}}.",
         "verificationEmailSentMessage": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico."
+      },
+      "authHandler": {
+        "processing": "Un momento, estamos procesando tu solicitud...",
+        "savingPassword": "Guardando tu nueva contraseña...",
+        "savePassword": "Guardar contraseña",
+        "passwordRequirementsNotMet": "Asegúrate de que tu contraseña cumpla con todos los requisitos.",
+        "verifyEmailTitle": "Verificando tu correo electrónico",
+        "verifyEmailSuccess": "¡Correo verificado!",
+        "verifyEmailSuccessRedirect": "Tu correo electrónico ha sido verificado. Serás redirigido a la página de inicio de sesión en breve.",
+        "resetPasswordTitle": "Restablece tu contraseña",
+        "resetPasswordSubtitle": "Ingresa una nueva contraseña para {{email}}.",
+        "newPasswordPlaceholder": "Nueva contraseña",
+        "passwordResetSuccess": "Tu contraseña se ha actualizado.",
+        "passwordResetSuccessFull": "Tu contraseña se ha actualizado correctamente. Ahora puedes iniciar sesión con tu nueva contraseña.",
+        "recoverEmailTitle": "Restaurando tu correo electrónico",
+        "recoverEmailSuccess": "Tu dirección de correo electrónico ha sido restaurada.",
+        "recoverEmailSuccessWithEmail": "Tu dirección de correo electrónico ha sido restaurada a {{email}}. También hemos enviado un enlace para restablecer la contraseña a esa dirección como medida de precaución.",
+        "errors": {
+          "title": "Algo salió mal",
+          "invalidLink": "Este enlace no contiene la información requerida. Puede estar mal formado o incompleto.",
+          "linkInvalidOrExpired": "Este enlace no es válido o ha expirado. Por favor solicita uno nuevo.",
+          "unknownMode": "No reconocimos la acción solicitada por este enlace."
+        }
       }
     },
     "components": {

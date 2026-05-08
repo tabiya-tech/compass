@@ -346,6 +346,29 @@
       "verifyEmail": {
         "registrationThankYou": "Zikomo chifukwa cha kulembetsa ku {{appName}}.",
         "verificationEmailSentMessage": "Imelo yotsimikiza yatumizidwa kwa imelo yanu. Kuti mupitilize, chonde tsimikizani imelo yanu koyamba."
+      },
+      "authHandler": {
+        "processing": "Dikirani pang'ono, tikukonza pempho lanu...",
+        "savingPassword": "Tikusunga pasiwedi yanu yatsopano...",
+        "savePassword": "Sunga pasiwedi",
+        "passwordRequirementsNotMet": "Onetsetsani kuti pasiwedi yanu ikukwaniritsa zofunikira zonse.",
+        "verifyEmailTitle": "Kutsimikiza imelo yanu",
+        "verifyEmailSuccess": "Imelo yatsimikizidwa!",
+        "verifyEmailSuccessRedirect": "Imelo yanu yatsimikizidwa. Mutumizidwa ku tsamba lolowera mu nthawi yochepa.",
+        "resetPasswordTitle": "Khazikitsanso pasiwedi yanu",
+        "resetPasswordSubtitle": "Lowetsani pasiwedi yatsopano ya {{email}}.",
+        "newPasswordPlaceholder": "Pasiwedi yatsopano",
+        "passwordResetSuccess": "Pasiwedi yanu yasinthidwa.",
+        "passwordResetSuccessFull": "Pasiwedi yanu yasinthidwa bwino. Tsopano mutha kulowa ndi pasiwedi yanu yatsopano.",
+        "recoverEmailTitle": "Kubwezeretsa imelo yanu",
+        "recoverEmailSuccess": "Adilesi ya imelo yanu yabwezeretsedwa.",
+        "recoverEmailSuccessWithEmail": "Adilesi ya imelo yanu yabwezeretsedwa ku {{email}}. Tatumizanso ulalo wokhazikitsanso pasiwedi ku adilesi imeneyo ngati chenjezo.",
+        "errors": {
+          "title": "Pena pena pakhala vuto",
+          "invalidLink": "Ulalo uwu ulibe zofunikira. Ungakhale wopenda kapena wosakwana.",
+          "linkInvalidOrExpired": "Ulalo uwu si wovomerezeka kapena watha. Chonde pemphani watsopano.",
+          "unknownMode": "Sitinathe kuzindikira chochita chomwe ulalo uwu wapempha."
+        }
       }
     },
     "components": {

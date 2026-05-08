@@ -346,6 +346,29 @@
       "verifyEmail": {
         "registrationThankYou": "Thank you for registering to {{appName}}.",
         "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first."
+      },
+      "authHandler": {
+        "processing": "Just a moment, we're handling your request...",
+        "savingPassword": "Saving your new password...",
+        "savePassword": "Save password",
+        "passwordRequirementsNotMet": "Please ensure your password meets all requirements.",
+        "verifyEmailTitle": "Verifying your email",
+        "verifyEmailSuccess": "Email verified!",
+        "verifyEmailSuccessRedirect": "Your email has been verified. You will be redirected to the login page shortly.",
+        "resetPasswordTitle": "Reset your password",
+        "resetPasswordSubtitle": "Enter a new password for {{email}}.",
+        "newPasswordPlaceholder": "New password",
+        "passwordResetSuccess": "Your password has been updated.",
+        "passwordResetSuccessFull": "Your password has been updated successfully. You can now sign in with your new password.",
+        "recoverEmailTitle": "Restoring your email",
+        "recoverEmailSuccess": "Your email address has been restored.",
+        "recoverEmailSuccessWithEmail": "Your email address has been restored to {{email}}. We've also sent a password reset link to that address as a precaution.",
+        "errors": {
+          "title": "Something went wrong",
+          "invalidLink": "This link is missing required information. It may be malformed or incomplete.",
+          "linkInvalidOrExpired": "This link is invalid or has expired. Please request a new one.",
+          "unknownMode": "We couldn't recognise the action requested by this link."
+        }
       }
     },
     "components": {
