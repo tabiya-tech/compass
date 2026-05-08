@@ -33,7 +33,6 @@ def _build_service(
     firebase_service.create_access_role = AsyncMock()
     firebase_service.update_access_role = AsyncMock()
     firebase_service.delete_access_role = AsyncMock()
-    firebase_service.generate_password_reset_link = MagicMock(return_value="https://reset")
 
     registrations_repo = MagicMock(spec=AdminRegistrationRepository)
     registrations_repo.delete_by_email = AsyncMock(return_value=delete_count)
@@ -66,6 +65,29 @@ class TestCreateUser:
             role="institution_staff",
             institution_id="inst-1",
         )
+
+    @pytest.mark.asyncio
+    async def test_does_not_generate_a_password_reset_link(self):
+        # Regression guard: the backend must NOT generate or log reset links —
+        # logged links are recoverable credentials. Email delivery is the
+        # frontend's job (Firebase sendPasswordResetEmail).
+
+        # GIVEN a service with a spy on the link generator
+        given_tenant = "Admin-Dashboard-test"
+        given_request = CreateUserRequest(
+            email="alice@school.edu",
+            name="Alice",
+            role=Role.INSTITUTION_STAFF,
+            institution_id="inst-1",
+        )
+        service, firebase_service, _ = _build_service()
+        firebase_service.generate_password_reset_link = MagicMock(return_value="https://reset")
+
+        # WHEN create_user is called
+        await service.create_user(tenant_id=given_tenant, request=given_request)
+
+        # THEN no reset link is generated server-side; email delivery is the frontend's job
+        firebase_service.generate_password_reset_link.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_does_not_set_institution_id_in_claims_for_admin(self):

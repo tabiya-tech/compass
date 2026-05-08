@@ -18,6 +18,7 @@ import { usersService, Role, CreateUserRequest, HttpError } from "../usersServic
 import { useUsersContext } from "../UsersContext";
 import InstitutionAutocomplete, { useInstitutionOptions } from "./InstitutionAutocomplete";
 import UserStateService from "src/userState/UserStateService";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService";
 
 const uniqueId = "create-user-modal-3a5c7e9f-1b2d-4f6a-8c0e-2d4f6a8b0c1e";
 
@@ -29,6 +30,9 @@ export const DATA_TEST_ID = {
   CREATE_USER_MODAL_INSTITUTION_ID: `${uniqueId}-institution-id`,
   CREATE_USER_MODAL_CANCEL: `${uniqueId}-cancel`,
   CREATE_USER_MODAL_SUBMIT: `${uniqueId}-submit`,
+  CREATE_USER_MODAL_EMAIL_FAILED_ALERT: `${uniqueId}-email-failed-alert`,
+  CREATE_USER_MODAL_RESEND: `${uniqueId}-resend`,
+  CREATE_USER_MODAL_CLOSE: `${uniqueId}-close`,
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -53,6 +57,8 @@ const CreateUserModal: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [emailFailedFor, setEmailFailedFor] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const isSuperAdmin = UserStateService.getInstance().isSuperAdmin();
 
   const handleClose = () => {
@@ -62,12 +68,14 @@ const CreateUserModal: React.FC = () => {
     setInstitutionId("");
     setError(null);
     setEmailError(null);
+    setEmailFailedFor(null);
     setCreateModalOpen(false);
   };
 
   const handleSubmit = async () => {
     setError(null);
     setEmailError(null);
+    setEmailFailedFor(null);
     const request: CreateUserRequest = {
       email,
       name,
@@ -76,9 +84,16 @@ const CreateUserModal: React.FC = () => {
     };
     setLoading(true);
     try {
-      await usersService.createUser(request);
-      handleClose();
+      const created = await usersService.createUser(request);
       fetchUsers();
+      // Backend committed the user; trigger Firebase's hosted email template.
+      // If the send fails, keep the dialog open with a Resend prompt.
+      try {
+        await FirebaseEmailAuthenticationService.getInstance().resetPassword(created.email);
+        handleClose();
+      } catch {
+        setEmailFailedFor(created.email);
+      }
     } catch (err: unknown) {
       if (err instanceof HttpError && err.status === 409) {
         setEmailError(t("users.error.emailAlreadyExists", "A user with this email already exists"));
@@ -90,8 +105,23 @@ const CreateUserModal: React.FC = () => {
     }
   };
 
+  const handleResend = async () => {
+    if (!emailFailedFor) return;
+    setResending(true);
+    try {
+      await FirebaseEmailAuthenticationService.getInstance().resetPassword(emailFailedFor);
+      handleClose();
+    } catch {
+      // Stay open; the alert remains visible so the user can retry.
+    } finally {
+      setResending(false);
+    }
+  };
+
   const isValid =
     email.trim() !== "" && name.trim() !== "" && (role !== Role.INSTITUTION_STAFF || institutionId.trim() !== "");
+
+  const showingResendState = emailFailedFor !== null;
 
   return (
     <Dialog
@@ -108,70 +138,101 @@ const CreateUserModal: React.FC = () => {
             {error}
           </Alert>
         )}
-        <TextField
-          label={t("users.createModal.email", "Email")}
-          type="email"
-          fullWidth
-          margin="normal"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setEmailError(null);
-          }}
-          required
-          disabled={loading}
-          error={!!emailError}
-          helperText={emailError}
-          data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL}
-        />
-        <TextField
-          label={t("users.createModal.name", "Display Name")}
-          fullWidth
-          margin="normal"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          disabled={loading}
-          data-testid={DATA_TEST_ID.CREATE_USER_MODAL_NAME}
-        />
-        <FormControl fullWidth margin="normal" required>
-          <InputLabel>{t("users.createModal.role", "Role")}</InputLabel>
-          <Select
-            value={role}
-            label={t("users.createModal.role", "Role")}
-            onChange={(e) => setRole(e.target.value as Role)}
-            disabled={loading}
-            data-testid={DATA_TEST_ID.CREATE_USER_MODAL_ROLE}
-          >
-            {isSuperAdmin && <MenuItem value={Role.SUPER_ADMIN}>{ROLE_LABELS[Role.SUPER_ADMIN]}</MenuItem>}
-            <MenuItem value={Role.ADMIN}>{ROLE_LABELS[Role.ADMIN]}</MenuItem>
-            <MenuItem value={Role.INSTITUTION_STAFF}>{ROLE_LABELS[Role.INSTITUTION_STAFF]}</MenuItem>
-          </Select>
-        </FormControl>
-        {role === Role.INSTITUTION_STAFF && (
-          <InstitutionAutocomplete
-            value={institutionId}
-            onChange={setInstitutionId}
-            required
-            disabled={loading}
-            options={institutionOptions}
-            loading={institutionsLoading}
-            error={institutionsError}
-          />
+        {showingResendState ? (
+          <Alert severity="warning" sx={{ mb: 2 }} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL_FAILED_ALERT}>
+            {t(
+              "users.createModal.emailFailed",
+              "Created {{email}}, but the password-reset email failed to send. You can retry now or send it later from the Forgot Password page.",
+              { email: emailFailedFor }
+            )}
+          </Alert>
+        ) : (
+          <>
+            <TextField
+              label={t("users.createModal.email", "Email")}
+              type="email"
+              fullWidth
+              margin="normal"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError(null);
+              }}
+              required
+              disabled={loading}
+              error={!!emailError}
+              helperText={emailError}
+              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL}
+            />
+            <TextField
+              label={t("users.createModal.name", "Display Name")}
+              fullWidth
+              margin="normal"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={loading}
+              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_NAME}
+            />
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel>{t("users.createModal.role", "Role")}</InputLabel>
+              <Select
+                value={role}
+                label={t("users.createModal.role", "Role")}
+                onChange={(e) => setRole(e.target.value as Role)}
+                disabled={loading}
+                data-testid={DATA_TEST_ID.CREATE_USER_MODAL_ROLE}
+              >
+                {isSuperAdmin && <MenuItem value={Role.SUPER_ADMIN}>{ROLE_LABELS[Role.SUPER_ADMIN]}</MenuItem>}
+                <MenuItem value={Role.ADMIN}>{ROLE_LABELS[Role.ADMIN]}</MenuItem>
+                <MenuItem value={Role.INSTITUTION_STAFF}>{ROLE_LABELS[Role.INSTITUTION_STAFF]}</MenuItem>
+              </Select>
+            </FormControl>
+            {role === Role.INSTITUTION_STAFF && (
+              <InstitutionAutocomplete
+                value={institutionId}
+                onChange={setInstitutionId}
+                required
+                disabled={loading}
+                options={institutionOptions}
+                loading={institutionsLoading}
+                error={institutionsError}
+              />
+            )}
+          </>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CANCEL}>
-          {t("common.cancel", "Cancel")}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={loading || !isValid}
-          data-testid={DATA_TEST_ID.CREATE_USER_MODAL_SUBMIT}
-        >
-          {loading ? <CircularProgress size={20} /> : t("users.createModal.submit", "Create User")}
-        </Button>
+        {showingResendState ? (
+          <>
+            <Button onClick={handleClose} disabled={resending} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CLOSE}>
+              {t("common.close", "Close")}
+            </Button>
+            <Button
+              onClick={handleResend}
+              variant="contained"
+              color="warning"
+              disabled={resending}
+              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_RESEND}
+            >
+              {resending ? <CircularProgress size={20} /> : t("users.createModal.resend", "Resend email")}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CANCEL}>
+              {t("common.cancel", "Cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={loading || !isValid}
+              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_SUBMIT}
+            >
+              {loading ? <CircularProgress size={20} /> : t("users.createModal.submit", "Create User")}
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );

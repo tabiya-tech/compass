@@ -1,6 +1,6 @@
 """
 Simple in-memory per-IP sliding-window rate limiter for the public registration
-and password-reset endpoints.
+endpoints.
 
 Caveat: state lives in this process only — limits are per-replica, not global.
 Acceptable for v1 expected signup volume; revisit (move to Redis) if traffic
@@ -15,7 +15,6 @@ from fastapi import HTTPException, Request, status
 # Hardcoded limits (per IP, per minute)
 REGISTRATION_RATE_LIMIT_PER_MIN = 5
 STATUS_RATE_LIMIT_PER_MIN = 30
-PASSWORD_RESET_RATE_LIMIT_PER_MIN = 5
 
 _WINDOW_SECONDS = 60
 
@@ -61,4 +60,3 @@ def make_rate_limiter(scope: str, limit_per_min: int):
 
 registration_rate_limiter = make_rate_limiter("registration", REGISTRATION_RATE_LIMIT_PER_MIN)
 status_rate_limiter = make_rate_limiter("registration_status", STATUS_RATE_LIMIT_PER_MIN)
-password_reset_rate_limiter = make_rate_limiter("password_reset", PASSWORD_RESET_RATE_LIMIT_PER_MIN)

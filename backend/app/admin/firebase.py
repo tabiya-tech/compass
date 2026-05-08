@@ -177,11 +177,6 @@ class FirebaseService:
         self._logger.info("Updated Firebase user with UID: %s", user.uid)
         return user
 
-    def generate_password_reset_link(self, tenant_id: str, email: str) -> str:
-        """Generate a password reset link for an existing Firebase user."""
-        auth_client = self._auth_clients.get_auth_client(tenant_id)
-        return auth_client.generate_password_reset_link(email)
-
     def set_custom_claims(
         self,
         tenant_id: str,

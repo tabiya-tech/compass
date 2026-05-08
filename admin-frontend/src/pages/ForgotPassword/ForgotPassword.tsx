@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { getDarkLogoUrl } from "src/envService";
-import { passwordResetService } from "./passwordResetService";
+import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService";
 
 const uniqueId = "forgot-password-page-2e4f6a8b-0c1d-4e3f-5a6b-7c8d9e0f1a2b";
 
@@ -31,9 +31,11 @@ const ForgotPassword: React.FC = () => {
     event.preventDefault();
     setSubmitting(true);
     try {
-      await passwordResetService.requestReset(email.trim());
+      await FirebaseEmailAuthenticationService.getInstance().resetPassword(email.trim());
     } catch {
-      // Best-effort. Backend always returns 204; show neutral success regardless.
+      // Anti-enumeration: show the same neutral success regardless of whether
+      // Firebase recognised the email (auth/user-not-found) or any other
+      // failure. The user is told to check inbox; nothing is leaked.
     } finally {
       setSubmitting(false);
       setSubmitted(true);

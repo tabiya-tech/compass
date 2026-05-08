@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.admin.password_reset import add_password_reset_routes
 from app.admin.registrations import add_admin_registrations_routes
 from app.admin.routes import get_admin_routes
 from app.conversations.routes import add_conversation_routes
@@ -431,11 +430,6 @@ add_user_invitations_routes(app)
 # Add admin self-service registration routes
 ############################################
 add_admin_registrations_routes(app, auth)
-
-############################################
-# Add public password-reset (forgot-password) route
-############################################
-add_password_reset_routes(app)
 
 ############################################
 # Add the jobs routes

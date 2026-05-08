@@ -111,6 +111,25 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   }
 
   /**
+   * Send a password-reset email via Firebase's hosted template.
+   * @param {string} email - Recipient address.
+   * @throws {FirebaseError} If the send fails (e.g. user-not-found, too-many-requests).
+   */
+  async resetPassword(email: string): Promise<void> {
+    const firebaseErrorFactory = getFirebaseErrorFactory("FirebaseEmailAuthService", "resetPassword");
+    try {
+      // No actionCodeSettings: passing a continueUrl forces Firebase's hosted
+      // reset page to load /__/firebase/init.json from the auth domain, which
+      // breaks on dev (auth subdomain Hosting site doesn't serve it; the apex
+      // redirect lacks CORS). After the reset, Firebase's default page links
+      // back to the app — close enough.
+      await firebaseAuth.sendPasswordResetEmail(email);
+    } catch (error) {
+      throw castToFirebaseError(error, firebaseErrorFactory);
+    }
+  }
+
+  /**
    * Clean up any resources used by the authentication service
    */
   async cleanup(): Promise<void> {

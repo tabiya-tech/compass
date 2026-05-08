@@ -36,6 +36,15 @@ jest.mock("src/pages/Register/registrationsService", () => ({
   RegistrationRoleRequest: { ADMIN: "admin", INSTITUTION_STAFF: "institution_staff" },
 }));
 
+jest.mock("src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService", () => ({
+  __esModule: true,
+  default: {
+    getInstance: () => ({
+      resetPassword: jest.fn().mockResolvedValue(undefined),
+    }),
+  },
+}));
+
 jest.mock("src/components/Header/Header", () => () => <div data-testid="mock-header" />);
 jest.mock("src/components/Footer/Footer", () => () => <div data-testid="mock-footer" />);
 jest.mock("./components/CreateUserModal", () => () => <div data-testid="mock-create-modal" />);
