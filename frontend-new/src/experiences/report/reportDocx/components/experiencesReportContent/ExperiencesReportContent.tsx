@@ -1,7 +1,7 @@
 import { Paragraph, TextRun } from "docx";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { COLORS } from "src/experiences/report/util";
 import { ReportConfig } from "src/experiences/report/config/types";
 

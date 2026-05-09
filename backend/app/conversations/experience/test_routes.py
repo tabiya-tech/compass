@@ -222,6 +222,129 @@ class TestExperienceRoutes:
             )
 
         @pytest.mark.asyncio
+        async def test_get_experiences_translates_to_english_when_language_en(
+                self,
+                authenticated_client_with_mocks: TestClientWithMocks,
+                mocker: pytest_mock.MockerFixture):
+            client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+            # GIVEN a valid session and experiences whose summary/title are in Swahili
+            given_session_id = get_random_session_id()
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(given_session_id))
+
+            given_experiences_entities = [(
+                ExperienceEntity(
+                    uuid="uuid-1",
+                    experience_title="Mwalimu",
+                    normalized_experience_title="Mwalimu wa Shule",
+                    company="Shule ya Msingi",
+                    location="Nairobi",
+                    timeline=Timeline(start="2020-01-01", end="2021-01-01"),
+                    work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+                    top_skills=[],
+                    remaining_skills=[],
+                    summary="Mwalimu wa serikali na mwanafunzi"
+                ),
+                DiveInPhase.PROCESSED)
+            ]
+            mocked_service.get_experiences_by_session_id = AsyncMock(return_value=given_experiences_entities)
+
+            # AND the translator is mocked to return English versions
+            mocked_translator = mocker.patch(
+                "app.conversations.experience.routes.translate_experience_text_to_english",
+                new=AsyncMock(return_value=("Government school teacher and student", "School Teacher"))
+            )
+
+            # WHEN the GET request includes ?language=en
+            actual_response = client.get(f"/conversations/{given_session_id}/experiences?language=en")
+
+            # THEN the response is OK and the summary/title are the English versions
+            assert actual_response.status_code == HTTPStatus.OK
+            body = actual_response.json()
+            assert len(body) == 1
+            assert body[0]["summary"] == "Government school teacher and student"
+            assert body[0]["normalized_experience_title"] == "School Teacher"
+
+            # AND the translator was called once per experience with the original strings
+            mocked_translator.assert_awaited_once_with(
+                summary="Mwalimu wa serikali na mwanafunzi",
+                normalized_experience_title="Mwalimu wa Shule",
+            )
+
+        @pytest.mark.asyncio
+        async def test_get_experiences_does_not_translate_without_language_param(
+                self,
+                authenticated_client_with_mocks: TestClientWithMocks,
+                mocker: pytest_mock.MockerFixture):
+            client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+            # GIVEN a valid session and experiences in the user's language
+            given_session_id = get_random_session_id()
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(given_session_id))
+
+            given_experiences_entities = [(
+                ExperienceEntity(
+                    uuid="uuid-1",
+                    experience_title="Mwalimu",
+                    normalized_experience_title="Mwalimu wa Shule",
+                    company="Shule",
+                    location="Nairobi",
+                    timeline=Timeline(start="2020", end="2021"),
+                    work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
+                    top_skills=[],
+                    remaining_skills=[],
+                    summary="Muhtasari kwa Kiswahili"
+                ),
+                DiveInPhase.PROCESSED)
+            ]
+            mocked_service.get_experiences_by_session_id = AsyncMock(return_value=given_experiences_entities)
+
+            # AND the translator is patched so we can assert it is NOT called
+            mocked_translator = mocker.patch(
+                "app.conversations.experience.routes.translate_experience_text_to_english",
+                new=AsyncMock()
+            )
+
+            # WHEN the GET request omits the language param
+            actual_response = client.get(f"/conversations/{given_session_id}/experiences")
+
+            # THEN the response is OK and the original (Swahili) strings are returned untouched
+            assert actual_response.status_code == HTTPStatus.OK
+            body = actual_response.json()
+            assert body[0]["summary"] == "Muhtasari kwa Kiswahili"
+            assert body[0]["normalized_experience_title"] == "Mwalimu wa Shule"
+
+            # AND the translator was never invoked
+            mocked_translator.assert_not_called()
+
+        @pytest.mark.asyncio
+        async def test_get_experiences_translation_with_empty_list_skips_translator(
+                self,
+                authenticated_client_with_mocks: TestClientWithMocks,
+                mocker: pytest_mock.MockerFixture):
+            client, mocked_service, mocked_preferences_repository, _ = authenticated_client_with_mocks
+            # GIVEN a valid session and no experiences
+            given_session_id = get_random_session_id()
+            mocked_preferences_repository.get_user_preference_by_user_id = AsyncMock(
+                return_value=get_mock_user_preferences(given_session_id))
+            mocked_service.get_experiences_by_session_id = AsyncMock(return_value=[])
+
+            mocked_translator = mocker.patch(
+                "app.conversations.experience.routes.translate_experience_text_to_english",
+                new=AsyncMock()
+            )
+
+            # WHEN ?language=en is set
+            actual_response = client.get(f"/conversations/{given_session_id}/experiences?language=en")
+
+            # THEN the response is OK with an empty list
+            assert actual_response.status_code == HTTPStatus.OK
+            assert actual_response.json() == []
+
+            # AND the translator was not called (no experiences to translate)
+            mocked_translator.assert_not_called()
+
+        @pytest.mark.asyncio
         @pytest.mark.parametrize("unedited",
                                  [True, False],
                                  ids=["unedited", "processed"])

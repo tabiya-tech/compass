@@ -1,5 +1,7 @@
 import i18n from "src/i18n/i18n";
 
+// Locale-aware: resolves at call/render time to the user's selected UI language.
+// Used by the in-app experiences drawer (and anywhere outside the report tree).
 export const ReportContent = {
   // Use i18n keys and resolve at call/render time
   get SKILLS_REPORT_TITLE() {
@@ -55,4 +57,53 @@ export const ReportContent = {
     WARNING_ICON: `${process.env.PUBLIC_URL}/warning.png`,
     QUIZ_ICON: `${process.env.PUBLIC_URL}/quiz.png`,
   },
+};
+
+// English-pinned variant. Used by the downloadable Skills Report so the report
+// is always English regardless of the user's selected UI language.
+const enT = (key: string, options?: Record<string, unknown>) =>
+  i18n.getFixedT("en-GB")(key, options as never);
+
+export const ReportContentEnglish = {
+  get SKILLS_REPORT_TITLE() {
+    return enT("experiences.report.skillsReportTitle");
+  },
+  get SKILLS_DESCRIPTION_TITLE() {
+    return enT("experiences.report.skillsDescriptionTitle");
+  },
+  get EXPERIENCES_TITLE() {
+    return enT("experiences.report.experiencesTitle");
+  },
+  get SELF_EMPLOYMENT_TITLE() {
+    return enT("experiences.report.selfEmploymentTitle");
+  },
+  get SALARY_WORK_TITLE() {
+    return enT("experiences.report.salaryWorkTitle");
+  },
+  get UNPAID_WORK_TITLE() {
+    return enT("experiences.report.unpaidWorkTitle");
+  },
+  get TRAINEE_WORK_TITLE() {
+    return enT("experiences.report.traineeWorkTitle");
+  },
+  get UNCATEGORIZED_TITLE() {
+    return enT("experiences.report.uncategorizedTitle");
+  },
+  get TOP_SKILLS_TITLE() {
+    return enT("experiences.report.topSkillsTitle");
+  },
+  get SKILLS_DESCRIPTION_TEXT() {
+    return enT("experiences.report.skillsDescriptionText");
+  },
+  get DISCLAIMER_TEXT_PART1() {
+    return enT("experiences.report.disclaimer.part1");
+  },
+  get DISCLAIMER_TEXT_PART2() {
+    return enT("experiences.report.disclaimer.part2");
+  },
+  get DISCLAIMER_TEXT_PART3() {
+    return enT("experiences.report.disclaimer.part3");
+  },
+  REPORT_BODY_TEXT: (currentDate: string) => enT("experiences.report.bodyText", { date: currentDate }),
+  IMAGE_URLS: ReportContent.IMAGE_URLS,
 };

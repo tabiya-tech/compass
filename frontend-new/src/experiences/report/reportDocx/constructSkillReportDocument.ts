@@ -1,6 +1,6 @@
 import { Document, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { Experience } from "src/experiences/experienceService/experiences.types";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import { COLORS, formatDate, getBase64Image, prettifyText } from "src/experiences/report/util";
 import constructSkillsDescription from "src/experiences/report/reportDocx/components/ConstructSkillsDescription";

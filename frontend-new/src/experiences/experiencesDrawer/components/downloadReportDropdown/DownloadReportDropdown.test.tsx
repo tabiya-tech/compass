@@ -21,6 +21,7 @@ import { EventType } from "src/metrics/types";
 import { MetricsError } from "src/error/commonErrors";
 import { resetAllMethodMocks } from "src/_test_utilities/resetAllMethodMocks";
 import { DownloadFormat, SkillsReportOutputConfig } from "src/experiences/report/config/types";
+import ExperienceService from "src/experiences/experienceService/experienceService";
 
 // mock the DownloadReportButton
 jest.mock("src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton", () => {
@@ -102,6 +103,10 @@ describe("DownloadReportDropdown", () => {
     // As a precaution, we reset all method mocks to ensure that no side effects are carried over between tests
     resetAllMethodMocks(UserPreferencesStateService.getInstance());
     resetAllMethodMocks(AuthenticationStateService.getInstance());
+    resetAllMethodMocks(ExperienceService.getInstance());
+    // By default, the English-only translation fetch returns empty (no overrides),
+    // which causes the dropdown to fall back to the in-memory experiences.
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValue([]);
   });
 
   test("should show the download report dropdown when the button is clicked", async () => {
@@ -186,6 +191,79 @@ describe("DownloadReportDropdown", () => {
       expect(console.warn).not.toHaveBeenCalled();
     }
   );
+
+  test("should fetch English-translated experiences and pass them to the download provider", async () => {
+    // GIVEN there is an active session
+    const givenSessionId = 123;
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValue(givenSessionId);
+    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "u" } as TabiyaUser);
+    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValue();
+
+    // AND ExperienceService returns English-translated versions for each experience
+    const translatedExperiences = mockExperiences.map((exp) => ({
+      ...exp,
+      summary: `EN summary for ${exp.UUID}`,
+      normalized_experience_title: `EN title for ${exp.UUID}`,
+    }));
+    jest
+      .spyOn(ExperienceService.getInstance(), "getExperiences")
+      .mockResolvedValueOnce(translatedExperiences);
+
+    // AND the PDF provider is captured
+    const pdfDownloadSpy = jest.fn().mockResolvedValue(undefined);
+    (PDFReportDownloadProvider as jest.Mock).mockImplementation(() => ({ download: pdfDownloadSpy }));
+
+    // WHEN the user opens the dropdown and clicks PDF
+    render(<DownloadReportDropdown {...mockData} />);
+    await userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER));
+    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
+
+    // THEN the experience service was called with language=en
+    await waitFor(() => {
+      expect(ExperienceService.getInstance().getExperiences).toHaveBeenCalledWith(givenSessionId, false, "en");
+    });
+
+    // AND the download provider received experiences with translated summary/title
+    expect(pdfDownloadSpy).toHaveBeenCalledTimes(1);
+    const downloadArgs = pdfDownloadSpy.mock.calls[0][0];
+    expect(downloadArgs.experiences).toHaveLength(mockExperiences.length);
+    downloadArgs.experiences.forEach((exp: { UUID: string; summary: string; normalized_experience_title: string }) => {
+      expect(exp.summary).toBe(`EN summary for ${exp.UUID}`);
+      expect(exp.normalized_experience_title).toBe(`EN title for ${exp.UUID}`);
+    });
+  });
+
+  test("should fall back to original experiences when translation fetch fails", async () => {
+    // GIVEN there is an active session
+    jest.spyOn(UserPreferencesStateService.getInstance(), "getActiveSessionId").mockReturnValue(123);
+    jest.spyOn(AuthenticationStateService.getInstance(), "getUser").mockReturnValue({ id: "u" } as TabiyaUser);
+    jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValue();
+
+    // AND the translation fetch fails
+    jest
+      .spyOn(ExperienceService.getInstance(), "getExperiences")
+      .mockRejectedValueOnce(new Error("network down"));
+
+    const pdfDownloadSpy = jest.fn().mockResolvedValue(undefined);
+    (PDFReportDownloadProvider as jest.Mock).mockImplementation(() => ({ download: pdfDownloadSpy }));
+
+    // WHEN the user clicks PDF
+    render(<DownloadReportDropdown {...mockData} />);
+    await userEvent.click(screen.getByTestId(DOWNLOAD_BUTTON_DATA_TEST_ID.DOWNLOAD_REPORT_BUTTON_CONTAINER));
+    await userEvent.click(screen.getByTestId(MENU_ITEM_ID.PDF));
+
+    // THEN the download still happens, with the original (untranslated) experiences
+    await waitFor(() => {
+      expect(pdfDownloadSpy).toHaveBeenCalledTimes(1);
+    });
+    const downloadArgs = pdfDownloadSpy.mock.calls[0][0];
+    expect(downloadArgs.experiences).toEqual(mockExperiences);
+    // AND a translation-failure error was logged
+    expect(console.error).toHaveBeenCalledWith(
+      "Failed to translate experiences for English-only report",
+      expect.any(Error)
+    );
+  });
 
   test("should handle error when downloading Report", async () => {
     // GIVEN the download will fail

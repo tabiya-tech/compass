@@ -14,6 +14,8 @@ import { MetricsError } from "src/error/commonErrors";
 import UserPreferencesStateService from "src/userPreferences/UserPreferencesStateService";
 import { DownloadFormat, SkillsReportOutputConfig } from "src/experiences/report/config/types";
 import { getSkillsReportOutputConfig } from "src/experiences/report/config/getConfig";
+import ExperienceService from "src/experiences/experienceService/experienceService";
+import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 
 interface DownloadReportDropdownProps {
   name: string;
@@ -45,36 +47,65 @@ export const MENU_ITEM_TEXT = {
 
 const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) => {
   const isOnline = useContext(IsOnlineContext);
+  const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const reportProps = {
-    name: props.name,
-    email: props.email,
-    phone: props.phone,
-    address: props.address,
-    experiences: props.experiences,
-    // if the conversation conducted at is somehow null, use the current date
-    conversationConductedAt: props.conversationConductedAt ?? new Date().toISOString(),
-  };
 
   const outputConfig = props.outputConfig ?? getSkillsReportOutputConfig();
   const docxsReportProvider = new DocxReportDownloadProvider(outputConfig);
   const pdfReportProvider = new PDFReportDownloadProvider(outputConfig);
+
+  // Returns experiences with `summary` and `normalized_experience_title` translated to English.
+  // Falls back to the in-memory experiences if the fetch fails so the report still downloads.
+  const getEnglishExperiences = async (sessionId: number | null): Promise<Experience[]> => {
+    if (!sessionId) {
+      return props.experiences;
+    }
+
+    try {
+      const translated = await ExperienceService.getInstance().getExperiences(sessionId, false, "en");
+      const byUuid = new Map(translated.map((exp) => [exp.UUID, exp]));
+      return props.experiences.map((exp) => {
+        const t = byUuid.get(exp.UUID);
+        if (!t) return exp;
+        return {
+          ...exp,
+          summary: t.summary ?? exp.summary,
+          normalized_experience_title: t.normalized_experience_title ?? exp.normalized_experience_title,
+        };
+      });
+    } catch (error) {
+      console.error("Failed to translate experiences for English-only report", error);
+      enqueueSnackbar(
+        "Could not translate the report to English. Downloading in the original language instead.",
+        { variant: "warning" }
+      );
+      return props.experiences;
+    }
+  };
 
   const handleDownload = async (
     downloadProvider: { download: (props: ReportProps) => Promise<void> },
     downloadFormat: CVFormat
   ) => {
     setIsLoading(true);
+    const sessionId = UserPreferencesStateService.getInstance().getActiveSessionId();
     try {
-      await downloadProvider.download(reportProps);
+      const englishExperiences = await getEnglishExperiences(sessionId);
+      await downloadProvider.download({
+        name: props.name,
+        email: props.email,
+        phone: props.phone,
+        address: props.address,
+        experiences: englishExperiences,
+        conversationConductedAt: props.conversationConductedAt ?? new Date().toISOString(),
+      });
     } catch (error) {
       console.error("Error downloading report", error);
     } finally {
       setIsLoading(false);
       const user_id = AuthenticationStateService.getInstance().getUser()?.id;
-      const session_id = UserPreferencesStateService.getInstance().getActiveSessionId();
+      const session_id = sessionId;
 
       if (user_id && session_id) {
         MetricsService.getInstance().sendMetricsEvent({

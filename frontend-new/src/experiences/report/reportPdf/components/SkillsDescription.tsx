@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text } from "@react-pdf/renderer";
 import styles from "src/experiences/report/reportPdf/styles";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 
 interface SkillsDescriptionProps {
   skillsList: { UUID: string; preferredLabel: string; description: string }[];

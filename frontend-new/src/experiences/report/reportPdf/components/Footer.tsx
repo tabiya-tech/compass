@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "src/experiences/report/reportPdf/styles";
 import { View, Text, Image } from "@react-pdf/renderer";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { getBase64Image } from "src/experiences/report/util";
 

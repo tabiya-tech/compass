@@ -1,6 +1,6 @@
 import { Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { Skill, Experience } from "src/experiences/experienceService/experiences.types";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { capitalizeFirstLetter } from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import { getUniqueSkills } from "src/experiences/report/util";

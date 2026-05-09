@@ -1,6 +1,7 @@
+import asyncio
 import logging
 from http import HTTPStatus
-from typing import List, Annotated
+from typing import List, Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
@@ -8,6 +9,7 @@ from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
 from app.conversations.constants import UNEXPECTED_FAILURE_MESSAGE
 from app.conversations.experience._types import ExperienceResponse, UpdateExperienceRequest
+from app.conversations.experience.experience_translator import translate_experience_text_to_english
 from app.conversations.experience.get_experience_service import get_experience_service
 from app.conversations.experience.service import ExperienceNotFoundError, ExperienceService, IExperienceService
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
@@ -37,6 +39,11 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
         int, Path(description="The session id for the conversation history.", examples=[123])],
                                deleted: Annotated[bool, Query(description="Weather to return deleted experiences",
                                                               examples=[True])] = False,
+                               language: Annotated[Optional[str], Query(
+                                   description="If set to 'en', translate summary and "
+                                               "normalized_experience_title to English before returning. "
+                                               "Used for English-only Skills Report generation.",
+                                   examples=["en"])] = None,
                                user_info: UserInfo = Depends(authentication.get_user_info()),
                                user_preferences_repository=Depends(get_user_preferences_repository),
                                service: ExperienceService = Depends(get_experience_service)
@@ -69,10 +76,24 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
             # Convert to a list for easier processing
             experiences_list = list(experience_entity_list)
 
-            return [ExperienceResponse.from_experience_entity(
+            responses = [ExperienceResponse.from_experience_entity(
                 experience_entity=experience_entity,
                 dive_in_phase=dive_in_phase
             ) for experience_entity, dive_in_phase in experiences_list]
+
+            if language == "en" and responses:
+                translations = await asyncio.gather(*[
+                    translate_experience_text_to_english(
+                        summary=resp.summary,
+                        normalized_experience_title=resp.normalized_experience_title,
+                    )
+                    for resp in responses
+                ])
+                for resp, (summary_en, title_en) in zip(responses, translations):
+                    resp.summary = summary_en
+                    resp.normalized_experience_title = title_en
+
+            return responses
 
         except UnauthorizedSessionAccessError as e:
             warning_msg = str(e)

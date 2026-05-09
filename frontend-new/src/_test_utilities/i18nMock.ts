@@ -118,6 +118,9 @@ jest.mock("react-i18next", () => {
 jest.mock("src/i18n/i18n", () => {
   const mock = {
     t: stableT,
+    // Mock translations are already English-only, so getFixedT returns the same stableT
+    // regardless of the requested locale.
+    getFixedT: () => stableT,
     use: jest.fn().mockReturnThis(),
     init: jest.fn().mockReturnThis(),
   };

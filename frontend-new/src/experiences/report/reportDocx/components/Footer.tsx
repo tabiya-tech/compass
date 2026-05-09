@@ -1,4 +1,4 @@
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { Footer, Paragraph, ImageRun, AlignmentType, TextRun, PageNumber, BorderStyle } from "docx";
 import { COLORS, getBase64Image } from "src/experiences/report/util";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";

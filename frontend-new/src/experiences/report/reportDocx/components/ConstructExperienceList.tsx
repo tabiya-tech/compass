@@ -2,7 +2,7 @@ import { Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from "docx"
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { generateExperience } from "./experiencesReportContent/ExperiencesReportContent";
 import { COLORS, getBase64Image, groupExperiencesByWorkType } from "src/experiences/report/util";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import { TabiyaBasicColors } from "src/theme/applicationTheme/applicationTheme";
 import { ReportConfig } from "src/experiences/report/config/types";
 

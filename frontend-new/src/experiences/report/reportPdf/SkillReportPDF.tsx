@@ -8,7 +8,7 @@ import {
   groupExperiencesByWorkType,
   prettifyText,
 } from "src/experiences/report/util";
-import { ReportContent } from "src/experiences/report/reportContent";
+import { ReportContentEnglish as ReportContent } from "src/experiences/report/reportContent";
 import Footer from "src/experiences/report/reportPdf/components/Footer";
 import ExperiencesReportContent from "src/experiences/report/reportPdf/components/experiencesReportContent/ExperiencesReportContent";
 import SkillsDescription from "src/experiences/report/reportPdf/components/SkillsDescription";
