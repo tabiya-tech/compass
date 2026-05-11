@@ -1,18 +1,18 @@
 {
   "branding": {
-    "appName": "Compass",
-    "browserTabTitle": "Compass",
-    "metaDescription": "Welcome to Compass! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities.",
+    "appName": "Njila",
+    "browserTabTitle": "Njila",
+    "metaDescription": "Welcome to Njila! An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities.",
     "seo": {
-      "name": "Compass",
-      "url": "https://www.example.org/compass",
+      "name": "Njila",
+      "url": "https://njila.ai",
       "image": "https://www.example.org/assets/logo.svg",
-      "description": "Compass is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Compass guides users to identify abilities gained through all types of work-formal, informal, and unpaid. It creates standardized digital profiles that can connect to opportunities."
+      "description": "Njila is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Njila guides users to identify abilities gained through all types of work-formal, informal, and unpaid. It creates standardized digital profiles that can connect to opportunities."
     },
     "assets": {
       "logo": "/logo.svg",
       "favicon": "/favicon.svg",
-      "appIcon": "/compass.svg"
+      "appIcon": "/njila-logo.svg"
     },
     "theme": {
       "brand-primary": "0 255 145",
