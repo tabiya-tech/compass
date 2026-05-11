@@ -46,7 +46,7 @@ exports[`AddSkillsDrawer should render component successfully 1`] = `
         class="MuiTypography-root MuiTypography-body2 css-1j9lmhu-MuiTypography-root"
         data-testid="skills-drawer-subtitle-82681361-b582-4dc3-8129-63f3f0f66eee"
       >
-        These are additional top skills identified by Compass based on your experience.
+        These are additional top skills identified by Njila based on your experience.
       </p>
     </div>
     <div
