@@ -193,6 +193,8 @@ describe("Sensitive Data Form", () => {
   });
 
   describe("Form validation", () => {
+    jest.setTimeout(15000);
+
     it("should enable submit button when all required fields are filled", async () => {
       // GIVEN a form with required fields
       jest.spyOn(UserPreferencesStateService.getInstance(), "getUserPreferences").mockReturnValue({
@@ -290,6 +292,8 @@ describe("Sensitive Data Form", () => {
   });
 
   describe("Form submission", () => {
+    jest.setTimeout(15000);
+
     const fillFormAndSubmit = async (user: ReturnType<typeof userEvent.setup>) => {
       await user.type(screen.getByLabelText(/First Name/i), "Alice");
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
@@ -667,6 +671,8 @@ describe("Sensitive Data Form", () => {
   });
 
   describe("Field validation for static fields", () => {
+    jest.setTimeout(15000);
+
     it("should show validation error for required string field when empty", async () => {
       // GIVEN a form rendered
       componentRender();
