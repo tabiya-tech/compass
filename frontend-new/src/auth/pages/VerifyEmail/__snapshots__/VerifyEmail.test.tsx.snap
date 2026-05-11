@@ -2,19 +2,57 @@
 
 exports[`Testing Verify Email component it should show verification page 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-iipt8s-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthSm MuiContainer-disableGutters css-1m56onv-MuiContainer-root"
   data-testid="verification-container-f1228c6a-e447-4946-b810-0c7ddc8ca833"
 >
+  <img
+    alt=""
+    class="MuiBox-root css-1rh8jvd"
+    src="/runner.svg"
+  />
   <div
-    class="MuiBox-root css-9ruuu9"
+    class="MuiBox-root css-79irh3"
   >
-    <span
-      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
-    />
+    <div
+      class="MuiBox-root css-js25am"
+      data-testid="verification-sent-badge-f1228c6a-e447-4946-b810-0c7ddc8ca833"
+    >
+      <div
+        class="MuiBox-root css-if1ah6"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-1uy2yf2-MuiSvgIcon-root"
+          data-testid="MailOutlineRoundedIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m-1 14H5c-.55 0-1-.45-1-1V8l6.94 4.34c.65.41 1.47.41 2.12 0L20 8v9c0 .55-.45 1-1 1m-7-7L4 6h16z"
+          />
+        </svg>
+      </div>
+      Verification email sent
+    </div>
+    <div
+      class="MuiBox-root css-0"
+    >
+      <h1
+        class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-1lre3s8-MuiTypography-root"
+        data-testid="verification-title-f1228c6a-e447-4946-b810-0c7ddc8ca833"
+      >
+        Thank you for registering to {{appName}}.
+      </h1>
+      <p
+        class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
+        data-testid="verification-body-f1228c6a-e447-4946-b810-0c7ddc8ca833"
+      >
+        A verification email has been sent to your email address. To continue, please verify your email address first.
+      </p>
+    </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-jzvid6-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-im8o9s-MuiButtonBase-root-MuiButton-root"
       data-testid="verification-back-to-login-button-f1228c6a-e447-4946-b810-0c7ddc8ca833"
-      style="margin-top: 16px;"
       tabindex="0"
       type="button"
     >

@@ -2,141 +2,82 @@
 
 exports[`Sensitive Data Form Rendering static fields should render First Name, Last Name, Institution, Programme, School Year fields 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-t5197c-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthSm MuiContainer-disableGutters css-1ynybr2-MuiContainer-root"
   data-testid="sensitive-data-container-ab02918f-d559-47ba-9662-ea6b3a3606d1"
 >
   <div
-    class="MuiBox-root css-1idwkqh"
+    class="MuiBox-root css-1tptax6"
   >
     <div
-      class="MuiBox-root css-jwp3xc"
-      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
+      class="MuiBox-root css-1idwkqh"
     >
-      <div
-        class="MuiBox-root css-1vd84sn"
-      >
-        <img
-          alt="Logo"
-          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
-          src="mock-logo-url"
-          style="max-width: 60%; margin: 5% 10%;"
-        />
-      </div>
-      <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-k6bshe-MuiTypography-root"
-        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
-      >
-        Provide Your Information
-      </h4>
       <div
         class="MuiBox-root css-0"
-        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
       >
-        We use your data to personalize your experience and may contact you about {{appName}}.
-         You can skip this step.
+        <h1
+          class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-1lre3s8-MuiTypography-root"
+        >
+          Provide Your Information
+        </h1>
+        <p
+          class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
+        >
+          We use your data to personalize your experience and may contact you about {{appName}}.
+           You can skip this step.
+        </p>
       </div>
-    </div>
-    <div
-      class="MuiBox-root css-1tcf7lu"
-    >
       <div
-        class="MuiBox-root css-yd8sa2"
+        class="MuiBox-root css-1tcf7lu"
       >
         <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
+          class="MuiBox-root css-yd8sa2"
         >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r1:"
-            id=":r1:-label"
-          >
-            First Name
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
           <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-rdckqg-MuiInputBase-root-MuiOutlinedInput-root"
+            class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
           >
-            <input
-              aria-invalid="false"
-              autocomplete="given-name"
-              class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r1:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+            <label
+              class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
+              data-shrink="false"
+              for=":r2:"
+              id=":r2:-label"
             >
-              <legend
-                class="css-1n64csd-MuiNotchedOutlined-root"
+              First Name
+              <span
+                aria-hidden="true"
+                class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
               >
-                <span>
-                  First Name
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
-          </div>
-        </div>
-        <div
-          class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
-        >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            for=":r2:"
-            id=":r2:-label"
-          >
-            Last Name
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
+                 
+                *
+              </span>
+            </label>
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-rdckqg-MuiInputBase-root-MuiOutlinedInput-root"
             >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-rdckqg-MuiInputBase-root-MuiOutlinedInput-root"
-          >
-            <input
-              aria-invalid="false"
-              autocomplete="family-name"
-              class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
-              id=":r2:"
-              required=""
-              type="text"
-              value=""
-            />
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-1n64csd-MuiNotchedOutlined-root"
+              <input
+                aria-invalid="false"
+                autocomplete="given-name"
+                class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
+                id=":r2:"
+                required=""
+                type="text"
+                value=""
+              />
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
               >
-                <span>
-                  Last Name
-                   
-                  *
-                </span>
-              </legend>
-            </fieldset>
+                <legend
+                  class="css-1n64csd-MuiNotchedOutlined-root"
+                >
+                  <span>
+                    First Name
+                     
+                    *
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
-        </div>
-        <div
-          class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-1tlcqt-MuiAutocomplete-root"
-        >
           <div
             class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
           >
@@ -146,7 +87,7 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
               for=":r3:"
               id=":r3:-label"
             >
-              Institution
+              Last Name
               <span
                 aria-hidden="true"
                 class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
@@ -156,46 +97,17 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
               </span>
             </label>
             <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-tyiq0s-MuiInputBase-root-MuiOutlinedInput-root"
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-rdckqg-MuiInputBase-root-MuiOutlinedInput-root"
             >
               <input
-                aria-autocomplete="list"
-                aria-expanded="false"
                 aria-invalid="false"
-                autocapitalize="none"
-                autocomplete="off"
-                class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-8x9d5a-MuiInputBase-input-MuiOutlinedInput-input"
+                autocomplete="family-name"
+                class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
                 id=":r3:"
-                placeholder="Start typing to search..."
                 required=""
-                role="combobox"
-                spellcheck="false"
                 type="text"
                 value=""
               />
-              <div
-                class="MuiAutocomplete-endAdornment css-1uhhrmm-MuiAutocomplete-endAdornment"
-              >
-                <button
-                  aria-label="Open"
-                  class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium MuiAutocomplete-popupIndicator css-wfl6dq-MuiButtonBase-root-MuiIconButton-root-MuiAutocomplete-popupIndicator"
-                  tabindex="-1"
-                  title="Open"
-                  type="button"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
-                    data-testid="ArrowDropDownIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M7 10l5 5 5-5z"
-                    />
-                  </svg>
-                </button>
-              </div>
               <fieldset
                 aria-hidden="true"
                 class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
@@ -204,7 +116,7 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
                   class="css-1n64csd-MuiNotchedOutlined-root"
                 >
                   <span>
-                    Institution
+                    Last Name
                      
                     *
                   </span>
@@ -212,180 +124,274 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
               </fieldset>
             </div>
           </div>
-        </div>
-        <div
-          class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-1tlcqt-MuiAutocomplete-root"
-        >
           <div
-            class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
-          >
-            <label
-              class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-disabled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
-              data-shrink="false"
-              for=":r6:"
-              id=":r6:-label"
-            >
-              Programme
-              <span
-                aria-hidden="true"
-                class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
-              >
-                 
-                *
-              </span>
-            </label>
-            <div
-              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-disabled MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-tyiq0s-MuiInputBase-root-MuiOutlinedInput-root"
-            >
-              <input
-                aria-autocomplete="list"
-                aria-expanded="false"
-                aria-invalid="false"
-                autocapitalize="none"
-                autocomplete="off"
-                class="MuiInputBase-input MuiOutlinedInput-input Mui-disabled MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-8x9d5a-MuiInputBase-input-MuiOutlinedInput-input"
-                disabled=""
-                id=":r6:"
-                placeholder="Select an institution first"
-                required=""
-                role="combobox"
-                spellcheck="false"
-                type="text"
-                value=""
-              />
-              <div
-                class="MuiAutocomplete-endAdornment css-1uhhrmm-MuiAutocomplete-endAdornment"
-              >
-                <button
-                  aria-label="Open"
-                  class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium MuiAutocomplete-popupIndicator css-wfl6dq-MuiButtonBase-root-MuiIconButton-root-MuiAutocomplete-popupIndicator"
-                  disabled=""
-                  tabindex="-1"
-                  title="Open"
-                  type="button"
-                >
-                  <svg
-                    aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
-                    data-testid="ArrowDropDownIcon"
-                    focusable="false"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M7 10l5 5 5-5z"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <fieldset
-                aria-hidden="true"
-                class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-              >
-                <legend
-                  class="css-1n64csd-MuiNotchedOutlined-root"
-                >
-                  <span>
-                    Programme
-                     
-                    *
-                  </span>
-                </legend>
-              </fieldset>
-            </div>
-          </div>
-        </div>
-        <div
-          class="MuiFormControl-root MuiFormControl-fullWidth css-11rpdry-MuiFormControl-root"
-        >
-          <label
-            class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
-            data-shrink="false"
-            id="school-year-label"
-          >
-            School Year
-            <span
-              aria-hidden="true"
-              class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
-            >
-               
-              *
-            </span>
-          </label>
-          <div
-            class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiSelect-root css-1kjolvi-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root"
+            class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-1tlcqt-MuiAutocomplete-root"
           >
             <div
-              aria-expanded="false"
-              aria-haspopup="listbox"
-              aria-labelledby="school-year-label"
-              aria-required="true"
-              class="MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input css-1ir8pkk-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input"
-              data-testid="sensitive-data-school-year-select-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-              role="combobox"
-              tabindex="0"
+              class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
             >
-              <span
-                aria-hidden="true"
-                class="notranslate"
+              <label
+                class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
+                data-shrink="false"
+                for=":r4:"
+                id=":r4:-label"
               >
-                ​
-              </span>
-            </div>
-            <input
-              aria-hidden="true"
-              aria-invalid="false"
-              class="MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput"
-              required=""
-              tabindex="-1"
-              value=""
-            />
-            <svg
-              aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-dfnomm-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon"
-              data-testid="ArrowDropDownIcon"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M7 10l5 5 5-5z"
-              />
-            </svg>
-            <fieldset
-              aria-hidden="true"
-              class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
-            >
-              <legend
-                class="css-1n64csd-MuiNotchedOutlined-root"
-              >
-                <span>
-                  School Year
+                Institution
+                <span
+                  aria-hidden="true"
+                  class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
+                >
                    
                   *
                 </span>
-              </legend>
-            </fieldset>
+              </label>
+              <div
+                class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-tyiq0s-MuiInputBase-root-MuiOutlinedInput-root"
+              >
+                <input
+                  aria-autocomplete="list"
+                  aria-expanded="false"
+                  aria-invalid="false"
+                  autocapitalize="none"
+                  autocomplete="off"
+                  class="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-8x9d5a-MuiInputBase-input-MuiOutlinedInput-input"
+                  id=":r4:"
+                  placeholder="Start typing to search..."
+                  required=""
+                  role="combobox"
+                  spellcheck="false"
+                  type="text"
+                  value=""
+                />
+                <div
+                  class="MuiAutocomplete-endAdornment css-1uhhrmm-MuiAutocomplete-endAdornment"
+                >
+                  <button
+                    aria-label="Open"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium MuiAutocomplete-popupIndicator css-wfl6dq-MuiButtonBase-root-MuiIconButton-root-MuiAutocomplete-popupIndicator"
+                    tabindex="-1"
+                    title="Open"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
+                      data-testid="ArrowDropDownIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M7 10l5 5 5-5z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <fieldset
+                  aria-hidden="true"
+                  class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+                >
+                  <legend
+                    class="css-1n64csd-MuiNotchedOutlined-root"
+                  >
+                    <span>
+                      Institution
+                       
+                      *
+                    </span>
+                  </legend>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div
+            class="MuiAutocomplete-root MuiAutocomplete-hasPopupIcon css-1tlcqt-MuiAutocomplete-root"
+          >
+            <div
+              class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-iqf2tr-MuiFormControl-root-MuiTextField-root"
+            >
+              <label
+                class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-disabled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
+                data-shrink="false"
+                for=":r7:"
+                id=":r7:-label"
+              >
+                Programme
+                <span
+                  aria-hidden="true"
+                  class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
+                >
+                   
+                  *
+                </span>
+              </label>
+              <div
+                class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary Mui-disabled MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd MuiAutocomplete-inputRoot css-tyiq0s-MuiInputBase-root-MuiOutlinedInput-root"
+              >
+                <input
+                  aria-autocomplete="list"
+                  aria-expanded="false"
+                  aria-invalid="false"
+                  autocapitalize="none"
+                  autocomplete="off"
+                  class="MuiInputBase-input MuiOutlinedInput-input Mui-disabled MuiInputBase-inputAdornedEnd MuiAutocomplete-input MuiAutocomplete-inputFocused css-8x9d5a-MuiInputBase-input-MuiOutlinedInput-input"
+                  disabled=""
+                  id=":r7:"
+                  placeholder="Select an institution first"
+                  required=""
+                  role="combobox"
+                  spellcheck="false"
+                  type="text"
+                  value=""
+                />
+                <div
+                  class="MuiAutocomplete-endAdornment css-1uhhrmm-MuiAutocomplete-endAdornment"
+                >
+                  <button
+                    aria-label="Open"
+                    class="MuiButtonBase-root Mui-disabled MuiIconButton-root Mui-disabled MuiIconButton-sizeMedium MuiAutocomplete-popupIndicator css-wfl6dq-MuiButtonBase-root-MuiIconButton-root-MuiAutocomplete-popupIndicator"
+                    disabled=""
+                    tabindex="-1"
+                    title="Open"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
+                      data-testid="ArrowDropDownIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M7 10l5 5 5-5z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <fieldset
+                  aria-hidden="true"
+                  class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+                >
+                  <legend
+                    class="css-1n64csd-MuiNotchedOutlined-root"
+                  >
+                    <span>
+                      Programme
+                       
+                      *
+                    </span>
+                  </legend>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+          <div
+            class="MuiFormControl-root MuiFormControl-fullWidth css-11rpdry-MuiFormControl-root"
+          >
+            <label
+              class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined MuiFormLabel-colorPrimary Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-outlined css-utjiy8-MuiFormLabel-root-MuiInputLabel-root"
+              data-shrink="false"
+              id="school-year-label"
+            >
+              School Year
+              <span
+                aria-hidden="true"
+                class="MuiFormLabel-asterisk MuiInputLabel-asterisk css-gvy03r-MuiFormLabel-asterisk"
+              >
+                 
+                *
+              </span>
+            </label>
+            <div
+              class="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiSelect-root css-1kjolvi-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root"
+            >
+              <div
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                aria-labelledby="school-year-label"
+                aria-required="true"
+                class="MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input css-1ir8pkk-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input"
+                data-testid="sensitive-data-school-year-select-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+                role="combobox"
+                tabindex="0"
+              >
+                <span
+                  aria-hidden="true"
+                  class="notranslate"
+                >
+                  ​
+                </span>
+              </div>
+              <input
+                aria-hidden="true"
+                aria-invalid="false"
+                class="MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput"
+                required=""
+                tabindex="-1"
+                value=""
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-dfnomm-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon"
+                data-testid="ArrowDropDownIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M7 10l5 5 5-5z"
+                />
+              </svg>
+              <fieldset
+                aria-hidden="true"
+                class="MuiOutlinedInput-notchedOutline css-1ohs4y1-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline"
+              >
+                <legend
+                  class="css-1n64csd-MuiNotchedOutlined-root"
+                >
+                  <span>
+                    School Year
+                     
+                    *
+                  </span>
+                </legend>
+              </fieldset>
+            </div>
           </div>
         </div>
-      </div>
-      <div
-        class="MuiBox-root css-sprkkq"
-      >
-        <a
-          aria-disabled="false"
-          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
-          data-testid="sensitive-data-skip-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+        <div
+          class="MuiBox-root css-ozb9gj"
         >
-          Skip
-        </a>
-        <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1dobt1y-MuiButtonBase-root-MuiButton-root"
-          data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
-          disabled=""
-          tabindex="-1"
-          type="button"
-        >
-          Start conversation
-        </button>
+          <a
+            aria-disabled="false"
+            class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1drfi9t-MuiTypography-root-MuiLink-root"
+            data-testid="sensitive-data-skip-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+          >
+            Skip
+          </a>
+          <button
+            class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-52k4rr-MuiButtonBase-root-MuiButton-root"
+            data-testid="sensitive-data-form-button-ab02918f-d559-47ba-9662-ea6b3a3606d1"
+            disabled=""
+            tabindex="-1"
+            type="button"
+          >
+            Start conversation
+            <div
+              class="MuiBox-root css-f2dt27"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1rwg863-MuiSvgIcon-root"
+                data-testid="ArrowForwardIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </div>

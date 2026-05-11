@@ -2,236 +2,170 @@
 
 exports[`Testing Consent Page render tests it should show consent screen with both agreements 1`] = `
 <div
-  class="MuiContainer-root MuiContainer-maxWidthXs css-t5197c-MuiContainer-root"
+  class="MuiContainer-root MuiContainer-maxWidthSm MuiContainer-disableGutters css-1ynybr2-MuiContainer-root"
   data-testid="consent-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
 >
   <div
-    aria-hidden="true"
-    class="MuiBackdrop-root css-141wtso-MuiBackdrop-root"
-    data-testid="backdrop-91b57774-d50c-4350-882d-363f80ac10e8"
-    style="opacity: 0; visibility: hidden;"
-  >
-    <div
-      class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation24 css-1ronkt8-MuiPaper-root"
-      style="--Paper-shadow: var(--mui-shadows-24);"
-    >
-      <div
-        class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-row css-r4xq4e-MuiGrid-root"
-      >
-        <div
-          class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
-        >
-          <h6
-            class="MuiTypography-root MuiTypography-h6 css-143jn3d-MuiTypography-root"
-            data-testid="message-91b57774-d50c-4350-882d-363f80ac10e8"
-          >
-            Logging you out...
-          </h6>
-        </div>
-        <div
-          class="MuiGrid-root MuiGrid-direction-xs-row css-17fpwt7-MuiGrid-root"
-          style="line-height: 0;"
-        >
-          <span
-            class="MuiCircularProgress-root MuiCircularProgress-indeterminate MuiCircularProgress-colorPrimary css-tka88f-MuiCircularProgress-root"
-            data-testid="progress-91b57774-d50c-4350-882d-363f80ac10e8"
-            role="progressbar"
-            style="width: 32px; height: 32px;"
-          >
-            <svg
-              class="MuiCircularProgress-svg css-54pwck-MuiCircularProgress-svg"
-              viewBox="22 22 44 44"
-            >
-              <circle
-                class="MuiCircularProgress-circle MuiCircularProgress-circleIndeterminate css-19t5dcl-MuiCircularProgress-circle"
-                cx="44"
-                cy="44"
-                fill="none"
-                r="20.2"
-                stroke-width="3.6"
-              />
-            </svg>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div
-    class="MuiBox-root css-jwp3xc"
+    class="MuiBox-root css-1tptax6"
   >
     <div
       class="MuiBox-root css-jwp3xc"
-      data-testid="auth-header-container-40374529-6e2c-49d8-81d7-93f01603a648"
     >
-      <div
-        class="MuiBox-root css-1vd84sn"
-      >
-        <img
-          alt="Logo"
-          data-testid="auth-header-logo-40374529-6e2c-49d8-81d7-93f01603a648"
-          src="mock-logo-url"
-          style="max-width: 60%; margin: 5% 10%;"
-        />
-      </div>
-      <h4
-        class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-k6bshe-MuiTypography-root"
-        data-testid="auth-header-title-40374529-6e2c-49d8-81d7-93f01603a648"
+      <h1
+        class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-1lre3s8-MuiTypography-root"
+        data-testid="consent-title-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
       >
         Before we begin...
-      </h4>
+      </h1>
       <div
-        class="MuiBox-root css-0"
-        data-testid="auth-header-title=40374529-6e2c-49d8-81d7-93f01603a648"
-      />
-    </div>
-    <div
-      class="MuiBox-root css-25rt61"
-    >
-      <p
-        class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-c7ofqp-MuiTypography-root"
-        data-testid="consent-agreement-body-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+        class="MuiBox-root css-25rt61"
       >
-        We created this AI tool for you with care to help you and other young people like you explore their skills and discover new opportunities.
-        <br />
-        <br />
-        <span
-          class="css-1ty5jm0"
+        <p
+          class="MuiTypography-root MuiTypography-body2 MuiTypography-gutterBottom css-c7ofqp-MuiTypography-root"
+          data-testid="consent-agreement-body-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
         >
-          Please use AI responsibly!
-        </span>
-        <br />
-        <br />
-        AI technology is new and far from perfect. It doesn't understand context like humans do.
-        <br />
-        <br />
-        Always double-check important details and avoid sharing personal information about yourself and others with the AI during the conversation.
-        <br />
-        <br />
-        Help us keep all AI interactions safe and positive! 😊
-      </p>
-      <div
-        class="MuiBox-root css-125zsqf"
-      >
-        <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ptu2ng-MuiFormControlLabel-root"
-        >
+          We created this AI tool for you with care to help you and other young people like you explore their skills and discover new opportunities.
+          <br />
+          <br />
           <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
-            data-testid="consent-accept-tc-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+            class="css-1w5vmfg"
           >
-            <input
-              aria-label="Terms and Conditions"
-              class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
-              data-indeterminate="false"
-              type="checkbox"
-            />
-            <svg
-              aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
-              data-testid="CheckBoxOutlineBlankIcon"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
-              />
-            </svg>
+            Please use AI responsibly!
           </span>
-          <p
-            class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
-            data-testid="consent-accept-tc-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-          >
-            I have read and accept the 
-            <a
-              aria-disabled="false"
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
-            >
-              Terms and Conditions
-            </a>
-             of {{appName}}.
-          </p>
-        </label>
-        <label
-          class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ptu2ng-MuiFormControlLabel-root"
-        >
-          <span
-            class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
-            data-testid="consent-accept-consent-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-          >
-            <input
-              aria-label="Privacy Policy"
-              class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
-              data-indeterminate="false"
-              type="checkbox"
-            />
-            <svg
-              aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
-              data-testid="CheckBoxOutlineBlankIcon"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
-              />
-            </svg>
-          </span>
-          <p
-            class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
-            data-testid="consent-accept-consent-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-          >
-            I have read and accept the 
-            <a
-              aria-disabled="false"
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
-            >
-              Privacy Policy
-            </a>
-             of {{appName}}.
-          </p>
-        </label>
-      </div>
-      <p
-        class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
-      >
-        Are you ready to start?
-        <br />
-      </p>
-    </div>
-    <div
-      class="MuiBox-root css-1gjlffp"
-    >
-      <a
-        aria-disabled="false"
-        class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
-        data-testid="consent-reject-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-      >
-        No, thank you
-      </a>
-      <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-jzvid6-MuiButtonBase-root-MuiButton-root"
-        data-testid="consent-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
-        disabled=""
-        tabindex="-1"
-        type="button"
-      >
-        Sure, I am ready
+          <br />
+          <br />
+          AI technology is new and far from perfect. It doesn't understand context like humans do.
+          <br />
+          <br />
+          Always double-check important details and avoid sharing personal information about yourself and others with the AI during the conversation.
+          <br />
+          <br />
+          Help us keep all AI interactions safe and positive! 😊
+        </p>
         <div
-          class="MuiBox-root css-f2dt27"
+          class="MuiBox-root css-125zsqf"
         >
-          <svg
-            aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1rwg863-MuiSvgIcon-root"
-            data-testid="ArrowForwardIcon"
-            focusable="false"
-            viewBox="0 0 24 24"
+          <label
+            class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ei6h23-MuiFormControlLabel-root"
           >
-            <path
-              d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
-            />
-          </svg>
+            <span
+              class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+              data-testid="consent-accept-tc-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+            >
+              <input
+                aria-label="Terms and Conditions"
+                class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
+                data-indeterminate="false"
+                type="checkbox"
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
+                data-testid="CheckBoxOutlineBlankIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                />
+              </svg>
+            </span>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
+              data-testid="consent-accept-tc-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+            >
+              I have read and accept the 
+              <a
+                aria-disabled="false"
+                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
+              >
+                Terms and Conditions
+              </a>
+               of {{appName}}.
+            </p>
+          </label>
+          <label
+            class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-ei6h23-MuiFormControlLabel-root"
+          >
+            <span
+              class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-rm2pxo-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+              data-testid="consent-accept-consent-checkbox-container-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+            >
+              <input
+                aria-label="Privacy Policy"
+                class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
+                data-indeterminate="false"
+                type="checkbox"
+              />
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-fnq9fx-MuiSvgIcon-root"
+                data-testid="CheckBoxOutlineBlankIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                />
+              </svg>
+            </span>
+            <p
+              class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
+              data-testid="consent-accept-consent-text-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+            >
+              I have read and accept the 
+              <a
+                aria-disabled="false"
+                class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-kqozpc-MuiTypography-root-MuiLink-root"
+              >
+                Privacy Policy
+              </a>
+               of {{appName}}.
+            </p>
+          </label>
         </div>
-      </button>
+        <p
+          class="MuiTypography-root MuiTypography-body1 css-id7iv4-MuiTypography-root"
+        >
+          Are you ready to start?
+          <br />
+        </p>
+      </div>
+      <div
+        class="MuiBox-root css-4nxxxe"
+      >
+        <a
+          aria-disabled="false"
+          class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1drfi9t-MuiTypography-root-MuiLink-root"
+          data-testid="consent-reject-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+        >
+          No, thank you
+        </a>
+        <button
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-52k4rr-MuiButtonBase-root-MuiButton-root"
+          data-testid="consent-accept-button-1dee3ba4-1853-40c6-aaad-eeeb0e94788d"
+          disabled=""
+          tabindex="-1"
+          type="button"
+        >
+          Sure, I am ready
+          <div
+            class="MuiBox-root css-f2dt27"
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1rwg863-MuiSvgIcon-root"
+              data-testid="ArrowForwardIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+              />
+            </svg>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </div>
