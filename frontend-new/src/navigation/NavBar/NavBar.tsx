@@ -99,7 +99,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   const isOnline = useContext(IsOnlineContext);
-  const { sentryEnabled, openFeedbackForm } = useSentryFeedbackForm();
+  const { sentryEnabled, openFeedbackForm, feedbackModalElement } = useSentryFeedbackForm();
   const { openExperiencesDrawer } = useExperiencesDrawer();
   const { triggerRebuildProfile } = useRebuildProfile();
 
@@ -642,6 +642,7 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
       />
 
       {isLoggingOut && <Backdrop isShown={isLoggingOut} message={t("chat.chat.backdrop.loggingOut")} />}
+      {feedbackModalElement}
     </Box>
   );
 };

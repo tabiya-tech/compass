@@ -738,6 +738,25 @@
     },
     "bugReport": {
       "reportBug": "Ripoti hitilafu"
+    },
+    "feedbackModal": {
+      "title": "Ripoti hitilafu au tuma maoni",
+      "subtitle": "Tuambie kilichotokea au kinachoweza kusaidia. Tunasoma kila ujumbe.",
+      "type": {
+        "bug": "Hitilafu",
+        "feedback": "Maoni",
+        "idea": "Wazo"
+      },
+      "priority": {
+        "low": "Chini",
+        "medium": "Wastani",
+        "high": "Juu"
+      },
+      "messagePlaceholder": "Eleza kilichotokea, ulichotarajia, au maoni yoyote...",
+      "cancel": "Ghairi",
+      "send": "Tuma",
+      "successMessage": "Asante kwa maoni yako!",
+      "errorMessage": "Hatukuweza kutuma maoni yako. Tafadhali jaribu tena."
     }
   },
   "error": {

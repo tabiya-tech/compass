@@ -756,6 +756,25 @@
     },
     "bugReport": {
       "reportBug": "Reportar un error"
+    },
+    "feedbackModal": {
+      "title": "Reportar un error o enviar comentarios",
+      "subtitle": "Cuéntanos qué ha pasado o qué nos ayudaría. Leemos cada mensaje.",
+      "type": {
+        "bug": "Error",
+        "feedback": "Comentario",
+        "idea": "Idea"
+      },
+      "priority": {
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta"
+      },
+      "messagePlaceholder": "Describe qué ha pasado, qué esperabas o cualquier comentario...",
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "successMessage": "¡Gracias por tus comentarios!",
+      "errorMessage": "No hemos podido enviar tus comentarios. Inténtalo de nuevo."
     }
   },
   "error": {

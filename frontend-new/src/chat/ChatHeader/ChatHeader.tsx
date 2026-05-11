@@ -35,7 +35,7 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const notificationShownRef = useRef<boolean>(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const { openFeedbackForm } = useSentryFeedbackForm();
+  const { openFeedbackForm, feedbackModalElement } = useSentryFeedbackForm();
 
   const handleGiveFeedback = useCallback(async () => {
     await openFeedbackForm({ markNotificationSeen: true });
@@ -118,12 +118,15 @@ const ChatHeader: React.FC<Readonly<ChatHeaderProps>> = ({
   ]);
 
   return (
-    <Box
-      display="flex"
-      justifyContent="flex-end"
-      alignItems="center"
-      data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
-    />
+    <>
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        alignItems="center"
+        data-testid={DATA_TEST_ID.CHAT_HEADER_CONTAINER}
+      />
+      {feedbackModalElement}
+    </>
   );
 };
 

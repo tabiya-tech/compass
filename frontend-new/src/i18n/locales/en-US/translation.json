@@ -756,6 +756,25 @@
     },
     "bugReport": {
       "reportBug": "Report a Bug"
+    },
+    "feedbackModal": {
+      "title": "Report a bug or send feedback",
+      "subtitle": "Tell us what happened or what would help. We read every one.",
+      "type": {
+        "bug": "Bug",
+        "feedback": "Feedback",
+        "idea": "Idea"
+      },
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "messagePlaceholder": "Describe what happened, what you expected, or any feedback...",
+      "cancel": "Cancel",
+      "send": "Send",
+      "successMessage": "Thank you for your feedback!",
+      "errorMessage": "We couldn't send your feedback. Please try again."
     }
   },
   "error": {

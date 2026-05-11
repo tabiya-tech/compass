@@ -756,6 +756,25 @@
     },
     "bugReport": {
       "reportBug": "Lengezani cholakwika"
+    },
+    "feedbackModal": {
+      "title": "Lengezani cholakwika kapena tumizani ndemanga",
+      "subtitle": "Tiuzeni zomwe zinachitika kapena zomwe zingathandize. Timawerenga zonse.",
+      "type": {
+        "bug": "Cholakwika",
+        "feedback": "Ndemanga",
+        "idea": "Lingaliro"
+      },
+      "priority": {
+        "low": "Yotsika",
+        "medium": "Yapakati",
+        "high": "Yapamwamba"
+      },
+      "messagePlaceholder": "Fotokozani zomwe zinachitika, zomwe munkayembekezera, kapena ndemanga iliyonse...",
+      "cancel": "Letsani",
+      "send": "Tumizani",
+      "successMessage": "Zikomo chifukwa cha ndemanga zanu!",
+      "errorMessage": "Sitinathe kutumiza ndemanga zanu. Yesaninso."
     }
   },
   "error": {

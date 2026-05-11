@@ -5,6 +5,7 @@ import "src/_test_utilities/consoleMock";
 
 import { fireEvent, render, screen, waitFor } from "src/_test_utilities/test-utils";
 import BugReportButton, { DATA_TEST_ID } from "src/feedback/bugReport/bugReportButton/BugReportButton";
+import { DATA_TEST_ID as MODAL_DATA_TEST_ID } from "src/feedback/feedbackModal/FeedbackModal";
 import * as Sentry from "@sentry/react";
 import { useMediaQuery } from "@mui/material";
 
@@ -83,59 +84,24 @@ describe("BugReportButton component", () => {
     expect(console.warn).not.toHaveBeenCalled();
   });
 
-  test("should attach Sentry bugReport when available", async () => {
-    // GIVEN a mock implementation of Sentry.getFeedback and createForm
-    const mockOpen = jest.fn();
-    const mockAppendToDom = jest.fn();
-    const mockCreateForm = jest.fn().mockResolvedValue({
-      appendToDom: mockAppendToDom,
-      open: mockOpen,
-    });
-    (Sentry.getFeedback as jest.Mock).mockReturnValue({
-      createForm: mockCreateForm,
-    });
-    // AND sentry is initialized
+  test("should open the feedback modal when the button is clicked", async () => {
+    // GIVEN sentry is initialized
     (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
 
     // WHEN the component is rendered
     render(<BugReportButton />);
 
-    // AND the user clicks the button
-    const button = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON);
-    fireEvent.click(button);
-
-    // THEN expect Sentry.getFeedback to have been called
-    expect(Sentry.getFeedback).toHaveBeenCalled();
-
-    // AND expect the form to be created and opened with translations
-    await waitFor(() => expect(mockCreateForm).toHaveBeenCalled());
-    await waitFor(() => expect(mockAppendToDom).toHaveBeenCalled());
-    await waitFor(() => expect(mockOpen).toHaveBeenCalled());
-
-    // AND expect no errors or warnings to have occurred
-    expect(console.error).not.toHaveBeenCalled();
-    expect(console.warn).not.toHaveBeenCalled();
-  });
-
-  test("should not attach Sentry bugReport when not available", () => {
-    // GIVEN Sentry.getFeedback returns undefined
-    (Sentry.getFeedback as jest.Mock).mockReturnValue(undefined);
-    // AND sentry is initialized
-    (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
-
-    // WHEN the component is rendered
-    render(<BugReportButton />);
+    // AND the modal is not yet visible
+    expect(screen.queryByTestId(MODAL_DATA_TEST_ID.FEEDBACK_MODAL_TITLE)).not.toBeInTheDocument();
 
     // AND the user clicks the button
     const button = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON);
     fireEvent.click(button);
 
-    // THEN expect Sentry.getFeedback to have been called
-    expect(Sentry.getFeedback).toHaveBeenCalled();
-
-    // AND expect the component to render without errors
-    const buttonContainer = screen.getByTestId(DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER);
-    expect(buttonContainer).toBeInTheDocument();
+    // THEN expect the feedback modal to become visible
+    await waitFor(() => {
+      expect(screen.getByTestId(MODAL_DATA_TEST_ID.FEEDBACK_MODAL_TITLE)).toBeInTheDocument();
+    });
 
     // AND expect no errors or warnings to have occurred
     expect(console.error).not.toHaveBeenCalled();

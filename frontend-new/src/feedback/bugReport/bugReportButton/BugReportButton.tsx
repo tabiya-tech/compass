@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import * as Sentry from "@sentry/react";
 import { Box, styled, useMediaQuery, Theme } from "@mui/material";
 import PrimaryIconButton from "src/theme/PrimaryIconButton/PrimaryIconButton";
 import { BugReport } from "@mui/icons-material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import { useSentryFeedbackForm } from "src/feedback/hooks/useSentryFeedbackForm";
 
 interface BugReportButtonProps {
   className?: string;
@@ -39,49 +39,18 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
 const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, className }) => {
   const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
-  const [sentryEnabled, setSentryEnabled] = useState(false);
+  const { sentryEnabled, openFeedbackForm, feedbackModalElement } = useSentryFeedbackForm();
 
-  useEffect(() => {
-    setSentryEnabled(Sentry.isInitialized());
-  }, []);
+  const handleOpenBugReport = useCallback(() => {
+    void openFeedbackForm();
+  }, [openFeedbackForm]);
 
-  const handleOpenBugReport = useCallback(async () => {
-    if (!sentryEnabled) {
-      return;
-    }
-
-    try {
-      const feedback = Sentry.getFeedback();
-      if (!feedback) {
-        return;
-      }
-
-      const form = await feedback.createForm({
-        formTitle: t("chat.chatHeader.giveGeneralFeedback"),
-        nameLabel: t("chat.chatHeader.nameLabel"),
-        namePlaceholder: t("chat.chatHeader.namePlaceholder"),
-        emailLabel: t("chat.chatHeader.emailLabel"),
-        emailPlaceholder: t("chat.chatHeader.emailPlaceholder"),
-        isRequiredLabel: t("chat.chatHeader.requiredLabel"),
-        messageLabel: t("chat.chatHeader.descriptionLabel"),
-        messagePlaceholder: t("chat.chatHeader.feedbackMessagePlaceholder"),
-        addScreenshotButtonLabel: t("chat.chatHeader.addScreenshot"),
-        submitButtonLabel: t("chat.chatHeader.sendFeedback"),
-        cancelButtonLabel: t("chat.chatHeader.cancelButton"),
-        successMessageText: t("chat.chatHeader.feedbackSuccessMessage"),
-      });
-
-      if (form) {
-        form.appendToDom();
-        form.open();
-      }
-    } catch (error) {
-      console.error("Error creating bug report form:", error);
-    }
-  }, [sentryEnabled, t]);
+  if (!sentryEnabled) {
+    return null;
+  }
 
   return (
-    sentryEnabled && (
+    <>
       <Box
         data-testid={DATA_TEST_ID.BUG_REPORT_BUTTON_CONTAINER}
         className={className}
@@ -113,7 +82,8 @@ const BugReportButton: React.FC<BugReportButtonProps> = ({ bottomAlign, classNam
           </PrimaryButton>
         )}
       </Box>
-    )
+      {feedbackModalElement}
+    </>
   );
 };
 
