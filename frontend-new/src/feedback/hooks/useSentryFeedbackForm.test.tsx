@@ -9,14 +9,13 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 
-const mockEnqueueSnackbar = jest.fn();
 jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
   const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
   return {
     ...actual,
     __esModule: true,
     useSnackbar: jest.fn().mockReturnValue({
-      enqueueSnackbar: mockEnqueueSnackbar,
+      enqueueSnackbar: jest.fn(),
       closeSnackbar: jest.fn(),
     }),
   };
