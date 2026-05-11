@@ -11,6 +11,7 @@ from app.users.preferences import add_user_preference_routes
 from app.programme_skills.routes import add_programme_skills_routes
 from app.users.me.profile_routes import add_user_me_profile_routes
 from app.users.me.progress_routes import add_user_me_progress_routes
+from app.user_institution_assignment.routes import add_institution_assignment_route
 
 """
 This module is responsible for managing all the routes related to the users.
@@ -36,6 +37,7 @@ def add_users_routes(app: FastAPI, authentication: Authentication):
     ############################################
     add_user_me_profile_routes(users_router, authentication)
     add_user_me_progress_routes(users_router, authentication)
+    add_institution_assignment_route(users_router, authentication)
 
     ############################################
     # Add the user preference routes

@@ -24,3 +24,5 @@ class Collections:
     CAREER_EXPLORER_SECTOR_CHUNKS: str = "career_explorer_sector_chunks"
     INSTITUTIONS: str = "institutions"
     PROGRAMME_SKILLS: str = "programme_skills"
+    PILOT_WHITELIST: str = "pilot_whitelist"
+    USER_INSTITUTION_ASSIGNMENT: str = "user_institution_assignment"

@@ -6,6 +6,7 @@ from fastapi import HTTPException
 
 from app.institutions.repository import IInstitutionRepository
 from app.institutions.service import InstitutionService
+from app.user_institution_assignment.pilot_whitelist_repository import IPilotWhitelistRepository
 
 _SAMPLE_INSTITUTION = {
     "name": "Test College",
@@ -26,11 +27,11 @@ class _FakeInstitutionRepository(IInstitutionRepository):
         self.search_called_with: Optional[Dict[str, Any]] = None
         self.count_called = False
 
-    async def search_institutions(self, keywords, province, sector, offset, limit, name_only=False):
+    async def search_institutions(self, keywords, province, sector, offset, limit, name_only=False, exclude_names=None):
         self.search_called_with = {"keywords": keywords, "province": province, "sector": sector, "offset": offset, "limit": limit, "name_only": name_only}
         return self._docs
 
-    async def count_institutions(self, keywords, province, sector):
+    async def count_institutions(self, keywords, province, sector, exclude_names=None):
         self.count_called = True
         return self._total
 
@@ -41,13 +42,24 @@ class _FakeInstitutionRepository(IInstitutionRepository):
         return next((d for d in self._docs if d.get("name") == name), None)
 
 
+class _FakePilotWhitelistRepository(IPilotWhitelistRepository):
+    async def get_whitelisted_institution_names(self) -> list[str]:
+        return []
+
+    async def is_whitelisted(self, institution_name: str) -> bool:
+        return False
+
+    async def get_reg_no_by_institution_name(self, institution_name: str):
+        return None
+
+
 class TestInstitutionService:
     @pytest.mark.asyncio
     async def test_search_returns_paginated_results(self):
         # GIVEN three docs but limit=2 → has_more=True
         docs = [_SAMPLE_INSTITUTION.copy(), _SAMPLE_INSTITUTION.copy(), _SAMPLE_INSTITUTION.copy()]
         repo = _FakeInstitutionRepository(docs=docs, total=100)
-        service = InstitutionService(repository=repo)
+        service = InstitutionService(repository=repo, whitelist_repository=_FakePilotWhitelistRepository())
 
         result = await service.search_institutions(
             keywords="development",
@@ -69,7 +81,7 @@ class TestInstitutionService:
     @pytest.mark.asyncio
     async def test_search_without_count_skips_count_query(self):
         repo = _FakeInstitutionRepository(docs=[_SAMPLE_INSTITUTION.copy()], total=50)
-        service = InstitutionService(repository=repo)
+        service = InstitutionService(repository=repo, whitelist_repository=_FakePilotWhitelistRepository())
 
         result = await service.search_institutions(
             keywords=None, province=None, sector=None, cursor=None, limit=20, include=None
@@ -82,7 +94,7 @@ class TestInstitutionService:
     @pytest.mark.asyncio
     async def test_search_with_invalid_cursor_raises_400(self):
         repo = _FakeInstitutionRepository(docs=[], total=0)
-        service = InstitutionService(repository=repo)
+        service = InstitutionService(repository=repo, whitelist_repository=_FakePilotWhitelistRepository())
 
         with pytest.raises(HTTPException) as exc_info:
             await service.search_institutions(
@@ -94,7 +106,7 @@ class TestInstitutionService:
     @pytest.mark.asyncio
     async def test_get_programmes_returns_programmes(self):
         repo = _FakeInstitutionRepository(docs=[_SAMPLE_INSTITUTION.copy()])
-        service = InstitutionService(repository=repo)
+        service = InstitutionService(repository=repo, whitelist_repository=_FakePilotWhitelistRepository())
 
         result = await service.get_programmes_by_institution("TVA/001")
 
@@ -106,7 +118,7 @@ class TestInstitutionService:
     @pytest.mark.asyncio
     async def test_get_programmes_not_found_raises_404(self):
         repo = _FakeInstitutionRepository(docs=[])
-        service = InstitutionService(repository=repo)
+        service = InstitutionService(repository=repo, whitelist_repository=_FakePilotWhitelistRepository())
 
         with pytest.raises(HTTPException) as exc_info:
             await service.get_programmes_by_institution("NONEXISTENT")

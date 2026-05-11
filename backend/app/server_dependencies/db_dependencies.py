@@ -281,6 +281,14 @@ class CompassDBProvider:
                 [("location.province", 1)]
             )
 
+            # Pilot whitelisting indexes
+            await application_db.get_collection(Collections.PILOT_WHITELIST).create_index(
+                [("institution_name", 1)], unique=True
+            )
+            await application_db.get_collection(Collections.USER_INSTITUTION_ASSIGNMENT).create_index(
+                [("email", 1)], unique=True
+            )
+
             logger.info("Finished creating indexes for the application database")
         except Exception as e:
             logger.exception(e)

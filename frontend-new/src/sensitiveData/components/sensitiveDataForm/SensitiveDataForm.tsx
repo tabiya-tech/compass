@@ -155,6 +155,10 @@ const SensitiveDataForm: React.FC = () => {
   const [institutionInputValue, setInstitutionInputValue] = useState("");
   const [selectedProgramme, setSelectedProgramme] = useState("");
 
+  // Pilot: pre-assigned institution (locks the field)
+  const [assignedInstitution, setAssignedInstitution] = useState<InstitutionSummary | null>(null);
+  const [assignmentLoading, setAssignmentLoading] = useState(true);
+
   // Institution autocomplete state
   const [institutionOptions, setInstitutionOptions] = useState<InstitutionSummary[]>([]);
   const [institutionLoading, setInstitutionLoading] = useState(false);
@@ -371,6 +375,46 @@ const SensitiveDataForm: React.FC = () => {
     }
   }, [enqueueSnackbar, userPreferences, t]);
 
+  // Fetch pilot institution assignment on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const assignment = await InstitutionService.getInstance().getInstitutionAssignment();
+        if (cancelled) return;
+        if (assignment) {
+          const institution: InstitutionSummary = {
+            name: assignment.institution_name,
+            reg_no: assignment.reg_no ?? undefined,
+          };
+          setAssignedInstitution(institution);
+          setSelectedInstitution(institution);
+          setInstitutionInputValue(institution.name);
+          setFieldValid("institution", true);
+          // Auto-load programmes for the assigned institution
+          if (assignment.reg_no) {
+            setProgrammesLoading(true);
+            try {
+              const result = await InstitutionService.getInstance().getProgrammesByInstitution(assignment.reg_no);
+              if (!cancelled) setProgrammes(result.programmes ?? []);
+            } catch (e) {
+              console.error("Failed to load programmes for assigned institution", e);
+            } finally {
+              if (!cancelled) setProgrammesLoading(false);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch institution assignment", e);
+      } finally {
+        if (!cancelled) setAssignmentLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const whiteBandContent = (
     <Container
       maxWidth="sm"
@@ -464,63 +508,75 @@ const SensitiveDataForm: React.FC = () => {
                 }
               />
 
-              {/* Institution — type-to-search autocomplete, shows province on the right */}
-              <Autocomplete
-                options={institutionOptions}
-                getOptionLabel={(option) => option.name}
-                loading={institutionLoading}
-                inputValue={institutionInputValue}
-                value={selectedInstitution}
-                filterOptions={(x) => x}
-                isOptionEqualToValue={(option, value) => option.name === value.name}
-                onInputChange={handleInstitutionInputChange}
-                onChange={handleInstitutionSelect}
-                noOptionsText={
-                  institutionInputValue.length < INSTITUTION_SEARCH_MIN_CHARS
-                    ? "Type at least 2 characters to search"
-                    : institutionLoading
-                      ? "Searching..."
-                      : "No institutions found"
-                }
-                renderOption={(props, option) => (
-                  <li {...props} key={option.name}>
-                    <Box display="flex" justifyContent="space-between" width="100%">
-                      <Typography variant="body2">{option.name}</Typography>
-                      {option.province && (
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 2, flexShrink: 0 }}>
-                          {option.province}
-                        </Typography>
-                      )}
-                    </Box>
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    required
-                    label="Institution"
-                    placeholder="Start typing to search..."
-                    inputRef={institutionRef}
-                    error={showFieldErrors && !validationErrors.institution}
-                    helperText={
-                      showFieldErrors && !validationErrors.institution
-                        ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
-                        : ""
-                    }
-                    slotProps={{
-                      input: {
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {institutionLoading ? <CircularProgress color="inherit" size={16} /> : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      },
-                    }}
-                  />
-                )}
-              />
+              {/* Institution — locked for pilot users, searchable for regular users */}
+              {assignedInstitution ? (
+                <TextField
+                  fullWidth
+                  required
+                  label="Institution"
+                  value={assignedInstitution.name}
+                  inputRef={institutionRef}
+                  slotProps={{ input: { readOnly: true } }}
+                />
+              ) : (
+                <Autocomplete
+                  options={institutionOptions}
+                  getOptionLabel={(option) => option.name}
+                  loading={institutionLoading || assignmentLoading}
+                  disabled={assignmentLoading}
+                  inputValue={institutionInputValue}
+                  value={selectedInstitution}
+                  filterOptions={(x) => x}
+                  isOptionEqualToValue={(option, value) => option.name === value.name}
+                  onInputChange={handleInstitutionInputChange}
+                  onChange={handleInstitutionSelect}
+                  noOptionsText={
+                    institutionInputValue.length < INSTITUTION_SEARCH_MIN_CHARS
+                      ? "Type at least 2 characters to search"
+                      : institutionLoading
+                        ? "Searching..."
+                        : "No institutions found"
+                  }
+                  renderOption={(props, option) => (
+                    <li {...props} key={option.name}>
+                      <Box display="flex" justifyContent="space-between" width="100%">
+                        <Typography variant="body2">{option.name}</Typography>
+                        {option.province && (
+                          <Typography variant="body2" color="text.secondary" sx={{ ml: 2, flexShrink: 0 }}>
+                            {option.province}
+                          </Typography>
+                        )}
+                      </Box>
+                    </li>
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      required
+                      label="Institution"
+                      placeholder="Start typing to search..."
+                      inputRef={institutionRef}
+                      error={showFieldErrors && !validationErrors.institution}
+                      helperText={
+                        showFieldErrors && !validationErrors.institution
+                          ? t("sensitiveData.components.sensitiveDataForm.fieldRequired")
+                          : ""
+                      }
+                      slotProps={{
+                        input: {
+                          ...params.InputProps,
+                          endAdornment: (
+                            <>
+                              {institutionLoading ? <CircularProgress color="inherit" size={16} /> : null}
+                              {params.InputProps.endAdornment}
+                            </>
+                          ),
+                        },
+                      }}
+                    />
+                  )}
+                />
+              )}
 
               {/* Programme — searchable autocomplete, disabled until institution is chosen */}
               <Autocomplete

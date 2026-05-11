@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from app.analytics.types import PaginatedListMeta, PaginatedListResponse
 from app.institutions.repository import IInstitutionRepository
 from app.institutions.types import InstitutionDocument, Programme
+from app.user_institution_assignment.pilot_whitelist_repository import IPilotWhitelistRepository
 
 
 class InstitutionProgrammes(BaseModel):
@@ -34,15 +35,18 @@ class IInstitutionService(ABC):
         pass
 
     @abstractmethod
-    async def get_programmes_by_institution(self, institution_id: str) -> InstitutionProgrammes:
+    async def get_programmes_by_institution(
+        self, institution_id: str, caller_assigned: bool = False
+    ) -> InstitutionProgrammes:
         pass
 
 
 class InstitutionService(IInstitutionService):
     """Business logic for institutions."""
 
-    def __init__(self, repository: IInstitutionRepository):
+    def __init__(self, repository: IInstitutionRepository, whitelist_repository: IPilotWhitelistRepository):
         self._repository = repository
+        self._whitelist_repository = whitelist_repository
         self._logger = logging.getLogger(self.__class__.__name__)
 
     @staticmethod
@@ -71,6 +75,8 @@ class InstitutionService(IInstitutionService):
         offset = self._parse_cursor_offset(cursor)
         include_count = self._include_total(include)
 
+        exclude_names = await self._whitelist_repository.get_whitelisted_institution_names()
+
         docs = await self._repository.search_institutions(
             keywords=keywords,
             province=province,
@@ -78,6 +84,7 @@ class InstitutionService(IInstitutionService):
             offset=offset,
             limit=limit,
             name_only=name_only,
+            exclude_names=exclude_names or None,
         )
 
         has_more = len(docs) > limit
@@ -87,7 +94,7 @@ class InstitutionService(IInstitutionService):
         institutions = [InstitutionDocument.model_validate(doc) for doc in page_docs]
 
         total = (
-            await self._repository.count_institutions(keywords, province, sector)
+            await self._repository.count_institutions(keywords, province, sector, exclude_names=exclude_names or None)
             if include_count
             else None
         )
@@ -99,9 +106,24 @@ class InstitutionService(IInstitutionService):
         )
         return PaginatedListResponse(data=institutions, meta=meta)
 
-    async def get_programmes_by_institution(self, institution_id: str) -> InstitutionProgrammes:
+    async def get_programmes_by_institution(
+        self, institution_id: str, caller_assigned: bool = False
+    ) -> InstitutionProgrammes:
+        """
+        Returns programmes for an institution.
+
+        If the institution is whitelisted (pilot), it is only accessible when
+        caller_assigned=True. The route layer is responsible for determining this
+        by checking the caller's email against the user_institution_assignment collection.
+        """
         doc = await self._repository.get_programmes_by_institution(institution_id)
         if doc is None:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail=f"Institution with reg_no '{institution_id}' not found",
+            )
+        institution_name = doc.get("name", "")
+        if await self._whitelist_repository.is_whitelisted(institution_name) and not caller_assigned:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail=f"Institution with reg_no '{institution_id}' not found",

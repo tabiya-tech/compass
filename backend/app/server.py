@@ -433,7 +433,7 @@ add_jobs_routes(app, auth)
 ############################################
 # Add the institutions routes
 ############################################
-add_institutions_routes(app)
+add_institutions_routes(app, auth)
 
 ############################################
 # Add the job preferences routes

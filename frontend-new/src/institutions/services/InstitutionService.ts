@@ -36,6 +36,11 @@ export interface InstitutionsApiResponse {
   };
 }
 
+export interface InstitutionAssignment {
+  institution_name: string;
+  reg_no?: string | null;
+}
+
 function parseJson<T>(responseBody: string, errorFactory: RestAPIErrorFactory): T {
   try {
     return JSON.parse(responseBody) as T;
@@ -50,9 +55,11 @@ function parseJson<T>(responseBody: string, errorFactory: RestAPIErrorFactory): 
 export default class InstitutionService {
   private static instance: InstitutionService;
   private readonly baseUrl: string;
+  private readonly usersBaseUrl: string;
 
   private constructor() {
     this.baseUrl = `${getBackendUrl()}/institutions`;
+    this.usersBaseUrl = `${getBackendUrl()}/users`;
   }
 
   static getInstance(): InstitutionService {
@@ -78,6 +85,23 @@ export default class InstitutionService {
     });
     const body = await response.text();
     return parseJson<InstitutionsApiResponse>(body, errorFactory);
+  }
+
+  async getInstitutionAssignment(): Promise<InstitutionAssignment | null> {
+    const url = `${this.usersBaseUrl}/me/institution-assignment`;
+    const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getInstitutionAssignment", "GET", url);
+
+    const response = await customFetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: SERVICE_NAME,
+      serviceFunction: "getInstitutionAssignment",
+      failureMessage: "Failed to fetch institution assignment",
+      expectedContentType: "application/json",
+    });
+    const body = await response.text();
+    return parseJson<InstitutionAssignment | null>(body, errorFactory);
   }
 
   async getProgrammesByInstitution(regNo: string): Promise<InstitutionProgrammes> {

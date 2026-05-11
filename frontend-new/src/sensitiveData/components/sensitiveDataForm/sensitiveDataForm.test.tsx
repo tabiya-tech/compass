@@ -112,6 +112,7 @@ describe("Sensitive Data Form", () => {
     jest.spyOn(InstitutionService, "getInstance").mockReturnValue({
       searchInstitutions: mockSearchInstitutions,
       getProgrammesByInstitution: mockGetProgrammes,
+      getInstitutionAssignment: jest.fn().mockResolvedValue(null),
     } as unknown as InstitutionService);
 
     // @ts-ignore
@@ -210,8 +211,9 @@ describe("Sensitive Data Form", () => {
       await user.type(screen.getByLabelText(/First Name/i), "Alice");
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
 
-      // AND an institution is searched and selected
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      // AND an institution is searched and selected (wait for pilot assignment fetch to complete)
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
       await typeDebouncedInput(institutionInput, "Univ");
 
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
@@ -298,7 +300,9 @@ describe("Sensitive Data Form", () => {
       await user.type(screen.getByLabelText(/First Name/i), "Alice");
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
 
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      // Wait for pilot assignment fetch to complete before the institution field is enabled
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
       await typeDebouncedInput(institutionInput, "Univ");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("University of Zambia");
@@ -628,8 +632,11 @@ describe("Sensitive Data Form", () => {
       // GIVEN a form is rendered
       componentRender();
 
-      // WHEN the user types in the institution field
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      // WHEN the pilot assignment fetch completes and the institution field is enabled
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
+
+      // AND the user types in the institution field
       await typeDebouncedInput(institutionInput, "Un");
 
       // THEN the institution service should be called
@@ -643,8 +650,11 @@ describe("Sensitive Data Form", () => {
       const user = userEvent.setup();
       componentRender();
 
-      // WHEN the user types only 1 character
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      // WHEN the pilot assignment fetch completes and the institution field is enabled
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
+
+      // AND the user types only 1 character
       await user.type(institutionInput, "U");
 
       // THEN the institution service should not be called
@@ -656,8 +666,9 @@ describe("Sensitive Data Form", () => {
       const user = userEvent.setup();
       componentRender();
 
-      // WHEN the user searches and selects an institution
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      // WHEN the user searches and selects an institution (wait for assignment fetch)
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
       await typeDebouncedInput(institutionInput, "Univ");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("University of Zambia");
@@ -719,7 +730,8 @@ describe("Sensitive Data Form", () => {
       await user.type(screen.getByLabelText(/First Name/i), "Alice");
       await user.type(screen.getByLabelText(/Last Name/i), "Smith");
 
-      const institutionInput = screen.getByLabelText(/Institution/i);
+      const institutionInput = await screen.findByLabelText(/Institution/i);
+      await waitFor(() => expect(institutionInput).not.toBeDisabled());
       await typeDebouncedInput(institutionInput, "No Pro");
       await waitFor(() => expect(mockSearchInstitutions).toHaveBeenCalled());
       const institutionOption = await screen.findByText("No Province Uni");
