@@ -198,12 +198,13 @@ def _grant_docker_repository_access_to_project_service_account(
         project_number: pulumi.Output[str],
         docker_project_id: pulumi.Output[str],
         docker_repository_name: pulumi.Output[str],
+        docker_repository_location: pulumi.Output[str],
 ) -> gcp.artifactregistry.RepositoryIamMember:
     # allow the current environment to read from the docker repository
     return gcp.artifactregistry.RepositoryIamMember(
         resource_name=get_resource_name(resource="project-sa-repository-reader", resource_type="iam-member"),
         project=docker_project_id,
-        location=basic_config.location,
+        location=docker_repository_location,
         repository=docker_repository_name,
         role="roles/artifactregistry.reader",
         member=project_number.apply(
@@ -526,7 +527,8 @@ def deploy_backend(
         basic_config,
         project_number,
         docker_repository.apply(lambda repo: repo.get("project")),
-        docker_repository.apply(lambda repo: repo.get("name"))
+        docker_repository.apply(lambda repo: repo.get("name")),
+        docker_repository.apply(lambda repo: repo.get("location")),
     )
 
     # get fully qualified image name
