@@ -27,10 +27,7 @@ describe("FeedbackModal", () => {
     expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MODAL_PRIORITY_OPTION("high"))).toBeInTheDocument();
 
     // AND expect default selections: bug + medium
-    expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MODAL_TYPE_OPTION("bug"))).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MODAL_TYPE_OPTION("bug"))).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId(DATA_TEST_ID.FEEDBACK_MODAL_PRIORITY_OPTION("medium"))).toHaveAttribute(
       "aria-pressed",
       "true"

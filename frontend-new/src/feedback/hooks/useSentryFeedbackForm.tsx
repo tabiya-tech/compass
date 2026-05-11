@@ -4,9 +4,7 @@ import * as Sentry from "@sentry/react";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { PersistentStorageService } from "src/app/PersistentStorageService/PersistentStorageService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
-import FeedbackModal, {
-  FeedbackModalSubmitPayload,
-} from "src/feedback/feedbackModal/FeedbackModal";
+import FeedbackModal, { FeedbackModalSubmitPayload } from "src/feedback/feedbackModal/FeedbackModal";
 
 interface OpenFeedbackFormOptions {
   markNotificationSeen?: boolean;

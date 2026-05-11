@@ -87,9 +87,7 @@ const PillButton: React.FC<PillButtonProps> = ({ selected, onClick, startIcon, c
         transition: "background-color 120ms ease, border-color 120ms ease, color 120ms ease",
         "&:hover": {
           borderColor: theme.palette.primary.main,
-          backgroundColor: selected
-            ? alpha(theme.palette.primary.main, 0.18)
-            : alpha(theme.palette.primary.main, 0.04),
+          backgroundColor: selected ? alpha(theme.palette.primary.main, 0.18) : alpha(theme.palette.primary.main, 0.04),
         },
         "&:focus-visible": {
           outline: `2px solid ${theme.palette.primary.main}`,
@@ -182,11 +180,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
         <Typography variant="h6" component="span" sx={{ fontWeight: 700 }}>
           {t("feedback.feedbackModal.title")}
         </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          data-testid={DATA_TEST_ID.FEEDBACK_MODAL_SUBTITLE}
-        >
+        <Typography variant="body2" color="text.secondary" data-testid={DATA_TEST_ID.FEEDBACK_MODAL_SUBTITLE}>
           {t("feedback.feedbackModal.subtitle")}
         </Typography>
       </DialogTitle>
@@ -249,11 +243,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
       </DialogContent>
 
       <DialogActions sx={{ padding: 0, gap: theme.spacing(1) }}>
-        <SecondaryButton
-          onClick={handleClose}
-          disabled={isSubmitting}
-          data-testid={DATA_TEST_ID.FEEDBACK_MODAL_CANCEL}
-        >
+        <SecondaryButton onClick={handleClose} disabled={isSubmitting} data-testid={DATA_TEST_ID.FEEDBACK_MODAL_CANCEL}>
           {t("feedback.feedbackModal.cancel")}
         </SecondaryButton>
         <PrimaryButton
