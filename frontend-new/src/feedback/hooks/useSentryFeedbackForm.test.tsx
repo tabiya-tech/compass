@@ -10,13 +10,17 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 jest.mock("src/app/PersistentStorageService/PersistentStorageService");
 
 const mockEnqueueSnackbar = jest.fn();
-jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => ({
-  ...jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider"),
-  useSnackbar: () => ({
-    enqueueSnackbar: mockEnqueueSnackbar,
-    closeSnackbar: jest.fn(),
-  }),
-}));
+jest.mock("src/theme/SnackbarProvider/SnackbarProvider", () => {
+  const actual = jest.requireActual("src/theme/SnackbarProvider/SnackbarProvider");
+  return {
+    ...actual,
+    __esModule: true,
+    useSnackbar: jest.fn().mockReturnValue({
+      enqueueSnackbar: mockEnqueueSnackbar,
+      closeSnackbar: jest.fn(),
+    }),
+  };
+});
 
 describe("useSentryFeedbackForm", () => {
   beforeEach(() => {

@@ -171,16 +171,11 @@ describe("ChatHeader", () => {
       expect(useSnackbar().enqueueSnackbar).not.toHaveBeenCalled();
     });
 
-    test("should open feedback form and mark notification as seen when link is clicked", async () => {
-      // GIVEN a logged-in user and Sentry feedback is available
+    test("should mark notification as seen when the feedback link is clicked", async () => {
+      // GIVEN a logged-in user and Sentry is initialized
       const user = { id: "123", name: "Foo Bar", email: "foo@bar.baz" };
       mockUser(user);
       (Sentry.isInitialized as jest.Mock).mockReturnValue(true);
-      const appendToDom = jest.fn();
-      const open = jest.fn();
-      (Sentry.getFeedback as jest.Mock).mockReturnValue({
-        createForm: jest.fn().mockResolvedValue({ appendToDom, open }),
-      });
       const setSeenSpy = jest.spyOn(PersistentStorageService, "setSeenFeedbackNotification").mockImplementation();
 
       // WHEN the component is rendered and the snackbar link is clicked
@@ -193,10 +188,8 @@ describe("ChatHeader", () => {
       render(snackbarContent);
       fireEvent.click(screen.getByTestId(DATA_TEST_ID.CHAT_HEADER_FEEDBACK_LINK));
 
-      // THEN the form is opened, appended, and marked as seen by the user
-      await waitFor(() => expect(open).toHaveBeenCalledTimes(1));
-      expect(appendToDom).toHaveBeenCalledTimes(1);
-      expect(setSeenSpy).toHaveBeenCalledWith(user.id);
+      // THEN the notification is marked as seen for the user
+      await waitFor(() => expect(setSeenSpy).toHaveBeenCalledWith(user.id));
     });
   });
 });
