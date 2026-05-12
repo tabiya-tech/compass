@@ -33,7 +33,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -41,7 +41,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
       </div>
     </div>
@@ -82,7 +82,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -90,7 +90,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
       </div>
     </div>
@@ -131,7 +131,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -139,7 +139,7 @@ exports[`Landing Page Continue as Guest button should not show guest button when
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
       </div>
     </div>
@@ -180,7 +180,7 @@ exports[`Landing Page Continue as Guest button should show guest button when app
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -188,7 +188,7 @@ exports[`Landing Page Continue as Guest button should show guest button when app
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
         <div
           class="MuiBox-root css-n085to"
@@ -256,7 +256,7 @@ exports[`Landing Page Register button should not show register link when registr
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <div
           class="MuiBox-root css-n085to"
@@ -324,7 +324,7 @@ exports[`Landing Page Register button should not show register link when registr
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <div
           class="MuiBox-root css-n085to"
@@ -392,7 +392,7 @@ exports[`Landing Page Register button should show register link when registratio
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -400,7 +400,7 @@ exports[`Landing Page Register button should show register link when registratio
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
         <div
           class="MuiBox-root css-n085to"
@@ -468,7 +468,7 @@ exports[`Landing Page Register button should show register link when registratio
           tabindex="0"
           type="button"
         >
-          Login
+          Sign In
         </button>
         <button
           class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -476,7 +476,7 @@ exports[`Landing Page Register button should show register link when registratio
           tabindex="0"
           type="button"
         >
-          Register
+          Create Account
         </button>
         <div
           class="MuiBox-root css-n085to"
@@ -543,7 +543,7 @@ exports[`Landing Page should render landing page successfully 1`] = `
         tabindex="0"
         type="button"
       >
-        Login
+        Sign In
       </button>
       <button
         class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth MuiButton-root MuiButton-outlined MuiButton-outlinedBrandAction MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation MuiButton-fullWidth css-18xwwry-MuiButtonBase-root-MuiButton-root"
@@ -551,7 +551,7 @@ exports[`Landing Page should render landing page successfully 1`] = `
         tabindex="0"
         type="button"
       >
-        Register
+        Create Account
       </button>
       <div
         class="MuiBox-root css-n085to"

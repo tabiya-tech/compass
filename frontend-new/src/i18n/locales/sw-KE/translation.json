@@ -2,10 +2,10 @@
   "common": {
     "buttons": {
       "login": "Ingia",
-      "loginLink": "Ingia",
+      "loginLink": "Ingia kwenye Njila",
       "logout": "Toka",
       "submit": "Wasilisha",
-      "register": "Jisajili",
+      "register": "Unda akaunti",
       "registerLink": "Unda akaunti",
       "startNewConversation": "Anza mazungumzo mapya",
       "settings": "Mipangilio",
@@ -288,10 +288,10 @@
         "welcomeBack": "Karibu tena!",
         "loginToYourAccountToContinue": "Ingia kwenye akaunti yako ili kuendelea",
         "loginUsing": "Ingia ukitumia",
-        "loggingYouIn": "Tunakuingiza...",
-        "loggingInAria": "Inaingia",
+        "loggingYouIn": "Tunaingiza...",
+        "loggingInAria": "Kuingia",
         "signInDescription": "Ikiwa tayari una akaunti ya Njila, weka <0>barua pepe</0> yako na <1>nenosiri</1> ili kuingia, au chagua <2>Google</2> ili kuingia.",
-        "dontHaveAnAccount": "Mpya kwenye Njila?",
+        "dontHaveAnAccount": "Bado huna akaunti? Unda akaunti bure.",
         "needHelp": "Msaada",
         "fillInEmailAndPassword": "Tafadhali jaza barua pepe na nenosiri",
         "orLoginToYourAccountToContinue": "Au ingia kwenye akaunti yako ili kuendelea",
@@ -321,7 +321,7 @@
       },
       "register": {
         "signUpTitle": "Fungua akaunti",
-        "signUpDescription": "Ili kuunda akaunti ya Njila, weka <0>anwani yako ya barua pepe</0> na unda <1>nenosiri</1>. Unaweza pia kujisajili na akaunti yako ya <2>Google</2>.",
+        "signUpDescription": "Ili kuunda akaunti ya Njila, weka <0>anwani yako ya barua pepe</0> na unda <1>nenosiri</1>. Unaweza pia kuunda akaunti ukitumia akaunti yako ya <2>Google</2>.",
         "emailPlaceholder": "Barua pepe yako",
         "passwordPlaceholder": "Tengeneza nenosiri",
         "confirmPasswordPlaceholder": "Rudia nenosiri",
@@ -330,13 +330,13 @@
         "subtitle": "Tunahitaji taarifa fulani ili kuanza",
         "registerWithGoogle": "Endelea na Google",
         "alreadyHaveAccount": "Tayari una akaunti?",
-        "registeringYou": "Tunakusajili...",
+        "registeringYou": "Tunaunda akaunti yako...",
         "enterRegistrationCode": "Ingiza nambari yako ya usajili",
         "registrationCode": "Nambari ya usajili",
         "andEitherContinueWith": "na endelea na",
         "components": {
           "registerWithEmailForm": {
-            "registeringAria": "Inasajili"
+            "registeringAria": "Inaunda akaunti"
           }
         }
       },
@@ -348,10 +348,10 @@
         "welcome": "Karibu!",
         "welcomeTitle": "Karibu kwenye {{appName}}!",
         "or": "au",
-        "loggingYouIn": "Tunakuingiza..."
+        "loggingYouIn": "Tunaingiza..."
       },
       "verifyEmail": {
-        "registrationThankYou": "Asante kwa kujisajili kwenye {{appName}}.",
+        "registrationThankYou": "Asante kwa kuunda akaunti kwenye {{appName}}.",
         "verificationEmailSentMessage": "Barua pepe ya uthibitisho imetumwa kwenye anwani yako ya barua pepe. Ili kuendelea, tafadhali thibitisha anwani yako ya barua pepe kwanza.",
         "verificationEmailSentBadge": "Barua pepe ya uthibitisho imetumwa"
       },
@@ -362,7 +362,7 @@
         "passwordRequirementsNotMet": "Tafadhali hakikisha nenosiri lako linakidhi mahitaji yote.",
         "verifyEmailTitle": "Tunathibitisha barua pepe yako",
         "verifyEmailSuccess": "Barua pepe imethibitishwa!",
-        "verifyEmailSuccessRedirect": "Barua pepe yako imethibitishwa. Utaelekezwa kwenye ukurasa wa kuingia hivi karibuni.",
+        "verifyEmailSuccessRedirect": "Barua pepe yako imethibitishwa. Utaelekezwa kuingia hivi karibuni.",
         "resetPasswordTitle": "Weka upya nenosiri lako",
         "resetPasswordSubtitle": "Weka nenosiri jipya kwa {{email}}.",
         "newPasswordPlaceholder": "Nenosiri jipya",
@@ -381,15 +381,15 @@
     },
     "components": {
       "anonymousAccountConversionDialog": {
-        "registerAccount": "Sajili Akaunti",
-        "registrationInfo": "Tafadhali jisajili na barua pepe ili kuhifadhi ufikivu wa mazungumzo haya.",
-        "closeRegistrationForm": "Funga fomu ya usajili",
+        "registerAccount": "Unda akaunti",
+        "registrationInfo": "Tafadhali unda akaunti kwa barua pepe ili kuhifadhi ufikivu wa mazungumzo haya. Bila akaunti, hutaweza kuingia tena au kurudi mazungumzo haya.",
+        "closeRegistrationForm": "Funga fomu ya kuunda akaunti",
         "invalidEmail": "Tafadhali ingiza anwani sahihi ya barua pepe",
         "emailsMismatch": "Tafadhali hakikisha anwani zote mbili za barua pepe zinafanana",
         "passwordRequirementsNotMet": "Tafadhali hakikisha nenosiri lako linakidhi mahitaji yote",
-        "registrationSuccess": "Akaunti imesajiliwa kwa mafanikio!",
+        "registrationSuccess": "Akaunti imeundwa kwa mafanikio!",
         "verificationSentWithEmail": "Kwa sasa umeingia na barua pepe: {{email}}. Barua pepe ya uthibitisho imetumwa. Tafadhali thibitisha akaunti yako kabla ya kuingia tena.",
-        "registrationFailed": "Imeshindikana kusajili akaunti",
+        "registrationFailed": "Imeshindikana kuunda akaunti",
         "emailWarning": "Tafadhali hakikisha unatumia barua pepe sahihi, kwani haiwezi kubadilishwa baadaye na utaulizwa kuithibitisha."
       },
       "passwordReset": {
@@ -428,17 +428,17 @@
       "socialAuth": {
         "orContinueWith": "Au",
         "loginWithGoogle": "Endelea na Google",
-        "googleLoginIsNotAvailableWhenOffline": "Kuingia na Google hakupatikani ukiwa nje ya mtandao.",
+        "googleLoginIsNotAvailableWhenOffline": "Huwezi kuingia kwa Google ukiwa nje ya mtandao.",
         "accountNotRegistered": "Akaunti hii haijasajiliwa. Tafadhali wasiliana na mtoa kiungo hiki."
       }
     },
     "loggingYouOutNotice": "Tunakutoa nje...",
     "errors": {
       "loginFailedGeneric": "Hatukuweza kukuingiza kwa sasa. Tafadhali jaribu tena.",
-      "registerFailedGeneric": "Hatukuweza kukamilisha usajili wako kwa sasa. Tafadhali jaribu tena.",
+      "registerFailedGeneric": "Hatukuweza kuunda akaunti yako kwa sasa. Tafadhali jaribu tena.",
       "preferencesFetchFailedWithMessage": "Kosa limetokea wakati wa kujaribu kupata mapendeleo yako: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "Akaunti yenye barua pepe hii tayari ipo. Ikiwa ulijiandikisha kwa Google, tafadhali tumia kitufe cha 'Ingia na Google' kuingia.",
+        "emailAlreadyInUse": "Akaunti yenye barua pepe hii tayari ipo. Ikiwa uliunda akaunti kwa Google, tafadhali tumia kitufe cha 'Ingia na Google' kuingia.",
         "emailNotVerified": "Barua pepe unayotumia imesajiliwa, lakini bado hujaithibitisha. Tafadhali thibitisha barua pepe yako ili kuendelea.",
         "invalidCredential": "Barua pepe/nenosiri iliyotolewa si sahihi.",
         "invalidEmail": "Anwani ya barua pepe si sahihi.",
@@ -452,8 +452,8 @@
         "tooManyUsers": "Kuna watumiaji wengi sana kwenye mradi huu.",
         "invalidRegistrationCode": "Nambari ya usajili uliyoingiza si sahihi. Tafadhali angalia nambari na ujaribu tena.",
         "invalidInvitationCode": "Nambari ya mwaliko uliyoingiza si sahihi. Tafadhali angalia nambari na ujaribu tena.",
-        "invalidInvitationType": "Nambari uliyotumia ni ya usajili na si ya kuingia. Tafadhali nenda kwenye ukurasa wa usajili.",
-        "invalidRegistrationType": "Nambari uliyotumia ni ya kuingia na si ya usajili. Tafadhali nenda kwenye ukurasa wa kuingia.",
+        "invalidInvitationType": "Nambari uliyotumia ni ya kuunda akaunti, si ya kuingia. Tafadhali nenda ukurasa wa Kuunda akaunti.",
+        "invalidRegistrationType": "Nambari uliyotumia ni ya kuingia, si ya kuunda akaunti. Tafadhali nenda ukurasa wa Kuingia.",
         "popupClosedByUser": "Dirisha la kuingia la Google lilifungwa kabla ya kukamilisha mchakato wa kuingia.",
         "invalidLoginMethod": "Operesheni hii hairuhusiwi kwa njia ya sasa ya kuingia.",
         "emailAlreadyVerified": "Anwani ya barua pepe tayari imethibitishwa."
@@ -1143,7 +1143,7 @@
     "faqAriaLabel": "Msaada na Maswali"
   },
   "faq": {
-    "lede": "Majibu ya maswali ya kawaida kuhusu Njila — jinsi inavyofanya kazi, jinsi ya kujiandikisha, na jinsi ya kutatua matatizo ya kawaida.",
+    "lede": "Majibu ya maswali ya kawaida kuhusu Njila — jinsi inavyofanya kazi, jinsi ya kuunda akaunti, na jinsi ya kutatua matatizo ya kawaida.",
     "searchPlaceholder": "Tafuta maswali…",
     "searchAriaLabel": "Tafuta katika Maswali",
     "clearSearch": "Futa utafutaji",

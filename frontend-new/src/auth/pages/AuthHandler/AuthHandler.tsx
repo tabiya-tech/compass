@@ -223,9 +223,9 @@ const AuthHandler: React.FC = () => {
         color="brandAction"
         data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
         sx={{
-          textTransform: "uppercase",
           backgroundColor: theme.palette.common.cream,
           color: theme.palette.brandAction.main,
+          alignSelf: "center",
         }}
       >
         {t("common.buttons.backToLogin")}
@@ -284,9 +284,9 @@ const AuthHandler: React.FC = () => {
         disabled={isSubmitting || !isPasswordValid || newPassword !== confirmPassword}
         data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
         sx={{
-          textTransform: "uppercase",
           backgroundColor: theme.palette.common.cream,
           color: theme.palette.brandAction.main,
+          alignSelf: "center",
         }}
       >
         {isSubmitting ? (
@@ -319,18 +319,17 @@ const AuthHandler: React.FC = () => {
           {body}
         </Typography>
         <PrimaryButton
-          fullWidth
           showCircle
           color="brandAction"
           onClick={goToLogin}
           data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
           sx={{
-            textTransform: "uppercase",
             backgroundColor: theme.palette.common.cream,
             color: theme.palette.brandAction.main,
+            alignSelf: "center",
           }}
         >
-          {t("common.buttons.backToLogin")}s
+          {t("common.buttons.backToLogin")}
         </PrimaryButton>
       </Box>
     );
@@ -365,13 +364,7 @@ const AuthHandler: React.FC = () => {
           "& .MuiLink-root": { color: theme.palette.common.white },
         }}
       >
-        <Typography
-          variant="h3"
-          alignSelf="flex-start"
-          textAlign="center"
-          gutterBottom
-          data-testid={DATA_TEST_ID.TITLE}
-        >
+        <Typography variant="h3" alignSelf="flex-start" textAlign="center" data-testid={DATA_TEST_ID.TITLE}>
           {title}
         </Typography>
         {status === Status.PROCESSING && renderProcessing()}

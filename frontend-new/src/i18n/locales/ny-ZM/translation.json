@@ -2,10 +2,10 @@
   "common": {
     "buttons": {
       "login": "Lowani",
-      "loginLink": "Lowani",
+      "loginLink": "Lowani ku Njila",
       "logout": "Tsekani",
       "submit": "Tumizani",
-      "register": "Lembetsani",
+      "register": "Pangani akaunti",
       "registerLink": "Pangani akaunti",
       "startNewConversation": "Yambani nkhani yatsopano",
       "settings": "Zokonda",
@@ -288,10 +288,10 @@
         "welcomeBack": "Mwalandilidwa!",
         "loginToYourAccountToContinue": "Lowani ku akaunti yanu kuti mupitilize",
         "loginUsing": "Lowani pogwiritsa ntchito",
-        "loggingYouIn": "Mukulowetsedwa...",
+        "loggingYouIn": "Mukulowa...",
         "loggingInAria": "Kulowa",
         "signInDescription": "Ngati muli ndi akaunti ya Njila kale, lowetsani <0>imelo</0> lanu ndi <1>mawu achinsinsi</1> kuti mulowe, kapena sankhani <2>Google</2> kuti mulowe.",
-        "dontHaveAnAccount": "Mwatsopano ku Njila?",
+        "dontHaveAnAccount": "Mulibe akaunti? Pangani kwaulere.",
         "needHelp": "Thandizo",
         "fillInEmailAndPassword": "Chonde lembani imelo ndi mawu achinsinsi",
         "orLoginToYourAccountToContinue": "Kapena lowani ku akaunti yanu kuti mupitilize",
@@ -321,7 +321,7 @@
       },
       "register": {
         "signUpTitle": "Pangani akaunti",
-        "signUpDescription": "Kuti mupange akaunti ya Njila, lowetsani <0>imelo yanu</0> ndipo mupange <1>mawu achinsinsi</1>. Mutha kutsekanso ndi akaunti yanu ya <2>Google</2>.",
+        "signUpDescription": "Kuti mupange akaunti ya Njila, lowetsani <0>imelo yanu</0> ndipo mupange <1>mawu achinsinsi</1>. Mutha kupanganso akaunti pogwiritsa akaunti yanu ya <2>Google</2>.",
         "emailPlaceholder": "Imelo yanu",
         "passwordPlaceholder": "Pangani mawu achinsinsi",
         "confirmPasswordPlaceholder": "Bwerezani mawu achinsinsi",
@@ -330,13 +330,13 @@
         "subtitle": "Tikufuna zobisika zina kuti tiyambe",
         "registerWithGoogle": "Pitilizani ndi Google",
         "alreadyHaveAccount": "Mwadzakhala ndi akaunti?",
-        "registeringYou": "Mukulembetsedwa...",
+        "registeringYou": "Mukupanga akaunti yanu...",
         "enterRegistrationCode": "Lembani code yanu yolembetsa",
         "registrationCode": "Code yolembetsa",
         "andEitherContinueWith": "ndipo pitilizani ndi",
         "components": {
           "registerWithEmailForm": {
-            "registeringAria": "Kulembetsa"
+            "registeringAria": "Kupanga akaunti"
           }
         }
       },
@@ -348,10 +348,10 @@
         "welcome": "Takulandilani!",
         "welcomeTitle": "Takulandilani ku {{appName}}!",
         "or": "kapena",
-        "loggingYouIn": "Mukulowetsedwa..."
+        "loggingYouIn": "Mukulowa..."
       },
       "verifyEmail": {
-        "registrationThankYou": "Zikomo chifukwa cha kulembetsa ku {{appName}}.",
+        "registrationThankYou": "Zikomo chifukwa chapanga akaunti ku {{appName}}.",
         "verificationEmailSentMessage": "Imelo yotsimikiza yatumizidwa kwa imelo yanu. Kuti mupitilize, chonde tsimikizani imelo yanu koyamba.",
         "verificationEmailSentBadge": "Imelo yotsimikiza yatumizidwa"
       },
@@ -362,7 +362,7 @@
         "passwordRequirementsNotMet": "Onetsetsani kuti pasiwedi yanu ikukwaniritsa zofunikira zonse.",
         "verifyEmailTitle": "Kutsimikiza imelo yanu",
         "verifyEmailSuccess": "Imelo yatsimikizidwa!",
-        "verifyEmailSuccessRedirect": "Imelo yanu yatsimikizidwa. Mutumizidwa ku tsamba lolowera mu nthawi yochepa.",
+        "verifyEmailSuccessRedirect": "Imelo yanu yatsimikizidwa. Muthatumizidwa kuti mulowe mu nthawi yochepa.",
         "resetPasswordTitle": "Khazikitsanso pasiwedi yanu",
         "resetPasswordSubtitle": "Lowetsani pasiwedi yatsopano ya {{email}}.",
         "newPasswordPlaceholder": "Pasiwedi yatsopano",
@@ -381,16 +381,16 @@
     },
     "components": {
       "anonymousAccountConversionDialog": {
-        "registerAccount": "Lembetsani Akaunti",
-        "registrationInfo": "Chonde lembetsani ndi imelo kuti mukhalenso ndi kupeza nkhaniyi. Popanda kulembetsa, simudzatha kulowa kenako kapena kubwerera ku nkhaniyi.",
+        "registerAccount": "Pangani akaunti",
+        "registrationInfo": "Chonde pangani akaunti ndi imelo kuti mukhalenso ndi kupeza nkhaniyi. Popanda akaunti, simudzatha kulowa kenako kapena kubwerera ku nkhaniyi.",
         "emailWarning": "Chonde onetsetsani kuti mukugwiritsa ntchito imelo yovomerezeka, chifukwa sizingasinthidwe kenako ndipo mudzapemphedwa kuitsimikiza.",
-        "closeRegistrationForm": "Tsekani fomu yolembetsa",
+        "closeRegistrationForm": "Tsekani fomu yopanga akaunti",
         "invalidEmail": "Chonde lembani imelo yovomerezeka",
         "emailsMismatch": "Chonde onetsetsani kuti imelo zonse ziwiri zikugwirizana",
         "passwordRequirementsNotMet": "Chonde onetsetsani kuti mawu achinsinsi anu akukwaniritsa zofunika zonse",
-        "registrationSuccess": "Akaunti yalembetsedwa bwino!",
+        "registrationSuccess": "Akaunti yapangidwa bwino!",
         "verificationSentWithEmail": "Pano mwalowa ndi imelo: {{email}}. Imelo yotsimikiza yatumizidwa kwa imelo yanu. Chonde tsimikizani akaunti yanu musanalowe kenako.",
-        "registrationFailed": "Kulembetsa akaunti kunalephera"
+        "registrationFailed": "Kupanga akaunti kunalephera"
       },
       "passwordReset": {
         "forgotPassword": "Muwala mawu achinsinsi?",
@@ -435,10 +435,10 @@
     "loggingYouOutNotice": "Tikukutulutsani...",
     "errors": {
       "loginFailedGeneric": "Sitinathe kukulowetsani pakadali pano. Chonde yesaninso.",
-      "registerFailedGeneric": "Sitinathe kumaliza kulembetsa kwanu pakadali pano. Chonde yesaninso.",
+      "registerFailedGeneric": "Sitinathe kupanga akaunti yanu pakadali pano. Chonde yesaninso.",
       "preferencesFetchFailedWithMessage": "Cholakwika chachitika pamene tinayesa kutenga zokonda zanu: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "Akaunti yokhala ndi imelo iyi ilipo kale. Ngati munalembetsa ndi Google, chonde gwiritsani ntchito batani la 'Lowani ndi Google' kulowa.",
+        "emailAlreadyInUse": "Akaunti yokhala ndi imelo iyi ilipo kale. Ngati mwapanga akaunti ndi Google, chonde gwiritsani ntchito batani la 'Lowani ndi Google' kulowa.",
         "emailNotVerified": "Imelo yomwe mukugwiritsa ntchito yalembetsedwa, koma simunatsimikiza. Chonde tsimikizani imelo yanu kuti mupitilize.",
         "invalidCredential": "Imelo/mawu achinsinsi omwe mwatumiza ndi ovutika.",
         "invalidEmail": "Imelo yokhayo ndi yovutika.",
@@ -452,8 +452,8 @@
         "tooManyUsers": "Pali ogwiritsa ambiri kwambiri pa pulojekiti ya Firebase.",
         "invalidRegistrationCode": "Code yolembetsa yomwe mwalemba ndi yovutika. Chonde onani code ndipo yesani kenako.",
         "invalidInvitationCode": "Code yokondera yomwe mwalemba ndi yovutika. Chonde onani code ndipo yesani kenako.",
-        "invalidInvitationType": "Code yomwe mwagwiritsa ntchito ndi yolembetsa osati yokulowerani. Chonde pitani ku tsamba lolembetsa.",
-        "invalidRegistrationType": "Code yomwe mwagwiritsa ntchito ndi yokulowerani osati yolembetsa. Chonde pitani ku tsamba lokulowerani.",
+        "invalidInvitationType": "Code yomwe mwagwiritsa ntchito ndi yopangira akaunti osati yokulowerani. Chonde pitani ku tsamba la Kupanga Akaunti.",
+        "invalidRegistrationType": "Code yomwe mwagwiritsa ntchito ndi yokulowerani osati yopangira akaunti. Chonde pitani ku tsamba la Kulowa.",
         "popupClosedByUser": "Popup ya Google yatsekedwa musanathe kulowa.",
         "invalidLoginMethod": "Ntchitoyi siloledwa ndi njira yano yokulowerani.",
         "emailAlreadyVerified": "Imelo yokhayo yatsimikizidwa kale."
@@ -1143,7 +1143,7 @@
     "faqAriaLabel": "Thandizo ndi Mafunso"
   },
   "faq": {
-    "lede": "Mayankho ku mafunso wamba okhudza Njila — momwe imagwirira ntchito, momwe mungalembetsere, ndi momwe mungathetsere mavuto wamba.",
+    "lede": "Mayankho ku mafunso wamba okhudza Njila — momwe imagwirira ntchito, momwe mungapange akaunti, ndi momwe mungathetsere mavuto wamba.",
     "searchPlaceholder": "Sakani mafunso…",
     "searchAriaLabel": "Sakani mu Mafunso",
     "clearSearch": "Chotsani kufufuza",

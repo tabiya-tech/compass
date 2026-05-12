@@ -1,17 +1,17 @@
 {
   "common": {
     "buttons": {
-      "login": "Login",
-      "loginLink": "Login",
+      "login": "Sign In",
+      "loginLink": "Sign In to Njila",
       "logout": "Logout",
       "submit": "Submit",
-      "register": "Register",
+      "register": "Create Account",
       "registerLink": "Create Account",
       "startNewConversation": "Start new conversation",
       "settings": "Settings",
       "cancel": "Cancel",
       "confirm": "Yes, I'm sure",
-      "backToLogin": "Back to Login",
+      "backToLogin": "Back to Sign In",
       "save": "Save",
       "goBack": "Go Back",
       "restore": "Restore",
@@ -86,8 +86,8 @@
         "unexpectedError": "Something went wrong on our end. Please try again in a moment, and if it keeps happening copy the reference below and share it with support.",
         "serverConnectionError": "Cannot connect to the service. Please check your internet connection or try again later.",
         "resourceNotFound": "The requested resource was not found. Please clear your browser's cache and refresh the page.",
-        "authenticationFailure": "It looks like you not logged in. Please log in to continue.",
-        "permissionDenied": "It looks like you do not have the necessary permissions. Please log out and log in again.",
+        "authenticationFailure": "It looks like you not logged in. Please sign in to continue.",
+        "permissionDenied": "It looks like you do not have the necessary permissions. Please log out and sign in again.",
         "unableToProcessResponse": "We encountered an issue while processing data. Clear the browser's cache and refresh or try again later.",
         "serviceUnavailable": "The service is currently unavailable. Please try again later.",
         "dataValidationError": "There seems to be an issue with your request. If you're submitting data, please make sure they're valid and try again. If the problem persists, clear your browser's cache and refresh the page.",
@@ -146,7 +146,7 @@
         "here": "here.",
         "createAccountIntro": "If you would like to explore your skills and experiences in the future, you can",
         "createAccount": "Create an Account",
-        "verificationReminder": "A verification email has been sent to your email address. Please verify your account before logging in again.",
+        "verificationReminder": "A verification email has been sent to your email address. Please verify your account before signing in again.",
         "feedbackWelcome": "We'd love to get more",
         "feedbackLinkText": "Feedback",
         "feedbackFromYouSuffix": "from you. It only takes 5 minutes and helps us improve!",
@@ -286,15 +286,15 @@
       "login": {
         "welcomeTitle": "Welcome to {{appName}}!",
         "welcomeBack": "Welcome back!",
-        "loginToYourAccountToContinue": "Login to your account to continue",
-        "loginUsing": "Login using",
-        "loggingYouIn": "Logging you in...",
-        "loggingInAria": "Logging in",
-        "signInDescription": "If you already have a Njila account, enter your <0>email</0> and <1>password</1> to access it, or choose <2>Google</2> to log in.",
-        "dontHaveAnAccount": "New to Njila?",
+        "loginToYourAccountToContinue": "Sign in to your account to continue",
+        "loginUsing": "Sign in using",
+        "loggingYouIn": "Signing you in...",
+        "loggingInAria": "Signing in",
+        "signInDescription": "If you already have a Njila account, enter your <0>email</0> and <1>password</1> to access it, or choose <2>Google</2> to sign in.",
+        "dontHaveAnAccount": "No account yet? Register for free.",
         "needHelp": "Help",
         "fillInEmailAndPassword": "Please fill in the email and password fields",
-        "orLoginToYourAccountToContinue": "Or login to your account to continue",
+        "orLoginToYourAccountToContinue": "Or sign in to your account to continue",
         "or": "or",
         "invitationCodeValid": "Invitation code is valid",
         "continueAsGuest": "Continue as Guest",
@@ -302,8 +302,8 @@
           "discoverLine": "Discover your",
           "skillsLine": "skills & strengths",
           "subheadline": "Your guided path from skills to your first job — built around what you know, what you've done, and where you want to go.",
-          "signInTitle": "Login",
-          "cta": "Login",
+          "signInTitle": "Sign In",
+          "cta": "Sign In",
           "whatIsTitleBefore": "What is ",
           "whatIsTitleBrand": "{{appName}}",
           "feature1Title": "Discover your strengths",
@@ -315,13 +315,13 @@
         },
         "components": {
           "loginWithInviteCodeForm": {
-            "loginCode": "Login Code"
+            "loginCode": "Sign-in code"
           }
         }
       },
       "register": {
         "signUpTitle": "Create an account",
-        "signUpDescription": "To create a Njila account, enter your <0>email address</0> and create a <1>password</1>. You can also register with your <2>Google</2> account.",
+        "signUpDescription": "To create a Njila account, enter your <0>email address</0> and create a <1>password</1>. You can also create an account with your <2>Google</2> account.",
         "emailPlaceholder": "Your email address",
         "passwordPlaceholder": "Create a password",
         "confirmPasswordPlaceholder": "Repeat the password",
@@ -330,13 +330,13 @@
         "subtitle": "We need some information to get started",
         "registerWithGoogle": "Continue with Google",
         "alreadyHaveAccount": "Already have an account?",
-        "registeringYou": "Registering you...",
+        "registeringYou": "Creating your account...",
         "enterRegistrationCode": "Enter your registration code",
         "registrationCode": "Registration code",
         "andEitherContinueWith": "and either continue with",
         "components": {
           "registerWithEmailForm": {
-            "registeringAria": "Registering"
+            "registeringAria": "Creating account"
           }
         }
       },
@@ -348,10 +348,10 @@
         "welcome": "Welcome!",
         "welcomeTitle": "Welcome to {{appName}}!",
         "or": "or",
-        "loggingYouIn": "Logging you in..."
+        "loggingYouIn": "Signing you in..."
       },
       "verifyEmail": {
-        "registrationThankYou": "Thank you for registering to {{appName}}.",
+        "registrationThankYou": "Thank you for creating an account with {{appName}}.",
         "verificationEmailSentMessage": "A verification email has been sent to your email address. To continue, please verify your email address first.",
         "verificationEmailSentBadge": "Verification email sent"
       },
@@ -362,7 +362,7 @@
         "passwordRequirementsNotMet": "Please ensure your password meets all requirements.",
         "verifyEmailTitle": "Verifying your email",
         "verifyEmailSuccess": "Email verified!",
-        "verifyEmailSuccessRedirect": "Your email has been verified. You will be redirected to the login page shortly.",
+        "verifyEmailSuccessRedirect": "Your email has been verified. You will be redirected to sign in shortly.",
         "resetPasswordTitle": "Reset your password",
         "resetPasswordSubtitle": "Enter a new password for {{email}}.",
         "newPasswordPlaceholder": "New password",
@@ -381,16 +381,16 @@
     },
     "components": {
       "anonymousAccountConversionDialog": {
-        "registerAccount": "Register Account",
-        "registrationInfo": "Please register with an email to keep access to this conversation. Without registering, you won't be able to log in again or return to this conversation.",
+        "registerAccount": "Create Account",
+        "registrationInfo": "Please create an account with an email to keep access to this conversation. Without an account, you won't be able to sign in again or return to this conversation.",
         "emailWarning": "Please make sure you use the correct email, as it cannot be changed later and you will be asked to verify it.",
-        "closeRegistrationForm": "Close registration form",
+        "closeRegistrationForm": "Close Create Account form",
         "invalidEmail": "Please enter a valid email address",
         "emailsMismatch": "Please ensure both email addresses match",
         "passwordRequirementsNotMet": "Please ensure your password meets all requirements",
-        "registrationSuccess": "Account successfully registered!",
-        "verificationSentWithEmail": "Currently logged in with the email: {{email}}. A verification email has been sent to your email address. Please verify your account before logging in again.",
-        "registrationFailed": "Failed to register account"
+        "registrationSuccess": "Account created successfully!",
+        "verificationSentWithEmail": "Currently signed in with the email: {{email}}. A verification email has been sent to your email address. Please verify your account before signing in again.",
+        "registrationFailed": "Failed to create account"
       },
       "passwordReset": {
         "forgotPassword": "Forgot password?",
@@ -417,7 +417,7 @@
         "invitationRequestSubmitError": "Something went wrong while attempting to send your request"
       },
       "requestInvitationCode": {
-        "requestLoginCode": "Don't have a login code?"
+        "requestLoginCode": "Don't have a sign-in code?"
       },
       "resendVerificationEmail": {
         "emailNotVerified": "Your email is not verified. Please check your inbox for the verification email.",
@@ -428,17 +428,17 @@
       "socialAuth": {
         "orContinueWith": "Or",
         "loginWithGoogle": "Continue with Google",
-        "googleLoginIsNotAvailableWhenOffline": "Google login is not available when offline.",
+        "googleLoginIsNotAvailableWhenOffline": "Google sign-in is not available when offline.",
         "accountNotRegistered": "This account isn’t registered. Please contact the provider of this link."
       }
     },
     "loggingYouOutNotice": "We are logging you out...",
     "errors": {
       "loginFailedGeneric": "We couldn't sign you in right now. Please try again.",
-      "registerFailedGeneric": "We couldn't complete your registration right now. Please try again.",
+      "registerFailedGeneric": "We couldn't create your account right now. Please try again.",
       "preferencesFetchFailedWithMessage": "An error occurred while trying to get your preferences: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "An account with this email already exists. If you signed up with Google, please use the 'Sign in with Google' button to log in.",
+        "emailAlreadyInUse": "An account with this email already exists. If you created an account with Google, please use the 'Sign in with Google' button to sign in.",
         "emailNotVerified": "The email you are using is registered, but you have not yet verified it. Please verify your email to continue.",
         "invalidCredential": "The email/password provided is invalid.",
         "invalidEmail": "The email address is not valid.",
@@ -452,10 +452,10 @@
         "tooManyUsers": "There are too many users on this Firebase project.",
         "invalidRegistrationCode": "The registration code you entered is invalid. Please check the code and try again.",
         "invalidInvitationCode": "The invitation code you entered is invalid. Please check the code and try again.",
-        "invalidInvitationType": "The code you used is for registration and not for login. Please go to the register page.",
-        "invalidRegistrationType": "The code you used is for login and not for registration. Please go to the login page.",
+        "invalidInvitationType": "The code you used is for creating an account, not for signing in. Please go to the Create Account page.",
+        "invalidRegistrationType": "The code you used is for signing in, not for creating an account. Please go to the Sign In page.",
         "popupClosedByUser": "The Google sign-in popup was closed before completing the sign-in process.",
-        "invalidLoginMethod": "This operation is not allowed with the current login method.",
+        "invalidLoginMethod": "This operation is not allowed with the current sign-in method.",
         "emailAlreadyVerified": "The email address is already verified."
       }
     },
@@ -1143,7 +1143,7 @@
     "faqAriaLabel": "Help and FAQ"
   },
   "faq": {
-    "lede": "Answers to common questions about Njila — how it works, how to sign up, and how to resolve common problems.",
+    "lede": "Answers to common questions about Njila — how it works, how to create an account, and how to resolve common problems.",
     "searchPlaceholder": "Search questions…",
     "searchAriaLabel": "Search FAQ",
     "clearSearch": "Clear search",

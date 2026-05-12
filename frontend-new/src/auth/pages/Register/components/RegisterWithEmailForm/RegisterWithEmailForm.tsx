@@ -129,24 +129,43 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.REGISTER_BUTTON}
         sx={{
-          textTransform: "uppercase",
           backgroundColor: theme.palette.common.cream,
           color: theme.palette.primary.main,
           alignSelf: "center",
           width: { xs: "90%", sm: "75%" },
           maxWidth: 420,
+          fontSize: theme.typography.subtitle1.fontSize,
+          alignItems: "center",
+          "& > span:first-of-type": {
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: 0,
+          },
+          "&.Mui-disabled": {
+            opacity: 0.4,
+            color: theme.palette.primary.main,
+            WebkitTextFillColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.common.cream,
+            "& > .MuiBox-root": {
+              backgroundColor: theme.palette.primary.main,
+              color: theme.palette.common.cream,
+            },
+          },
         }}
       >
         {isRegistering ? (
-          <CircularProgress
-            color={"secondary"}
-            aria-label={t("auth.pages.register.components.registerWithEmailForm.registeringAria")}
-            data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
-            size={16}
-            sx={{ marginTop: theme.tabiyaSpacing.sm, marginBottom: theme.tabiyaSpacing.sm }}
-          />
+          <span>
+            <CircularProgress
+              color={"secondary"}
+              aria-label={t("auth.pages.register.components.registerWithEmailForm.registeringAria")}
+              data-testid={DATA_TEST_ID.REGISTER_BUTTON_CIRCULAR_PROGRESS}
+              size={16}
+            />
+          </span>
         ) : (
-          t("common.buttons.register")
+          <span>{t("common.buttons.register")}</span>
         )}
       </PrimaryButton>
     </Box>

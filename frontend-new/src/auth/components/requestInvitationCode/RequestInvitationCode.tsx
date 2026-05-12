@@ -18,7 +18,7 @@ export const DATA_TEST_ID = {
   REQUEST_INVITATION_CODE_LINK: `request-invitation-code-link-${uniqueId}`,
 };
 export const UI_TEXT = {
-  REQUEST_LOGIN_CODE: "Don't have a login code?",
+  REQUEST_LOGIN_CODE: "Don't have a sign-in code?",
   REQUEST_REGISTRATION_CODE: "Don't have a registration code?",
   REQUEST_INVITATION_CODE_LINK: "Reach out",
 };

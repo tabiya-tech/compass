@@ -9,7 +9,7 @@ exports[`Testing LoginWithInviteCodeForm component it should show login form 1`]
     class="MuiInputBase-input MuiOutlinedInput-input css-p1mqw2-MuiInputBase-input-MuiOutlinedInput-input"
     data-testid="login-inviteCode-input-300d373e-b913-4bd5-9045-3a28d490cf2c"
     id=":r1:"
-    placeholder="Login Code"
+    placeholder="Sign-in code"
     type="text"
     value="invite-code"
   />

@@ -9,7 +9,7 @@ import { getDarkLogoUrl, getLogoUrl, getProductName, getRegistrationDisabled } f
 import { AuthPageProvider } from "src/auth/components/AuthLayout/AuthPageContext";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
 import { routerPaths } from "src/app/routerPaths";
-import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
+import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 
 const FeatureColumn: React.FC<{
   imageSrc: string;
@@ -216,7 +216,7 @@ const AuthLayout: React.FC = () => {
         {(showRegisterLink || showLoginLink) && (
           <Box
             sx={{
-              mt: theme.fixedSpacing(1.5),
+              mt: theme.fixedSpacing(2),
               width: "100%",
               maxWidth: { xs: 420, md: 360, lg: 420 },
               display: "flex",
@@ -226,25 +226,26 @@ const AuthLayout: React.FC = () => {
             }}
           >
             <Typography
-              variant="body1"
               sx={{
                 textAlign: "center",
                 color: theme.palette.text.primary,
-                fontWeight: 500,
+                fontWeight: 700,
                 width: "100%",
                 maxWidth: "100%",
                 px: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                fontSize: theme.typography.subtitle1.fontSize,
               }}
             >
               {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}
             </Typography>
-            <PrimaryButton
+            <SecondaryButton
               showCircle
               onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
-              color={showRegisterLink ? "primary" : "brandAction"}
+              color={showRegisterLink ? "brandAction" : "primary"}
+              sx={{ alignSelf: "center" }}
             >
               {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink")}
-            </PrimaryButton>
+            </SecondaryButton>
           </Box>
         )}
       </Box>

@@ -41,7 +41,7 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
         class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-1lre3s8-MuiTypography-root"
         data-testid="verification-title-f1228c6a-e447-4946-b810-0c7ddc8ca833"
       >
-        Thank you for registering to {{appName}}.
+        Thank you for creating an account with {{appName}}.
       </h1>
       <p
         class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
@@ -56,7 +56,7 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
       tabindex="0"
       type="button"
     >
-      Back to Login
+      Back to Sign In
       <div
         class="MuiBox-root css-f2dt27"
       >

@@ -2,10 +2,10 @@
   "common": {
     "buttons": {
       "login": "Iniciar sesión",
-      "loginLink": "Iniciar sesión",
+      "loginLink": "Iniciar sesión en Njila",
       "logout": "Cerrar sesión",
       "submit": "Enviar",
-      "register": "Registrarse",
+      "register": "Crear cuenta",
       "registerLink": "Crear cuenta",
       "startNewConversation": "Iniciar nueva conversación",
       "settings": "Configuración",
@@ -291,7 +291,7 @@
         "loggingYouIn": "Iniciando sesión...",
         "loggingInAria": "Iniciando sesión",
         "signInDescription": "Si ya tienes una cuenta de Njila, introduce tu <0>correo electrónico</0> y tu <1>contraseña</1> para acceder, o elige <2>Google</2> para iniciar sesión.",
-        "dontHaveAnAccount": "¿Nuevo en Njila?",
+        "dontHaveAnAccount": "¿Aún no tienes cuenta? Regístrate gratis.",
         "needHelp": "Ayuda",
         "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
         "orLoginToYourAccountToContinue": "O inicia sesión en tu cuenta para continuar",
@@ -321,7 +321,7 @@
       },
       "register": {
         "signUpTitle": "Crear una cuenta",
-        "signUpDescription": "Para crear una cuenta de Njila, introduce tu <0>dirección de correo</0> y crea una <1>contraseña</1>. También puedes registrarte con tu cuenta de <2>Google</2>.",
+        "signUpDescription": "Para crear una cuenta de Njila, introduce tu <0>dirección de correo</0> y crea una <1>contraseña</1>. También puedes crear una cuenta con tu cuenta de <2>Google</2>.",
         "emailPlaceholder": "Tu correo electrónico",
         "passwordPlaceholder": "Crea una contraseña",
         "confirmPasswordPlaceholder": "Repite la contraseña",
@@ -330,13 +330,13 @@
         "subtitle": "Necesitamos algo de información para comenzar",
         "registerWithGoogle": "Continuar con Google",
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
-        "registeringYou": "Registrándote...",
+        "registeringYou": "Creando tu cuenta...",
         "enterRegistrationCode": "Ingresa tu código de registro",
         "registrationCode": "Código de registro",
         "andEitherContinueWith": "o continúa con",
         "components": {
           "registerWithEmailForm": {
-            "registeringAria": "Registrando"
+            "registeringAria": "Creando cuenta"
           }
         }
       },
@@ -351,7 +351,7 @@
         "loggingYouIn": "Iniciando sesión..."
       },
       "verifyEmail": {
-        "registrationThankYou": "Gracias por registrarte en {{appName}}.",
+        "registrationThankYou": "Gracias por crear una cuenta en {{appName}}.",
         "verificationEmailSentMessage": "Se ha enviado un correo de verificación a tu dirección de correo electrónico. Para continuar, primero verifica tu correo electrónico.",
         "verificationEmailSentBadge": "Correo de verificación enviado"
       },
@@ -362,7 +362,7 @@
         "passwordRequirementsNotMet": "Asegúrate de que tu contraseña cumpla con todos los requisitos.",
         "verifyEmailTitle": "Verificando tu correo electrónico",
         "verifyEmailSuccess": "¡Correo verificado!",
-        "verifyEmailSuccessRedirect": "Tu correo electrónico ha sido verificado. Serás redirigido a la página de inicio de sesión en breve.",
+        "verifyEmailSuccessRedirect": "Tu correo electrónico ha sido verificado. En breve serás redirigido para iniciar sesión.",
         "resetPasswordTitle": "Restablece tu contraseña",
         "resetPasswordSubtitle": "Ingresa una nueva contraseña para {{email}}.",
         "newPasswordPlaceholder": "Nueva contraseña",
@@ -381,16 +381,16 @@
     },
     "components": {
       "anonymousAccountConversionDialog": {
-        "registerAccount": "Registrar cuenta",
-        "registrationInfo": "Por favor regístrate con un correo electrónico para mantener el acceso a esta conversación. Sin registrarte, no podrás iniciar sesión nuevamente ni regresar a esta conversación.",
+        "registerAccount": "Crear cuenta",
+        "registrationInfo": "Por favor crea una cuenta con un correo electrónico para mantener el acceso a esta conversación. Sin una cuenta, no podrás iniciar sesión nuevamente ni regresar a esta conversación.",
         "emailWarning": "Asegúrate de usar el correo correcto, ya que no se podrá cambiar más tarde y se te pedirá verificarlo.",
-        "closeRegistrationForm": "Cerrar formulario de registro",
+        "closeRegistrationForm": "Cerrar formulario para crear cuenta",
         "invalidEmail": "Por favor ingresa una dirección de correo válida",
         "emailsMismatch": "Asegúrate de que ambas direcciones de correo coincidan",
         "passwordRequirementsNotMet": "Asegúrate de que tu contraseña cumpla todos los requisitos",
-        "registrationSuccess": "¡Cuenta registrada con éxito!",
+        "registrationSuccess": "¡Cuenta creada con éxito!",
         "verificationSentWithEmail": "Actualmente has iniciado sesión con el correo: {{email}}. Se ha enviado un correo de verificación a tu dirección. Verifica tu cuenta antes de volver a iniciar sesión.",
-        "registrationFailed": "Error al registrar la cuenta"
+        "registrationFailed": "No se pudo crear la cuenta"
       },
       "passwordReset": {
         "forgotPassword": "¿Olvidaste tu contraseña?",
@@ -435,10 +435,10 @@
     "loggingYouOutNotice": "Cerrando tu sesión...",
     "errors": {
       "loginFailedGeneric": "No pudimos iniciar tu sesión en este momento. Inténtalo de nuevo.",
-      "registerFailedGeneric": "No pudimos completar tu registro en este momento. Inténtalo de nuevo.",
+      "registerFailedGeneric": "No pudimos crear tu cuenta en este momento. Inténtalo de nuevo.",
       "preferencesFetchFailedWithMessage": "Se produjo un error al obtener tus preferencias: {{message}}",
       "firebase": {
-        "emailAlreadyInUse": "Ya existe una cuenta con este correo electrónico. Si te registraste con Google, usa el botón 'Iniciar sesión con Google' para acceder.",
+        "emailAlreadyInUse": "Ya existe una cuenta con este correo electrónico. Si creaste una cuenta con Google, usa el botón 'Iniciar sesión con Google' para iniciar sesión.",
         "emailNotVerified": "El correo que estás usando está registrado, pero aún no ha sido verificado. Por favor verifica tu correo para continuar.",
         "invalidCredential": "El correo/contraseña proporcionados no son válidos.",
         "invalidEmail": "La dirección de correo no es válida.",
@@ -452,8 +452,8 @@
         "tooManyUsers": "Hay demasiados usuarios en este proyecto de Firebase.",
         "invalidRegistrationCode": "El código de registro ingresado no es válido. Verifica el código e inténtalo nuevamente.",
         "invalidInvitationCode": "El código de invitación ingresado no es válido. Verifica el código e inténtalo nuevamente.",
-        "invalidInvitationType": "El código que usaste es para registro y no para inicio de sesión. Ve a la página de registro.",
-        "invalidRegistrationType": "El código que usaste es para inicio de sesión y no para registro. Ve a la página de inicio de sesión.",
+        "invalidInvitationType": "El código que usaste es para crear una cuenta, no para iniciar sesión. Ve a la página de Crear cuenta.",
+        "invalidRegistrationType": "El código que usaste es para iniciar sesión, no para crear una cuenta. Ve a la página de Iniciar sesión.",
         "popupClosedByUser": "La ventana emergente de Google se cerró antes de completar el inicio de sesión.",
         "invalidLoginMethod": "Esta operación no está permitida con el método de inicio de sesión actual.",
         "emailAlreadyVerified": "La dirección de correo ya está verificada."
@@ -1143,7 +1143,7 @@
     "faqAriaLabel": "Ayuda y preguntas frecuentes"
   },
   "faq": {
-    "lede": "Respuestas a preguntas comunes sobre Njila: cómo funciona, cómo registrarse y cómo resolver problemas habituales.",
+    "lede": "Respuestas a preguntas comunes sobre Njila: cómo funciona, cómo crear una cuenta y cómo resolver problemas habituales.",
     "searchPlaceholder": "Buscar preguntas…",
     "searchAriaLabel": "Buscar en preguntas frecuentes",
     "clearSearch": "Borrar búsqueda",

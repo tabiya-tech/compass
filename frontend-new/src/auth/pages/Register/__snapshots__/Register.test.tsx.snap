@@ -23,7 +23,7 @@ exports[`Testing Register component it should show register form successfully 1`
         <strong>
           email address
         </strong>
-         and create a &lt;1&gt;password&lt;/1&gt;. You can also register with your &lt;2&gt;Google&lt;/2&gt; account.
+         and create a &lt;1&gt;password&lt;/1&gt;. You can also create an account with your &lt;2&gt;Google&lt;/2&gt; account.
       </div>
     </div>
     <h6
@@ -129,7 +129,7 @@ exports[`Testing Register component should handle application registration code 
         <strong>
           email address
         </strong>
-         and create a &lt;1&gt;password&lt;/1&gt;. You can also register with your &lt;2&gt;Google&lt;/2&gt; account.
+         and create a &lt;1&gt;password&lt;/1&gt;. You can also create an account with your &lt;2&gt;Google&lt;/2&gt; account.
       </div>
     </div>
     <span

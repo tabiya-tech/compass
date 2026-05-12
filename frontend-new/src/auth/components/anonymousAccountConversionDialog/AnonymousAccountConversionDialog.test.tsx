@@ -126,12 +126,12 @@ describe("AnonymousAccountConversionDialog", () => {
     );
 
     // AND the snackbar should show two messages
-    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(1, "Account successfully registered!", {
+    expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(1, "Account created successfully!", {
       variant: "success",
     });
     expect(useSnackbar().enqueueSnackbar).toHaveBeenNthCalledWith(
       2,
-      `Currently logged in with the email: ${givenEmail}. A verification email has been sent to your email address. Please verify your account before logging in again.`,
+      `Currently signed in with the email: ${givenEmail}. A verification email has been sent to your email address. Please verify your account before signing in again.`,
       {
         variant: "info",
         persist: true,
