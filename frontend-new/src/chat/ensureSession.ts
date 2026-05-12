@@ -10,7 +10,11 @@ import { SessionError } from "src/error/commonErrors";
  */
 export const ensureSessionForUser = async (user_id: string): Promise<number | null> => {
   try {
-    const user_preferences = await UserPreferencesService.getInstance().getUserPreferences(user_id);
+    // Chat init can race the registration POST during first sign-up; retry the GET so a
+    // transient 404 doesn't lock the chat with the SOMETHING_WENT_WRONG fallback.
+    const user_preferences = await UserPreferencesService.getInstance().getUserPreferences(user_id, {
+      retryOn404: true,
+    });
     UserPreferencesStateService.getInstance().setUserPreferences(user_preferences);
     return UserPreferencesStateService.getInstance().getActiveSessionId();
   } catch (e) {

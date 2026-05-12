@@ -288,6 +288,41 @@ describe("index", () => {
       expect(console.error).not.toHaveBeenCalled();
       expect(console.warn).not.toHaveBeenCalled();
     });
+
+    test("should fetch user preferences with retryOn404 enabled and not log out when the GET resolves", async () => {
+      // GIVEN a valid token in persistent storage
+      // (also stub getToken on the state service prototype — an earlier test mocks loadToken
+      //  to a no-op, which would otherwise leave AuthenticationStateService.token null)
+      jest.spyOn(PersistentStorageService, "getToken").mockReturnValue("valid-token");
+      jest.spyOn(AuthenticationStateService.prototype, "getToken").mockReturnValue("valid-token");
+
+      // AND getUserPreferences resolves with some preferences
+      const givenPreferences = {
+        user_id: "foo",
+        language: Language.en,
+        sessions: [123],
+        accepted_tc: new Date(),
+        has_sensitive_personal_data: false,
+        user_feedback_answered_questions: {},
+        sensitive_personal_data_requirement: SensitivePersonalDataRequirement.NOT_REQUIRED,
+        experiments: {},
+      };
+      const getPreferencesSpy = jest
+        .spyOn(UserPreferencesService.getInstance(), "getUserPreferences")
+        .mockResolvedValue(givenPreferences);
+
+      // WHEN the app is rendered
+      render(<App />);
+      await waitForAppLoadingToFinish();
+
+      // THEN getUserPreferences is called with retryOn404: true so a transient 404
+      // from the registration race retries instead of forcing logout
+      expect(getPreferencesSpy).toHaveBeenCalledWith("123", { retryOn404: true });
+
+      // AND logout is NOT called when the GET resolves
+      const mockAuthService = AuthenticationFactoryModule.default.getCurrentAuthenticationService();
+      expect(mockAuthService!.logout).not.toHaveBeenCalled();
+    });
   });
 
   describe("register listeners", () => {

@@ -158,7 +158,9 @@ const App = () => {
 
       let preferences = null;
       try {
-        preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id);
+        // Bootstrap can race the registration POST that creates the preferences doc;
+        // retry the 404 before treating the user as truly unregistered and logging out.
+        preferences = await UserPreferencesService.getInstance().getUserPreferences(user.id, { retryOn404: true });
       } catch (error) {
         if (
           error instanceof RestAPIError &&

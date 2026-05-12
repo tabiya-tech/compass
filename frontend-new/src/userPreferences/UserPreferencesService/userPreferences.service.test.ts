@@ -171,6 +171,41 @@ describe("UserPreferencesService", () => {
       await expect(getUserPreferencesCallback).rejects.toThrow("Failed to get user preferences");
     });
 
+    test("getUserPreferences should request retry-on-404 from customFetch when retryOn404 is true", async () => {
+      // GIVEN the GET REST API will respond with OK and some preferences
+      const givenResponseBody = getTestUserPreferences();
+      // AND the client id matches so the legacy-update path is skipped
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenResponseBody.client_id as string);
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+
+      // WHEN getUserPreferences is called with retryOn404: true
+      const service = UserPreferencesService.getInstance();
+      await service.getUserPreferences(givenResponseBody.user_id, { retryOn404: true });
+
+      // THEN customFetch is called once
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // AND the request opts include retriableStatusCodes: [NOT_FOUND] so the
+      // registration race resolves without surfacing a 404 to the caller
+      const [, actualConfig] = fetchSpy.mock.calls[0];
+      expect(actualConfig.retriableStatusCodes).toEqual([StatusCodes.NOT_FOUND]);
+    });
+
+    test("getUserPreferences should not request retry-on-404 when retryOn404 is omitted (preserve fast-fail default)", async () => {
+      // GIVEN the GET REST API will respond with OK and some preferences
+      const givenResponseBody = getTestUserPreferences();
+      jest.spyOn(PersistentStorageService, "getClientId").mockReturnValue(givenResponseBody.client_id as string);
+      const fetchSpy = setupAPIServiceSpy(StatusCodes.OK, givenResponseBody, "application/json;charset=UTF-8");
+
+      // WHEN getUserPreferences is called without options
+      const service = UserPreferencesService.getInstance();
+      await service.getUserPreferences(givenResponseBody.user_id);
+
+      // THEN the request opts pass an empty retriableStatusCodes list
+      // (Authentication.service.ts::onSuccessfulLogin relies on the fast-fail default)
+      const [, actualConfig] = fetchSpy.mock.calls[0];
+      expect(actualConfig.retriableStatusCodes).toEqual([]);
+    });
+
     test.each([
       ["is a malformed json", "{"],
       ["is a string", "foo"],

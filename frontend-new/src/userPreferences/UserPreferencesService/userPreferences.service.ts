@@ -146,11 +146,19 @@ export default class UserPreferencesService {
   }
 
   /**
-   * Gets the user preferences of a user with an ID
+   * Gets the user preferences of a user with an ID.
+   *
+   * When `options.retryOn404` is true, the underlying fetch retries on 404 using customFetch's
+   * exponential backoff: 1s, 2s, 4s between attempts (typical race resolves on the 2nd attempt
+   * after ~1s; up to ~7s before a 4th attempt fires, ~15s before giving up entirely). This is
+   * intended for callers that race with the registration POST during sign-up (auth bootstrap,
+   * chat init). The fast-fail default is preserved for `Authentication.service.ts::onSuccessfulLogin`,
+   * which uses the 404 as a signal that the user is about to register.
+   *
    * @returns {Promise<UserPreference>} The user preferences object
    * @throws {RestAPIError} If the user preferences are invalid or the user does not exist
    */
-  async getUserPreferences(userId: string): Promise<UserPreference> {
+  async getUserPreferences(userId: string, options?: { retryOn404?: boolean }): Promise<UserPreference> {
     const serviceName = UserPreferencesService.serviceName;
     const serviceFunction = "getUserPreferences";
     const method = "GET";
@@ -168,6 +176,7 @@ export default class UserPreferencesService {
       failureMessage: `Failed to get user preferences for user with id ${userId}`,
       expectedContentType: "application/json",
       retryOnFailedToFetch: true,
+      retriableStatusCodes: options?.retryOn404 ? [StatusCodes.NOT_FOUND] : [],
     });
 
     const userPreferences = await this.parseJsonResponse(response, userId, errorFactory);

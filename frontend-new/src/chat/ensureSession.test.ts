@@ -34,7 +34,9 @@ describe("ensureSessionForUser", () => {
 
     const actualSessionId = await ensureSessionForUser(givenUserId);
 
-    expect(givenUserPreferencesServiceInstance.getUserPreferences).toHaveBeenCalledWith(givenUserId);
+    expect(givenUserPreferencesServiceInstance.getUserPreferences).toHaveBeenCalledWith(givenUserId, {
+      retryOn404: true,
+    });
     expect(actualSessionId).toBe(givenNewSessionId);
     expect(UserPreferencesStateService.getInstance().getUserPreferences()).toEqual(givenUserPreferences);
     expect(console.error).not.toHaveBeenCalled();
