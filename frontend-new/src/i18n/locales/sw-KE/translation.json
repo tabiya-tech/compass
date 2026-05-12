@@ -761,6 +761,9 @@
         "high": "Juu"
       },
       "messagePlaceholder": "Eleza kilichotokea, ulichotarajia, au maoni yoyote...",
+      "addScreenshot": "Ongeza picha ya skrini",
+      "removeScreenshot": "Ondoa picha ya skrini",
+      "screenshotAlt": "Picha ya skrini iliyoambatishwa",
       "cancel": "Ghairi",
       "send": "Tuma",
       "successMessage": "Asante kwa maoni yako!",

@@ -779,6 +779,9 @@
         "high": "Yapamwamba"
       },
       "messagePlaceholder": "Fotokozani zomwe zinachitika, zomwe munkayembekezera, kapena ndemanga iliyonse...",
+      "addScreenshot": "Onjezani chithunzi cha skiriini",
+      "removeScreenshot": "Chotsani chithunzi cha skiriini",
+      "screenshotAlt": "Chithunzi cha skiriini choyikidwa",
       "cancel": "Letsani",
       "send": "Tumizani",
       "successMessage": "Zikomo chifukwa cha ndemanga zanu!",

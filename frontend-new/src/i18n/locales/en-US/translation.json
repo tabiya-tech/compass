@@ -779,6 +779,9 @@
         "high": "High"
       },
       "messagePlaceholder": "Describe what happened, what you expected, or any feedback...",
+      "addScreenshot": "Add screenshot",
+      "removeScreenshot": "Remove screenshot",
+      "screenshotAlt": "Attached screenshot",
       "cancel": "Cancel",
       "send": "Send",
       "successMessage": "Thank you for your feedback!",

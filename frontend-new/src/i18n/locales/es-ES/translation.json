@@ -779,6 +779,9 @@
         "high": "Alta"
       },
       "messagePlaceholder": "Describe qué ha pasado, qué esperabas o cualquier comentario...",
+      "addScreenshot": "Añadir captura de pantalla",
+      "removeScreenshot": "Eliminar captura de pantalla",
+      "screenshotAlt": "Captura de pantalla adjunta",
       "cancel": "Cancelar",
       "send": "Enviar",
       "successMessage": "¡Gracias por tus comentarios!",

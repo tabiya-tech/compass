@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Box,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,17 +13,24 @@ import {
 import type { Theme } from "@mui/material/styles";
 import { alpha, useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
-import { BugReport, ChatBubbleOutline, EmojiObjectsOutlined } from "@mui/icons-material";
+import { AddPhotoAlternate, BugReport, ChatBubbleOutline, Close, EmojiObjectsOutlined } from "@mui/icons-material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
 
 export type FeedbackType = "bug" | "feedback" | "idea";
 export type FeedbackPriority = "low" | "medium" | "high";
 
+export interface FeedbackScreenshot {
+  data: Uint8Array;
+  filename: string;
+  contentType: string;
+}
+
 export interface FeedbackModalSubmitPayload {
   type: FeedbackType;
   priority: FeedbackPriority;
   message: string;
+  screenshot?: FeedbackScreenshot;
 }
 
 export interface FeedbackModalProps {
@@ -44,6 +52,9 @@ export const DATA_TEST_ID = {
   FEEDBACK_MODAL_MESSAGE: `feedback-modal-message-${uniqueId}`,
   FEEDBACK_MODAL_CANCEL: `feedback-modal-cancel-${uniqueId}`,
   FEEDBACK_MODAL_SEND: `feedback-modal-send-${uniqueId}`,
+  FEEDBACK_MODAL_SCREENSHOT_BUTTON: `feedback-modal-screenshot-button-${uniqueId}`,
+  FEEDBACK_MODAL_SCREENSHOT_PREVIEW: `feedback-modal-screenshot-preview-${uniqueId}`,
+  FEEDBACK_MODAL_SCREENSHOT_REMOVE: `feedback-modal-screenshot-remove-${uniqueId}`,
 };
 
 const FEEDBACK_TYPES: ReadonlyArray<{ value: FeedbackType; icon: React.ReactNode }> = [
@@ -101,6 +112,45 @@ const PillButton: React.FC<PillButtonProps> = ({ selected, onClick, startIcon, c
   );
 };
 
+async function captureScreenshot(): Promise<FeedbackScreenshot | null> {
+  const stream = await navigator.mediaDevices.getDisplayMedia({
+    video: { width: window.innerWidth * devicePixelRatio, height: window.innerHeight * devicePixelRatio },
+    audio: false,
+    // @ts-expect-error experimental flags used by Sentry's own implementation
+    preferCurrentTab: true,
+    selfBrowserSurface: "include",
+    surfaceSwitching: "exclude",
+    monitorTypeSurfaces: "exclude",
+  });
+
+  const video = document.createElement("video");
+  await new Promise<void>((resolve, reject) => {
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      stream.getTracks().forEach((track) => track.stop());
+      resolve();
+    };
+    video.onerror = reject;
+    video.play().catch(reject);
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.drawImage(video, 0, 0);
+
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+  if (!blob) return null;
+
+  return {
+    data: new Uint8Array(await blob.arrayBuffer()),
+    filename: "screenshot.png",
+    contentType: "image/png",
+  };
+}
+
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -109,12 +159,23 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
   const [type, setType] = useState<FeedbackType>("bug");
   const [priority, setPriority] = useState<FeedbackPriority>("medium");
   const [message, setMessage] = useState("");
+  const [screenshot, setScreenshot] = useState<FeedbackScreenshot | null>(null);
+  const [screenshotPreviewUrl, setScreenshotPreviewUrl] = useState<string | null>(null);
+  const [isCapturingScreenshot, setIsCapturingScreenshot] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const previewUrlRef = useRef<string | null>(null);
 
   const resetState = useCallback(() => {
     setType("bug");
     setPriority("medium");
     setMessage("");
+    setScreenshot(null);
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    setScreenshotPreviewUrl(null);
+    setIsCapturingScreenshot(false);
     setIsSubmitting(false);
   }, []);
 
@@ -124,17 +185,45 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
     onClose();
   }, [isSubmitting, onClose, resetState]);
 
+  const handleAddScreenshot = useCallback(async () => {
+    setIsCapturingScreenshot(true);
+    try {
+      const captured = await captureScreenshot();
+      if (captured) {
+        if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+        const url = URL.createObjectURL(new Blob([captured.data], { type: captured.contentType }));
+        previewUrlRef.current = url;
+        setScreenshot(captured);
+        setScreenshotPreviewUrl(url);
+      }
+    } catch (error) {
+      // User cancelled or browser denied — silently ignore
+      console.debug("Screenshot capture cancelled or failed:", error);
+    } finally {
+      setIsCapturingScreenshot(false);
+    }
+  }, []);
+
+  const handleRemoveScreenshot = useCallback(() => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    setScreenshot(null);
+    setScreenshotPreviewUrl(null);
+  }, []);
+
   const handleSend = useCallback(async () => {
     if (isSubmitting || message.trim().length === 0) return;
     setIsSubmitting(true);
     try {
-      await onSubmit({ type, priority, message: message.trim() });
+      await onSubmit({ type, priority, message: message.trim(), screenshot: screenshot ?? undefined });
       resetState();
       onClose();
     } finally {
       setIsSubmitting(false);
     }
-  }, [isSubmitting, message, onClose, onSubmit, priority, resetState, type]);
+  }, [isSubmitting, message, onClose, onSubmit, priority, resetState, screenshot, type]);
 
   const typeLabels = useMemo(
     () => ({
@@ -240,6 +329,88 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
           disabled={isSubmitting}
           inputProps={{ "aria-label": t("feedback.feedbackModal.messagePlaceholder") }}
         />
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: theme.spacing(1) }}>
+          {screenshotPreviewUrl ? (
+            <Box sx={{ position: "relative", display: "inline-flex", alignSelf: "flex-start" }}>
+              <Box
+                component="img"
+                src={screenshotPreviewUrl}
+                alt={t("feedback.feedbackModal.screenshotAlt")}
+                data-testid={DATA_TEST_ID.FEEDBACK_MODAL_SCREENSHOT_PREVIEW}
+                sx={{
+                  maxWidth: "100%",
+                  maxHeight: 160,
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.divider}`,
+                  display: "block",
+                }}
+              />
+              <Box
+                component="button"
+                type="button"
+                aria-label={t("feedback.feedbackModal.removeScreenshot")}
+                data-testid={DATA_TEST_ID.FEEDBACK_MODAL_SCREENSHOT_REMOVE}
+                onClick={handleRemoveScreenshot}
+                sx={{
+                  position: "absolute",
+                  top: -8,
+                  right: -8,
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  border: "none",
+                  backgroundColor: theme.palette.text.secondary,
+                  color: theme.palette.background.paper,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  padding: 0,
+                  "&:hover": { backgroundColor: theme.palette.text.primary },
+                }}
+              >
+                <Close sx={{ fontSize: 14 }} />
+              </Box>
+            </Box>
+          ) : (
+            <Box
+              component="button"
+              type="button"
+              data-testid={DATA_TEST_ID.FEEDBACK_MODAL_SCREENSHOT_BUTTON}
+              disabled={isSubmitting || isCapturingScreenshot}
+              onClick={handleAddScreenshot}
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                alignSelf: "flex-start",
+                gap: theme.spacing(0.75),
+                paddingY: theme.spacing(0.75),
+                paddingX: theme.spacing(1.5),
+                borderRadius: 999,
+                border: `1px dashed ${theme.palette.divider}`,
+                backgroundColor: "transparent",
+                color: theme.palette.text.secondary,
+                fontSize: theme.typography.body2.fontSize,
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "border-color 120ms ease, color 120ms ease",
+                "&:hover:not(:disabled)": {
+                  borderColor: theme.palette.primary.main,
+                  color: theme.palette.primary.main,
+                },
+                "&:disabled": { opacity: 0.5, cursor: "default" },
+              }}
+            >
+              {isCapturingScreenshot ? (
+                <CircularProgress size={14} color="inherit" />
+              ) : (
+                <AddPhotoAlternate sx={{ fontSize: 16 }} />
+              )}
+              <span>{t("feedback.feedbackModal.addScreenshot")}</span>
+            </Box>
+          )}
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ padding: 0, gap: theme.spacing(1) }}>

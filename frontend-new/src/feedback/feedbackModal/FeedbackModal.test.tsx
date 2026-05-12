@@ -63,6 +63,7 @@ describe("FeedbackModal", () => {
         type: "idea",
         priority: "high",
         message: "My feedback",
+        screenshot: undefined,
       });
     });
     await waitFor(() => expect(onClose).toHaveBeenCalled());

@@ -65,7 +65,10 @@ export const useSentryFeedbackForm = (options: UseSentryFeedbackFormOptions = {}
               "feedback.priority": payload.priority,
             },
           },
-          { includeReplay: true }
+          {
+            includeReplay: true,
+            attachments: payload.screenshot ? [payload.screenshot] : undefined,
+          }
         );
         enqueueSnackbar(t("feedback.feedbackModal.successMessage"), { variant: "success" });
       } catch (error) {
