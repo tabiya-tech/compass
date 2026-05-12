@@ -175,18 +175,28 @@
         "workTypes": "tipos de trabajo",
         "experiences": "experiencias",
         "questions": "preguntas",
-        "tasks": "tareas"
+        "tasks": "tareas",
+        "of": "de"
       },
       "phases": {
         "initializing": "Inicializando...",
         "intro": "Introducción",
         "collecting": "Recopilando",
         "exploring": "Explorando",
+        "preferenceElicitation": "Conociendo lo que te importa",
         "discoveringPreferences": "Descubriendo preferencias",
         "rankingOccupations": "Clasificando ocupaciones",
         "recommendations": "Discutiendo recomendaciones",
         "finished": "Conversación finalizada",
         "unknown": "Fase desconocida"
+      },
+      "preferenceSubPhases": {
+        "experienceQuestions": "Reflexionando sobre tu experiencia",
+        "vignettes": "Imaginando escenarios laborales",
+        "followUp": "Profundizando un poco más",
+        "gate": "Aclarando tus preferencias",
+        "wrapup": "Finalizando",
+        "bws": "Comparando carreras"
       }
     },
     "util": {

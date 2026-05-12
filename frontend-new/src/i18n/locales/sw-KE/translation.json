@@ -216,18 +216,28 @@
         "workTypes": "aina za kazi",
         "experiences": "uzoefu",
         "questions": "maswali",
-        "tasks": "kazi"
+        "tasks": "kazi",
+        "of": "kati ya"
       },
       "phases": {
         "initializing": "Inaanzisha...",
         "intro": "Utangulizi",
         "collecting": "Inakusanya",
         "exploring": "Inachunguza",
+        "preferenceElicitation": "Tunajifunza yanayokufaa",
         "discoveringPreferences": "Inagundua mapendeleo",
         "rankingOccupations": "Inapanga kazi",
         "recommendations": "Inajadili mapendekezo",
         "finished": "Mazungumzo yamekamilika",
         "unknown": "Hatua isiyojulikana"
+      },
+      "preferenceSubPhases": {
+        "experienceQuestions": "Tunatafakari uzoefu wako",
+        "vignettes": "Tunafikiria mazingira ya kazi",
+        "followUp": "Tunachunguza zaidi",
+        "gate": "Tunafafanua mapendeleo yako",
+        "wrapup": "Tunamalizia",
+        "bws": "Kulinganisha kazi"
       }
     },
     "util": {

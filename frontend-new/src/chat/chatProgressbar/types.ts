@@ -9,11 +9,25 @@ export enum ConversationPhase {
   UNKNOWN = "UNKNOWN",
 }
 
+// Sub-phase identifiers for PREFERENCE_ELICITATION. Mirror the literal type on
+// the backend's PreferenceElicitationAgentState.conversation_phase.
+export enum PreferenceSubPhase {
+  INTRO = "INTRO",
+  EXPERIENCE_QUESTIONS = "EXPERIENCE_QUESTIONS",
+  VIGNETTES = "VIGNETTES",
+  FOLLOW_UP = "FOLLOW_UP",
+  GATE = "GATE",
+  BWS = "BWS",
+  WRAPUP = "WRAPUP",
+  COMPLETE = "COMPLETE",
+}
+
 export type CurrentPhase = {
   percentage: number;
   phase: ConversationPhase;
   current: number | null;
   total: number | null;
+  sub_phase?: string | null;
 };
 
 export const defaultCurrentPhase: CurrentPhase = {
@@ -21,4 +35,5 @@ export const defaultCurrentPhase: CurrentPhase = {
   percentage: 0,
   current: null,
   total: null,
+  sub_phase: null,
 };

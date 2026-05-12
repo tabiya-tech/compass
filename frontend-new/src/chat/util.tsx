@@ -222,6 +222,7 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
     percentage: newPhase.percentage,
     current: newPhase.current,
     total: newPhase.total,
+    sub_phase: newPhase.sub_phase ?? null,
   };
 
   if (previousPhase && newPhase.percentage < previousPhase.percentage) {

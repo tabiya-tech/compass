@@ -118,6 +118,14 @@ class ConversationPhaseResponse(BaseModel):
     Total number of entities (work types/experiences) in the conversation.
     """
 
+    sub_phase: str | None = None
+    """
+    Sub-phase identifier within `phase`. Currently only emitted when
+    `phase == PREFERENCE_ELICITATION`, where it carries the preference-agent
+    sub-phase ("EXPERIENCE_QUESTIONS", "VIGNETTES", "FOLLOW_UP", "GATE",
+    "BWS", "WRAPUP"). Frontend uses it to pick a sub-phase-specific label.
+    """
+
     class Config:
         extra = "forbid"
         use_enum_values = True

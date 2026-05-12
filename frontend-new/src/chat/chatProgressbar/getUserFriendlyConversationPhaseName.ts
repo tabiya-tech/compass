@@ -1,4 +1,4 @@
-import { ConversationPhase, CurrentPhase } from "./types";
+import { ConversationPhase, CurrentPhase, PreferenceSubPhase } from "./types";
 import i18n from "src/i18n/i18n";
 
 // Use a Proxy to create a getter pattern that fetches translations on-demand.
@@ -14,7 +14,7 @@ const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => {
         [ConversationPhase.INTRO]: "chat.chatProgressbar.phases.intro",
         [ConversationPhase.COLLECT_EXPERIENCES]: "chat.chatProgressbar.phases.collecting",
         [ConversationPhase.DIVE_IN]: "chat.chatProgressbar.phases.exploring",
-        [ConversationPhase.PREFERENCE_ELICITATION]: "chat.chatProgressbar.phases.discoveringPreferences",
+        [ConversationPhase.PREFERENCE_ELICITATION]: "chat.chatProgressbar.phases.preferenceElicitation",
         [ConversationPhase.RECOMMENDATION]: "chat.chatProgressbar.phases.recommendations",
         [ConversationPhase.ENDED]: "chat.chatProgressbar.phases.finished",
         [ConversationPhase.UNKNOWN]: "chat.chatProgressbar.phases.unknown",
@@ -24,6 +24,36 @@ const getUserFriendlyPhaseNames = (): Record<ConversationPhase, string> => {
     },
   });
 };
+
+// Per-sub-phase labels for the preference-elicitation agent. BWS is handled
+// separately because it has a deterministic counter (12 tasks).
+const PREFERENCE_SUB_PHASE_TRANSLATION_KEYS: Partial<Record<PreferenceSubPhase, string>> = {
+  [PreferenceSubPhase.EXPERIENCE_QUESTIONS]: "chat.chatProgressbar.preferenceSubPhases.experienceQuestions",
+  [PreferenceSubPhase.VIGNETTES]: "chat.chatProgressbar.preferenceSubPhases.vignettes",
+  [PreferenceSubPhase.FOLLOW_UP]: "chat.chatProgressbar.preferenceSubPhases.followUp",
+  [PreferenceSubPhase.GATE]: "chat.chatProgressbar.preferenceSubPhases.gate",
+  [PreferenceSubPhase.WRAPUP]: "chat.chatProgressbar.preferenceSubPhases.wrapup",
+};
+
+function renderPreferenceElicitation(phase: CurrentPhase, fallbackPhaseName: string): string {
+  // BWS sub-phase: deterministic 12 occupation-ranking tasks → show counter.
+  if (phase.sub_phase === PreferenceSubPhase.BWS && phase.current !== null && phase.total !== null) {
+    return `${i18n.t("chat.chatProgressbar.preferenceSubPhases.bws")}: ${phase.current} ${i18n.t("chat.chatProgressbar.labels.of")} ${phase.total}`;
+  }
+
+  // Other sub-phases: count is adaptive, no honest denominator. Render the
+  // sub-phase-specific label.
+  const subPhaseKey = phase.sub_phase
+    ? PREFERENCE_SUB_PHASE_TRANSLATION_KEYS[phase.sub_phase as PreferenceSubPhase]
+    : undefined;
+  if (subPhaseKey) {
+    return i18n.t(subPhaseKey);
+  }
+
+  // No sub-phase signal (or one we don't recognise) → fall back to the
+  // top-level phase name.
+  return fallbackPhaseName;
+}
 
 /**
  * Get a user-friendly name for the conversation phase
@@ -41,24 +71,7 @@ export function getUserFriendlyConversationPhaseName(phase: CurrentPhase): strin
   }
 
   if (phase.phase === ConversationPhase.PREFERENCE_ELICITATION) {
-    // Show progress if current and total are provided
-    if (phase.current !== null && phase.total !== null) {
-      // BWS phase has total=12 (occupation ranking tasks)
-      // Use different label for BWS vs regular questions
-      const label =
-        phase.total === 8
-          ? i18n.t("chat.chatProgressbar.labels.tasks")
-          : i18n.t("chat.chatProgressbar.labels.questions");
-
-      const phaseName =
-        phase.total === 8
-          ? i18n.t("chat.chatProgressbar.phases.rankingOccupations")
-          : USER_FRIENDLY_PHASE_NAMES[ConversationPhase.PREFERENCE_ELICITATION];
-
-      return `${phaseName}: ${phase.current}/${phase.total} ${label}`;
-    }
-    // Otherwise just show the phase name
-    return USER_FRIENDLY_PHASE_NAMES[ConversationPhase.PREFERENCE_ELICITATION];
+    return renderPreferenceElicitation(phase, USER_FRIENDLY_PHASE_NAMES[ConversationPhase.PREFERENCE_ELICITATION]);
   }
 
   return USER_FRIENDLY_PHASE_NAMES[phase.phase] || USER_FRIENDLY_PHASE_NAMES[ConversationPhase.UNKNOWN];

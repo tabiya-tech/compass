@@ -142,6 +142,7 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
     current_phase_percentage: float = BEGINNING_CONVERSATION_PERCENTAGE
     current: int | None = None
     total: int | None = None
+    sub_phase: str | None = None
 
     current_conversation_phase = state.agent_director_state.current_phase
     if current_conversation_phase == ConversationPhase.INTRO:
@@ -251,38 +252,18 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
                         PREFERENCE_ELICITATION_PERCENTAGE + (progress_ratio * pref_gap)
                     )
 
-                # For display: show progress based on current sub-phase
-                # Different phases track progress differently
-                if pref_elicitation_phase == "EXPERIENCE_QUESTIONS":
-                    # During experience questions: show categories being explored
-                    total = total_categories
-                    current = len(state.preference_elicitation_agent_state.categories_covered) + 1
-                    if current > total:
-                        current = total
-
-                elif pref_elicitation_phase == "BWS":
-                    # During BWS: show occupation ranking tasks
+                # For display: BWS is the only sub-phase with a deterministic
+                # total (12 occupation-ranking tasks). All other sub-phases end
+                # adaptively (AdaptiveConfig min=4 / max=12, stopping criterion
+                # driven by Fisher information), so we have no honest denominator
+                # to show — leave current/total as None. The frontend uses
+                # sub_phase to pick a sub-phase-specific label.
+                sub_phase = pref_elicitation_phase
+                if pref_elicitation_phase == "BWS":
                     total = 12  # Total BWS tasks
                     # BWS agent increments counter AFTER showing question, so don't add +1
                     # (counter is already "pre-incremented" to match the current task)
                     current = state.preference_elicitation_agent_state.bws_tasks_completed
-                    if current > total:
-                        current = total
-
-                elif pref_elicitation_phase in ("VIGNETTES", "FOLLOW_UP"):
-                    # During vignettes/follow-ups: show vignettes completed
-                    total = min_vignettes
-                    current = len(state.preference_elicitation_agent_state.completed_vignettes) + 1
-                    if current > total:
-                        current = total
-
-                else:
-                    # Default/fallback: show combined progress
-                    total = min_vignettes + total_categories
-                    current = (
-                        len(state.preference_elicitation_agent_state.completed_vignettes) +
-                        len(state.preference_elicitation_agent_state.categories_covered) + 1
-                    )
                     if current > total:
                         current = total
             else:
@@ -334,5 +315,6 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
         percentage=current_phase_percentage,
         phase=current_phase,
         current=current,
-        total=total
+        total=total,
+        sub_phase=sub_phase,
     )
