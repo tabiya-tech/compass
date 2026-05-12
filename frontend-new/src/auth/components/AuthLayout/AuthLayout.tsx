@@ -184,7 +184,7 @@ const AuthLayout: React.FC = () => {
             display: "block",
             position: { xs: "static", md: "absolute" },
             right: { md: "100%" },
-            bottom: { md: -85, lg: -95 },
+            bottom: { md: -84, lg: -94 },
             width: { xs: "min(100%, 320px)", md: 320, lg: 360 },
             maxWidth: "100%",
             height: "auto",
@@ -192,7 +192,7 @@ const AuthLayout: React.FC = () => {
             objectFit: "contain",
             zIndex: 3,
             mx: { xs: "auto", md: 0 },
-            mr: { md: -7, lg: -3.2 },
+            mr: { md: -4.5, lg: -3.5 },
             my: { xs: theme.fixedSpacing(2), md: 0 },
           }}
         />
@@ -223,6 +223,10 @@ const AuthLayout: React.FC = () => {
               flexDirection: "column",
               alignItems: "center",
               gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+              position: "relative",
+              zIndex: 4,
+              overflow: "visible",
+              boxSizing: "border-box",
             }}
           >
             <Typography
@@ -232,8 +236,9 @@ const AuthLayout: React.FC = () => {
                 fontWeight: 700,
                 width: "100%",
                 maxWidth: "100%",
-                px: theme.fixedSpacing(theme.tabiyaSpacing.sm),
+                px: theme.fixedSpacing(theme.tabiyaSpacing.md),
                 fontSize: theme.typography.subtitle1.fontSize,
+                overflowWrap: "break-word",
               }}
             >
               {showRegisterLink ? t("auth.pages.login.dontHaveAnAccount") : t("auth.pages.register.alreadyHaveAccount")}
