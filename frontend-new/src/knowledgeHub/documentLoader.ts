@@ -17,6 +17,9 @@ import agriculturePathwayMd from "!!raw-loader!./documents/agriculture.md";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import waterPathwayMd from "!!raw-loader!./documents/water.md";
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import healthPathwayMd from "!!raw-loader!./documents/health.md";
+
 // Document registry - add new documents here
 const documentRegistry: Record<string, string> = {
   "mining-pathway": miningPathwayMd,
@@ -24,6 +27,7 @@ const documentRegistry: Record<string, string> = {
   "hospitality-pathway": hospitalityPathwayMd,
   "agriculture-pathway": agriculturePathwayMd,
   "water-pathway": waterPathwayMd,
+  "health-pathway": healthPathwayMd,
 };
 
 // Parse frontmatter from markdown content

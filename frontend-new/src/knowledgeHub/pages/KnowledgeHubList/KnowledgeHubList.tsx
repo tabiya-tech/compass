@@ -26,6 +26,7 @@ const ICON_BY_SECTOR: Record<string, string> = {
   hospitality: `${process.env.PUBLIC_URL}/hospitality.svg`,
   agriculture: `${process.env.PUBLIC_URL}/agriculture.svg`,
   water: `${process.env.PUBLIC_URL}/water.svg`,
+  health: `${process.env.PUBLIC_URL}/health.svg`,
 };
 
 const SECTOR_TRANSLATION_KEYS = {
@@ -43,6 +44,9 @@ const SECTOR_TRANSLATION_KEYS = {
   },
   water: {
     title: "knowledgeHub.sectors.water.title",
+  },
+  health: {
+    title: "knowledgeHub.sectors.health.title",
   },
 } as const;
 
@@ -269,7 +273,13 @@ const KnowledgeHubList: React.FC = () => {
                     sx={textAlignGrid}
                     data-testid={`${DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_ITEM}-${doc.id}`}
                   >
-                    <Box component="img" src={iconSrc} alt="" aria-hidden />
+                    <Box
+                      component="img"
+                      src={iconSrc}
+                      alt=""
+                      aria-hidden
+                      sx={{ width: "100%", height: "auto", display: "block" }}
+                    />
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
                         {displayName}

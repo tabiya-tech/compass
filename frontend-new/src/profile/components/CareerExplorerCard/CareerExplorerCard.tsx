@@ -21,7 +21,7 @@ export interface CareerExplorerCardProps {
   isLoading: boolean;
 }
 
-type PathwaySlug = "mining" | "energy" | "agriculture" | "hospitality" | "water";
+type PathwaySlug = "mining" | "energy" | "agriculture" | "hospitality" | "water" | "health";
 
 const PATHWAY_TITLE_KEYS: Record<PathwaySlug, TranslationKey> = {
   mining: "home.profile.pathways.mining.title",
@@ -29,6 +29,7 @@ const PATHWAY_TITLE_KEYS: Record<PathwaySlug, TranslationKey> = {
   agriculture: "home.profile.pathways.agriculture.title",
   hospitality: "home.profile.pathways.hospitality.title",
   water: "home.profile.pathways.water.title",
+  health: "home.profile.pathways.health.title",
 };
 
 const PATHWAY_DESCRIPTION_KEYS: Record<PathwaySlug, TranslationKey> = {
@@ -37,6 +38,7 @@ const PATHWAY_DESCRIPTION_KEYS: Record<PathwaySlug, TranslationKey> = {
   agriculture: "home.profile.pathways.agriculture.description",
   hospitality: "home.profile.pathways.hospitality.description",
   water: "home.profile.pathways.water.description",
+  health: "home.profile.pathways.health.description",
 };
 
 const ALL_SECTORS: readonly {
@@ -48,8 +50,9 @@ const ALL_SECTORS: readonly {
   { id: "mining-pathway", slug: "mining", emoji: "⛏️", bg: "secondary.light" },
   { id: "energy-pathway", slug: "energy", emoji: "⚡️", bg: "info.light" },
   { id: "agriculture-pathway", slug: "agriculture", emoji: "🌾", bg: "success.light" },
-  { id: "hospitality-pathway", slug: "hospitality", emoji: "🏨", bg: "brandAction.light" },
+  { id: "hospitality-pathway", slug: "hospitality", emoji: "🏞", bg: "brandAction.light" },
   { id: "water-pathway", slug: "water", emoji: "💧", bg: "primary.light" },
+  { id: "health-pathway", slug: "health", emoji: "🩺", bg: "warning.light" },
 ];
 export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors: _sectors, isLoading }) => {
   const theme = useTheme();

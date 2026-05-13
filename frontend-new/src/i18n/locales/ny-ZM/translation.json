@@ -1038,12 +1038,16 @@
           "description": "Ulimi, kukonza zakudya, bizinesi za ulimi"
         },
         "hospitality": {
-          "title": "Alendo ndi ulendo",
+          "title": "Alendo ndi Ulendo",
           "description": "Alendo, ma hotelo, chakudya, ntchito ya makasitomala"
         },
         "water": {
-          "title": "Madzi ndi ukhondo",
+          "title": "Madzi ndi Ukhondo",
           "description": "Kusamalira madzi, ukhondo, zipangizo"
+        },
+        "health": {
+          "title": "Sayansi ya Zachipatala",
+          "description": "Zachipatala, mankhwala, physiotherapy"
         }
       }
     },
@@ -1095,6 +1099,9 @@
       },
       "water": {
         "title": "Madzi ndi Ukhondo"
+      },
+      "health": {
+        "title": "Sayansi ya Zachipatala"
       }
     },
     "noDocumentsAvailable": "Palibe zikalata zomwe zilipo pakadali pano.",

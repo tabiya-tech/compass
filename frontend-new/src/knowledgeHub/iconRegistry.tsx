@@ -4,6 +4,7 @@ import AgricultureIcon from "@mui/icons-material/Agriculture";
 import BoltIcon from "@mui/icons-material/Bolt";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import WaterIcon from "@mui/icons-material/Water";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 
 // Icon registry - maps icon names to MUI icon components
@@ -13,6 +14,7 @@ export const ICON_REGISTRY: Record<string, React.ReactNode> = {
   Energy: <BoltIcon sx={{ fontSize: 40 }} />,
   Hospitality: <RestaurantIcon sx={{ fontSize: 40 }} />,
   Water: <WaterIcon sx={{ fontSize: 40 }} />,
+  Health: <LocalHospitalIcon sx={{ fontSize: 40 }} />,
 };
 
 // Default icon to use when no icon is specified or found in registry

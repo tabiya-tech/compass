@@ -1038,12 +1038,16 @@
           "description": "Kilimo, usindikaji wa chakula, biashara za kilimo"
         },
         "hospitality": {
-          "title": "Utalii na hoteli",
+          "title": "Ukarimu na Utalii",
           "description": "Utalii, hoteli, huduma za chakula, huduma kwa wateja"
         },
         "water": {
-          "title": "Maji na usafi",
+          "title": "Maji na Usafi wa Mazingira",
           "description": "Usimamizi wa maji, usafi wa mazingira, miundombinu"
+        },
+        "health": {
+          "title": "Sayansi ya Afya",
+          "description": "Afya msaidizi, utambuzi, famasia, fizioterapia"
         }
       }
     },
@@ -1095,6 +1099,9 @@
       },
       "water": {
         "title": "Maji na Usafi wa Mazingira"
+      },
+      "health": {
+        "title": "Sayansi ya Afya"
       }
     },
     "noDocumentsAvailable": "Bado hakuna waraka zinazopatikana.",

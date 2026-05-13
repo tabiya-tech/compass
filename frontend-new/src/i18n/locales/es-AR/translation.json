@@ -904,6 +904,9 @@
       },
       "water": {
         "title": "Agua y Saneamiento"
+      },
+      "health": {
+        "title": "Ciencias de la Salud"
       }
     },
     "noDocumentsAvailable": "Aún no hay documentos disponibles.",
@@ -1093,12 +1096,16 @@
           "description": "Agricultura, procesamiento de alimentos y agronegocios"
         },
         "hospitality": {
-          "title": "Hostelería",
+          "title": "Hospitalidad y Turismo",
           "description": "Turismo, hoteles, catering y atención al cliente"
         },
         "water": {
-          "title": "Agua",
+          "title": "Agua y Saneamiento",
           "description": "Gestión del agua, saneamiento e infraestructura"
+        },
+        "health": {
+          "title": "Ciencias de la Salud",
+          "description": "Salud aliada, diagnóstico, farmacia, fisioterapia"
         }
       }
     },

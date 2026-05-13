@@ -263,6 +263,71 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
       "Sources: 2023 Labour Force Survey (ZamStats) · EEI 2022/2023 (ZamStats) · Critical Skills List (TEVETA, 2025) · TEVETA Master Dataset (Dec 2025) · Priority Curriculum Development (ILO/TEVETA, 2026) · Zambia CPSD (World Bank, 2024)",
   },
 
+  "health-pathway": {
+    displayName: "Health Sciences",
+    sectorApiParam: "Health",
+    heroColor: "#0F766E",
+    ladderColors: ["#0F766E", "#0c8378", "#0e9082", "#129d8e", "#14ab9a"],
+    avgEarnings: "—",
+    heroText:
+      "Zambia's health workforce is anchored by allied health sciences, a field that supports clinical care through diagnostics, rehabilitation, dispensing, laboratory work, and environmental health. TEVET programmes in this area are concentrated at diploma level and lead to regulated roles registered with the Health Professions Council of Zambia (HPCZ). Clinical nursing, medicine, and dentistry sit outside the TEVET system and are trained at universities.",
+    heroHighlight:
+      "Evelyn Hone College in Lusaka is the country's leading public TEVET provider for allied health, offering diplomas in pharmacy, physiotherapy, radiography, biomedical science and engineering, environmental health, and social work.",
+    geoLabel:
+      "Allied-health training and employment is concentrated in Lusaka, where the country's largest public hospitals, regulatory bodies, and the main public TEVET provider (Evelyn Hone College) are based. Copperbelt offers a secondary cluster centred on mine-hospital networks and Ndola's teaching hospital.",
+    mapFile: "zm-health-map.svg",
+    mapAlt: "Map of Zambia highlighting Lusaka and Copperbelt provinces for health sciences",
+    employers: [
+      {
+        province: "Lusaka",
+        employers: [
+          "University Teaching Hospitals (UTH)",
+          "Ministry of Health (national and provincial offices)",
+          "Zambia Medicines Regulatory Authority (ZAMRA)",
+          "Private hospitals and diagnostic centres",
+        ],
+      },
+      {
+        province: "Copperbelt",
+        employers: [
+          "Ndola Teaching Hospital",
+          "Mine hospital networks (Konkola, Mopani, Kansanshi)",
+          "Private diagnostic and pharmacy chains",
+        ],
+      },
+      {
+        province: "Nationwide",
+        employers: [
+          "Provincial and district hospitals",
+          "NGOs and faith-based health networks (e.g. CHAZ)",
+          "Pharmaceutical wholesalers and retail chains",
+        ],
+      },
+    ],
+    programmeSubtitleSuffix:
+      "Most diploma-level roles lead to regulated positions registered with the Health Professions Council of Zambia (HPCZ).",
+    considerations: [
+      {
+        title: "What TEVET covers (and doesn't)",
+        body: "TEVET health sciences cover allied-health roles: pharmacy technologists, radiographers, physiotherapists, biomedical scientists and engineers, environmental health technologists, and social workers. Clinical nursing, midwifery, medicine, and dentistry are trained at universities and regulated separately by the Health Professions Council of Zambia (HPCZ) and the Nursing and Midwifery Council of Zambia.",
+      },
+      {
+        title: "Regulation and registration",
+        body: "Most allied-health roles require registration with HPCZ before you can practise. This usually means completing an accredited diploma, passing a council assessment, and maintaining continuing professional development. Employers, both public and private, will ask for a valid HPCZ practising certificate.",
+      },
+      {
+        title: "Concentration in Lusaka",
+        body: "Training, regulation, and the largest employers are concentrated in Lusaka. The University Teaching Hospitals complex, the Ministry of Health, ZAMRA, and the main TEVET provider (Evelyn Hone College) are all based there. Copperbelt is the secondary cluster; provincial hospitals outside these two regions recruit but in smaller numbers.",
+      },
+      {
+        title: "Not a national priority sector",
+        body: "Health sciences is not currently one of Zambia's five declared priority skills sectors (Mining, Energy, Agriculture, Water, Tourism). This means it is not covered by the Critical Skills List or the Priority Curriculum Development programme, and some sector-level planning data available for other profiles is not published for health.",
+      },
+    ],
+    sources:
+      "Sources: TEVETA Master Dataset (Dec 2025) · Evelyn Hone College programme listings (2025) · Health Professions Act No. 24 of 2009 · Health Professions Council of Zambia (HPCZ) scopes of practice · National Health Strategic Plan 2022–2026 (MoH)",
+  },
+
   "water-pathway": {
     displayName: "Water & Sanitation",
     sectorApiParam: "Water",
