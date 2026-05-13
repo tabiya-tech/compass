@@ -25,22 +25,29 @@ SECTOR_KEY_MAP = {
 INSTITUTION_SECTOR_MAP = {
     "Energy": "Electricity & Gas",
     "Water": "Water & Waste",
+    "Tourism": "Accommodation & Food",
 }
 
 
 def get_data() -> dict:
     global _data
-    if _data is None:
-        logger.info("Loading teveta-master.json from %s", _DATA_PATH)
-        with open(_DATA_PATH, "r", encoding="utf-8") as f:
-            _data = json.load(f)
-        logger.info(
-            "Loaded teveta data: %d institutions, %d programmes, %d critical_skills",
-            len(_data.get("institutions", [])),
-            len(_data.get("programmes", [])),
-            len(_data.get("critical_skills", [])),
-        )
-    return _data
+    if _data is not None:
+        return _data
+    logger.info("Loading teveta-master.json from %s", _DATA_PATH)
+    with open(_DATA_PATH, "r", encoding="utf-8") as f:
+        loaded: dict = json.load(f)
+    # Some priority_curriculum rows ship `ranking` as an int; downstream model is Optional[str].
+    for entry in loaded.get("priority_curriculum", []):
+        if isinstance(entry.get("ranking"), int):
+            entry["ranking"] = str(entry["ranking"])
+    logger.info(
+        "Loaded teveta data: %d institutions, %d programmes, %d critical_skills",
+        len(loaded.get("institutions", [])),
+        len(loaded.get("programmes", [])),
+        len(loaded.get("critical_skills", [])),
+    )
+    _data = loaded
+    return loaded
 
 
 def get_sector_data(sector: str) -> Optional[dict]:
