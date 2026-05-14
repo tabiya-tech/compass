@@ -205,9 +205,7 @@ describe("DownloadReportDropdown", () => {
       summary: `EN summary for ${exp.UUID}`,
       normalized_experience_title: `EN title for ${exp.UUID}`,
     }));
-    jest
-      .spyOn(ExperienceService.getInstance(), "getExperiences")
-      .mockResolvedValueOnce(translatedExperiences);
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockResolvedValueOnce(translatedExperiences);
 
     // AND the PDF provider is captured
     const pdfDownloadSpy = jest.fn().mockResolvedValue(undefined);
@@ -240,9 +238,7 @@ describe("DownloadReportDropdown", () => {
     jest.spyOn(MetricsService.getInstance(), "sendMetricsEvent").mockReturnValue();
 
     // AND the translation fetch fails
-    jest
-      .spyOn(ExperienceService.getInstance(), "getExperiences")
-      .mockRejectedValueOnce(new Error("network down"));
+    jest.spyOn(ExperienceService.getInstance(), "getExperiences").mockRejectedValueOnce(new Error("network down"));
 
     const pdfDownloadSpy = jest.fn().mockResolvedValue(undefined);
     (PDFReportDownloadProvider as jest.Mock).mockImplementation(() => ({ download: pdfDownloadSpy }));

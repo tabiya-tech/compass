@@ -61,8 +61,8 @@ export const ReportContent = {
 
 // English-pinned variant. Used by the downloadable Skills Report so the report
 // is always English regardless of the user's selected UI language.
-const enT = (key: string, options?: Record<string, unknown>) =>
-  i18n.getFixedT("en-GB")(key, options as never);
+const enT = (key: string, options?: Record<string, unknown>): string =>
+  i18n.getFixedT("en-GB")(key, options as never) as unknown as string;
 
 export const ReportContentEnglish = {
   get SKILLS_REPORT_TITLE() {

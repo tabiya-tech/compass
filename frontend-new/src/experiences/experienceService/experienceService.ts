@@ -27,11 +27,7 @@ export default class ExperienceService {
     this.experiencesEndpointUrl = `${this.apiServeUrl}/conversations`;
   }
 
-  async getExperiences(
-    sessionId: number,
-    deleted: boolean = false,
-    language?: "en"
-  ): Promise<Experience[]> {
+  async getExperiences(sessionId: number, deleted: boolean = false, language?: "en"): Promise<Experience[]> {
     const params = new URLSearchParams({ deleted: String(deleted) });
     if (language) {
       params.set("language", language);

@@ -76,10 +76,9 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
       });
     } catch (error) {
       console.error("Failed to translate experiences for English-only report", error);
-      enqueueSnackbar(
-        "Could not translate the report to English. Downloading in the original language instead.",
-        { variant: "warning" }
-      );
+      enqueueSnackbar("Could not translate the report to English. Downloading in the original language instead.", {
+        variant: "warning",
+      });
       return props.experiences;
     }
   };
