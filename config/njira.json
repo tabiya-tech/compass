@@ -1,13 +1,13 @@
 {
   "branding": {
-    "appName": "Njira",
-    "browserTabTitle": "Njira",
-    "metaDescription": "Welcome to Njira. An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities.",
+    "appName": "Njila",
+    "browserTabTitle": "Njila",
+    "metaDescription": "Welcome to Njila. An AI-powered career assistant that helps jobseekers identify and showcase their skills. Join now to create a digital profile and connect with new opportunities.",
     "seo": {
-      "name": "Njira",
-      "url": "https://www.example.org/njira",
+      "name": "Njila",
+      "url": "https://www.example.org/njila",
       "image": "https://www.example.org/assets/logo.svg",
-      "description": "Njira is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Njira guides users to identify abilities gained through all types of work."
+      "description": "Njila is an AI-powered conversational tool that helps jobseekers discover and articulate their skills. Through natural dialogue, Njila guides users to identify abilities gained through all types of work."
     },
     "assets": {
       "logo": "/njila_logo.svg",

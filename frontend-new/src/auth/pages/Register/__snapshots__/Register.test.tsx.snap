@@ -32,7 +32,7 @@ exports[`Testing Register component it should show register form successfully 1`
       Enter your registration code
     </h6>
     <div
-      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-14ngfea-MuiFormControl-root-MuiTextField-root"
+      class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-k4p5nu-MuiFormControl-root-MuiTextField-root"
     >
       <label
         class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled Mui-required MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-pw7yny-MuiFormLabel-root-MuiInputLabel-root"

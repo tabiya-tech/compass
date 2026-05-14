@@ -301,7 +301,7 @@
         "appHero": {
           "discoverLine": "Senzani zanu",
           "skillsLine": "nzeru ndi mphamvu zanu",
-          "subheadline": "Njira yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
+          "subheadline": "Njila yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
           "signInTitle": "Lowani",
           "cta": "Lowani",
           "whatIsTitleBefore": "Ndi chani ",
@@ -310,7 +310,7 @@
           "feature1Body": "Dziwani nzeru zimene muli nazo kale — kuchokera ku maphunziro anu, ntchito yanu, ndi moyo wanu.",
           "feature2Title": "Mangani CV yovumbulika",
           "feature2Body": "Pangani CV yaukadaulo yomwe imagwirizana ndi zomwe ogwira ntchito ku Zambia akufuna.",
-          "feature3Title": "Pezani njira yanu",
+          "feature3Title": "Pezani njila yanu",
           "feature3Body": "Yang'anani ntchito zofunika, mutsekese zofunikira, ndipo linganizani ndi mwayi woona wa ntchito."
         },
         "components": {
@@ -455,7 +455,7 @@
         "invalidInvitationType": "Code yomwe mwagwiritsa ntchito ndi yopangira akaunti osati yokulowerani. Chonde pitani ku tsamba la Kupanga Akaunti.",
         "invalidRegistrationType": "Code yomwe mwagwiritsa ntchito ndi yokulowerani osati yopangira akaunti. Chonde pitani ku tsamba la Kulowa.",
         "popupClosedByUser": "Popup ya Google yatsekedwa musanathe kulowa.",
-        "invalidLoginMethod": "Ntchitoyi siloledwa ndi njira yano yokulowerani.",
+        "invalidLoginMethod": "Ntchitoyi siloledwa ndi njila yano yokulowerani.",
         "emailAlreadyVerified": "Imelo yokhayo yatsimikizidwa kale."
       }
     },
@@ -938,7 +938,7 @@
     "dashboard": "Malo Anu a Ntchito",
     "backToDashboard": "Bwererani ku dashibodi",
     "welcomeBack": "Takulandirani, {{name}}",
-    "subtitle": "{{appName}} ndi mlatho pakati pa zomwe mwaphunzira ndi komwe mukupita. Lankhulani ndi AI kuti mupeze luso lanu, mukonzekere mafunso antchito, ndikufufuza njira za ntchito ku Zambia.",
+    "subtitle": "{{appName}} ndi mlatho pakati pa zomwe mwaphunzira ndi komwe mukupita. Lankhulani ndi AI kuti mupeze luso lanu, mukonzekere mafunso antchito, ndikufufuza njila za ntchito ku Zambia.",
     "profileStrength": "Mphamvu ya mbiri yanu ndi {{progress}}%.",
     "profileStrengthHint": "Ndi chiyambi chabwino — yesani Luso ndi Zomwe Ndimakonda kuti mudziwe zambiri za zomwe mukudziwa ndikusangalala nazo.",
     "seeProfile": "Onani mbiri →",
@@ -947,16 +947,16 @@
     "hero": {
       "headline1": "Tiyeni tipeze",
       "headline2": "Maluso & mphamvu zanu",
-      "body": "Njira yanu yowongolera kuchokera ku luso kupita kuntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa - kenako fufuzani ntchito, konzekerani ntchito, ndikupeza mwayi weniweni ku Zambia.",
-      "illustrationAlt": "Munthu ali pachikwangwani panjira, kuyang'ana njira zantchito"
+      "body": "Njila yanu yowongolera kuchokera ku luso kupita kuntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa - kenako fufuzani ntchito, konzekerani ntchito, ndikupeza mwayi weniweni ku Zambia.",
+      "illustrationAlt": "Munthu ali pachikwangwani panjila, kuyang'ana njila zantchito"
     },
     "cta": {
       "buildProfileTitle": "Pangani mbiri yanu",
       "buildProfileDesc": "Yambani pozindikira zomwe mumabweretsa, pangani lipoti lathunthu la maluso ndipo tiuzeni mtundu wa ntchito yomwe mukufuna",
       "buildProfileCta": "Yambani kucheza pa mbiri",
       "explorePathsTitle": "Kafukufuku wa Ntchito",
-      "explorePathsDesc": "Fufuzani magawo ndi ntchito zomwe mukukondwera nazo - malipiro, njira za ziyeneretso, mapulogalamu a maphunziro, ndi olemba ntchito akuluakulu.",
-      "explorePathsCta": "Fufuzani njira za ntchito",
+      "explorePathsDesc": "Fufuzani magawo ndi ntchito zomwe mukukondwera nazo - malipiro, njila za ziyeneretso, mapulogalamu a maphunziro, ndi olemba ntchito akuluakulu.",
+      "explorePathsCta": "Fufuzani njila za ntchito",
       "jobMatchesTitle": "Ntchito zogwirizana",
       "jobMatchesDesc": "Mwayi weniweni ku Zambia yonse, wogwirizana ndi zomwe mungathe kuchita pano.",
       "jobMatchesCta": "Fufuzani ntchito zanu"
@@ -1020,7 +1020,7 @@
       "noSectorsYet": "Palibe gawo lopezeka mpaka pano.",
       "sectorsExplored": "Mwafufuza magawo {{count}}",
       "profileStrength": "Kulimba kwa mbiri",
-      "careerPathways": "Njira za ntchito",
+      "careerPathways": "Njila za ntchito",
       "browseAllPathways": "Onani zonse →",
       "skillsShowLess": "Siyanitsani",
       "skillsShowAll": "Onani zonse {{count}} →",
@@ -1056,8 +1056,8 @@
       "jobMatching": "Kufanana kwa Ntchito",
       "skillsDiscoveryDesc": "Lankhulani ndi {{appName}} kuti mupeze luso lanu ndi zomwe mumakonda — kuchokera ku maphunziro anu, ntchito, ndi moyo wa tsiku ndi tsiku.",
       "jobReadinessDesc": "Phunzirani luso lofunikira la ntchito kudzera mu ma module otsogoleredwa ndi AI — kuyambira kulemba CV mpaka kuchita mafunso oyeserera.",
-      "careerExplorerDesc": "Fufuzani njira za ntchito mu Mphamvu, Migodi, Ulimi ndi zina — ndi chidziwitso cha malipiro ndi njira zoyenera.",
-      "knowledgeHubDesc": "Fufuzani mbiri ya magawo, malipiro, ndi njira za maphunziro a TEVET pamalo amodzi.",
+      "careerExplorerDesc": "Fufuzani njila za ntchito mu Mphamvu, Migodi, Ulimi ndi zina — ndi chidziwitso cha malipiro ndi njila zoyenera.",
+      "knowledgeHubDesc": "Fufuzani mbiri ya magawo, malipiro, ndi njila za maphunziro a TEVET pamalo amodzi.",
       "jobMatchingDesc": "Onani momwe luso lanu limafanana ndi maudindo a ntchito enieni ndikufufuza chidziwitso cha msika wa ntchito ku Zambia.",
       "continue": "Pitirizani",
       "completed": "Zatha",
@@ -1074,11 +1074,11 @@
   },
   "knowledgeHub": {
     "backToDashboard": "Bwererani ku Dashibodi",
-    "backToKnowledgeHub": "Bwererani ku Njira",
+    "backToKnowledgeHub": "Bwererani ku Njila",
     "documentNotFound": "Chikalata sichinapezeke",
-    "heroTitlePrefix": "Njira za Ntchito",
+    "heroTitlePrefix": "Njila za Ntchito",
     "heroTitleQuestion": "Kodi ku Zambia akulemba ntchito kuti?",
-    "introduction": "Awa ndi magawo ofunikira a Zambia kwa omaliza maphunziro a TEVET. Mbiri iliyonse ikukupatsani chiwonetsero cha momwe makampaniwo akuwonekera, ntchito zomwe zilipo, ndi zomwe mungayembekezere kupeza. Fufuzani magawo omwe amakusangalatsani kuti mupange zisankho zanzeru pa njira yanu ya ntchito.",
+    "introduction": "Awa ndi magawo ofunikira a Zambia kwa omaliza maphunziro a TEVET. Mbiri iliyonse ikukupatsani chiwonetsero cha momwe makampaniwo akuwonekera, ntchito zomwe zilipo, ndi zomwe mungayembekezere kupeza. Fufuzani magawo omwe amakusangalatsani kuti mupange zisankho zanzeru pa njila yanu ya ntchito.",
     "discoverSectorCta": "Dziwani zambiri za gawo la {{sector}} →",
     "sectors": {
       "energy": {
@@ -1098,7 +1098,7 @@
       }
     },
     "noDocumentsAvailable": "Palibe zikalata zomwe zilipo pakadali pano.",
-    "careerPathwaysTitle": "Njira za Ntchito",
+    "careerPathwaysTitle": "Njila za Ntchito",
     "prioritySector": "Gawo Lofunika Kwambiri",
     "avgMonthlyEarnings": "Avg zopeza pamwezi (gawo lokhazikika)",
     "criticalOccupations": "Ntchito zovuta zazindikiridwa",
@@ -1140,7 +1140,7 @@
   "nav": {
     "search": "Sakani...",
     "dashboard": "Dashibodi",
-    "pathways": "Njira",
+    "pathways": "Njila",
     "needHelp": "Thandizo",
     "faq": "Mafunso",
     "faqAriaLabel": "Thandizo ndi Mafunso"

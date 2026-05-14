@@ -1,4 +1,7 @@
 export const outlinedNoBorderSx = {
+  "& .MuiOutlinedInput-root": {
+    overflow: "hidden",
+  },
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
   },

@@ -115,20 +115,26 @@ const VerifyEmail: React.FC = () => {
             {t("auth.pages.verifyEmail.verificationEmailSentMessage")}
           </Typography>
         </Box>
-        <PrimaryButton
-          variant="contained"
-          showCircle
-          color="primary"
-          data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
-          onClick={handleBackToLogin}
+        <Box
           sx={{
-            alignSelf: "flex-start",
-            width: "fit-content",
-            minWidth: { xs: 190, md: 220 },
+            textAlign: "right",
           }}
         >
-          {t("common.buttons.backToLogin")}
-        </PrimaryButton>
+          <PrimaryButton
+            variant="contained"
+            showCircle
+            color="primary"
+            data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
+            onClick={handleBackToLogin}
+            sx={{
+              alignSelf: "flex-start",
+              width: "fit-content",
+              minWidth: { xs: 190, md: 220 },
+            }}
+          >
+            {t("common.buttons.backToLogin")}
+          </PrimaryButton>
+        </Box>
       </Box>
     </Container>
   );

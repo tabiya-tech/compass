@@ -238,7 +238,7 @@ const Consent: React.FC = () => {
           },
         }}
       >
-        <Box display="flex" flexDirection="column" alignItems="center" justifyContent={"space-evenly"}>
+        <Box display="flex" flexDirection="column" alignItems="left" justifyContent={"space-evenly"}>
           <Typography variant="h1" color="primary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
             {t("consent.components.consentPage.beforeWeBeginTitle")}
           </Typography>

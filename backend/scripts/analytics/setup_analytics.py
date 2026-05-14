@@ -141,7 +141,7 @@ Examples:
   python3 setup_analytics.py \\
     --ga4-account-id 123456789 \\
     --gtm-account-id 987654321 \\
-    --url "https://njira.compass.tabiya.tech" \\
+    --url "https://njila.compass.tabiya.tech" \\
     --config ../../config/default.json \\
     --credentials path/to/service_account_key.json
 
@@ -155,7 +155,7 @@ Prerequisites:
     )
     parser.add_argument("--ga4-account-id", required=True, help="GA4 account ID (numeric)")
     parser.add_argument("--gtm-account-id", required=True, help="GTM account ID (numeric)")
-    parser.add_argument("--url", required=True, help="Deployed URL of the fork (e.g., https://njira.compass.tabiya.tech)")
+    parser.add_argument("--url", required=True, help="Deployed URL of the fork (e.g., https://njila.compass.tabiya.tech)")
     default_config = str(Path(__file__).parent.parent.parent.parent / "config" / "default.json")
     parser.add_argument("--config", default=default_config, help="Config JSON file to update (default: config/default.json)")
     parser.add_argument("--credentials", required=True, help="Path to service account JSON key file")
