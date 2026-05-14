@@ -27,11 +27,11 @@ class _FakeInstitutionRepository(IInstitutionRepository):
         self.search_called_with: Optional[Dict[str, Any]] = None
         self.count_called = False
 
-    async def search_institutions(self, keywords, province, sector, offset, limit, name_only=False, exclude_names=None):
+    async def search_institutions(self, keywords, province, sector, offset, limit, name_only=False, exclude_reg_nos=None):
         self.search_called_with = {"keywords": keywords, "province": province, "sector": sector, "offset": offset, "limit": limit, "name_only": name_only}
         return self._docs
 
-    async def count_institutions(self, keywords, province, sector, exclude_names=None):
+    async def count_institutions(self, keywords, province, sector, exclude_reg_nos=None):
         self.count_called = True
         return self._total
 
@@ -43,14 +43,11 @@ class _FakeInstitutionRepository(IInstitutionRepository):
 
 
 class _FakePilotWhitelistRepository(IPilotWhitelistRepository):
-    async def get_whitelisted_institution_names(self) -> list[str]:
+    async def get_whitelisted_reg_nos(self) -> list[str]:
         return []
 
-    async def is_whitelisted(self, institution_name: str) -> bool:
+    async def is_whitelisted_by_reg_no(self, reg_no: str) -> bool:
         return False
-
-    async def get_reg_no_by_institution_name(self, institution_name: str):
-        return None
 
 
 class TestInstitutionService:

@@ -1,39 +1,17 @@
 from __future__ import annotations
 
-import asyncio
 from http import HTTPStatus
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response
-from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.analytics.types import PaginatedListResponse
 from app.constants.errors import HTTPErrorResponse
 from app.institutions.get_institution_service import get_institution_service
 from app.institutions.service import IInstitutionService, InstitutionDocument, InstitutionProgrammes
-from app.server_dependencies.database_collections import Collections
-from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.user_institution_assignment.repository import (
-    IUserInstitutionAssignmentRepository,
-    UserInstitutionAssignmentRepository,
-)
+from app.user_institution_assignment.get_repository import get_assignment_repository
+from app.user_institution_assignment.repository import IUserInstitutionAssignmentRepository
 from app.users.auth import Authentication, UserInfo
-
-_assignment_repo_lock = asyncio.Lock()
-_assignment_repo_singleton: Optional[IUserInstitutionAssignmentRepository] = None
-
-
-async def _get_assignment_repo(
-    application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
-) -> IUserInstitutionAssignmentRepository:
-    global _assignment_repo_singleton
-    if _assignment_repo_singleton is None:
-        async with _assignment_repo_lock:
-            if _assignment_repo_singleton is None:
-                _assignment_repo_singleton = UserInstitutionAssignmentRepository(
-                    application_db.get_collection(Collections.USER_INSTITUTION_ASSIGNMENT)
-                )
-    return _assignment_repo_singleton
 
 
 def add_institutions_routes(app: FastAPI, auth: Authentication):
@@ -96,14 +74,14 @@ def add_institutions_routes(app: FastAPI, auth: Authentication):
         response: Response,
         reg_no: str = Query(..., description="Institution registration number"),
         institution_service: IInstitutionService = Depends(get_institution_service),
-        assignment_repo: IUserInstitutionAssignmentRepository = Depends(_get_assignment_repo),
+        assignment_repo: IUserInstitutionAssignmentRepository = Depends(get_assignment_repository),
         user_info: UserInfo = Depends(auth.get_user_info()),
     ):
         response.headers["Access-Control-Allow-Origin"] = "*"
         # Determine whether the caller is assigned to this institution (for whitelisted institutions)
         caller_assigned = False
-        if user_info.email:
-            assignment = await assignment_repo.find_by_email(user_info.email)
+        if user_info.user_id:
+            assignment = await assignment_repo.find_by_user_id(user_info.user_id)
             if assignment is not None and assignment.reg_no == reg_no:
                 caller_assigned = True
         try:

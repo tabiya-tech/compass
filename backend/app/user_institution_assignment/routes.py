@@ -4,41 +4,19 @@ GET /users/me/institution-assignment
 Returns the institution pre-assigned to the authenticated user (if any).
 Used by the sensitive data form to lock the institution field for pilot users.
 """
-import asyncio
 import logging
 from http import HTTPStatus
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 
 from app.constants.errors import HTTPErrorResponse
-from app.server_dependencies.database_collections import Collections
-from app.server_dependencies.db_dependencies import CompassDBProvider
-from app.user_institution_assignment.repository import (
-    IUserInstitutionAssignmentRepository,
-    UserInstitutionAssignmentRepository,
-)
+from app.user_institution_assignment.get_repository import get_assignment_repository
+from app.user_institution_assignment.repository import IUserInstitutionAssignmentRepository
 from app.users.auth import Authentication, UserInfo
 
 logger = logging.getLogger(__name__)
-
-_lock = asyncio.Lock()
-_repo_singleton: Optional[IUserInstitutionAssignmentRepository] = None
-
-
-async def _get_assignment_repository(
-    application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
-) -> IUserInstitutionAssignmentRepository:
-    global _repo_singleton
-    if _repo_singleton is None:
-        async with _lock:
-            if _repo_singleton is None:
-                _repo_singleton = UserInstitutionAssignmentRepository(
-                    application_db.get_collection(Collections.USER_INSTITUTION_ASSIGNMENT)
-                )
-    return _repo_singleton
 
 
 class InstitutionAssignmentResponse(BaseModel):
@@ -66,7 +44,7 @@ def add_institution_assignment_route(users_router: APIRouter, auth: Authenticati
     )
     async def _get_institution_assignment(
         user_info: UserInfo = Depends(auth.get_user_info()),
-        repo: IUserInstitutionAssignmentRepository = Depends(_get_assignment_repository),
+        repo: IUserInstitutionAssignmentRepository = Depends(get_assignment_repository),
     ) -> Optional[InstitutionAssignmentResponse]:
         try:
             assignment = await repo.find_by_user_id(user_info.user_id)

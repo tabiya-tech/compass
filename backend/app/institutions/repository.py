@@ -39,7 +39,7 @@ class IInstitutionRepository(ABC):
         sector: Optional[str],
         offset: int,
         limit: int,
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         pass
 
@@ -49,7 +49,7 @@ class IInstitutionRepository(ABC):
         keywords: Optional[str],
         province: Optional[str],
         sector: Optional[str],
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> int:
         pass
 
@@ -85,7 +85,7 @@ class InstitutionRepository(IInstitutionRepository):
         offset: int,
         limit: int,
         name_only: bool,
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """Build an aggregation pipeline using Atlas Search for keyword queries.
 
@@ -140,8 +140,8 @@ class InstitutionRepository(IInstitutionRepository):
             post_match["location.province"] = {"$regex": province, "$options": "i"}
         if sector:
             post_match["sectors_covered"] = {"$regex": sector, "$options": "i"}
-        if exclude_names:
-            post_match["name"] = {"$nin": exclude_names}
+        if exclude_reg_nos:
+            post_match["reg_no"] = {"$nin": exclude_reg_nos}
         if post_match:
             pipeline.append({"$match": post_match})
 
@@ -160,7 +160,7 @@ class InstitutionRepository(IInstitutionRepository):
     def _build_filter(
         province: Optional[str],
         sector: Optional[str],
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Build a plain MongoDB filter for province/sector and pilot exclusions (no-keyword path)."""
         conditions: List[Dict[str, Any]] = []
@@ -168,8 +168,8 @@ class InstitutionRepository(IInstitutionRepository):
             conditions.append({"location.province": {"$regex": province, "$options": "i"}})
         if sector:
             conditions.append({"sectors_covered": {"$regex": sector, "$options": "i"}})
-        if exclude_names:
-            conditions.append({"name": {"$nin": exclude_names}})
+        if exclude_reg_nos:
+            conditions.append({"reg_no": {"$nin": exclude_reg_nos}})
         if len(conditions) == 1:
             return conditions[0]
         if len(conditions) > 1:
@@ -184,7 +184,7 @@ class InstitutionRepository(IInstitutionRepository):
         offset: int,
         limit: int,
         name_only: bool = False,
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         if keywords and keywords.strip():
             pipeline = self._build_search_pipeline(
@@ -194,13 +194,13 @@ class InstitutionRepository(IInstitutionRepository):
                 offset=offset,
                 limit=limit,
                 name_only=name_only,
-                exclude_names=exclude_names,
+                exclude_reg_nos=exclude_reg_nos,
             )
             cursor = self._collection.aggregate(pipeline)
             return [doc async for doc in cursor]
 
         # No keywords — plain find() with optional province/sector filters
-        query = self._build_filter(province, sector, exclude_names=exclude_names)
+        query = self._build_filter(province, sector, exclude_reg_nos=exclude_reg_nos)
         projection = self._NAME_ONLY_PROJECTION if name_only else self._PROJECTION
         cursor = self._collection.find(query, projection=projection).skip(offset).limit(limit + 1)
         return [doc async for doc in cursor]
@@ -210,7 +210,7 @@ class InstitutionRepository(IInstitutionRepository):
         keywords: Optional[str],
         province: Optional[str],
         sector: Optional[str],
-        exclude_names: Optional[List[str]] = None,
+        exclude_reg_nos: Optional[List[str]] = None,
     ) -> int:
         if keywords and keywords.strip():
             # Use Atlas Search pipeline with $count instead of $limit
@@ -221,7 +221,7 @@ class InstitutionRepository(IInstitutionRepository):
                 offset=0,
                 limit=10_000,  # generous upper bound for count
                 name_only=False,
-                exclude_names=exclude_names,
+                exclude_reg_nos=exclude_reg_nos,
             )
             # Replace the $limit stage with a $count stage
             pipeline = [s for s in pipeline if "$limit" not in s and "$skip" not in s]
@@ -230,7 +230,7 @@ class InstitutionRepository(IInstitutionRepository):
             result = await cursor.to_list(length=1)
             return result[0]["total"] if result else 0
 
-        query = self._build_filter(province, sector, exclude_names=exclude_names)
+        query = self._build_filter(province, sector, exclude_reg_nos=exclude_reg_nos)
         return await self._collection.count_documents(query)
 
     async def get_programmes_by_institution(self, institution_id: str) -> Optional[Dict[str, Any]]:

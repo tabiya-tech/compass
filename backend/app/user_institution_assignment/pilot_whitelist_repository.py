@@ -7,21 +7,17 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 
 class IPilotWhitelistRepository(ABC):
     @abstractmethod
-    async def get_whitelisted_institution_names(self) -> list[str]:
+    async def get_whitelisted_reg_nos(self) -> list[str]:
         pass
 
     @abstractmethod
-    async def is_whitelisted(self, institution_name: str) -> bool:
-        pass
-
-    @abstractmethod
-    async def get_reg_no_by_institution_name(self, institution_name: str) -> Optional[str]:
+    async def is_whitelisted_by_reg_no(self, reg_no: str) -> bool:
         pass
 
 
 class PilotWhitelistRepository(IPilotWhitelistRepository):
     """
-    Stores institution names that are hidden from the public institution search.
+    Stores institutions that are hidden from the public institution search.
     Documents: { institution_name: str, reg_no: str | null }
     """
 
@@ -29,17 +25,13 @@ class PilotWhitelistRepository(IPilotWhitelistRepository):
         self._collection = collection
         self._logger = logging.getLogger(self.__class__.__name__)
 
-    async def get_whitelisted_institution_names(self) -> list[str]:
-        cursor = self._collection.find({}, projection={"_id": 0, "institution_name": 1})
-        return [doc["institution_name"] async for doc in cursor]
-
-    async def is_whitelisted(self, institution_name: str) -> bool:
-        doc = await self._collection.find_one({"institution_name": {"$eq": institution_name}})
-        return doc is not None
-
-    async def get_reg_no_by_institution_name(self, institution_name: str) -> Optional[str]:
-        doc = await self._collection.find_one(
-            {"institution_name": {"$eq": institution_name}},
+    async def get_whitelisted_reg_nos(self) -> list[str]:
+        cursor = self._collection.find(
+            {"reg_no": {"$exists": True, "$ne": None}},
             projection={"_id": 0, "reg_no": 1},
         )
-        return doc.get("reg_no") if doc else None
+        return [doc["reg_no"] async for doc in cursor]
+
+    async def is_whitelisted_by_reg_no(self, reg_no: str) -> bool:
+        doc = await self._collection.find_one({"reg_no": {"$eq": reg_no}})
+        return doc is not None

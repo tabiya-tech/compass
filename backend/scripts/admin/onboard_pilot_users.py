@@ -12,12 +12,12 @@ For each row the script:
 Because plain_personal_data is pre-populated, has_sensitive_personal_data resolves to
 True on first login and the user goes straight to chat — no onboarding form needed.
 
-Expected CSV columns (from the Evelyn Hone Google Form export):
-    "A1. Full name"                          – required
-    "A3. Personal email address"             – required  (used as Firebase email)
-    "A4. What program or trade are you studying?"  – required
-    "A4.1. If 'Other', please name your program (and ZQF level) below."  – optional
-    "A6. Which year of your program are you in?"   – required
+Expected CSV columns:
+    "full_name"        – required
+    "email"            – required  (used as Firebase email)
+    "programme"        – required
+    "programme_other"  – optional, used when programme == "Other"
+    "school_year"      – optional
 
 Usage:
     # Dry run — preview, no changes
@@ -25,8 +25,8 @@ Usage:
         --institution-name "Evelyn Hone College" \\
         --institution-reg-no "EHC/001" \\
         --file form_responses.csv \\
-        --tenant-id "YourTenantId" \\
         --project-id "your-gcp-project" \\
+        --firebase-web-api-key "your-web-api-key" \\
         --mongodb-uri "mongodb://127.0.0.1:27017/" \\
         --db-name "compass-application-dev" \\
         --dry-run
@@ -36,8 +36,8 @@ Usage:
         --institution-name "Evelyn Hone College" \\
         --institution-reg-no "EHC/001" \\
         --file form_responses.csv \\
-        --tenant-id "YourTenantId" \\
         --project-id "your-gcp-project" \\
+        --firebase-web-api-key "your-web-api-key" \\
         --mongodb-uri "mongodb://127.0.0.1:27017/" \\
         --db-name "compass-application-dev"
 """
@@ -54,8 +54,10 @@ from datetime import datetime, timezone
 from typing import Optional
 
 import firebase_admin
+import requests
 from dotenv import load_dotenv
-from firebase_admin import credentials, tenant_mgt
+from firebase_admin import auth as firebase_auth
+from firebase_admin import credentials
 from pymongo import MongoClient
 
 load_dotenv()
@@ -72,12 +74,12 @@ COLLECTION_PLAIN_PERSONAL_DATA = "plain_personal_data"
 COLLECTION_USER_INSTITUTION_ASSIGNMENT = "user_institution_assignment"
 COLLECTION_PILOT_WHITELIST = "pilot_whitelist"
 
-# ── Form CSV column names ─────────────────────────────────────────────────────
-COL_FULL_NAME = "A1. Full name"
-COL_EMAIL = "A3. Personal email address"
-COL_PROGRAMME = "A4. What program or trade are you studying?"
-COL_PROGRAMME_OTHER = "A4.1. If 'Other', please name your program (and ZQF level) below."
-COL_YEAR = "A6. Which year of your program are you in?"
+# ── CSV column names ──────────────────────────────────────────────────────────
+COL_FULL_NAME = "full_name"
+COL_EMAIL = "email"
+COL_PROGRAMME = "programme"
+COL_PROGRAMME_OTHER = "programme_other"
+COL_YEAR = "school_year"
 
 
 @dataclass
@@ -105,13 +107,13 @@ def _read_csv(path: str) -> list[PilotUser]:
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for i, row in enumerate(reader, start=2):  # row 1 = header
-            email = row.get(COL_EMAIL, "").strip().lower()
-            full_name = row.get(COL_FULL_NAME, "").strip()
-            programme = row.get(COL_PROGRAMME, "").strip()
+            email = (row.get(COL_EMAIL) or "").strip().lower()
+            full_name = (row.get(COL_FULL_NAME) or "").strip()
+            programme = (row.get(COL_PROGRAMME) or "").strip()
             # If programme is "Other", use the free-text field
             if programme.lower() == "other":
-                programme = row.get(COL_PROGRAMME_OTHER, "").strip() or "Other"
-            school_year = row.get(COL_YEAR, "").strip()
+                programme = (row.get(COL_PROGRAMME_OTHER) or "").strip() or "Other"
+            school_year = (row.get(COL_YEAR) or "").strip()
 
             if not email:
                 logger.warning("Row %d: missing email — skipping", i)
@@ -129,17 +131,14 @@ def _read_csv(path: str) -> list[PilotUser]:
     return users
 
 
-def _create_firebase_user(
-    email: str, display_name: str, tenant_id: str, dry_run: bool
-) -> str:
+def _create_firebase_user(email: str, display_name: str, dry_run: bool) -> str:
     if dry_run:
         logger.info("[DRY RUN] Would create Firebase user: %s (name=%s)", email, display_name)
         return f"dry-run-uid-{email}"
 
-    auth_client = tenant_mgt.auth_for_tenant(tenant_id)
     password = _generate_password()
     try:
-        user = auth_client.create_user(
+        user = firebase_auth.create_user(
             email=email,
             email_verified=True,
             password=password,
@@ -151,18 +150,27 @@ def _create_firebase_user(
     except Exception as exc:
         if "EMAIL_EXISTS" in str(exc) or "email-already-exists" in str(exc).lower():
             logger.warning("Firebase user already exists for %s — reusing", email)
-            existing = auth_client.get_user_by_email(email)
+            existing = firebase_auth.get_user_by_email(email)
             return existing.uid
         raise
 
 
-def _send_password_reset(email: str, tenant_id: str, dry_run: bool) -> None:
+def _send_password_reset(email: str, firebase_web_api_key: str, dry_run: bool) -> None:
     if dry_run:
-        logger.info("[DRY RUN] Would send password reset to: %s", email)
+        logger.info("[DRY RUN] Would send password reset email to: %s", email)
         return
-    auth_client = tenant_mgt.auth_for_tenant(tenant_id)
-    link = auth_client.generate_password_reset_link(email)
-    logger.info("Password reset link for %s: %s", email, link)
+    # generate_password_reset_link only produces the URL — it does not send an email.
+    # We use the Firebase Auth REST API to actually trigger the email delivery.
+    resp = requests.post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode",
+        params={"key": firebase_web_api_key},
+        json={"requestType": "PASSWORD_RESET", "email": email},
+        headers={"Content-Type": "application/json"},
+        timeout=10,
+    )
+    if not resp.ok:
+        raise RuntimeError(f"Failed to send password reset to {email}: {resp.status_code} {resp.text}")
+    logger.info("Password reset email sent to %s", email)
 
 
 def _insert_user_preferences(db, user_id: str, dry_run: bool) -> None:
@@ -268,7 +276,7 @@ def run(args) -> None:
         sys.exit(1)
     logger.info("Loaded %d user(s) from %s", len(users), args.file)
 
-    mongo_client = MongoClient(args.mongodb_uri, tlsAllowInvalidCertificates=True)
+    mongo_client = MongoClient(args.mongodb_uri, tlsAllowInvalidCertificates=args.allow_invalid_tls)
     db = mongo_client[args.db_name]
 
     # Whitelist the institution once (idempotent)
@@ -277,8 +285,8 @@ def run(args) -> None:
     ok, failed = 0, 0
     for user in users:
         try:
-            uid = _create_firebase_user(user.email, user.full_name, args.tenant_id, args.dry_run)
-            _send_password_reset(user.email, args.tenant_id, args.dry_run)
+            uid = _create_firebase_user(user.email, user.full_name, args.dry_run)
+            _send_password_reset(user.email, args.firebase_web_api_key, args.dry_run)
             _insert_user_preferences(db, uid, args.dry_run)
             _insert_plain_personal_data(db, uid, user, args.institution_name, args.institution_reg_no, args.dry_run)
             _upsert_assignment(db, uid, args.institution_name, args.institution_reg_no, args.dry_run)
@@ -301,11 +309,17 @@ def parse_args():
     parser.add_argument("--institution-name", required=True)
     parser.add_argument("--institution-reg-no", required=False, default=None)
     parser.add_argument("--file", required=True, help="Path to the Google Form CSV export")
-    parser.add_argument("--tenant-id", required=True, help="Firebase tenant ID")
     parser.add_argument("--project-id", required=True, help="GCP project ID")
+    parser.add_argument("--firebase-web-api-key", required=True, help="Firebase Web API key (from Firebase console → Project settings → General)")
     parser.add_argument("--mongodb-uri", required=True)
     parser.add_argument("--db-name", required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--allow-invalid-tls",
+        action="store_true",
+        default=False,
+        help="Disable TLS certificate verification (only for local/dev MongoDB URIs)",
+    )
     return parser.parse_args()
 
 

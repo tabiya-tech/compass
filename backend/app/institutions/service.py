@@ -75,7 +75,7 @@ class InstitutionService(IInstitutionService):
         offset = self._parse_cursor_offset(cursor)
         include_count = self._include_total(include)
 
-        exclude_names = await self._whitelist_repository.get_whitelisted_institution_names()
+        exclude_reg_nos = await self._whitelist_repository.get_whitelisted_reg_nos()
 
         docs = await self._repository.search_institutions(
             keywords=keywords,
@@ -84,7 +84,7 @@ class InstitutionService(IInstitutionService):
             offset=offset,
             limit=limit,
             name_only=name_only,
-            exclude_names=exclude_names or None,
+            exclude_reg_nos=exclude_reg_nos or None,
         )
 
         has_more = len(docs) > limit
@@ -94,7 +94,7 @@ class InstitutionService(IInstitutionService):
         institutions = [InstitutionDocument.model_validate(doc) for doc in page_docs]
 
         total = (
-            await self._repository.count_institutions(keywords, province, sector, exclude_names=exclude_names or None)
+            await self._repository.count_institutions(keywords, province, sector, exclude_reg_nos=exclude_reg_nos or None)
             if include_count
             else None
         )
@@ -122,8 +122,8 @@ class InstitutionService(IInstitutionService):
                 status_code=HTTPStatus.NOT_FOUND,
                 detail=f"Institution with reg_no '{institution_id}' not found",
             )
-        institution_name = doc.get("name", "")
-        if await self._whitelist_repository.is_whitelisted(institution_name) and not caller_assigned:
+        doc_reg_no = doc.get("reg_no", "")
+        if doc_reg_no and await self._whitelist_repository.is_whitelisted_by_reg_no(doc_reg_no) and not caller_assigned:
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail=f"Institution with reg_no '{institution_id}' not found",

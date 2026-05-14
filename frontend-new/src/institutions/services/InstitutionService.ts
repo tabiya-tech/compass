@@ -99,6 +99,7 @@ export default class InstitutionService {
       serviceFunction: "getInstitutionAssignment",
       failureMessage: "Failed to fetch institution assignment",
       expectedContentType: "application/json",
+      retryOnFailedToFetch: true,
     });
     const body = await response.text();
     return parseJson<InstitutionAssignment | null>(body, errorFactory);
