@@ -162,6 +162,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
   const [screenshot, setScreenshot] = useState<FeedbackScreenshot | null>(null);
   const [screenshotPreviewUrl, setScreenshotPreviewUrl] = useState<string | null>(null);
   const [isCapturingScreenshot, setIsCapturingScreenshot] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
 
@@ -176,6 +177,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
     }
     setScreenshotPreviewUrl(null);
     setIsCapturingScreenshot(false);
+    setIsHidden(false);
     setIsSubmitting(false);
   }, []);
 
@@ -187,6 +189,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
 
   const handleAddScreenshot = useCallback(async () => {
     setIsCapturingScreenshot(true);
+    setIsHidden(true);
     try {
       const captured = await captureScreenshot();
       if (captured) {
@@ -200,6 +203,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
       // User cancelled or browser denied — silently ignore
       console.debug("Screenshot capture cancelled or failed:", error);
     } finally {
+      setIsHidden(false);
       setIsCapturingScreenshot(false);
     }
   }, []);
@@ -251,6 +255,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
       data-testid={DATA_TEST_ID.FEEDBACK_MODAL}
       fullWidth
       maxWidth="sm"
+      sx={{ visibility: isHidden ? "hidden" : "visible" }}
       PaperProps={{
         sx: {
           padding: isSmallMobile
