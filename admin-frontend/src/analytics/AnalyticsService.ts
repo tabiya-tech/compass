@@ -16,6 +16,7 @@ import type {
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
   SkillsSupplyStatsResponse,
+  InstitutionFilterOptionsResponse,
 } from "./AnalyticsService.types";
 
 export type {
@@ -31,6 +32,7 @@ export type {
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
   SkillsSupplyStatsResponse,
+  InstitutionFilterOptionsResponse,
 };
 
 const SERVICE_NAME = "AnalyticsService";
@@ -148,9 +150,16 @@ export default class AnalyticsService {
     }
   }
 
-  async getSkillGapStats(limit = 10, institution?: string): Promise<SkillGapStatsResponse> {
+  async getSkillGapStats(
+    limit = 10,
+    institution?: string,
+    location?: string,
+    sector?: string
+  ): Promise<SkillGapStatsResponse> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (institution) params.set("institution", institution);
+    if (location) params.set("location", location);
+    if (sector) params.set("sector", sector);
     const url = `${this.baseUrl}/analytics/skill-gap-stats?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getSkillGapStats", "GET", url);
     const response = await customFetch(url, {
@@ -203,9 +212,16 @@ export default class AnalyticsService {
     }
   }
 
-  async getSkillsSupplyStats(limit = 10, institution?: string): Promise<SkillsSupplyStatsResponse> {
+  async getSkillsSupplyStats(
+    limit = 10,
+    institution?: string,
+    location?: string,
+    sector?: string
+  ): Promise<SkillsSupplyStatsResponse> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (institution) params.set("institution", institution);
+    if (location) params.set("location", location);
+    if (sector) params.set("sector", sector);
     const url = `${this.baseUrl}/analytics/skills-supply-stats?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getSkillsSupplyStats", "GET", url);
     const response = await customFetch(url, {
@@ -283,6 +299,27 @@ export default class AnalyticsService {
     });
     try {
       return (await response.json()) as CareerExplorerStatsResponse;
+    } catch (e) {
+      throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
+        error: e,
+      });
+    }
+  }
+
+  async getInstitutionFilterOptions(): Promise<InstitutionFilterOptionsResponse> {
+    const url = `${this.baseUrl}/analytics/institutions/filter-options`;
+    const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getInstitutionFilterOptions", "GET", url);
+    const response = await customFetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: SERVICE_NAME,
+      serviceFunction: "getInstitutionFilterOptions",
+      failureMessage: "Failed to fetch institution filter options",
+      expectedContentType: "application/json",
+    });
+    try {
+      return (await response.json()) as InstitutionFilterOptionsResponse;
     } catch (e) {
       throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
         error: e,

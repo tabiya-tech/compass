@@ -131,6 +131,11 @@ export interface SkillsDiscoveryStatsResponse {
   funnel: SkillsDiscoveryFunnelStage[];
 }
 
+export interface InstitutionFilterOptionsResponse {
+  provinces: string[];
+  sectors: string[];
+}
+
 export interface JobApiItem {
   title?: string;
   employer?: string;

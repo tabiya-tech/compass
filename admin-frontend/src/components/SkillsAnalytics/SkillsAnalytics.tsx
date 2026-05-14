@@ -1,18 +1,121 @@
-import React from "react";
-import { Box, Skeleton, Typography, useTheme, Select, MenuItem, LinearProgress } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Skeleton,
+  Typography,
+  useTheme,
+  Select,
+  MenuItem,
+  LinearProgress,
+  SelectChangeEvent,
+  ListSubheader,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
-import { useSkillGapStats } from "src/hooks/useSkillGapStats";
 import { useSkillsSupplyStats } from "src/hooks/useSkillsSupplyStats";
+import { useSkillGapStats } from "src/hooks/useSkillGapStats";
+import { useSkillsAnalyticsFilterOptions } from "src/hooks/useSkillsAnalyticsFilterOptions";
 import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
+import { MODULE_FILTER_LOCATIONS } from "src/data/moduleFilterOptions";
+
 interface SkillsAnalyticsProps {
   institution?: string;
 }
 
+interface SearchableSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+  allLabel: string;
+  options: string[];
+  searchPlaceholder: string;
+}
+
+const SearchableSelect: React.FC<SearchableSelectProps> = ({
+  value,
+  onChange,
+  allLabel,
+  options,
+  searchPlaceholder,
+}) => {
+  const theme = useTheme();
+  const [search, setSearch] = useState("");
+
+  const filtered = options.filter((o) => o.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <Select
+      size="small"
+      value={value}
+      onChange={(e: SelectChangeEvent) => onChange(e.target.value)}
+      onClose={() => setSearch("")}
+      displayEmpty
+      sx={{
+        backgroundColor: theme.palette.background.paper,
+        minWidth: 250,
+        fontSize: theme.typography.body2.fontSize,
+        "& .MuiSelect-select": { py: theme.fixedSpacing(0.5), fontSize: theme.typography.body2.fontSize },
+      }}
+      MenuProps={{
+        autoFocus: false,
+        PaperProps: { sx: { maxHeight: 400 } },
+      }}
+    >
+      (
+      <ListSubheader sx={{ py: theme.fixedSpacing(0.5), px: theme.fixedSpacing(1), lineHeight: "normal" }}>
+        <TextField
+          size="small"
+          autoFocus
+          placeholder={searchPlaceholder}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.stopPropagation()}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 16 }} />
+                </InputAdornment>
+              ),
+              sx: { fontSize: theme.typography.body2.fontSize },
+            },
+          }}
+          sx={{ width: "100%" }}
+        />
+      </ListSubheader>
+      <MenuItem value="" sx={{ fontSize: theme.typography.body2.fontSize }}>
+        {allLabel}
+      </MenuItem>
+      {filtered.map((opt) => (
+        <MenuItem key={opt} value={opt} sx={{ fontSize: theme.typography.body2.fontSize }}>
+          {opt}
+        </MenuItem>
+      ))}
+    </Select>
+  );
+};
+
 const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { data: skillGapData, loading: skillGapLoading } = useSkillGapStats(10, institution);
-  const { data: skillSupplyData, loading: skillSupplyLoading } = useSkillsSupplyStats(10, institution);
+  const [province, setProvince] = useState("");
+  const [sector, setSector] = useState("");
+
+  const { sectors } = useSkillsAnalyticsFilterOptions();
+
+  const { data: skillSupplyData, loading: skillSupplyLoading } = useSkillsSupplyStats(
+    10,
+    institution,
+    province || undefined,
+    sector || undefined
+  );
+  const { data: skillGapData, loading: skillGapLoading } = useSkillGapStats(
+    10,
+    institution,
+    province || undefined,
+    sector || undefined
+  );
 
   // Supply: top skills students actually have, as % of students with that skill vs total with any skill
   const supplyTotal = skillSupplyData?.total_students_with_skills ?? 0;
@@ -21,12 +124,13 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
     supplyPct: supplyTotal > 0 ? Math.round((entry.student_count / supplyTotal) * 100) : 0,
   }));
 
-  // Demand: top skill gaps from recommendations
+  // Demand: top skill gaps (placeholder until job-matching pipeline is available)
   const demandTotal = skillGapData?.total_students_with_skill_gaps ?? 0;
   const demandData = (skillGapData?.top_skill_gaps ?? []).map((entry) => ({
     skillName: entry.skill_label,
     demandPct: demandTotal > 0 ? Math.round((entry.students_with_gap_count / demandTotal) * 100) : 0,
   }));
+
   const renderSimpleBar = (label: string, value: number, barColor: string, ariaLabel: string) => (
     <Box
       display="grid"
@@ -78,23 +182,21 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
             </Typography>
             <MetricInfoIcon title={t("dashboard.skillsAnalytics.supplyVsDemandTitleTooltip")} />
           </Box>
-          <Box display="flex" gap={2}>
-            <Select
-              size="small"
-              value=""
-              displayEmpty
-              sx={{ backgroundColor: theme.palette.background.paper, minWidth: 140 }}
-            >
-              <MenuItem value="">{t("dashboard.skillsAnalytics.filters.allProvinces")}</MenuItem>
-            </Select>
-            <Select
-              size="small"
-              value=""
-              displayEmpty
-              sx={{ backgroundColor: theme.palette.background.paper, minWidth: 140 }}
-            >
-              <MenuItem value="">{t("dashboard.skillsAnalytics.filters.allSectors")}</MenuItem>
-            </Select>
+          <Box display="flex" gap={1}>
+            <SearchableSelect
+              value={province}
+              onChange={setProvince}
+              allLabel={t("dashboard.skillsAnalytics.filters.allProvinces")}
+              options={MODULE_FILTER_LOCATIONS}
+              searchPlaceholder="Search provinces..."
+            />
+            <SearchableSelect
+              value={sector}
+              onChange={setSector}
+              allLabel={t("dashboard.skillsAnalytics.filters.allSectors")}
+              options={sectors}
+              searchPlaceholder="Search sectors..."
+            />
           </Box>
         </Box>
 
@@ -104,7 +206,7 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
             gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           }}
         >
-          {/* Left Column */}
+          {/* Left Column — Supply */}
           <Box sx={{ pr: { md: 3 } }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Typography
@@ -163,7 +265,7 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
             </Box>
           </Box>
 
-          {/* Right Column */}
+          {/* Right Column — Demand (Job Postings) */}
           <Box sx={{ borderLeft: { md: 1 }, borderColor: { md: "divider" }, pl: { md: 3 } }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
               <Typography

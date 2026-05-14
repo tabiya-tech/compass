@@ -1,14 +1,17 @@
+import asyncio
+import base64
 import logging
 from http import HTTPStatus
 from typing import Literal, Optional
 
-import base64
-
 from fastapi import APIRouter, Depends, HTTPException, Query
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.analytics.institutions.repository import InstitutionRepository, get_institution_repository
-from app.analytics.types import Institution, PaginatedListMeta, PaginatedListResponse
+from app.analytics.types import Institution, InstitutionFilterOptions, PaginatedListMeta, PaginatedListResponse
 from app.constants.errors import HTTPErrorResponse
+from app.server_dependencies.database_collections import Collections
+from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
 
 logger = logging.getLogger(__name__)
@@ -74,3 +77,29 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
             total=total if include_count else None,
         )
         return PaginatedListResponse(data=items, meta=meta)
+
+    @router.get(
+        "/institutions/filter-options",
+        response_model=InstitutionFilterOptions,
+        responses={HTTPStatus.INTERNAL_SERVER_ERROR: {"model": HTTPErrorResponse}},
+        description="Return distinct province and sector values across all institutions.",
+    )
+    async def get_institution_filter_options(
+        user_info: UserInfo = Depends(auth.get_user_info()),
+        application_db: AsyncIOMotorDatabase = Depends(CompassDBProvider.get_application_db),
+    ) -> InstitutionFilterOptions:
+        try:
+            coll = application_db.get_collection(Collections.INSTITUTIONS)
+            provinces_raw, sectors_raw = await asyncio.gather(
+                coll.distinct("province"),
+                coll.distinct("sectors_covered"),
+            )
+            _exclude = {"all sectors", "all provinces", "all"}
+            provinces = sorted(p for p in provinces_raw if p and isinstance(p, str) and p.lower() not in _exclude)
+            sectors = sorted(s for s in sectors_raw if s and isinstance(s, str) and s.lower() not in _exclude)
+            return InstitutionFilterOptions(provinces=provinces, sectors=sectors)
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Unexpected error"
+            ) from e

@@ -69,3 +69,8 @@ class DashboardStats(BaseModel):
     institutions_active: int
     total_students: int
     active_students_7_days: int
+
+
+class InstitutionFilterOptions(BaseModel):
+    provinces: list[str]
+    sectors: list[str]
