@@ -199,7 +199,7 @@
         "manufacturing": "Fabricación",
         "water": "Agua",
         "transport": "Transporte",
-        "other": "Otro"
+        "others": "Otros"
       },
       "filters": {
         "allLocations": "Todas las ubicaciones",

@@ -145,13 +145,26 @@ export function useModules(filters?: CareerReadinessFilters): UseModulesResult {
       breakdownTitleKey: "dashboard.modules.topSectorsExplored",
       breakdownItems: (() => {
         const totalUsers = ceData.top_sectors.reduce((sum, s) => sum + s.unique_users, 0) || 1;
-        return ceData.top_sectors.map((s) => ({
+        const main = ceData.top_sectors.filter((s) => (s.unique_users / totalUsers) * 100 >= 2);
+        const small = ceData.top_sectors.filter((s) => (s.unique_users / totalUsers) * 100 < 2);
+        const items = main.map((s) => ({
           labelKey: s.sector_name,
           value: s.unique_users,
           total: totalUsers,
           percentage: Math.round((s.unique_users / totalUsers) * 100),
           color: s.is_priority ? "primary" : "secondary",
         }));
+        if (small.length > 0) {
+          const othersValue = small.reduce((sum, s) => sum + s.unique_users, 0);
+          items.push({
+            labelKey: "dashboard.modules.sectors.others",
+            value: othersValue,
+            total: totalUsers,
+            percentage: Math.round((othersValue / totalUsers) * 100),
+            color: "secondary",
+          });
+        }
+        return items;
       })(),
     });
   }

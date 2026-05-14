@@ -194,7 +194,7 @@
         "manufacturing": "Manufacturing",
         "water": "Water",
         "transport": "Transport",
-        "other": "Other"
+        "others": "Others"
       },
       "filters": {
         "allLocations": "All Locations",

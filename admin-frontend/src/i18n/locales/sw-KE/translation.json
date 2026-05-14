@@ -199,7 +199,7 @@
         "manufacturing": "Utengenezaji",
         "water": "Maji",
         "transport": "Usafiri",
-        "other": "Nyingine"
+        "others": "Nyingine"
       },
       "filters": {
         "allLocations": "Maeneo yote",
