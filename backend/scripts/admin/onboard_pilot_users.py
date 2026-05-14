@@ -73,6 +73,7 @@ COLLECTION_USER_PREFERENCES = "user_preferences"
 COLLECTION_PLAIN_PERSONAL_DATA = "plain_personal_data"
 COLLECTION_USER_INSTITUTION_ASSIGNMENT = "user_institution_assignment"
 COLLECTION_PILOT_WHITELIST = "pilot_whitelist"
+COLLECTION_INSTITUTIONS = "institutions"
 
 # ── CSV column names ──────────────────────────────────────────────────────────
 COL_FULL_NAME = "full_name"
@@ -264,6 +265,49 @@ def _upsert_pilot_whitelist(
     logger.info("Upserted pilot_whitelist: %s", institution_name)
 
 
+def _validate_institution_and_programmes(db, institution_reg_no: str, institution_name: str, users: list[PilotUser]) -> None:
+    """
+    Abort early if:
+    - The institution reg_no doesn't exist in the institutions collection.
+    - The institution name doesn't match what's stored (catches typos).
+    - Any programme name in the CSV doesn't exist in the institution's programmes list
+      (programme names must match exactly for the skills mapping to work).
+    """
+    doc = db[COLLECTION_INSTITUTIONS].find_one({"reg_no": institution_reg_no})
+    if doc is None:
+        raise SystemExit(
+            f"[VALIDATION ERROR] No institution found with reg_no='{institution_reg_no}'. "
+            "Check the value passed to --institution-reg-no."
+        )
+
+    stored_name = doc.get("name", "")
+    if stored_name != institution_name:
+        raise SystemExit(
+            f"[VALIDATION ERROR] Institution name mismatch: "
+            f"--institution-name is '{institution_name}' but the DB has '{stored_name}' for reg_no='{institution_reg_no}'. "
+            "Update --institution-name to match exactly."
+        )
+
+    valid_programme_names = {p["name"] for p in doc.get("programmes", []) if "name" in p}
+    errors = []
+    for user in users:
+        if user.programme and user.programme not in valid_programme_names:
+            errors.append(f"  - '{user.programme}' (user: {user.email})")
+    if errors:
+        raise SystemExit(
+            f"[VALIDATION ERROR] The following programme names in the CSV don't match any programme "
+            f"in '{stored_name}' (reg_no='{institution_reg_no}'):\n"
+            + "\n".join(errors)
+            + f"\n\nValid programmes are:\n"
+            + "\n".join(f"  - {n}" for n in sorted(valid_programme_names))
+        )
+
+    logger.info(
+        "Validation passed: institution '%s' (%s) found with %d programmes",
+        stored_name, institution_reg_no, len(valid_programme_names),
+    )
+
+
 def run(args) -> None:
     if args.dry_run:
         logger.info("=" * 60)
@@ -278,6 +322,12 @@ def run(args) -> None:
 
     mongo_client = MongoClient(args.mongodb_uri, tlsAllowInvalidCertificates=args.allow_invalid_tls)
     db = mongo_client[args.db_name]
+
+    # Validate institution and programmes before writing anything
+    if args.institution_reg_no:
+        _validate_institution_and_programmes(db, args.institution_reg_no, args.institution_name, users)
+    else:
+        logger.warning("No --institution-reg-no provided — skipping institution and programme validation")
 
     # Whitelist the institution once (idempotent)
     _upsert_pilot_whitelist(db, args.institution_name, args.institution_reg_no, args.dry_run)
