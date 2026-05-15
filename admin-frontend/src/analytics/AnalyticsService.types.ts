@@ -23,6 +23,7 @@ export interface StudentApiItem {
   institution: string | null;
   province: string | null;
   programme: string | null;
+  qualification_type: string | null;
   year: string | null;
   gender: string | null;
   active: boolean;

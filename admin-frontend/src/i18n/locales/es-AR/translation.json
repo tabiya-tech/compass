@@ -331,6 +331,7 @@
       "headers": {
         "studentName": "Nombre del estudiante",
         "programme": "Programa",
+        "qualificationType": "Tipo de Calificación",
         "year": "Año",
         "gender": "Género",
         "profileStrength": "Fuerza del perfil",

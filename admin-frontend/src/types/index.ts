@@ -32,6 +32,7 @@ export interface InstructorStudentRow {
   id: string;
   studentName: string;
   programme: string;
+  qualificationType: string;
   year: string;
   gender: string;
   modulesExplored: number;

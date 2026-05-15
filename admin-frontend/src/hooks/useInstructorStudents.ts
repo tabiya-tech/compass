@@ -53,6 +53,7 @@ const toInstructorStudentRow = (
   }
 
   const programme = toText(item.programme) ?? PLACEHOLDER_SYMBOL;
+  const qualificationType = toText(item.qualification_type) ?? PLACEHOLDER_SYMBOL;
   const year = toText(item.year) ?? PLACEHOLDER_SYMBOL;
   const gender = normalizeGender(toText(item.gender)) ?? PLACEHOLDER_SYMBOL;
   const lastActiveModuleId = toText(item.last_active_module) ?? PLACEHOLDER_SYMBOL;
@@ -63,6 +64,7 @@ const toInstructorStudentRow = (
     id,
     studentName: name,
     programme,
+    qualificationType,
     year,
     gender,
     modulesExplored,

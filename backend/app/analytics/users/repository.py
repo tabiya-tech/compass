@@ -317,6 +317,7 @@ class UsersRepository:
                 institution=plain.get("institution_name"),
                 province=plain.get("province"),
                 programme=plain.get("programme_name"),
+                qualification_type=plain.get("qualification_type"),
                 year=plain.get("school_year"),
                 gender=plain.get("gender"),
                 active=d.get("accepted_tc") is not None,

@@ -95,6 +95,14 @@ const STATIC_FIELDS: FieldDefinition[] = [
     encrypt: false,
   }),
   new StringFieldDefinition({
+    name: "qualificationType",
+    dataKey: "qualification_type",
+    type: FieldType.String,
+    required: false,
+    label: "Qualification Type",
+    encrypt: false,
+  }),
+  new StringFieldDefinition({
     name: "province",
     dataKey: "province",
     type: FieldType.String,
@@ -153,7 +161,7 @@ const SensitiveDataForm: React.FC = () => {
   const [schoolYear, setSchoolYear] = useState("");
   const [selectedInstitution, setSelectedInstitution] = useState<InstitutionSummary | null>(null);
   const [institutionInputValue, setInstitutionInputValue] = useState("");
-  const [selectedProgramme, setSelectedProgramme] = useState("");
+  const [selectedProgramme, setSelectedProgramme] = useState<Programme | null>(null);
 
   // Pilot: pre-assigned institution (locks the field)
   const [assignedInstitution, setAssignedInstitution] = useState<InstitutionSummary | null>(null);
@@ -205,7 +213,7 @@ const SensitiveDataForm: React.FC = () => {
       // Clear institution & programme when user clears or changes input
       if (!value) {
         setSelectedInstitution(null);
-        setSelectedProgramme("");
+        setSelectedProgramme(null);
         setProgrammes([]);
         setFieldValid("institution", false);
         setFieldValid("programme", false);
@@ -237,7 +245,7 @@ const SensitiveDataForm: React.FC = () => {
   const handleInstitutionSelect = useCallback(
     async (_event: React.SyntheticEvent, institution: InstitutionSummary | null) => {
       setSelectedInstitution(institution);
-      setSelectedProgramme("");
+      setSelectedProgramme(null);
       setProgrammes([]);
       setFieldValid("programme", false);
 
@@ -270,7 +278,8 @@ const SensitiveDataForm: React.FC = () => {
       firstName,
       lastName,
       institution: selectedInstitution?.name ?? "",
-      programme: selectedProgramme,
+      programme: selectedProgramme?.name ?? "",
+      qualificationType: selectedProgramme?.qualification_type ?? "",
       province: selectedInstitution?.province ?? "",
       schoolYear,
     }),
@@ -584,11 +593,10 @@ const SensitiveDataForm: React.FC = () => {
                 getOptionLabel={(option) => option.name}
                 disabled={!selectedInstitution || programmesLoading}
                 loading={programmesLoading}
-                value={programmes.find((p) => p.name === selectedProgramme) ?? null}
+                value={selectedProgramme}
                 onChange={(_event, programme) => {
-                  const val = programme?.name ?? "";
-                  setSelectedProgramme(val);
-                  setFieldValid("programme", !!val);
+                  setSelectedProgramme(programme ?? null);
+                  setFieldValid("programme", !!programme);
                 }}
                 noOptionsText={
                   !selectedInstitution

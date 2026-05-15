@@ -36,6 +36,7 @@ class User(BaseModel):
     institution: Optional[str] = None
     province: Optional[str] = None
     programme: Optional[str] = None
+    qualification_type: Optional[str] = None
     year: Optional[str] = None
     gender: Optional[str] = None
     active: bool = True

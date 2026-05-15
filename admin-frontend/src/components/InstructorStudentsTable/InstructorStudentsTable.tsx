@@ -109,6 +109,18 @@ const InstructorStudentsTable: React.FC<InstructorStudentsTableProps> = ({
       ),
     },
     {
+      key: "qualificationType",
+      label: t("instructorDashboard.studentsTable.headers.qualificationType").toUpperCase(),
+      sortable: true,
+      sortType: "text",
+      align: "center",
+      render: (val, row) => (
+        <Typography variant="body2" noWrap title={row.qualificationType} sx={{ textAlign: "center", width: "100%" }}>
+          {row.qualificationType}
+        </Typography>
+      ),
+    },
+    {
       key: "year",
       label: t("instructorDashboard.studentsTable.headers.year").toUpperCase(),
       sortable: true,
