@@ -49,7 +49,7 @@ describe("ExperienceService", () => {
         // THEN expect to make a GET request with the correct headers and payload
         expectCorrectFetchRequest(
           fetchSpy,
-          `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?deleted=${deleted}`,
+          `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?deleted=${deleted}&language=en`,
           {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -102,7 +102,7 @@ describe("ExperienceService", () => {
             ExperienceService.name,
             "getExperiences",
             "GET",
-            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?deleted=false`,
+            `${givenApiServerUrl}/conversations/${givenSessionId}/experiences?deleted=false&language=en`,
             StatusCodes.OK,
             ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY,
             "",
