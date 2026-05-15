@@ -125,24 +125,21 @@ describe("getUserFriendlyConversationPhaseName", () => {
       [PreferenceSubPhase.FOLLOW_UP, "chat.chatProgressbar.preferenceSubPhases.followUp"],
       [PreferenceSubPhase.GATE, "chat.chatProgressbar.preferenceSubPhases.gate"],
       [PreferenceSubPhase.WRAPUP, "chat.chatProgressbar.preferenceSubPhases.wrapup"],
-    ])(
-      "sub-phase %s renders its own label (no X/Y counter)",
-      (subPhase, translationKey) => {
-        const givenPhase: CurrentPhase = {
-          phase: ConversationPhase.PREFERENCE_ELICITATION,
-          percentage: 72,
-          current: null,
-          total: null,
-          sub_phase: subPhase,
-        };
+    ])("sub-phase %s renders its own label (no X/Y counter)", (subPhase, translationKey) => {
+      const givenPhase: CurrentPhase = {
+        phase: ConversationPhase.PREFERENCE_ELICITATION,
+        percentage: 72,
+        current: null,
+        total: null,
+        sub_phase: subPhase,
+      };
 
-        const actual = getUserFriendlyConversationPhaseName(givenPhase);
+      const actual = getUserFriendlyConversationPhaseName(givenPhase);
 
-        expect(actual).toBe(i18n.t(translationKey));
-        expect(actual).not.toMatch(/\d+\/\d+/);
-        expect(actual).not.toMatch(/\d+ of \d+/);
-      }
-    );
+      expect(actual).toBe(i18n.t(translationKey));
+      expect(actual).not.toMatch(/\d+\/\d+/);
+      expect(actual).not.toMatch(/\d+ of \d+/);
+    });
 
     test("non-BWS sub-phases never render BWS wording", () => {
       const subPhases = [

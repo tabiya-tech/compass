@@ -14,8 +14,7 @@ const meta: Meta<typeof ChatProgressBar> = {
     sub_phase: {
       options: [null, ...Object.values(PreferenceSubPhase)],
       control: { type: "select" },
-      description:
-        "Preference-elicitation sub-phase. Only meaningful when phase === PREFERENCE_ELICITATION.",
+      description: "Preference-elicitation sub-phase. Only meaningful when phase === PREFERENCE_ELICITATION.",
     },
     percentage: {
       control: { type: "range", min: 0, max: 100, step: 1 },
