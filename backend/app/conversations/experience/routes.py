@@ -39,7 +39,7 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
         int, Path(description="The session id for the conversation history.", examples=[123])],
                                deleted: Annotated[bool, Query(description="Weather to return deleted experiences",
                                                               examples=[True])] = False,
-                               language: Annotated[Optional[str], Query(
+                               language: Annotated[str, Query(
                                    description="If set to 'en', translate summary and "
                                                "normalized_experience_title to English before returning. "
                                                "Used for English-only Skills Report generation.",
