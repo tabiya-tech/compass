@@ -72,5 +72,6 @@ class DashboardStats(BaseModel):
 
 
 class InstitutionFilterOptions(BaseModel):
+    institution_names: list[str]
     provinces: list[str]
     sectors: list[str]

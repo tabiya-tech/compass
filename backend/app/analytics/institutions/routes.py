@@ -90,14 +90,16 @@ def add_institutions_routes(router: APIRouter, auth: Authentication):
     ) -> InstitutionFilterOptions:
         try:
             coll = application_db.get_collection(Collections.INSTITUTIONS)
-            provinces_raw, sectors_raw = await asyncio.gather(
+            names_raw, provinces_raw, sectors_raw = await asyncio.gather(
+                coll.distinct("name"),
                 coll.distinct("province"),
                 coll.distinct("sectors_covered"),
             )
             _exclude = {"all sectors", "all provinces", "all"}
+            institution_names = sorted(n for n in names_raw if n and isinstance(n, str))
             provinces = sorted(p for p in provinces_raw if p and isinstance(p, str) and p.lower() not in _exclude)
             sectors = sorted(s for s in sectors_raw if s and isinstance(s, str) and s.lower() not in _exclude)
-            return InstitutionFilterOptions(provinces=provinces, sectors=sectors)
+            return InstitutionFilterOptions(institution_names=institution_names, provinces=provinces, sectors=sectors)
         except Exception as e:
             logger.exception(e)
             raise HTTPException(

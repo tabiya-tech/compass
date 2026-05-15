@@ -132,6 +132,7 @@ export interface SkillsDiscoveryStatsResponse {
 }
 
 export interface InstitutionFilterOptionsResponse {
+  institution_names: string[];
   provinces: string[];
   sectors: string[];
 }

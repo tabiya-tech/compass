@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import InstitutionService from "src/institutions/InstitutionService";
+import AnalyticsService from "src/analytics/AnalyticsService";
 
 export interface InstitutionFilterOptions {
   institutionNames: string[];
@@ -7,11 +7,6 @@ export interface InstitutionFilterOptions {
   error: Error | null;
 }
 
-/**
- * Fetches all institutions from the backend collection and returns a sorted
- * list of unique institution names for use in dashboard filter dropdowns.
- * Paginates through all pages automatically.
- */
 export function useInstitutionFilterOptions(): InstitutionFilterOptions {
   const [institutionNames, setInstitutionNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,29 +14,20 @@ export function useInstitutionFilterOptions(): InstitutionFilterOptions {
 
   useEffect(() => {
     let isMounted = true;
-
-    async function fetchAll() {
-      setLoading(true);
-      try {
-        const result = await InstitutionService.getInstance().searchInstitutions({
-          limit: 100,
-          fields: "name",
-        });
+    AnalyticsService.getInstance()
+      .getInstitutionFilterOptions()
+      .then((result) => {
         if (isMounted) {
-          setInstitutionNames(result.data.map((i) => i.name).sort());
+          setInstitutionNames(result.institution_names ?? []);
           setError(null);
         }
-      } catch (e) {
-        if (isMounted) {
-          setError(e instanceof Error ? e : new Error(String(e)));
-        }
-      } finally {
+      })
+      .catch((err) => {
+        if (isMounted) setError(err instanceof Error ? err : new Error(String(err)));
+      })
+      .finally(() => {
         if (isMounted) setLoading(false);
-      }
-    }
-
-    fetchAll();
-
+      });
     return () => {
       isMounted = false;
     };
