@@ -91,20 +91,7 @@ const VerifyEmail: React.FC = () => {
             fontSize: "0.85rem",
           }}
         >
-          <Box
-            sx={{
-              width: 24,
-              height: 24,
-              borderRadius: "50%",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: theme.palette.secondary.main,
-              color: theme.palette.common.white,
-            }}
-          >
-            <MailOutlineRoundedIcon fontSize="small" />
-          </Box>
+          <MailOutlineRoundedIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
           {t("auth.pages.verifyEmail.verificationEmailSentBadge")}
         </Box>
         <Box>
@@ -117,19 +104,18 @@ const VerifyEmail: React.FC = () => {
         </Box>
         <Box
           sx={{
-            textAlign: "right",
+            textAlign: "left",
+            mt: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           }}
         >
           <PrimaryButton
             variant="contained"
-            showCircle
             color="primary"
             data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
             onClick={handleBackToLogin}
             sx={{
               alignSelf: "flex-start",
               width: "fit-content",
-              minWidth: { xs: 190, md: 220 },
             }}
           >
             {t("common.buttons.backToLogin")}
