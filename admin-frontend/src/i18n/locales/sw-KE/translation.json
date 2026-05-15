@@ -246,6 +246,7 @@
         "lastUpdatedOn": "Imesasishwa tarehe {{date}}"
       },
       "searchPlaceholder": "Tafuta majina ya kazi...",
+      "skillsSearchPlaceholder": "Tafuta ujuzi umetolewa...",
       "jobsCount": "{{count}} kati ya {{total}} kazi",
       "moreSkills": "+{{count}} zaidi",
       "filters": {

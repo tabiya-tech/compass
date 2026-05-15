@@ -246,6 +246,7 @@
         "lastUpdatedOn": "Yasinthidwa pa {{date}}"
       },
       "searchPlaceholder": "Sakani mayina antchito...",
+      "skillsSearchPlaceholder": "Sakani maluso ochotsedwa...",
       "jobsCount": "{{count}} mwa {{total}} ntchito",
       "moreSkills": "+{{count}} zina",
       "filters": {

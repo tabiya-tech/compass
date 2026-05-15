@@ -32,7 +32,7 @@ const JobPostings: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sectorSearch, setSectorSearch] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
-  const [platformSearch, setPlatformSearch] = useState("");
+  const [skillsSearch, setSkillsSearch] = useState("");
   const {
     rows: jobPostings,
     stats: jobPostingStats,
@@ -46,14 +46,13 @@ const JobPostings: React.FC = () => {
     goToPage,
     onSortChange,
     onSortClear,
-  } = useJobPostings({ searchQuery: search, sectorQuery: sectorSearch, locationQuery: locationSearch });
+  } = useJobPostings({
+    searchQuery: search,
+    sectorQuery: sectorSearch,
+    locationQuery: locationSearch,
+    skillsQuery: skillsSearch,
+  });
   const [selectedJob, setSelectedJob] = useState<JobPostingRow | null>(null);
-
-  const filteredRows = useMemo(() => {
-    const normalizedPlatform = platformSearch.trim().toLowerCase();
-    if (!normalizedPlatform) return jobPostings;
-    return jobPostings.filter((row) => (row.platform ?? "").toLowerCase().includes(normalizedPlatform));
-  }, [jobPostings, platformSearch]);
 
   const lastUpdatedSubtitle = useMemo(() => {
     const latestTimestamp = Math.max(
@@ -246,15 +245,15 @@ const JobPostings: React.FC = () => {
           <TextField
             size="small"
             fullWidth
-            placeholder={`${t("dashboard.jobPostings.table.platform")}...`}
-            value={platformSearch}
-            onChange={(e) => setPlatformSearch(e.target.value)}
+            placeholder={t("dashboard.jobPostings.skillsSearchPlaceholder")}
+            value={skillsSearch}
+            onChange={(e) => setSkillsSearch(e.target.value)}
           />
         </Grid>
       </Grid>
 
       <DataTable<JobPostingRow>
-        rows={filteredRows}
+        rows={jobPostings}
         columns={columns}
         loading={loading}
         skeletonRows={8}

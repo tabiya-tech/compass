@@ -35,6 +35,7 @@ class IJobService(ABC):
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
+        skills: Optional[str],
         days: Optional[int],
         page: Optional[int],
         cursor: Optional[str],
@@ -123,6 +124,7 @@ class JobService(IJobService):
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
+        skills: Optional[str],
         days: Optional[int],
     ) -> Dict[str, Any]:
         fquery: Dict[str, Any] = {}
@@ -134,6 +136,9 @@ class JobService(IJobService):
             fquery["employment_type"] = employment_type
         if location:
             fquery["location"] = JobService._case_insensitive_space_tolerant_match(location)
+        if skills:
+            # Mongo applies the regex element-wise to the array field; matches if any label matches.
+            fquery["_source_skill_labels"] = {"$regex": re.escape(skills), "$options": "i"}
         if days is not None:
             cutoff_date = (datetime.now(timezone.utc) - timedelta(days=days)).date().isoformat()
             fquery["posted_date"] = {"$gte": cutoff_date}
@@ -187,6 +192,7 @@ class JobService(IJobService):
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
+        skills: Optional[str],
         days: Optional[int],
         page: Optional[int],
         cursor: Optional[str],
@@ -195,7 +201,7 @@ class JobService(IJobService):
         sort_dir: str,
         include: Optional[str],
     ) -> PaginatedListResponse[JobDocument]:
-        filter_query = self._build_jobs_mongo_filter(search, category, employment_type, location, days)
+        filter_query = self._build_jobs_mongo_filter(search, category, employment_type, location, skills, days)
         include_count = self._include_total(include) or page is not None
         if page is not None:
             if page < 1:

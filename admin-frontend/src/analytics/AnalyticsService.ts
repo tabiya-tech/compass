@@ -354,6 +354,7 @@ export default class AnalyticsService {
       category?: string;
       employment_type?: string;
       location?: string;
+      skills?: string;
       cursor?: string;
       limit?: number;
       sort_by?: "title" | "category" | "location" | "source_platform" | "posted_date";
@@ -367,6 +368,7 @@ export default class AnalyticsService {
     if (params.category) query.set("category", params.category);
     if (params.employment_type) query.set("employment_type", params.employment_type);
     if (params.location) query.set("location", params.location);
+    if (params.skills) query.set("skills", params.skills);
     if (params.cursor) query.set("cursor", params.cursor);
     if (params.sort_by) query.set("sort_by", params.sort_by);
     if (params.sort_dir) query.set("sort_dir", params.sort_dir);

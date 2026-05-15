@@ -33,6 +33,7 @@ class _MockJobService(IJobService):
         category: Optional[str],
         employment_type: Optional[str],
         location: Optional[str],
+        skills: Optional[str],
         days: Optional[int],
         page: Optional[int],
         cursor: Optional[str],
@@ -130,6 +131,27 @@ class TestJobsRoutes:
         # THEN request succeeds and page is passed through
         assert response.status_code == HTTPStatus.OK
         assert response.json()["meta"]["total"] == 100
+
+    def test_get_jobs_forwards_skills_query_to_service(self, client_with_mock_service: tuple[TestClient, _MockJobService], monkeypatch):
+        # GIVEN a service that captures the skills argument
+        client, service = client_with_mock_service
+        captured: dict = {}
+
+        async def _capture_skills(*_args, **kwargs):
+            captured["skills"] = kwargs["skills"]
+            return PaginatedListResponse(
+                data=[],
+                meta=PaginatedListMeta(limit=kwargs["limit"], next_cursor=None, has_more=False, total=None),
+            )
+
+        monkeypatch.setattr(service, "list_jobs", _capture_skills)
+
+        # WHEN GET /jobs is called with ?skills=welding
+        response = client.get("/jobs?skills=welding")
+
+        # THEN the skills query is forwarded verbatim to the service
+        assert response.status_code == HTTPStatus.OK
+        assert captured["skills"] == "welding"
 
     def test_get_jobs_rejects_invalid_page(self, client_with_mock_service: tuple[TestClient, _MockJobService], monkeypatch):
         # GIVEN service validation for invalid page input

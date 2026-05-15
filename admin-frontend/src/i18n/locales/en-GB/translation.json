@@ -244,6 +244,7 @@
         "lastUpdatedOn": "Last updated {{date}}"
       },
       "searchPlaceholder": "Search job titles...",
+      "skillsSearchPlaceholder": "Search skills extracted...",
       "jobsCount": "{{count}} of {{total}} jobs",
       "page": "Page {{page}} of {{totalPages}}",
       "moreSkills": "+{{count}} more",

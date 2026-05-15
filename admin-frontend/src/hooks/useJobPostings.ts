@@ -56,6 +56,7 @@ export interface JobPostingQueryFilters {
   searchQuery: string;
   sectorQuery?: string;
   locationQuery?: string;
+  skillsQuery?: string;
 }
 
 function mapSortKeyToApiField(key: keyof JobPostingRow): "title" | "category" | "location" | "source_platform" | null {
@@ -72,6 +73,7 @@ export function useJobPostings({
   searchQuery,
   sectorQuery = "",
   locationQuery = "",
+  skillsQuery = "",
 }: JobPostingQueryFilters): UseJobPostingsResult {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<keyof JobPostingRow | null>(null);
@@ -87,10 +89,11 @@ export function useJobPostings({
   const normalizedSearchQuery = searchQuery.trim();
   const normalizedSectorQuery = sectorQuery.trim();
   const normalizedLocationQuery = locationQuery.trim();
+  const normalizedSkillsQuery = skillsQuery.trim();
 
   useEffect(() => {
     setPage(1);
-  }, [normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery]);
+  }, [normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery, normalizedSkillsQuery]);
 
   // Fetch stats once
   useEffect(() => {
@@ -126,6 +129,7 @@ export function useJobPostings({
           search: normalizedSearchQuery || undefined,
           category: normalizedSectorQuery || undefined,
           location: normalizedLocationQuery || undefined,
+          skills: normalizedSkillsQuery || undefined,
           page,
           limit: PAGE_SIZE,
           include: "count",
@@ -152,7 +156,15 @@ export function useJobPostings({
     return () => {
       cancelled = true;
     };
-  }, [page, sortDir, sortKey, normalizedSearchQuery, normalizedSectorQuery, normalizedLocationQuery]);
+  }, [
+    page,
+    sortDir,
+    sortKey,
+    normalizedSearchQuery,
+    normalizedSectorQuery,
+    normalizedLocationQuery,
+    normalizedSkillsQuery,
+  ]);
 
   const goToPage = useCallback(
     (nextPage: number) => {

@@ -246,6 +246,7 @@
         "lastUpdatedOn": "Actualizado el {{date}}"
       },
       "searchPlaceholder": "Buscar titulos de empleo...",
+      "skillsSearchPlaceholder": "Buscar habilidades extraidas...",
       "jobsCount": "{{count}} de {{total}} empleos",
       "moreSkills": "+{{count}} mas",
       "filters": {
