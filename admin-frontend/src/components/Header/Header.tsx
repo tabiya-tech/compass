@@ -32,7 +32,7 @@ const Header: React.FC = () => {
 
   const preferredLogoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const [logoSrc, setLogoSrc] = useState(preferredLogoSrc);
-
+  const isAdmin = UserStateService.getInstance().isAdmin();
   const isSuperAdmin = UserStateService.getInstance().isSuperAdmin();
   const pendingCount = usePendingCount(isSuperAdmin);
   const usersHref = isSuperAdmin && pendingCount > 0 ? `${routerPaths.USERS}?tab=pending` : routerPaths.USERS;
@@ -124,19 +124,21 @@ const Header: React.FC = () => {
           </NavLink>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: theme.spacing(theme.tabiyaSpacing.md) }}>
-          <NavLink
-            to={usersHref}
-            style={({ isActive }) => ({ fontWeight: isActive ? 600 : 400, textDecoration: "none", color: "inherit" })}
-          >
-            <Badge
-              badgeContent={isSuperAdmin ? pendingCount : 0}
-              color="warning"
-              overlap="rectangular"
-              sx={{ pr: pendingCount > 0 ? 1.5 : 0 }}
+          {isAdmin && (
+            <NavLink
+              to={usersHref}
+              style={({ isActive }) => ({ fontWeight: isActive ? 600 : 400, textDecoration: "none", color: "inherit" })}
             >
-              {t("header.users", "Users")}
-            </Badge>
-          </NavLink>
+              <Badge
+                badgeContent={isSuperAdmin ? pendingCount : 0}
+                color="warning"
+                overlap="rectangular"
+                sx={{ pr: pendingCount > 0 ? 1.5 : 0 }}
+              >
+                {t("header.users", "Users")}
+              </Badge>
+            </NavLink>
+          )}
           <LanguageContextMenu removeMargin={true} />
           <PrimaryIconButton
             sx={{ color: theme.palette.common.black }}

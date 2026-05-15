@@ -9,6 +9,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { routerPaths } from "src/app/routerPaths";
 import { AdminUser } from "src/auth/auth.types";
 import AuthenticationStateService from "src/auth/services/AuthenticationState.service";
+import UserStateService from "src/userState/UserStateService";
 
 /**
  * Helper function to mock the authenticated user state
@@ -57,8 +58,9 @@ const renderWithRouter = (initialPath: string, routes: RouteConfig[]) => {
 describe("ProtectedRoute", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset all method mocks on the singleton to avoid side effects between tests
+    // Reset all method mocks on the singletons to avoid side effects between tests
     resetAllMethodMocks(AuthenticationStateService.getInstance());
+    resetAllMethodMocks(UserStateService.getInstance());
   });
 
   describe("login page behavior", () => {
@@ -153,6 +155,69 @@ describe("ProtectedRoute", () => {
       // THEN expect the user to be redirected to the login page
       expect(screen.getByText("Login Page")).toBeInTheDocument();
       // AND expect the protected page not to be displayed
+      expect(screen.queryByText("Users Page")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("users page admin gating", () => {
+    const givenUser: AdminUser = {
+      id: "user-123",
+      name: "John Doe",
+      email: "john@example.com",
+    };
+
+    test("should allow admin to access the users page", () => {
+      // GIVEN the user is authenticated AND is an admin
+      mockGetUser(givenUser);
+      jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(true);
+      jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(false);
+
+      // WHEN navigating to the users page
+      renderWithRouter(routerPaths.USERS, [
+        { path: routerPaths.USERS, element: <div>Users Page</div> },
+        { path: routerPaths.INSTRUCTOR, element: <div>Instructor Page</div> },
+        { path: routerPaths.ROOT, element: <div>Root Page</div> },
+      ]);
+
+      // THEN expect the users page to be displayed
+      expect(screen.getByText("Users Page")).toBeInTheDocument();
+    });
+
+    test("should redirect institution staff from the users page to the instructor dashboard", () => {
+      // GIVEN the user is authenticated AND is institution staff (not admin)
+      mockGetUser(givenUser);
+      jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(true);
+
+      // WHEN navigating to the users page
+      renderWithRouter(routerPaths.USERS, [
+        { path: routerPaths.USERS, element: <div>Users Page</div> },
+        { path: routerPaths.INSTRUCTOR, element: <div>Instructor Page</div> },
+        { path: routerPaths.ROOT, element: <div>Root Page</div> },
+      ]);
+
+      // THEN expect the instructor page to be displayed
+      expect(screen.getByText("Instructor Page")).toBeInTheDocument();
+      // AND expect the users page not to be displayed
+      expect(screen.queryByText("Users Page")).not.toBeInTheDocument();
+    });
+
+    test("should redirect a non-admin, non-staff user from the users page to the root page", () => {
+      // GIVEN the user is authenticated but has neither admin nor institution staff role
+      mockGetUser(givenUser);
+      jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(false);
+
+      // WHEN navigating to the users page
+      renderWithRouter(routerPaths.USERS, [
+        { path: routerPaths.USERS, element: <div>Users Page</div> },
+        { path: routerPaths.INSTRUCTOR, element: <div>Instructor Page</div> },
+        { path: routerPaths.ROOT, element: <div>Root Page</div> },
+      ]);
+
+      // THEN expect the root page to be displayed
+      expect(screen.getByText("Root Page")).toBeInTheDocument();
+      // AND expect the users page not to be displayed
       expect(screen.queryByText("Users Page")).not.toBeInTheDocument();
     });
   });

@@ -44,6 +44,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to={routerPaths.INSTRUCTOR} replace />;
   }
 
+  // Restrict user-management ("permissioning") routes to admins.
+  if (targetPath === routerPaths.USERS && !userStateService.isAdmin()) {
+    console.debug(`redirecting from ${targetPath} --> ${homePath} because user is not an admin`);
+    return <Navigate to={homePath} replace />;
+  }
+
   // User is authenticated, show the page
   return <>{children}</>;
 };
