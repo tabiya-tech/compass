@@ -151,7 +151,7 @@ def _setup_email_templates_dns(basic_config: ProjectBaseConfig,
         ),
     ]
 
-
+NJILA_AI_APP_NAME = "Njila.ai"
 def _setup_identity_platform(
         *,
         basic_config: ProjectBaseConfig,
@@ -173,15 +173,15 @@ def _setup_identity_platform(
         return _authorized_domains
 
     authorized_domains = pulumi.Output.all(frontend_domain, environment_type).apply(_get_authorized_domains)
-    final_frontend_domain = "njila.ai" if app_name == "Njila.ai" else frontend_domain
-    firebase_custom_domain = final_frontend_domain
+    firebase_custom_domain = "njila.ai" if app_name == NJILA_AI_APP_NAME else frontend_domain
+    callback_uri =  "https://njila.ai/#/auth-handler" if app_name == NJILA_AI_APP_NAME else frontend_domain.apply(lambda v: f"https://{v}/#/auth-handler")
     idp_config = IdentityPlatform(
         get_resource_name(resource="identity-platform", resource_type="default-config"),
         notification_config=NotificationConfigArgs(
             send_email=SendEmailArgs(
                 # Custom email-action handler hosted by the frontend at /#/auth-handler.
                 # Handles resetPassword, recoverEmail, and verifyEmail Firebase action modes.
-                callback_uri=f"https://{final_frontend_domain}/#/auth-handler",
+                callback_uri=callback_uri,
                 dns_info=DNSInfoArgs(
                     custom_domain=firebase_custom_domain,
                     use_custom_domain=True,
