@@ -3,18 +3,21 @@ from __future__ import annotations
 import asyncio
 import logging
 from http import HTTPStatus
-from typing import Annotated, Any, Literal, Optional
+from typing import Annotated, Literal, Optional
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.agent.recommender_advisor_agent.matching_service_client import (
-    MatchingServiceClient,
-    MatchingServiceError,
+from app.matching.client import MatchingServiceError
+from app.matching.get_service import get_matching_service
+from app.matching.matching_types import (
+    CompassOpportunity,
+    PreferenceVector,
+    Skill,
+    SkillsVector,
 )
 from app.agent.recommender_advisor_agent.skills_extractor import SkillsExtractor
 from app.analytics.types import PaginatedListResponse
-from app.app_config import get_application_config
 from app.constants.errors import HTTPErrorResponse
 from app.job_preferences.get_job_preferences_service import get_job_preferences_service
 from app.job_preferences.service import IJobPreferencesService
@@ -37,30 +40,6 @@ logger = logging.getLogger(__name__)
 
 
 # ─── Module-level lazy singletons ────────────────────────────────────────────
-
-_matching_client_lock = asyncio.Lock()
-_matching_client_singleton: Optional[MatchingServiceClient] = None
-_matching_client_initialized: bool = False
-
-
-async def _get_matching_client() -> Optional[MatchingServiceClient]:
-    """Lazy-initialise the matching service client; returns None when not configured."""
-    global _matching_client_singleton, _matching_client_initialized
-    if not _matching_client_initialized:
-        async with _matching_client_lock:
-            if not _matching_client_initialized:
-                try:
-                    config = get_application_config()
-                    if config.matching_service_url and config.matching_service_api_key:
-                        _matching_client_singleton = MatchingServiceClient(
-                            base_url=config.matching_service_url,
-                            api_key=config.matching_service_api_key,
-                        )
-                except Exception as exc:
-                    logger.warning("Could not initialise matching service client: %s", exc)
-                _matching_client_initialized = True
-    return _matching_client_singleton
-
 
 _user_profile_repo_lock = asyncio.Lock()
 _user_profile_repo_singleton: Optional[UserProfileRepository] = None
@@ -97,73 +76,90 @@ async def _get_programme_skills_repository(
 
 # ─── Pure helpers for building the matching service request and parsing the response ──
 
-def _build_skills_vector(programme_skills_doc) -> dict:
+def _build_skills_vector(programme_skills_doc) -> SkillsVector:
     """Build the matching-service skills vector from a programme_skills document."""
     if not programme_skills_doc:
-        return {"skills": []}
-    return {
-        "skills": [
-            {
-                "skill_id": skill.UUID,
-                "uuid": skill.UUID,
-                "originUUID": skill.originUUID,
-                "preferred_label": skill.preferredLabel,
-                "skill_type": skill.skillType,
-                "proficiency": 0.8,
-                "score": 0.8,
-            }
+        return SkillsVector(top_skills=[])
+    return SkillsVector(
+        top_skills=[
+            Skill(
+                preferred_label=skill.preferredLabel,
+                origin_uuid=skill.originUUID,
+                proficiency=0.8,
+            )
             for skill in programme_skills_doc.skills
         ]
-    }
+    )
 
 
-def _build_skills_vector_from_experiences(experiences) -> dict:
-    """Aggregate the user's S&I-extracted skills into a matching-service skills vector."""
+def _build_skills_vector_from_experiences(experiences) -> SkillsVector:
+    """Aggregate the user's S&I-extracted skills into a matching-service skills vector.
+
+    `origin_uuid` can be empty for ESCO entities lacking the upstream link; we keep the entry
+    in that case (the matching service treats it as an unknown-origin skill) rather than dropping it.
+    """
     if not experiences:
-        return {"skills": []}
+        return SkillsVector(top_skills=[])
     extracted = SkillsExtractor().extract_skills_vector(experiences)
-    return {"skills": extracted.get("skills", [])}
+    return SkillsVector(
+        top_skills=[
+            Skill(
+                preferred_label=s["preferred_label"],
+                origin_uuid=s.get("origin_uuid") or "",
+                proficiency=s.get("proficiency", 0.5),
+            )
+            for s in extracted.get("skills", [])
+            if s.get("preferred_label")
+        ]
+    )
 
 
-def _build_preference_vector(prefs) -> Optional[dict]:
-    """Build the matching-service preference vector from the user's JobPreferences."""
+def _build_preference_vector(prefs) -> PreferenceVector:
+    """Build the matching-service preference vector from the user's JobPreferences.
+
+    Falls back to neutral (0.5) defaults when the user has no recorded preferences,
+    since the matching service requires the core preference dimensions.
+    """
     if prefs is None:
-        return None
-    return {
-        "earnings_per_month": prefs.financial_importance,
-        "task_content": prefs.task_preference_importance,
-        "physical_demand": 0.5,
-        "work_flexibility": prefs.work_life_balance_importance,
-        "social_interaction": 0.5,
-        "career_growth": prefs.career_advancement_importance,
-        "social_meaning": prefs.social_impact_importance,
-    }
-
-
-def _select_user_data(raw: Any) -> dict:
-    """Matching service returns a list (one entry per user) or a single dict; pick the right one."""
-    if isinstance(raw, list):
-        return raw[0] if raw else {}
-    if isinstance(raw, dict):
-        return raw
-    return {}
+        return PreferenceVector(
+            earnings_per_month=0.5,
+            physical_demand=0.5,
+            social_interaction=0.5,
+            career_growth=0.5,
+        )
+    return PreferenceVector(
+        earnings_per_month=prefs.financial_importance,
+        task_content=prefs.task_preference_importance,
+        physical_demand=0.5,
+        work_flexibility=prefs.work_life_balance_importance,
+        social_interaction=0.5,
+        career_growth=prefs.career_advancement_importance,
+        social_meaning=prefs.social_impact_importance,
+    )
 
 
 def _enrich_matched_jobs(
-    opportunity_recs: list,
+    opportunities: list[CompassOpportunity],
     jobs_by_url: dict,
 ) -> list[MatchedJobDocument]:
-    """Map matching-service opportunities to MatchedJobDocument and enrich with jobs-collection fields.
+    """Map CompassOpportunity entries to MatchedJobDocument and enrich with jobs-collection fields.
 
     Join key is `URL` (matching service) ↔ `application_url` (jobs collection). The matching
     service's `uuid` is stored on the entity for use as a row key on the frontend, but is not
     used for the join (see service.py docstring for the schema mismatch context).
     """
     results: list[MatchedJobDocument] = []
-    for opp in opportunity_recs:
-        if not isinstance(opp, dict):
-            continue
-        doc = MatchedJobDocument.model_validate(opp)
+    for opp in opportunities:
+        doc = MatchedJobDocument(
+            uuid=opp.uuid or None,
+            opportunity_title=opp.opportunity_title or None,
+            location=opp.location,
+            contract_type=opp.contract_type,
+            URL=opp.url,
+            final_score=opp.final_score,
+            justification=opp.justification,
+            rank=opp.rank or None,
+        )
         job = jobs_by_url.get(doc.URL or "")
         if job:
             doc.employer = job.employer
@@ -283,11 +279,6 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
             limit: Annotated[int, Query(ge=1, le=100, description="Max results")] = 20,
         ):
             try:
-                matching_client = await _get_matching_client()
-                if matching_client is None:
-                    logger.warning("Matching service not configured; returning empty list")
-                    return MatchedJobsResponse(matches=[], skills_source="none")
-
                 # Fetch session id and personal data in parallel
                 session_id, personal_data = await asyncio.gather(
                     user_profile_repo.get_latest_session_id(user_info.user_id),
@@ -313,12 +304,12 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                         else None
                     )
                     skills_vector = _build_skills_vector(programme_skills_doc)
-                    skills_source = "programme" if skills_vector["skills"] else "none"
+                    skills_source = "programme" if skills_vector.top_skills else "none"
 
                 # Short-circuit: no skills to match on → don't call the matching service
                 # (it returns generic fallback junk for empty input). The frontend renders an
                 # explanatory empty state from skills_source=none.
-                if not skills_vector["skills"]:
+                if not skills_vector.top_skills:
                     logger.info(
                         "matched-jobs request user=%s skills_source=none — returning empty without calling matching service",
                         user_info.user_id,
@@ -336,34 +327,27 @@ def add_jobs_routes(app: FastAPI, authentication: Optional[Authentication] = Non
                     "matched-jobs request user=%s skills_source=%s skills_count=%d has_prefs=%s",
                     user_info.user_id,
                     skills_source,
-                    len(skills_vector["skills"]),
-                    preference_vector is not None,
+                    len(skills_vector.top_skills),
+                    prefs is not None,
                 )
 
-                raw: Any = await matching_client.generate_recommendations(
+                matching_service = get_matching_service()
+                matching_result = await matching_service.generate_recommendations(
                     youth_id=user_info.user_id,
                     city=None,
                     province=str(province) if province else None,
                     skills_vector=skills_vector,
                     preference_vector=preference_vector,
                 )
-                user_data = _select_user_data(raw)
-
-                # Defensive: opportunity_recommendations may be null or non-list
-                raw_recs = user_data.get("opportunity_recommendations") or []
-                opportunity_recs = raw_recs[:limit] if isinstance(raw_recs, list) else []
+                opportunities = matching_result.opportunities[:limit]
 
                 # Enrich matched jobs with employer/category/posted_date from the jobs collection.
                 # Join key is application_url (matching service's `URL` == our `application_url`).
-                matched_urls: list[str] = []
-                for opp in opportunity_recs:
-                    if not isinstance(opp, dict):
-                        continue
-                    opp_url = opp.get("URL")
-                    if isinstance(opp_url, str) and opp_url:
-                        matched_urls.append(opp_url)
+                matched_urls: list[str] = [
+                    opp.url for opp in opportunities if opp.url
+                ]
                 jobs_by_url = await job_service.get_jobs_by_application_urls(matched_urls)
-                results = _enrich_matched_jobs(opportunity_recs, jobs_by_url)
+                results = _enrich_matched_jobs(opportunities, jobs_by_url)
 
                 logger.info(
                     "matched-jobs response user=%s skills_source=%s matches_count=%d",

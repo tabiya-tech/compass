@@ -34,7 +34,9 @@ _mocked_application_config = ApplicationConfig(
         available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
     ),
     app_name="Compass",
-    admin_firebase_tenant_id="foo-tenant-id"
+    admin_firebase_tenant_id="foo-tenant-id",
+    matching_service_url="https://foo-matching-service",
+    matching_service_api_key="foo-matching-api-key",
 )
 
 @pytest.fixture(scope='session')

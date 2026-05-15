@@ -173,14 +173,15 @@ def _setup_identity_platform(
         return _authorized_domains
 
     authorized_domains = pulumi.Output.all(frontend_domain, environment_type).apply(_get_authorized_domains)
-    firebase_custom_domain = "njila.ai" if app_name == "Njila.ai" else frontend_domain
+    final_frontend_domain = "njila.ai" if app_name == "Njila.ai" else frontend_domain
+    firebase_custom_domain = final_frontend_domain
     idp_config = IdentityPlatform(
         get_resource_name(resource="identity-platform", resource_type="default-config"),
         notification_config=NotificationConfigArgs(
             send_email=SendEmailArgs(
                 # Custom email-action handler hosted by the frontend at /#/auth-handler.
                 # Handles resetPassword, recoverEmail, and verifyEmail Firebase action modes.
-                callback_uri=frontend_domain.apply(lambda s: f"https://{s}/#/auth-handler"),
+                callback_uri=f"https://{final_frontend_domain}/#/auth-handler",
                 dns_info=DNSInfoArgs(
                     custom_domain=firebase_custom_domain,
                     use_custom_domain=True,

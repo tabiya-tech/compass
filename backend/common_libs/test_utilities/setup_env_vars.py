@@ -129,6 +129,8 @@ def setup_env_vars(*, env_vars: dict[str, str] = None):
         'DEFAULT_COUNTRY_OF_USER': Country.UNSPECIFIED.value,
         'BACKEND_CV_STORAGE_BUCKET': "foo",
         'BACKEND_CV_MAX_UPLOADS_PER_USER': "5",
+        'MATCHING_SERVICE_URL': "foo",
+        'MATCHING_SERVICE_API_KEY': "foo",
         'BACKEND_CV_RATE_LIMIT_PER_MINUTE': "10",
         "BACKEND_LANGUAGE_CONFIG": '{"default_locale":"en-US","available_locales":[{"locale":"en-US","date_format":"MM/DD/YYYY"}]}',
         "GLOBAL_PRODUCT_NAME": "foo",

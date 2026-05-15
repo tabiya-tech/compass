@@ -89,7 +89,7 @@ class RecommenderAdvisorAgent(Agent):
         db6_client: Optional['DB6Client'] = None,
         node2vec_client: Optional[Any] = None,
         occupation_search_service: Optional[SimilaritySearchService[OccupationEntity]] = None,
-        matching_service_client: Optional[Any] = None,
+        matching_service: Optional[Any] = None,
     ):
         """
         Initialize the Recommender/Advisor Agent.
@@ -98,7 +98,7 @@ class RecommenderAdvisorAgent(Agent):
             db6_client: Optional DB6 client for Epic 1 Youth Database integration.
             node2vec_client: Optional Node2Vec client for generating recommendations (legacy).
             occupation_search_service: Optional occupation search service for finding occupations not in recommendations.
-            matching_service_client: Optional MatchingServiceClient for deployed matching service.
+            matching_service: Optional MatchingService (v1 or v2) for deployed matching service.
         """
         super().__init__(
             agent_type=AgentType.RECOMMENDER_ADVISOR_AGENT,
@@ -139,9 +139,9 @@ class RecommenderAdvisorAgent(Agent):
         from app.agent.recommender_advisor_agent.intent_classifier import IntentClassifier
         self._intent_classifier = IntentClassifier(intent_caller=self._intent_caller)
 
-        # Initialize recommendation interface with matching service client
+        # Initialize recommendation interface with matching service
         self._recommendation_interface = RecommendationInterface(
-            matching_service_client=matching_service_client,
+            matching_service=matching_service,
             node2vec_client=node2vec_client  # Keep for backwards compatibility
         )
 

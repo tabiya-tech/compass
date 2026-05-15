@@ -93,12 +93,12 @@ class ApplicationConfig(BaseModel):
     A flag to disable registration code validation for registered users.
     """
 
-    matching_service_url: Optional[str] = None
+    matching_service_url: str
     """
     URL for the matching service API endpoint (Epic 3).
     """
 
-    matching_service_api_key: Optional[str] = None
+    matching_service_api_key: str
     """
     API key for authenticating with the matching service (Epic 3).
     """

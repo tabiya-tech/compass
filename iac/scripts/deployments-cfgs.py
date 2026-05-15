@@ -44,10 +44,10 @@ def _construct_environment_info(*,
     stack_outputs = stack.outputs()
 
     env_vars_secrets_path = stack_tags.get("env_vars_secrets_path")
-    env_vars_local_path = os.path.join(output_dir, ".env")
+    env_vars_local_path = os.path.join(output_dir, f".env.{environment.realm_name}.{environment.environment_name}")
 
     stack_config_secret_path = stack_tags.get("stack_config_secret_path")
-    stack_configs_local_path = os.path.join(output_dir, "stack_config.yaml")
+    stack_configs_local_path = os.path.join(output_dir, f"stack_config.{environment.realm_name}.{environment.environment_name}.yaml")
 
     # Download the secrets.
     # If the file is not found, set to None and log a warning.
@@ -119,6 +119,9 @@ def _prepare_and_download_cfgs(*,
     summaries: list[dict[str, Any]] = []
     for environment in environments:
         try:
+            if environment.environment_name not in ["njila", "dev-njila"]:
+                continue
+
             environment_output_dir = os.path.join(output_dir, environment.environment_name)
             os.makedirs(environment_output_dir, exist_ok=True)
 

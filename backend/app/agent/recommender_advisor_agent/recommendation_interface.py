@@ -12,6 +12,12 @@ Epic 3: Recommender Agent Implementation
 from typing import Any, Optional
 import logging
 
+from app.matching.matching_types import (
+    CompassMatchingResult,
+    PreferenceVector as MatchingPreferenceVector,
+    Skill as MatchingSkill,
+    SkillsVector as MatchingSkillsVector,
+)
 from app.agent.recommender_advisor_agent.types import (
     Node2VecRecommendations,
     OccupationRecommendation,
@@ -190,26 +196,131 @@ except ImportError:
     NODE2VEC_AVAILABLE = False
 
 
+def _compass_result_to_node2vec(result: CompassMatchingResult) -> Node2VecRecommendations:
+    """Convert a unified CompassMatchingResult (produced by v1 or v2) to agent format."""
+    occupations = [
+        OccupationRecommendation(
+            uuid=occ.uuid or "unknown",
+            originUuid=occ.origin_uuid or occ.uuid or "unknown",
+            rank=occ.rank or 1,
+            occupation_id=occ.uuid or "unknown",
+            occupation_code=occ.uuid or "unknown",
+            occupation=occ.label or "Unknown",
+            is_eligible=occ.is_eligible,
+            final_score=occ.final_score,
+            justification=occ.justification,
+            description=occ.description,
+        )
+        for occ in result.occupations
+    ]
+
+    opportunities = [
+        OpportunityRecommendation(
+            uuid=opp.uuid or "unknown",
+            originUuid=opp.url or opp.uuid or "unknown",
+            rank=opp.rank or 1,
+            opportunity_title=opp.opportunity_title or "Job opportunity",
+            location=opp.location or "",
+            is_eligible=opp.is_eligible,
+            final_score=opp.final_score,
+            justification=opp.justification,
+            contract_type=opp.contract_type,
+            employer=opp.employer,
+            salary_range=opp.salary_text,
+            posting_url=opp.url,
+        )
+        for opp in result.opportunities
+    ]
+
+    skill_gap_dicts = [
+        {
+            "skill_id": g.skill_id,
+            "skill_label": g.skill_label,
+            "proximity_score": g.proximity_score,
+            "job_unlock_count": g.job_unlock_count,
+            "combined_score": g.combined_score,
+            "reasoning": g.reasoning,
+        }
+        for g in result.skill_gaps
+    ]
+    trainings = convert_skill_gaps_to_trainings(skill_gap_dicts)
+
+    return Node2VecRecommendations(
+        youth_id=result.user_id,
+        occupation_recommendations=occupations,
+        opportunity_recommendations=opportunities,
+        skillstraining_recommendations=trainings,
+        skill_gap_recommendations=skill_gap_dicts,
+        algorithm_version=f"matching_service_{result.algorithm_version}",
+        confidence=0.8,
+    )
+
+
+def _to_matching_skills_vector(skills_vector: Optional[dict]) -> MatchingSkillsVector:
+    """Translate the agent's Compass skills_vector dict into the matching service's typed model.
+
+    The agent passes `{"skills": [{preferred_label, origin_uuid, proficiency, ...}, ...]}`;
+    the matching service expects `{"top_skills": [Skill(preferred_label, origin_uuid, proficiency)]}`.
+    Entries missing the required identifiers are dropped.
+    """
+    if not skills_vector:
+        return MatchingSkillsVector(top_skills=[])
+    return MatchingSkillsVector(
+        top_skills=[
+            MatchingSkill(
+                preferred_label=s["preferred_label"],
+                origin_uuid=s["origin_uuid"],
+                proficiency=float(s.get("proficiency", 0.5)),
+            )
+            for s in (skills_vector.get("skills") or [])
+            if s.get("preferred_label") and s.get("origin_uuid")
+        ]
+    )
+
+
+def _to_matching_preference_vector(preference_vector: Optional[PreferenceVector]) -> MatchingPreferenceVector:
+    """Translate the agent's Bayesian PreferenceVector into the matching service's PreferenceVector.
+
+    The two models use different dimension names (the agent uses importance scores like
+    `financial_importance`; the matching service uses domain dimensions like
+    `earnings_per_month`). Unmapped matching-service dimensions default to neutral 0.5.
+    """
+    if preference_vector is None:
+        return MatchingPreferenceVector(
+            earnings_per_month=0.5,
+            physical_demand=0.5,
+            social_interaction=0.5,
+            career_growth=0.5,
+        )
+    return MatchingPreferenceVector(
+        earnings_per_month=preference_vector.financial_importance,
+        physical_demand=0.5,
+        work_flexibility=preference_vector.work_life_balance_importance,
+        social_interaction=0.5,
+        career_growth=preference_vector.career_advancement_importance,
+    )
+
+
 class RecommendationInterface:
     """
     Interface for generating/loading recommendations.
 
-    Abstracts away the source of recommendations (MatchingServiceClient or stubs)
+    Abstracts away the source of recommendations (MatchingService or stubs)
     so the agent doesn't need to know about the implementation.
     """
 
-    def __init__(self, matching_service_client: Optional[Any] = None, node2vec_client: Optional[Any] = None):
+    def __init__(self, matching_service: Optional[Any] = None, node2vec_client: Optional[Any] = None):
         """
         Initialize the recommendation interface.
 
         Args:
-            matching_service_client: Optional MatchingServiceClient for deployed matching service.
-            node2vec_client: Optional Node2Vec client (deprecated - use matching_service_client).
+            matching_service: Optional MatchingService (v1 or v2) returning CompassMatchingResult.
+            node2vec_client: Optional Node2Vec client (deprecated - use matching_service).
                             If None, uses stub recommendations.
         """
-        self._matching_service_client = matching_service_client
+        self._matching_service = matching_service
         self._node2vec_client = node2vec_client  # Keep for backwards compatibility
-    
+
     async def generate_recommendations(
         self,
         youth_id: str,
@@ -222,7 +333,7 @@ class RecommendationInterface:
         """
         Generate recommendations for a user.
 
-        Tries MatchingServiceClient first, then Node2Vec, falls back to stubs if unavailable.
+        Tries MatchingService first, then Node2Vec, falls back to stubs if unavailable.
 
         Args:
             youth_id: User/youth identifier
@@ -235,24 +346,27 @@ class RecommendationInterface:
         Returns:
             Node2VecRecommendations object (in agent format)
         """
-        # Try MatchingServiceClient first (deployed service)
-        if self._matching_service_client:
+        # Try MatchingService first (deployed service, v1 or v2)
+        if self._matching_service:
             try:
-                logger.info(f"Generating recommendations for {youth_id} via MatchingServiceClient")
-                raw_output = await self._matching_service_client.generate_recommendations(
+                logger.info(
+                    f"Generating recommendations for {youth_id} via MatchingService "
+                    f"(version={self._matching_service.algorithm_version})"
+                )
+                result = await self._matching_service.generate_recommendations(
                     youth_id=youth_id,
                     city=city,
                     province=province,
-                    skills_vector=skills_vector,
-                    preference_vector=preference_vector
+                    skills_vector=_to_matching_skills_vector(skills_vector),
+                    preference_vector=_to_matching_preference_vector(preference_vector),
                 )
 
-                # Convert matching service format to agent format
-                logger.debug("Converting MatchingService output to agent format")
-                return Node2VecRecommendations.from_jasmin_output(raw_output)
+                # Convert unified CompassMatchingResult to agent format
+                logger.debug("Converting CompassMatchingResult to agent format")
+                return _compass_result_to_node2vec(result)
 
             except Exception as e:
-                logger.warning(f"MatchingServiceClient failed, trying fallbacks: {e}")
+                logger.warning(f"MatchingService failed, trying fallbacks: {e}")
 
         # Try Node2Vec client (legacy/local)
         if self._node2vec_client and NODE2VEC_AVAILABLE:

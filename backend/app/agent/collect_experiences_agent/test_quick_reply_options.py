@@ -85,6 +85,8 @@ def setup_application_config():
         ),
         app_name="Compass",
         admin_firebase_tenant_id="test-tenant-id",
+        matching_service_url="https://test-matching-service",
+        matching_service_api_key="test-matching-api-key",
     )
     set_application_config(config)
     # Set the locale context variable so t() can resolve translations

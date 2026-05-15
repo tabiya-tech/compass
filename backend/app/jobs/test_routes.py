@@ -6,7 +6,11 @@ import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from app.agent.recommender_advisor_agent.matching_service_client import MatchingServiceError
+from app.matching.client import MatchingServiceError
+from app.matching.matching_types import (
+    CompassMatchingResult,
+    CompassOpportunity,
+)
 from app.analytics.types import PaginatedListMeta, PaginatedListResponse
 from app.job_preferences.get_job_preferences_service import get_job_preferences_service
 from app.job_preferences.service import IJobPreferencesService
@@ -175,15 +179,17 @@ def matched_client(monkeypatch) -> tuple[TestClient, _MatchedFixtureMocks]:
     mock_job_service = AsyncMock(spec=IJobService)
     mock_job_service.get_jobs_by_application_urls.return_value = {}
 
-    # Mock the matching service client (returns an empty opportunities list by default)
+    # Mock the matching service (returns an empty CompassMatchingResult by default).
+    # Despite the variable name (kept stable for existing assertions), this is a
+    # MatchingService wrapper that yields CompassMatchingResult, not the raw HTTP client.
     mock_matching_client = AsyncMock()
-    mock_matching_client.generate_recommendations.return_value = {"opportunity_recommendations": []}
+    mock_matching_client.generate_recommendations.return_value = CompassMatchingResult(
+        user_id="mock-user",
+        algorithm_version="v1",
+    )
 
-    async def _mock_get_matching_client():
-        return mock_matching_client
-
-    # Patch the module-level _get_matching_client (called directly inside the handler, not via Depends)
-    monkeypatch.setattr(jobs_routes_module, "_get_matching_client", _mock_get_matching_client)
+    # Patch the get_matching_service symbol imported into the routes module (handler calls it directly, not via Depends)
+    monkeypatch.setattr(jobs_routes_module, "get_matching_service", lambda: mock_matching_client)
 
     # Override the Depends() factories
     async def _override_user_profile_repo():
@@ -232,24 +238,6 @@ def _given_programme_skills_doc():
 
 
 class TestMatchedJobsRoute:
-    def test_returns_empty_with_skills_source_none_when_matching_client_not_configured(
-        self, matched_client: tuple[TestClient, _MatchedFixtureMocks], monkeypatch
-    ):
-        # GIVEN the matching client is not configured (returns None)
-        client, _ = matched_client
-
-        async def _no_client():
-            return None
-
-        monkeypatch.setattr(jobs_routes_module, "_get_matching_client", _no_client)
-
-        # WHEN GET /jobs/matched is called
-        actual_response = client.get("/jobs/matched")
-
-        # THEN response is 200 with an empty envelope
-        assert actual_response.status_code == HTTPStatus.OK
-        assert actual_response.json() == {"matches": [], "skills_source": "none"}
-
     def test_calls_matching_service_with_authenticated_user_context_when_programme_skills_exist(
         self, matched_client: tuple[TestClient, _MatchedFixtureMocks]
     ):
@@ -267,7 +255,7 @@ class TestMatchedJobsRoute:
         actual_call_kwargs = mocks["matching_client"].generate_recommendations.call_args.kwargs
         assert actual_call_kwargs["youth_id"] == mocks["auth_user"].user_id
         assert actual_call_kwargs["province"] == "Lusaka"
-        assert len(actual_call_kwargs["skills_vector"]["skills"]) == 1
+        assert len(actual_call_kwargs["skills_vector"].top_skills) == 1
         assert actual_response.json()["skills_source"] == "programme"
 
     def test_enriches_results_from_jobs_collection(self, matched_client: tuple[TestClient, _MatchedFixtureMocks]):
@@ -276,11 +264,19 @@ class TestMatchedJobsRoute:
         mocks["user_profile_repo"].get_explored_experience_entities.return_value = None
         mocks["programme_skills_repo"].find_by_programme_name.return_value = _given_programme_skills_doc()
         given_url = "https://example.com/jobs/engineer-1"
-        mocks["matching_client"].generate_recommendations.return_value = {
-            "opportunity_recommendations": [
-                {"uuid": "matching-svc-id-1", "URL": given_url, "opportunity_title": "Engineer", "final_score": 0.9}
-            ]
-        }
+        mocks["matching_client"].generate_recommendations.return_value = CompassMatchingResult(
+            user_id="mock-user",
+            algorithm_version="v1",
+            opportunities=[
+                CompassOpportunity(
+                    uuid="matching-svc-id-1",
+                    rank=1,
+                    opportunity_title="Engineer",
+                    url=given_url,
+                    final_score=0.9,
+                )
+            ],
+        )
         mocks["job_service"].get_jobs_by_application_urls.return_value = {
             given_url: JobDocument(
                 application_url=given_url,
@@ -308,11 +304,19 @@ class TestMatchedJobsRoute:
         client, mocks = matched_client
         mocks["user_profile_repo"].get_explored_experience_entities.return_value = None
         mocks["programme_skills_repo"].find_by_programme_name.return_value = _given_programme_skills_doc()
-        mocks["matching_client"].generate_recommendations.return_value = {
-            "opportunity_recommendations": [
-                {"uuid": "id-1", "URL": "https://example.com/jobs/missing", "opportunity_title": "Engineer", "final_score": 0.9}
-            ]
-        }
+        mocks["matching_client"].generate_recommendations.return_value = CompassMatchingResult(
+            user_id="mock-user",
+            algorithm_version="v1",
+            opportunities=[
+                CompassOpportunity(
+                    uuid="id-1",
+                    rank=1,
+                    opportunity_title="Engineer",
+                    url="https://example.com/jobs/missing",
+                    final_score=0.9,
+                )
+            ],
+        )
         mocks["job_service"].get_jobs_by_application_urls.return_value = {}
 
         # WHEN GET /jobs/matched is called
@@ -366,11 +370,19 @@ class TestMatchedJobsRoute:
         # AND a programme is also on file (we want to prove S&I wins)
         mocks["programme_skills_repo"].find_by_programme_name.return_value = _given_programme_skills_doc()
         # AND the matching service returns one match
-        mocks["matching_client"].generate_recommendations.return_value = {
-            "opportunity_recommendations": [
-                {"uuid": "id-1", "URL": "https://example.com/jobs/cook", "opportunity_title": "Cook", "final_score": 0.85}
-            ]
-        }
+        mocks["matching_client"].generate_recommendations.return_value = CompassMatchingResult(
+            user_id="mock-user",
+            algorithm_version="v1",
+            opportunities=[
+                CompassOpportunity(
+                    uuid="id-1",
+                    rank=1,
+                    opportunity_title="Cook",
+                    url="https://example.com/jobs/cook",
+                    final_score=0.85,
+                )
+            ],
+        )
 
         # WHEN GET /jobs/matched is called
         actual_response = client.get("/jobs/matched")
@@ -382,7 +394,7 @@ class TestMatchedJobsRoute:
         assert actual_body["skills_source"] == "s&i"
         assert len(actual_body["matches"]) == 1
         actual_call_kwargs = mocks["matching_client"].generate_recommendations.call_args.kwargs
-        assert len(actual_call_kwargs["skills_vector"]["skills"]) >= 1
+        assert len(actual_call_kwargs["skills_vector"].top_skills) >= 1
         mocks["programme_skills_repo"].find_by_programme_name.assert_not_awaited()
 
     def test_short_circuits_to_empty_when_no_skills_anywhere(self, matched_client: tuple[TestClient, _MatchedFixtureMocks]):
