@@ -55,18 +55,6 @@ const JobPostings: React.FC = () => {
     return jobPostings.filter((row) => (row.platform ?? "").toLowerCase().includes(normalizedPlatform));
   }, [jobPostings, platformSearch]);
 
-  const sourcePlatformsList = useMemo(() => {
-    const uniquePlatforms = Array.from(
-      new Set(jobPostings.map((row) => (row.platform ?? "").trim()).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b));
-
-    if (uniquePlatforms.length === 0) {
-      return undefined;
-    }
-
-    return uniquePlatforms.map((platform) => capitalize(platform)).join(", ");
-  }, [jobPostings]);
-
   const lastUpdatedSubtitle = useMemo(() => {
     const latestTimestamp = Math.max(
       ...jobPostings.map((row) => Date.parse(row.postedDate ?? "")).filter((timestamp) => Number.isFinite(timestamp)),
@@ -218,7 +206,6 @@ const JobPostings: React.FC = () => {
           <StatCard
             title={t("dashboard.jobPostings.stats.sourcePlatforms")}
             value={jobPostingStats.sourcePlatformsCount}
-            subtitle={sourcePlatformsList}
             tooltip={t("dashboard.jobPostings.stats.sourcePlatformsTooltip")}
           />
         </Grid>
