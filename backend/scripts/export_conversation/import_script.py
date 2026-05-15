@@ -10,6 +10,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
+from app.agent.recommender_advisor_agent import RecommenderAdvisorAgentState
 from app.application_state import ApplicationStateStore, ApplicationState
 from app.users.generate_session_id import generate_new_session_id
 from app.users.repositories import UserPreferenceRepository

@@ -72,5 +72,8 @@ def get_random_application_config() -> ApplicationConfig:
         embeddings_service_name=get_random_printable_string(10),
         embeddings_model_name=get_random_printable_string(10),
         features={},
-        experience_pipeline_config={}
+        experience_pipeline_config={},
+        admin_firebase_tenant_id=get_random_printable_string(10),
+        matching_service_url="https://random-matching-service",
+        matching_service_api_key=get_random_printable_string(10),
     )

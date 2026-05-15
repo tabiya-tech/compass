@@ -33,7 +33,10 @@ _mocked_application_config = ApplicationConfig(
         default_locale=Locale.EN_US,
         available_locales=[LocaleDateFormatEntry(locale=Locale.EN_US, date_format="MM/DD/YYYY")]
     ),
-    app_name="Compass"
+    app_name="Compass",
+    admin_firebase_tenant_id="foo-tenant-id",
+    matching_service_url="https://foo-matching-service",
+    matching_service_api_key="foo-matching-api-key",
 )
 
 @pytest.fixture(scope='session')
@@ -142,6 +145,15 @@ async def in_memory_application_database(in_memory_mongo_server) -> AsyncIOMotor
 
 
 @pytest.fixture(scope='function')
+async def in_memory_career_explorer_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+    career_explorer_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                           tlsAllowInvalidCertificates=True).get_database(random_db_name())
+    await CompassDBProvider.initialize_career_explorer_mongo_db(career_explorer_db, logger=logging.getLogger(__name__))
+    logging.info(f"Created career explorer database: {career_explorer_db.name}")
+    return career_explorer_db
+
+
+@pytest.fixture(scope='function')
 async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
     """
     Fixture to create an in-memory metrics database.
@@ -156,6 +168,14 @@ async def in_memory_metrics_database(in_memory_mongo_server) -> AsyncIOMotorData
     await CompassDBProvider.initialize_metrics_mongo_db(metrics_db, logger=logging.getLogger(__name__))
     logging.info(f"Created metrics database: {metrics_db.name}")
     return metrics_db
+
+
+@pytest.fixture(scope='function')
+async def in_memory_jobs_database(in_memory_mongo_server) -> AsyncIOMotorDatabase:
+    jobs_db = AsyncIOMotorClient(in_memory_mongo_server.connection_string,
+                                        tlsAllowInvalidCertificates=True).get_database(random_db_name())
+    logging.info(f"Created jobs database: {jobs_db.name}")
+    return jobs_db
 
 
 @pytest.fixture(scope="function")
