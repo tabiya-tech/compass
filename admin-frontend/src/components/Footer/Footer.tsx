@@ -20,7 +20,7 @@ export const DATA_TEST_ID = {
   FOOTER_COLLABORATION: `footer-collaboration-${uniqueId}`,
 };
 
-const FOOTER_CONTACT_MAILTO = "mailto:hi@tabiya.org";
+const FOOTER_CONTACT_MAILTO = "mailto:hi@njila.ai";
 
 const Footer: React.FC = () => {
   const theme = useTheme();

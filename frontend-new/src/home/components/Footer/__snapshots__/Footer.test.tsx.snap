@@ -64,7 +64,7 @@ exports[`Footer should render the footer container, logos, links, and collaborat
           aria-disabled="false"
           class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1l1mpms-MuiTypography-root-MuiLink-root"
           data-testid="footer-contact-link-a7f3d2b1-8e4c-4a9f-b6d5-3c1e2f7a8b9d"
-          href="mailto:hi@tabiya.org"
+          href="mailto:hi@njila.ai"
           rel="noopener noreferrer"
           target="_blank"
         >

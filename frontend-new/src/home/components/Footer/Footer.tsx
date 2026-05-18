@@ -23,7 +23,7 @@ export const DATA_TEST_ID = {
 };
 
 export const EXTERNAL_URLS = {
-  CONTACT: "mailto:hi@tabiya.org",
+  CONTACT: "mailto:hi@njila.ai",
 };
 
 interface FooterProps {
