@@ -5,8 +5,9 @@ from typing import List, Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
+from app.app_config import get_application_config
 from app.constants.errors import HTTPErrorResponse
-from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
+from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var, user_language_ctx_var
 from app.conversations.constants import UNEXPECTED_FAILURE_MESSAGE
 from app.conversations.experience._types import ExperienceResponse, UpdateExperienceRequest
 from app.conversations.experience.experience_translator import translate_experience_text_to_english
@@ -46,7 +47,8 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                                    examples=["en"])] = None,
                                user_info: UserInfo = Depends(authentication.get_user_info()),
                                user_preferences_repository=Depends(get_user_preferences_repository),
-                               service: ExperienceService = Depends(get_experience_service)
+                               service: ExperienceService = Depends(get_experience_service),
+                               app_config = Depends(get_application_config)
                                ) -> List[ExperienceResponse]:
         """
         Endpoint for retrieving the experiences of a user.
@@ -58,7 +60,7 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
         # and downstream functions
         session_id_ctx_var.set(session_id)
         user_id_ctx_var.set(user_info.user_id)
-
+        user_language_ctx_var.set(app_config.language_config.default_locale)
         try:
             # check that the user making the request has the session_id in their user preferences
             current_user_preferences = await user_preferences_repository.get_user_preference_by_user_id(user_id)
@@ -156,6 +158,7 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
                                            str, Path(description="The uuid of the experience to retrieve.")],
                                        user_info: UserInfo = Depends(authentication.get_user_info()),
                                        user_preferences_repository=Depends(get_user_preferences_repository),
+                                       app_config = Depends(get_application_config),
                                        service: IExperienceService = Depends(
                                            get_experience_service)) -> ExperienceResponse:
         """
@@ -165,6 +168,7 @@ def add_experience_routes(conversation_router: APIRouter, authentication: Authen
 
         session_id_ctx_var.set(session_id)
         user_id_ctx_var.set(user_info.user_id)
+        user_language_ctx_var.set(app_config.language_config.default_locale)
 
         try:
             # check that the user making the request has the session_id in their user preferences

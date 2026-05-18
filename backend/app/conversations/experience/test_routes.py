@@ -10,12 +10,15 @@ from fastapi.testclient import TestClient
 
 from app.agent.experience import WorkType, Timeline, ExperienceEntity
 from app.agent.explore_experiences_agent_director import DiveInPhase
+from app.app_config import get_application_config
 from app.conversations.experience._types import ExperienceResponse, EXPERIENCE_TITLE_MAX_LENGTH, \
     COMPANY_MAX_LENGTH, LOCATION_MAX_LENGTH, \
     SUMMARY_MAX_LENGTH, SKILL_LABEL_MAX_LENGTH
 from app.conversations.experience.routes import get_experience_service
 from app.conversations.experience.service import IExperienceService
 from app.conversations.routes import add_experience_routes
+from app.i18n.language_config import LanguageConfig, LocaleDateFormatEntry
+from app.i18n.types import Locale
 from app.users.auth import UserInfo
 from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.repositories import IUserPreferenceRepository
@@ -102,12 +105,27 @@ def _create_test_client_with_mocks(auth) -> TestClientWithMocks:
     def get_mock_user_preferences_repository():
         return _instance_user_preferences_repository
 
+    def _mocked_application_config():
+        return type(
+            "MockedAppConfig",
+            (),
+            {
+                "language_config": LanguageConfig(
+                    default_locale=Locale.EN_US,
+                    available_locales=[
+                        LocaleDateFormatEntry(locale=Locale.EN_US, date_format="YYYY-MM-DD")
+                    ],
+                )
+            },
+        )
+
     # Set up the FastAPI app with the mocked dependencies
     app = FastAPI()
 
     # Set up the app dependency overrides
     app.dependency_overrides[get_experience_service] = _mocked_experience_service
     app.dependency_overrides[get_user_preferences_repository] = get_mock_user_preferences_repository
+    app.dependency_overrides[get_application_config] = _mocked_application_config
 
     conversation_router = APIRouter(
         prefix="/conversations/{session_id}",
