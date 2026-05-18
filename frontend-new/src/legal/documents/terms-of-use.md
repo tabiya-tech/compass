@@ -2,193 +2,190 @@
 title: "Terms of Use for Njila"
 ---
 
-_Last updated_: March 05, 2025
+_Last updated: 12 May 2026_
 
-## 1. Introduction
+These Terms of Use ("Terms") govern your use of Njila ("Njila" or the "Service"), an AI-powered career guidance and skills discovery platform operated by Tabiya US ("Tabiya," "we," "us," or "our"). By accessing or using Njila, you agree to be bound by these Terms.
 
-### 1.1 Welcome to Njila
+If you do not agree to these Terms, do not use Njila.
 
-Welcome to **Njila** (the “**Service**”), an AI-driven platform designed to help individuals assess and articulate their skills. Njila is operated by **Tabiya**, a fiscally sponsored project of the **Global Development Incubator (GDI)**, a 501(c)(3) nonprofit organization headquartered in the United States. While Tabiya runs the day-to-day operations of Njila, **GDI** is the legal entity responsible for the Service’s compliance and liability matters. References to “**you**,” “**the user**,” or “**user**” in these Terms refer to you as the user of Njila. References to “**we**,” “**us**,” “**our**,” or “**Tabiya**” in these Terms refer collectively to Tabiya and/or GDI acting on behalf of Tabiya.
+## 1. About Njila
 
-## 1.2 Acceptance of Terms
+Njila is a free, open-source platform that helps users discover their skills, explore career pathways, and connect with economic opportunities. Njila is operated by Tabiya US, a 501(c)(3) nonprofit organization incorporated in Washington, DC, United States.
 
-These Terms of Use (“**Terms**”) govern your access to and use of Njila. By creating an account or otherwise using the Service, you agree to be bound by these Terms and all applicable laws and regulations. If you do not agree, you must **discontinue use** of the Service immediately.
+Njila is provided as part of Tabiya's charitable mission to expand access to economic opportunity. It is delivered in partnership with the World Bank and the Government of Zambia's Ministry of Technology and Science, supporting Zambia's Technical Education, Vocational and Entrepreneurship Training Authority (TEVETA) and participating institutions.
 
-## 1.3 Related Policies
+## 2. Eligibility
 
-Your use of Njila is also subject to our **Privacy Policy**, which explains how we collect, use, protect, and share your personal data. Please review the Privacy Policy carefully as it is incorporated into these Terms by reference.
+You may use Njila if:
 
-## Eligibility
+- You are 18 years of age or older; or
+- You are between the ages of 16 and 18 and use Njila with the consent of a parent, guardian, or institution authorized to provide such consent on your behalf.
 
-## 2.1 Minimum Age
+If you are using Njila as part of a program offered by an educational institution, your use is also subject to that institution's rules and policies.
 
-You must be at least 16 years old (or the age of majority in your jurisdiction if higher) to use Njila. If you are under the age of 18 (or the legal age of majority in your jurisdiction), you may use the Service only with the consent and active supervision of a parent or legal guardian who agrees to be bound by these Terms. We do not knowingly permit children under 16 to create accounts.
+By using Njila, you represent and warrant that you meet these eligibility requirements and that the information you provide to us is accurate.
 
-## 2.2 Legal Capacity
+## 3. Your Account
 
-By using the Service, you represent that (a) all information you submit is truthful and accurate; (b) you will maintain the accuracy of such information; and (c) your use of the Service does not violate any applicable law or regulation, in both your country of residence and the United States, where GDI is based.
+To use Njila, you need to create an account. You are responsible for:
 
-## 3. Description of the Service
+- Providing accurate and complete information when you register.
+- Keeping your account credentials confidential and secure.
+- Notifying us promptly if you become aware of unauthorized access to your account.
+- All activity that occurs under your account.
 
-### 3.1 Njila Overview
+We may suspend or terminate your account if we believe it is being used in violation of these Terms or applicable law.
 
-Njila uses artificial intelligence (AI) — including interactions with third-party AI models — to analyze user inputs and generate personalized skill insights, CV drafts, or related recommendations. The Service aims to empower individuals in their career or skill development journey.
+## 4. Privacy
 
-### 3.2 No Guarantee of Results
+Your use of Njila is also governed by our Privacy Policy, which describes how we collect, use, store, and protect your personal data. By using Njila, you acknowledge that you have read and understood the Privacy Policy.
 
-While we strive to offer valuable insights, we do not guarantee any specific employment outcome, skill acquisition, or improvement in your professional profile. You remain solely responsible for verifying the accuracy of any AI-generated advice or content before relying on it.
+The Privacy Policy explains, among other things, that your personal data is stored on servers located in the European Union. By creating an account, you consent to this cross-border transfer of your personal data as required by Section 71 of the Zambia Data Protection Act No. 3 of 2021.
 
-## 4. User Accounts
+## 5. Acceptable Use
 
-### 4.1 Account Creation
+You agree to use Njila only for lawful purposes and in a manner consistent with these Terms. You agree **not** to:
 
-Using certain features of Njila may require registering an account. You agree to provide and maintain true, accurate, and current information about yourself. You are responsible for keeping your login credentials (e.g., username, password) confidential.
+- Use Njila in any way that violates applicable law or regulation.
+- Impersonate any person or entity, or misrepresent your affiliation with any person or entity.
+- Interfere with or disrupt the operation of Njila, including by introducing malware, attempting to gain unauthorized access to any part of the Service, or overloading our infrastructure.
+- Use Njila to harass, abuse, threaten, or harm any other person.
+- Use Njila to collect, harvest, or extract personal data of other users.
+- Use automated tools, scripts, or bots to interact with Njila without our prior written permission.
+- Use Njila in connection with any commercial activity that is not expressly authorized by us.
+- Attempt to reverse-engineer, decompile, or otherwise extract the source code of Njila, except to the extent that such activity is expressly permitted by applicable law or by the open-source licenses under which Njila's code is published.
 
-### 4.2 Account Security
+We reserve the right to investigate violations of these Terms and to take appropriate action, including suspending or terminating your account.
 
-Account Sharing: Each account is personal to you. You agree not to share your account with others. Any activity that occurs under your account is your responsibility. If you suspect unauthorized use of your credentials, notify us immediately.
+## 6. AI-Generated Content
 
-### 4.3 Account Termination
+Njila uses artificial intelligence — including large language models — to generate guidance, suggestions, summaries, and other content for you. You acknowledge and agree that:
 
-We may suspend or terminate your account, with or without notice, if we believe you have violated these Terms, engaged in fraudulent activity, or behaved in a manner harmful to other users, Tabiya, or GDI. You may also close your account at any time by contacting us.
+- AI-generated content is provided for informational and exploratory purposes. It is not professional advice, and it should not be relied on as the sole basis for important decisions about your education, employment, or career.
+- AI-generated content may sometimes be inaccurate, incomplete, biased, or out of date. We continually work to improve the quality of Njila's outputs, but we cannot guarantee accuracy.
+- You are responsible for reviewing and exercising your own judgment about any AI-generated content before acting on it.
+- Njila does not make automated decisions that produce legal or similarly significant effects on you. All decisions about your education and employment remain yours.
 
-## 5. Acceptable Use Policy
+## 7. Your Content
 
-### 5.1 Prohibited Conduct
+You may provide information to Njila about yourself, your skills, your work history, your preferences, and other matters ("Your Content"). You retain ownership of Your Content. By providing Your Content to Njila, you grant Tabiya a worldwide, non-exclusive, royalty-free license to use Your Content as necessary to:
 
-You agree not to:
+- Provide the Service to you.
+- Operate, maintain, improve, and develop Njila and Tabiya's other products and services.
+- Conduct research that advances Tabiya's charitable mission, using anonymized or aggregated data where appropriate.
 
-- Use Njila for any illegal or unauthorized purpose, or in violation of any applicable laws.
-- Submit content that is offensive, defamatory, infringing, obscene, or otherwise objectionable.
-- Introduce malware or engage in activities that disrupt or damage the Service or its users’ devices.
-- Circumvent or attempt to breach any security or authentication measures implemented in Njila.
-- Reverse engineer, decompile, or otherwise attempt to access or extract proprietary software or algorithms.
-- Use Njila to create false or misleading information about your professional background.
-- Use content generated by Njila to engage in fraudulent job application practices.
+This license terminates when you delete Your Content or close your account, except that:
 
-### 5.2 User Content
+- We may retain anonymized or aggregated data derived from Your Content for research, evaluation, and reporting purposes.
+- We may retain backup copies of Your Content for a limited period after deletion, in accordance with our standard retention practices.
 
-By uploading or inputting content (e.g., text, resumes, conversation details) into Njila, you represent and warrant that you own or have the necessary rights to do so and that the content does not infringe upon any third party’s rights or violate any applicable law.
+## 8. Intellectual Property
 
-## 6. AI Disclaimer
+Njila and the technology that powers it are licensed as open-source software under the MIT License. The source code is available at https://github.com/tabiya-tech. You are free to use, copy, modify, and distribute the code under the terms of the MIT License.
 
-### 6.1 AI-Generated Outputs
+The trademarks "Njila," "Tabiya," the Tabiya logo, and related branding are owned by Tabiya US. You may not use these trademarks without our prior written permission, except as expressly permitted by applicable law.
 
-Njila leverages AI models, including third-party APIs, to generate insights or recommendations based on your inputs. You acknowledge and agree that:
+Content generated by Njila using your inputs (such as summaries of your skills profile or draft outputs) is provided for your use. We do not claim ownership of AI-generated content produced for your individual use.
 
-- **Potential Inaccuracies**: AI-generated outputs may contain errors, omissions, or biases. Tabiya cannot guarantee their factual or contextual accuracy.
-- **No Professional Advice**: The information provided by the Service does not constitute legal, financial, or professional advice. Always use your own judgment and, if necessary, consult a qualified professional.
-- **User Responsibility**: You are solely responsible for the decisions or actions you take based on AI-generated content. Tabiya and GDI are not liable for any outcome arising from reliance on the Service.
+## 9. Service Availability
 
-### 6.2 Responsible Use
+We provide Njila on an "as available" basis. We will use reasonable efforts to keep the Service available and operating properly, but we do not guarantee uninterrupted access. From time to time, the Service may be unavailable due to maintenance, technical issues, or events beyond our control.
 
-You agree to use AI outputs responsibly, including not using them to misrepresent your skills, credentials, or background. You also agree to refrain from prompting or instructing the AI to produce hateful, violent, or deceptive content. We reserve the right to monitor or review inputs and outputs to ensure compliance with these Terms and our internal policies.
+We may, at any time and without notice, modify, suspend, or discontinue all or part of Njila. Where reasonably possible, we will provide advance notice of material changes.
 
-### 6.3 Prohibited Activities and Security
+## 10. Disclaimers
 
-You agree not to attempt to gain unauthorized access to any accounts, systems, or data, interfere with the security, availability or integrity of our services, or engage in any activity that compromises the confidentiality, availability, or security of user data or our platform.
+To the maximum extent permitted by applicable law:
 
-## 7. Intellectual Property
+- **Njila is provided "as is" and "as available," without warranties of any kind, whether express or implied.** We disclaim all warranties, including warranties of merchantability, fitness for a particular purpose, accuracy, non-infringement, and title.
+- We do not warrant that Njila will be error-free, secure, uninterrupted, or free from harmful components.
+- We do not warrant that the information or recommendations provided through Njila are accurate, complete, or suitable for your particular circumstances.
+- Njila is not a substitute for professional advice (including career counseling, legal, medical, or financial advice).
 
-### 7.1 Open Source Code
+Some jurisdictions do not allow the exclusion of certain warranties. In those jurisdictions, the above disclaimers apply only to the extent permitted by law.
 
-Some portions of the Njila source code are made available by Tabiya under the MIT License (**“Open-Source Components**”). You can find the Open-Source Components in our public GitHub repository. To the extent the MIT License (or another relevant open-source license referenced in our repository) conflicts with these Terms of Use, the open-source license terms will control **solely** for the specific Open-Source Components. For clarity, you are free to copy, modify, merge, publish, distribute, sublicense, and/or sell copies of those Open-Source Components under the terms of the MIT License.
+## 11. Limitation of Liability
 
-### 7.2 Tabiya/GDI IP Rights
+To the maximum extent permitted by applicable law:
 
-Except for the Open-Source Components described in Section 7.1, all other aspects of Njila—including, but not limited to, the user interface, designs, trademarks, logos, text, and any proprietary software or content not explicitly released under an open-source license—remain the exclusive property of Tabiya (fiscally sponsored by Global Development Incubator, **GDI**). You are granted a limited, non-exclusive, revocable license to access and use Njila for personal, non-commercial purposes in accordance with these Terms. Any commercial use or distribution of non-open-source portions of Njila requires prior written permission from Tabiya/GDI.
+- Tabiya US, its officers, directors, employees, volunteers, and partners will not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages arising out of or related to your use of Njila.
+- Tabiya's total aggregate liability arising out of or related to these Terms or your use of Njila will not exceed one hundred United States dollars (USD 100), or the equivalent in the local currency of your jurisdiction.
 
-### 7.3 Trademarks and Branding
+These limitations apply regardless of the legal theory on which a claim is based and even if we have been advised of the possibility of such damages.
 
-“**Tabiya**,” “**Njila**,” and related names, logos, or slogans (collectively, “Marks”) are trademarks or service marks (whether registered or not) of Tabiya/GDI. Nothing in these Terms grants you a license to use these Marks. You agree not to use Tabiya’s or GDI’s Marks in a way that could mislead or imply our endorsement or sponsorship without explicit written consent.
+Some jurisdictions do not allow the limitation or exclusion of certain damages. In those jurisdictions, the above limitations apply only to the extent permitted by law. Nothing in these Terms limits or excludes liability that cannot be limited or excluded under applicable law.
 
-### 7.4 User-Generated Content
+## 12. Indemnification
 
-You retain ownership of any content or data you submit to Njila, such as text prompts, resumes, or conversation logs. By submitting such content, you grant Tabiya/GDI a non-exclusive, worldwide, royalty-free license to use, store, process, and display your content as necessary to operate and improve the Service, as described in these Terms and our Privacy Policy.
+You agree to indemnify and hold harmless Tabiya US, its officers, directors, employees, volunteers, and partners from and against any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to:
 
-### 7.5 Feedback
+- Your violation of these Terms.
+- Your violation of any applicable law or regulation.
+- Your violation of the rights of any third party.
+- Your misuse of Njila.
 
-If you provide suggestions, ideas, or other feedback about Njila, Tabiya/GDI may use such feedback without any obligation to you. You hereby grant Tabiya/GDI a worldwide, royalty-free, perpetual, irrevocable license to use and incorporate that feedback in our products or services at our discretion.
+We reserve the right to assume the exclusive defense and control of any matter for which you have agreed to indemnify us, in which case you will cooperate with our defense.
 
-## 8. Disclaimers
+## 13. Governing Law and Dispute Resolution
 
-### 8.1 “As Is” and “As Available”
+### 13.1 Data protection matters
 
-Njila is provided on an “**AS IS**” and “**AS AVAILABLE**” basis, **without** warranties of any kind. To the fullest extent permitted by law, we disclaim all express or implied warranties, including implied warranties of merchantability, fitness for a particular purpose, accuracy, and non-infringement. We do not warrant that the Service will meet your requirements or be uninterrupted, secure, error-free, or virus-free.
+To the extent these Terms relate to the processing of your personal data or to rights you have under the Zambia Data Protection Act No. 3 of 2021, they are governed by the laws of the Republic of Zambia. You may bring a claim or complaint relating to data protection matters before the Zambia Data Protection Commission or before the competent courts of Zambia.
 
-### 8.2 Third-Party Services
+### 13.2 All other matters
 
-Njila may integrate with third-party providers (e.g., cloud hosts like Google Cloud, AI APIs like Google Gemini, database services like MongoDB Atlas, and analytics tools). We are not responsible for any acts or omissions of such third parties. You agree that Tabiya/GDI will not be liable for any damage or loss arising from your use of or reliance on services provided by third parties.
+For all other matters, these Terms are governed by the laws of the District of Columbia, United States, without regard to its conflict-of-laws principles.
 
-## 9. Limitation of Liability
+### 13.3 Informal resolution
 
-To the maximum extent permitted by law:
+Before bringing any formal claim against us, you agree to first contact us at hi@njila.ai to attempt to resolve the matter informally. We commit to engaging in good-faith discussions for a period of 60 days from the date you contact us.
 
-- **No Indirect Damages**: Tabiya/GDI shall not be liable for any indirect, incidental, special, or consequential damages (including lost profits, loss of data, or business interruption) arising from your use of or inability to use Njila.
-- **Cap on Damages**: In no event shall Tabiya/GDI’s total cumulative liability to you exceed USD $100 or the amount you paid us (if any) in the preceding 12 months, whichever is greater. Some jurisdictions do not allow limitations of liability for certain types of harm, so some or all of the above limitations may not apply to you if prohibited by law.
+### 13.4 Forum
 
-## 10. Dispute Resolution and Governing Law
+If informal resolution does not succeed, and subject to Section 13.1 for data protection matters, any dispute arising out of or related to these Terms will be resolved in the courts of the District of Columbia, United States. Both parties consent to the personal jurisdiction of those courts.
 
-### 10.1 Governing Law
+### 13.5 No class actions
 
-These Terms and any dispute arising hereunder shall be governed by the laws of the United States of America, specifically the laws of Washington, DC, without regard to its conflict-of-law principles. If you access Njila from another country, you are responsible for compliance with that country’s laws.
+To the maximum extent permitted by law, you and Tabiya agree that any dispute will be brought on an individual basis and not as part of a class action, collective action, or representative proceeding.
 
-### 10.2 Informal Resolution
+## 14. Termination
 
-Please contact us at hi@tabiya.org if you have any dispute or concern related to the Service. We will attempt in good faith to resolve it promptly.
+You may stop using Njila and delete your account at any time by contacting us at hi@njila.ai or using the in-Service account deletion feature where available.
 
-### 10.3 Binding Arbitration and Class Action Waiver
+We may suspend or terminate your access to Njila if:
 
-Except for Exempt Claims (defined below), you agree that any dispute, claim, or controversy arising out of or relating to these Terms or your use of Njila that cannot be resolved informally shall be resolved by confidential, binding arbitration on an individual basis. You understand that by agreeing to arbitration, you are waiving the right to a trial by jury or to participate in a class or representative action.
+- You violate these Terms.
+- We believe your use of Njila creates a risk to other users, to Tabiya, or to third parties.
+- We are required to do so by law or by a competent authority.
+- We discontinue the Service in your jurisdiction.
 
-- **Rules and Venue**: Arbitration will be conducted by the American Arbitration Association (AAA) in Washington, DC, under its Commercial Arbitration Rules.
-- **Exempt Claims**: Either party may assert claims in small claims court if they qualify or seek injunctive relief for intellectual property issues.
-- **Opt-Out**: You may opt out of arbitration by sending a written notice to hi@tabiya.org within 60 days of first accepting these Terms, with your name, address, and an explicit statement you wish to opt out of arbitration.
-- **Class Action Waiver**: All disputes must be resolved on an individual basis. No class, consolidated, or representative actions are allowed. Please see the additional details in the arbitration section of the Tabiya.org Terms if you want more specifics on procedures. By continuing to use the Service, you agree to this binding arbitration clause unless you opt out.
+Sections of these Terms that by their nature should survive termination — including Sections 7, 8, 10, 11, 12, 13, and 15 — will survive.
 
-## 11. Indemnification
+## 15. Changes to These Terms
 
-You agree to indemnify and hold harmless Tabiya, GDI, their officers, employees, agents, and affiliates from any claims, liabilities, damages, losses, costs, or expenses (including legal fees) arising out of (a) your violation of these Terms, (b) your misuse of Njila, (c) your infringement of any third party’s intellectual property or other rights, or (d) any content you submit to Njila.
+We may update these Terms from time to time. When we make material changes, we will notify you through the Service or by email. Your continued use of Njila after changes take effect constitutes your acceptance of the revised Terms.
 
-## 12. Modifications, Suspension, and Termination
+If you do not accept the revised Terms, you should stop using Njila.
 
-### 12.1 Service Changes
+## 16. Miscellaneous
 
-We reserve the right to modify, suspend, or discontinue Njila (in whole or in part) at any time, with or without notice. We are not liable if all or part of the Service is unavailable for any reason.
+**Entire agreement.** These Terms, together with our Privacy Policy and any other terms expressly incorporated by reference, constitute the entire agreement between you and Tabiya regarding Njila.
 
-### 12.2 Terminating Access
+**Severability.** If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.
 
-We may terminate or suspend your account if you violate these Terms or if we have reason to suspect any fraudulent or unlawful activity. Upon termination or discontinuation of the Service, your right to use Njila immediately ceases. You may request deletion of your account at any time.
+**No waiver.** Our failure to enforce any provision of these Terms is not a waiver of our right to do so later.
 
-### 12.3 Survival
+**Assignment.** You may not assign or transfer your rights or obligations under these Terms without our prior written consent. We may assign these Terms in connection with a merger, acquisition, or transfer of assets.
 
-Any provisions of these Terms that by their nature should survive termination will remain in effect (e.g., disclaimers, limitations of liability, indemnification, dispute resolution).
+**Headings.** Section headings are for convenience only and do not affect interpretation.
 
-## 13. Miscellaneous
+**Language.** These Terms are written in English. If we provide translations into other languages, the English version controls in case of conflict.
 
-### 13.1 Severability
+## 17. Contact
 
-If any provision of these Terms is found invalid or unenforceable, that provision will be limited or eliminated to the minimum extent necessary, and the remaining provisions will remain in full force and effect.
+If you have questions about these Terms, please contact us:
 
-### 13.2 No Waiver
+- **Email:** hi@njila.ai
+- **Mail:** Tabiya US, 1401 K Street NW, Suite 900, Washington, DC 20005, United States
 
-Our failure to enforce any right or provision in these Terms shall not constitute a waiver of such right or provision unless acknowledged and agreed to by us in writing.
-
-### 13.3 Entire Agreement
-
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and Tabiya/GDI regarding the use of Njila, superseding any prior agreements.
-
-### 13.4 Assignment
-
-You may not assign or transfer these Terms or any of your rights or obligations hereunder without our prior written consent. We may assign these Terms without restriction in connection with a reorganization, merger, or other transfer of assets.
-
-### 13.5 Headings
-
-Section headings are for convenience only and do not affect the interpretation of these Terms.
-
-## 14. Contact Us
-
-If you have any questions about these Terms or the Site, or if you wish to provide any notice under these Terms, please contact us:
-
-- By email: hi@tabiya.org
-- By mail: Global Development Incubator (attn: Tabiya), 1401 K St NW, Suite 900, Washington, DC 20005, USA
+For privacy-related questions, see our Privacy Policy or contact privacy@njila.ai.

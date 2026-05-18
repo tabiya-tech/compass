@@ -73,6 +73,9 @@ const MarkdownContainer = styled(Box, {
       fontFamily: "monospace",
       fontSize: "0.9em",
     },
+    "& strong code": {
+      color: theme.palette.primary.main,
+    },
     "& pre": {
       backgroundColor: theme.palette.grey[100],
       padding: theme.fixedSpacing(theme.tabiyaSpacing.md),

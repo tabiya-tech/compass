@@ -1,9 +1,11 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Box, Container, Typography, useTheme } from "@mui/material";
 import MarkdownReader from "src/knowledgeHub/components/MarkdownReader/MarkdownReader";
 import { getDarkLogoUrl, getLogoUrl, getProductName } from "src/envService";
 import { getLegalDocument } from "src/legal/legalDocumentLoader";
 import type { LegalDocumentVariant } from "src/legal/legalDocumentLoader";
+import { routerPaths } from "src/app/routerPaths";
 
 const uniqueId = "b2c9e1a4-6f3d-4b8e-9c2a-1d5e7f0a4b6c";
 
@@ -49,13 +51,15 @@ const LegalDocumentPage: React.FC<LegalDocumentPageProps> = ({ variant }) => {
           gap: theme.spacing(theme.tabiyaSpacing.md),
         }}
       >
-        <Box
-          component="img"
-          src={logoSrc}
-          alt=""
-          data-testid={DATA_TEST_ID.LEGAL_PAGE_LOGO}
-          sx={{ maxWidth: "70%", width: "auto", height: "auto", objectFit: "contain", alignSelf: "flex-start" }}
-        />
+        <Link to={routerPaths.ROOT} aria-label="Go back">
+          <Box
+            component="img"
+            src={logoSrc}
+            alt={appName}
+            data-testid={DATA_TEST_ID.LEGAL_PAGE_LOGO}
+            sx={{ maxWidth: "70%", width: "auto", height: "auto", objectFit: "contain", alignSelf: "flex-start" }}
+          />
+        </Link>
 
         <Typography variant="h2" textAlign="center" data-testid={DATA_TEST_ID.LEGAL_PAGE_TITLE}>
           {title}
