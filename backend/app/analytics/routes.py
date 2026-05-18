@@ -8,6 +8,7 @@ from app.analytics.adoption_trends.routes import add_adoption_trends_routes
 from app.analytics.stats.routes import add_stats_routes
 from app.analytics.career_readiness.routes import add_career_readiness_analytics_routes
 from app.analytics.skill_gap.routes import add_skill_gap_analytics_routes
+from app.analytics.job_demand.routes import add_job_demand_analytics_routes
 from app.analytics.skills_discovery.routes import add_skills_discovery_analytics_routes
 from app.analytics.skills_supply.routes import add_skills_supply_analytics_routes
 from app.analytics.sector_engagement.routes import add_sector_engagement_routes
@@ -28,6 +29,7 @@ def add_analytics_routes(app: FastAPI, auth: Authentication):
     add_stats_routes(analytics_router, auth)
     add_career_readiness_analytics_routes(analytics_router, auth)
     add_skill_gap_analytics_routes(analytics_router, auth)
+    add_job_demand_analytics_routes(analytics_router, auth)
     add_skills_discovery_analytics_routes(analytics_router, auth)
     add_skills_supply_analytics_routes(analytics_router, auth)
     add_sector_engagement_routes(analytics_router, auth)

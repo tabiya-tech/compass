@@ -15,7 +15,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { useSkillsSupplyStats } from "src/hooks/useSkillsSupplyStats";
-import { useSkillGapStats } from "src/hooks/useSkillGapStats";
+import { useJobDemandStats } from "src/hooks/useJobDemandStats";
 import { useSkillsAnalyticsFilterOptions } from "src/hooks/useSkillsAnalyticsFilterOptions";
 import MetricInfoIcon from "src/components/MetricInfoIcon/MetricInfoIcon";
 import { MODULE_FILTER_LOCATIONS } from "src/data/moduleFilterOptions";
@@ -110,12 +110,9 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
     province || undefined,
     sector || undefined
   );
-  const { data: skillGapData, loading: skillGapLoading } = useSkillGapStats(
-    10,
-    institution,
-    province || undefined,
-    sector || undefined
-  );
+  // Province only — Sector is intentionally not passed (jobs have no sector
+  // field aligned to the Sector dropdown; the students chart still uses it).
+  const { data: jobDemandData, loading: jobDemandLoading } = useJobDemandStats(10, province || undefined);
 
   // Supply: top skills students actually have, as % of students with that skill vs total with any skill
   const supplyTotal = skillSupplyData?.total_students_with_skills ?? 0;
@@ -124,15 +121,22 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
     supplyPct: supplyTotal > 0 ? Math.round((entry.student_count / supplyTotal) * 100) : 0,
   }));
 
-  // Demand: top skill gaps (placeholder until job-matching pipeline is available)
-  const demandTotal = skillGapData?.total_students_with_skill_gaps ?? 0;
-  const demandData = (skillGapData?.top_skill_gaps ?? []).map((entry) => ({
+  // Demand: % of postings-with-a-linked-skill (denominator excludes postings
+  // with none, keeping bars comparable to the supply chart).
+  const jobsWithLinkedSkills = jobDemandData?.jobs_with_linked_skills ?? 0;
+  const totalJobsInFilter = jobDemandData?.total_jobs ?? 0;
+  const demandData = (jobDemandData?.top_skills_in_demand ?? []).map((entry) => ({
     skillName: entry.skill_label,
-    demandPct: demandTotal > 0 ? Math.round((entry.students_with_gap_count / demandTotal) * 100) : 0,
+    demandPct: jobsWithLinkedSkills > 0 ? Math.round((entry.jobs_count / jobsWithLinkedSkills) * 100) : 0,
   }));
+  const noLinkedSkillPct =
+    totalJobsInFilter > 0 ? Math.round(((totalJobsInFilter - jobsWithLinkedSkills) / totalJobsInFilter) * 100) : 0;
 
-  const renderSimpleBar = (label: string, value: number, barColor: string, ariaLabel: string) => (
+  // rowKey is `${label}-${index}`: supply labels can repeat (grouped by UUID),
+  // so label alone would collide as a React key.
+  const renderSimpleBar = (rowKey: string, label: string, value: number, barColor: string, ariaLabel: string) => (
     <Box
+      key={rowKey}
       display="grid"
       gridTemplateColumns="minmax(100px, 160px) 1fr 36px"
       gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}
@@ -253,8 +257,9 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
                   {t("dashboard.comingSoon")}
                 </Typography>
               ) : (
-                supplyData.map((item) =>
+                supplyData.map((item, i) =>
                   renderSimpleBar(
+                    `${item.skillName}-${i}`,
                     item.skillName,
                     item.supplyPct,
                     theme.palette.secondary.main,
@@ -300,8 +305,20 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
                 </Box>
               </Box>
             </Box>
+            {totalJobsInFilter > 0 && (
+              <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0.5, mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t("dashboard.skillsAnalytics.topSkillsInDemandCaption", {
+                    withSkills: jobsWithLinkedSkills,
+                    total: totalJobsInFilter,
+                    pct: noLinkedSkillPct,
+                  })}
+                </Typography>
+                <MetricInfoIcon title={t("dashboard.skillsAnalytics.topSkillsInDemandCaptionTooltip")} />
+              </Box>
+            )}
             <Box>
-              {skillGapLoading ? (
+              {jobDemandLoading ? (
                 Array.from({ length: 10 }).map((_, i) => (
                   <Skeleton key={i} variant="text" height={28} sx={{ mb: 0.5 }} />
                 ))
@@ -310,8 +327,9 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
                   {t("dashboard.comingSoon")}
                 </Typography>
               ) : (
-                demandData.map((item) =>
+                demandData.map((item, i) =>
                   renderSimpleBar(
+                    `${item.skillName}-${i}`,
                     item.skillName,
                     item.demandPct,
                     theme.palette.primary.main,

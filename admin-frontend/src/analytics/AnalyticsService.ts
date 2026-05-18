@@ -16,6 +16,7 @@ import type {
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
   SkillsSupplyStatsResponse,
+  JobDemandStatsResponse,
   InstitutionFilterOptionsResponse,
 } from "./AnalyticsService.types";
 
@@ -32,6 +33,7 @@ export type {
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
   SkillsSupplyStatsResponse,
+  JobDemandStatsResponse,
   InstitutionFilterOptionsResponse,
 };
 
@@ -173,6 +175,29 @@ export default class AnalyticsService {
     });
     try {
       return (await response.json()) as SkillGapStatsResponse;
+    } catch (e) {
+      throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
+        error: e,
+      });
+    }
+  }
+
+  async getJobDemandStats(limit = 10, location?: string): Promise<JobDemandStatsResponse> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (location) params.set("location", location);
+    const url = `${this.baseUrl}/analytics/job-demand-stats?${params}`;
+    const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getJobDemandStats", "GET", url);
+    const response = await customFetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      expectedStatusCode: StatusCodes.OK,
+      serviceName: SERVICE_NAME,
+      serviceFunction: "getJobDemandStats",
+      failureMessage: "Failed to fetch job demand stats",
+      expectedContentType: "application/json",
+    });
+    try {
+      return (await response.json()) as JobDemandStatsResponse;
     } catch (e) {
       throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
         error: e,

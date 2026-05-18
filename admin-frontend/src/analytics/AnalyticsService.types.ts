@@ -102,6 +102,17 @@ export interface SkillsSupplyStatsResponse {
   top_skills: SkillSupplyEntry[];
 }
 
+export interface JobDemandEntry {
+  skill_label: string;
+  jobs_count: number;
+}
+
+export interface JobDemandStatsResponse {
+  total_jobs: number;
+  jobs_with_linked_skills: number;
+  top_skills_in_demand: JobDemandEntry[];
+}
+
 export interface CareerExplorerSectorStat {
   sector_name: string;
   is_priority: boolean;

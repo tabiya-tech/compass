@@ -210,6 +210,8 @@
       "supplyVsDemandTitleTooltip": "Top skills students already have (supply) versus the skills employers most often ask for in job postings (demand).",
       "topSkillsAmongStudents": "Top Skills Among Students",
       "topSkillsInDemand": "Top Skills In Demand (Job Postings)",
+      "topSkillsInDemandCaption": "Based on {{withSkills}} of {{total}} postings · {{pct}}% had no taxonomy-linked skill",
+      "topSkillsInDemandCaptionTooltip": "Only skills linked to the skills taxonomy are ranked. The remaining postings had no linked skill — none were detected, or detected phrases could not be matched to the taxonomy — so they are excluded from this ranking.",
       "gapBySectorTitle": "Skills Gap by Sector",
       "gapBySectorTitleTooltip": "Difference between the skills students have and the skills employers ask for, broken down by sector.",
       "avgGapLabel": "Avg. gap between student skills supply and labour market demand",

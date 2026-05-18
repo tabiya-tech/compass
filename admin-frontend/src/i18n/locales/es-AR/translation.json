@@ -214,6 +214,8 @@
       "supplyVsDemandTitleTooltip": "Las principales habilidades que los estudiantes ya tienen (oferta) versus las habilidades que los empleadores solicitan con mayor frecuencia en las ofertas de trabajo (demanda).",
       "topSkillsAmongStudents": "Principales habilidades entre los estudiantes",
       "topSkillsInDemand": "Principales habilidades en demanda (publicaciones de trabajo)",
+      "topSkillsInDemandCaption": "Basado en {{withSkills}} de {{total}} publicaciones · {{pct}}% no tenía ninguna habilidad vinculada a la taxonomía",
+      "topSkillsInDemandCaptionTooltip": "Solo se clasifican las habilidades vinculadas a la taxonomía de habilidades. El resto de las publicaciones no tenía ninguna habilidad vinculada (no se detectó ninguna, o las frases detectadas no pudieron asociarse a la taxonomía), por lo que se excluyen de esta clasificación.",
       "gapBySectorTitle": "Brecha de habilidades por sector",
       "gapBySectorTitleTooltip": "Diferencia entre las habilidades que tienen los estudiantes y las que demandan los empleadores, desglosada por sector.",
       "avgGapLabel": "Promedio brecha entre la oferta de habilidades de los estudiantes y la demanda del mercado laboral",

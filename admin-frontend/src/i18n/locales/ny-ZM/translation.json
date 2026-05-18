@@ -214,6 +214,8 @@
       "supplyVsDemandTitleTooltip": "Maluso apamwamba omwe ophunzira ali nawo kale (opereka) motsutsana ndi luso lomwe olemba anzawo ntchito amafunsa nthawi zambiri polemba ntchito (zofuna).",
       "topSkillsAmongStudents": "Maluso Apamwamba Pakati pa Ophunzira",
       "topSkillsInDemand": "Maluso Apamwamba Omwe Akufunika (Zolemba Ntchito)",
+      "topSkillsInDemandCaption": "Kutengera zolemba {{withSkills}} mwa {{total}} · {{pct}}% zinalibe luso lolumikizidwa ndi taksonomi",
+      "topSkillsInDemandCaptionTooltip": "Ndi luso lolumikizidwa ndi taksonomi ya luso lokha lomwe limalembedwa. Zolemba zotsala zinalibe luso lolumikizidwa — palibe lomwe linapezeka, kapena mawu opezeka sanathe kulumikizidwa ndi taksonomi — choncho zachotsedwa mu mndandanda uwu.",
       "gapBySectorTitle": "Kusiyana kwa Maluso ndi Sector",
       "gapBySectorTitleTooltip": "Kusiyana pakati pa luso lomwe ophunzira ali nalo ndi luso lomwe olemba anzawo ntchito amafunsa, zogawidwa malinga ndi magawo.",
       "avgGapLabel": "Avg. kusiyana pakati pa kupezeka kwa luso la ophunzira ndi kufunikira kwa msika wa ntchito",

@@ -214,6 +214,8 @@
       "supplyVsDemandTitleTooltip": "Ustadi wa hali ya juu ambao wanafunzi wana (ugavi) dhidi ya ujuzi ambao waajiri mara nyingi huuliza katika machapisho ya kazi (mahitaji).",
       "topSkillsAmongStudents": "Ujuzi Bora Miongoni mwa Wanafunzi",
       "topSkillsInDemand": "Ujuzi Bora Unaohitajika (Machapisho ya Kazi)",
+      "topSkillsInDemandCaption": "Kwa msingi wa machapisho {{withSkills}} kati ya {{total}} · {{pct}}% hayakuwa na ujuzi uliounganishwa na taksonomia",
+      "topSkillsInDemandCaptionTooltip": "Ni ujuzi uliounganishwa na taksonomia ya ujuzi pekee unaopangwa. Machapisho yaliyobaki hayakuwa na ujuzi uliounganishwa — hakuna uliogunduliwa, au misemo iliyogunduliwa haikuweza kulinganishwa na taksonomia — hivyo yameachwa nje ya orodha hii.",
       "gapBySectorTitle": "Pengo la Ujuzi kwa Sekta",
       "gapBySectorTitleTooltip": "Tofauti kati ya ujuzi wanafunzi walio nao na ujuzi wanaoomba waajiri, ukigawanywa kulingana na sekta.",
       "avgGapLabel": "Wastani. pengo kati ya ugavi wa ujuzi wa wanafunzi na mahitaji ya soko la ajira",
