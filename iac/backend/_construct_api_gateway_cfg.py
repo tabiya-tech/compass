@@ -39,10 +39,21 @@ def _convert_open_api_3_to_2(openapi3: dict):
                             param['type'] = schema['type']
                         elif 'anyOf' in schema:
                             # Handle nullable types (e.g. Optional[str] → anyOf: [{type: string}, {type: null}])
-                            # Pick the first non-null type for Swagger 2.0 compatibility
-                            non_null = [s['type'] for s in schema['anyOf'] if s.get('type') != 'null']
-                            if non_null:
-                                param['type'] = non_null[0]
+                            # Pick the first non-null type for Swagger 2.0 compatibility.
+                            # If the non-null entry is a $ref (e.g. Optional[SomeEnum]), resolve it
+                            # from components/schemas and inline the enum values with type: string.
+                            non_null_entries = [s for s in schema['anyOf'] if s.get('type') != 'null']
+                            for entry in non_null_entries:
+                                if 'type' in entry:
+                                    param['type'] = entry['type']
+                                    break
+                                elif '$ref' in entry:
+                                    ref_name = entry['$ref'].split('/')[-1]
+                                    ref_schema = openapi3.get('components', {}).get('schemas', {}).get(ref_name, {})
+                                    param['type'] = ref_schema.get('type', 'string')
+                                    if 'enum' in ref_schema:
+                                        param['enum'] = ref_schema['enum']
+                                    break
 
             # Add quota/rate-limiter
             metric_costs = {'metricCosts': {}}  # set the default value
