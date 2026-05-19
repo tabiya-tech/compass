@@ -9,9 +9,15 @@ from app.jobs.service import JobService
 
 
 class _FakeJobRepository(IJobRepository):
-    def __init__(self, docs: List[Dict[str, Any]], total: int):
+    def __init__(
+        self,
+        docs: List[Dict[str, Any]],
+        total: int,
+        distinct: Optional[Dict[str, List[str]]] = None,
+    ):
         self._docs = docs
         self._total = total
+        self._distinct = distinct or {}
         self.last_filter_query: Optional[Dict[str, Any]] = None
         self.last_offset: Optional[int] = None
         self.last_limit: Optional[int] = None
@@ -35,7 +41,7 @@ class _FakeJobRepository(IJobRepository):
         return self._total
 
     async def distinct_values(self, field: str, filter_query: Dict[str, Any]) -> List[str]:
-        return []
+        return self._distinct.get(field, [])
 
     async def find_by_application_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
         return [doc for doc in self._docs if doc.get("application_url") in urls]
@@ -262,3 +268,62 @@ class TestJobService:
 
         # THEN the result is an empty dict and no repository call was needed
         assert actual_result == {}
+
+    @pytest.mark.asyncio
+    async def test_get_job_stats_returns_correct_counts(self):
+        # GIVEN distinct categories and platforms in the repository
+        repo = _FakeJobRepository(
+            docs=[],
+            total=42,
+            distinct={
+                "category": ["Agriculture", "Mining", "Retail"],
+                "source_platform": ["PlatformA", "PlatformB"],
+            },
+        )
+        service = JobService(repository=repo)
+
+        # WHEN get_job_stats is called
+        stats = await service.get_job_stats()
+
+        # THEN counts match the distinct values in the repository
+        assert stats.total == 42
+        assert stats.sectors == 3
+        assert stats.platforms == 2
+
+    @pytest.mark.asyncio
+    async def test_get_job_stats_deduplicates_sectors_case_insensitively(self):
+        # GIVEN categories that differ only by case or surrounding whitespace
+        repo = _FakeJobRepository(
+            docs=[],
+            total=10,
+            distinct={
+                "category": ["Engineering", "engineering", "ENGINEERING", "  Engineering  ", "Finance"],
+                "source_platform": [],
+            },
+        )
+        service = JobService(repository=repo)
+
+        # WHEN get_job_stats is called
+        stats = await service.get_job_stats()
+
+        # THEN case/whitespace variants are collapsed into a single sector
+        assert stats.sectors == 2
+
+    @pytest.mark.asyncio
+    async def test_get_job_stats_excludes_blank_categories(self):
+        # GIVEN categories that include empty or whitespace-only strings
+        repo = _FakeJobRepository(
+            docs=[],
+            total=5,
+            distinct={
+                "category": ["Engineering", "", "   "],
+                "source_platform": [],
+            },
+        )
+        service = JobService(repository=repo)
+
+        # WHEN get_job_stats is called
+        stats = await service.get_job_stats()
+
+        # THEN blank entries are not counted as sectors
+        assert stats.sectors == 1

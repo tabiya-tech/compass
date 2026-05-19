@@ -153,12 +153,14 @@ class JobService(IJobService):
         return include is not None and "count" in include.split(",")
 
     async def get_job_stats(self) -> JobStats:
-        total, sectors, platforms = await asyncio.gather(
+        total, raw_categories, raw_platforms = await asyncio.gather(
             self._repository.count_jobs({}),
             self._repository.distinct_values("category", {}),
             self._repository.distinct_values("source_platform", {}),
         )
-        return JobStats(total=total, sectors=len(sectors), platforms=len(platforms))
+        # Deduplicate categories across platforms — "Engineering" and "engineering" count as one sector.
+        sectors_covered = len({c.strip().lower() for c in raw_categories if c.strip()})
+        return JobStats(total=total, sectors=sectors_covered, platforms=len(raw_platforms))
 
     @staticmethod
     def _extract_skills(doc: Dict[str, Any]) -> Optional[list[str]]:

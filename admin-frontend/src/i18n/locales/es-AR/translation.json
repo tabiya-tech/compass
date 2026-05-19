@@ -240,6 +240,7 @@
         "jobsSourcedTooltip": "Total de ofertas de trabajo recopiladas de las plataformas de empleo admitidas.",
         "sectorsCovered": "Sectores cubiertos",
         "sectorsCoveredTooltip": "Número de sectores distintos representados en las ofertas de trabajo recopiladas.",
+        "sectorsCoveredSubtitle": "Categorías de empleo en todas las ofertas",
         "sourcePlatforms": "Plataformas de origen",
         "sourcePlatformsTooltip": "Número de plataformas de bolsa de trabajo distintas que alimentan el conjunto de datos.",
         "lastUpdatedOn": "Actualizado el {{date}}"

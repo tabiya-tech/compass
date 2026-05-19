@@ -238,6 +238,7 @@
         "jobsSourcedTooltip": "Total job postings collected from supported job platforms.",
         "sectorsCovered": "Sectors Covered",
         "sectorsCoveredTooltip": "Number of distinct sectors represented across the collected job postings.",
+        "sectorsCoveredSubtitle": "Job categories across all postings",
         "sourcePlatforms": "Source Platforms",
         "sourcePlatformsTooltip": "Number of distinct job-board platforms feeding the dataset.",
         "lastUpdatedOn": "Last updated {{date}}"

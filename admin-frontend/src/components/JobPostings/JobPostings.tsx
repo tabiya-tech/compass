@@ -199,6 +199,7 @@ const JobPostings: React.FC = () => {
           <StatCard
             title={t("dashboard.jobPostings.stats.sectorsCovered")}
             value={jobPostingStats.sectorsCovered}
+            subtitle={t("dashboard.jobPostings.stats.sectorsCoveredSubtitle")}
             tooltip={t("dashboard.jobPostings.stats.sectorsCoveredTooltip")}
           />
         </Grid>

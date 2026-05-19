@@ -240,6 +240,7 @@
         "jobsSourcedTooltip": "Zolemba zonse za ntchito zomwe zasonkhanitsidwa kuchokera kumapulatifomu othandizira ntchito.",
         "sectorsCovered": "Magawo ophimbidwa",
         "sectorsCoveredTooltip": "Chiwerengero cha magawo osiyanasiyana omwe akuyimiridwa pazolemba zomwe zasonkhanitsidwa.",
+        "sectorsCoveredSubtitle": "Mitundu ya ntchito mwa zolemba zonse",
         "sourcePlatforms": "Mapulatifomu oyambira",
         "sourcePlatformsTooltip": "Chiwerengero cha mapulatifomu osiyanasiyana opangira ntchito omwe akudyetsa deta.",
         "lastUpdatedOn": "Yasinthidwa pa {{date}}"

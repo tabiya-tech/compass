@@ -240,6 +240,7 @@
         "jobsSourcedTooltip": "Jumla ya machapisho ya kazi yaliyokusanywa kutoka kwa mifumo ya kazi inayotumika.",
         "sectorsCovered": "Sekta zilizofunikwa",
         "sectorsCoveredTooltip": "Idadi ya sekta mahususi zilizowakilishwa katika machapisho ya kazi yaliyokusanywa.",
+        "sectorsCoveredSubtitle": "Kategoria za kazi katika machapisho yote",
         "sourcePlatforms": "Majukwaa ya chanzo",
         "sourcePlatformsTooltip": "Idadi ya majukwaa mahususi ya bodi ya kazi inayolisha mkusanyiko wa data.",
         "lastUpdatedOn": "Imesasishwa tarehe {{date}}"
