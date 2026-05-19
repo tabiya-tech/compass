@@ -1,5 +1,5 @@
 import React, { startTransition, useContext, useMemo } from "react";
-import { Box, Container, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
@@ -91,8 +91,9 @@ const KnowledgeHubList: React.FC = () => {
     gridTemplateColumns: {
       xs: "minmax(40px, 52px) minmax(0, 1fr)",
       sm: "minmax(48px, 56px) minmax(0, 1fr)",
+      md: "250px minmax(0, 1fr)",
     },
-    columnGap: { xs: theme.fixedSpacing(3), sm: theme.fixedSpacing(4) },
+    columnGap: { xs: theme.fixedSpacing(3), sm: theme.fixedSpacing(4), md: theme.fixedSpacing(6) },
     alignItems: "flex-start",
     width: "100%",
   } as const;
@@ -116,28 +117,13 @@ const KnowledgeHubList: React.FC = () => {
             backgroundColor: theme.palette.common.white,
             overflow: "visible",
             pt: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-            pb: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+            pb: theme.fixedSpacing(6),
             position: "relative",
             zIndex: 1,
           }}
         >
-          <Container
-            maxWidth="md"
-            sx={{
-              marginX: "auto",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              overflow: "visible",
-              pl: { xs: 0, md: 20 },
-            }}
-          >
-            <Box
-              sx={{
-                ...contentColumnSx,
-                mb: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-              }}
-            >
+          <Box sx={{ ...contentColumnSx, overflow: "visible" }}>
+            <Box sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}>
               <BackLink
                 label={t("home.backToDashboard")}
                 isOnline={isOnline}
@@ -148,18 +134,14 @@ const KnowledgeHubList: React.FC = () => {
                 }}
                 dataTestId={DATA_TEST_ID.KNOWLEDGE_HUB_BACK_LINK}
                 color={theme.palette.brandAction.main}
-                sx={{
-                  opacity: isOnline ? 1 : 0.5,
-                  ml: { xs: 0, md: "-165px" },
-                }}
+                sx={{ opacity: isOnline ? 1 : 0.5 }}
               />
             </Box>
             <Box
               data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_HERO}
               sx={{
-                ...contentColumnSx,
                 ...textAlignGrid,
-                gridTemplateColumns: { xs: "1fr", md: "minmax(48px, 56px) minmax(0, 1fr)" },
+                gridTemplateColumns: { xs: "1fr", md: "250px minmax(0, 1fr)" },
                 rowGap: { xs: theme.fixedSpacing(2), md: 0 },
                 position: "relative",
                 overflow: "visible",
@@ -185,6 +167,7 @@ const KnowledgeHubList: React.FC = () => {
                   alignSelf: "stretch",
                   overflow: "visible",
                   display: { xs: "none", md: "block" },
+                  mb: { md: theme.fixedSpacing(-10) },
                 }}
               >
                 <Box
@@ -193,13 +176,13 @@ const KnowledgeHubList: React.FC = () => {
                   alt=""
                   sx={{
                     position: "absolute",
-                    left: { md: -190 },
+                    left: { md: 0 },
                     top: { md: -20 },
                     width: { md: 250 },
                     height: { md: 290 },
                     opacity: 1,
                     display: "block",
-                    zIndex: 1,
+                    zIndex: 2,
                     pointerEvents: "none",
                   }}
                 />
@@ -229,7 +212,7 @@ const KnowledgeHubList: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
-          </Container>
+          </Box>
         </Box>
 
         <Box
@@ -239,25 +222,12 @@ const KnowledgeHubList: React.FC = () => {
             backgroundColor: theme.palette.containerBackground.main,
             position: "relative",
             zIndex: 0,
-            pt: { xs: 12, sm: 10, md: 8 },
-            pb: 16,
+            pt: theme.fixedSpacing(8),
+            pb: theme.fixedSpacing(16),
           }}
         >
-          <Container
-            maxWidth="md"
-            sx={{
-              marginX: "auto",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              pl: { xs: 0, md: 20 },
-            }}
-          >
-            <Stack
-              spacing={theme.fixedSpacing(6)}
-              sx={contentColumnSx}
-              data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_LIST}
-            >
+          <Box sx={contentColumnSx}>
+            <Stack spacing={theme.fixedSpacing(6)} data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_LIST}>
               {documents.map((doc) => {
                 const sectorKey = getSectorKey(doc);
                 const iconSrc = getSectorIconSrc(doc);
@@ -278,7 +248,14 @@ const KnowledgeHubList: React.FC = () => {
                       src={iconSrc}
                       alt=""
                       aria-hidden
-                      sx={{ width: "100%", height: "auto", display: "block" }}
+                      sx={{
+                        width: { xs: "100%", md: "auto" },
+                        maxWidth: { md: 56 },
+                        height: { xs: "auto", md: 56 },
+                        objectFit: "contain",
+                        display: "block",
+                        justifySelf: { md: "end" },
+                      }}
                     />
                     <Box sx={{ minWidth: 0 }}>
                       <Typography variant="h3" sx={{ color: theme.palette.text.primary }}>
@@ -335,7 +312,7 @@ const KnowledgeHubList: React.FC = () => {
                 </Typography>
               </Box>
             )}
-          </Container>
+          </Box>
         </Box>
       </Box>
       <Footer sx={{ backgroundColor: theme.palette.containerBackground.main }} />
