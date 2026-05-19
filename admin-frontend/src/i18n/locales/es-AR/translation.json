@@ -215,7 +215,7 @@
       "topSkillsAmongStudents": "Principales habilidades entre los estudiantes",
       "topSkillsInDemand": "Principales habilidades en demanda (publicaciones de trabajo)",
       "topSkillsInDemandCaption": "Basado en {{withSkills}} de {{total}} publicaciones · {{pct}}% no tenía ninguna habilidad vinculada a la taxonomía",
-      "topSkillsInDemandCaptionTooltip": "Solo se clasifican las habilidades vinculadas a la taxonomía de habilidades. El resto de las publicaciones no tenía ninguna habilidad vinculada (no se detectó ninguna, o las frases detectadas no pudieron asociarse a la taxonomía), por lo que se excluyen de esta clasificación.",
+      "topSkillsInDemandCaptionTooltip": "Solo se clasifican las habilidades vinculadas a la taxonomía de habilidades. El resto de las publicaciones no tenía ninguna habilidad vinculada (no se detectó ninguna, o las frases detectadas no pudieron asociarse a la taxonomía), por lo que se excluyen de esta clasificación. Los recuentos reflejan la Provincia y el Sector seleccionados; el Sector se aproxima a partir de las categorías de las publicaciones de empleo.",
       "gapBySectorTitle": "Brecha de habilidades por sector",
       "gapBySectorTitleTooltip": "Diferencia entre las habilidades que tienen los estudiantes y las que demandan los empleadores, desglosada por sector.",
       "avgGapLabel": "Promedio brecha entre la oferta de habilidades de los estudiantes y la demanda del mercado laboral",

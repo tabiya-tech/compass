@@ -182,9 +182,10 @@ export default class AnalyticsService {
     }
   }
 
-  async getJobDemandStats(limit = 10, location?: string): Promise<JobDemandStatsResponse> {
+  async getJobDemandStats(limit = 10, location?: string, sector?: string): Promise<JobDemandStatsResponse> {
     const params = new URLSearchParams({ limit: String(limit) });
     if (location) params.set("location", location);
+    if (sector) params.set("sector", sector);
     const url = `${this.baseUrl}/analytics/job-demand-stats?${params}`;
     const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getJobDemandStats", "GET", url);
     const response = await customFetch(url, {

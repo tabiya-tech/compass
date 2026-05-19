@@ -6,6 +6,7 @@ from typing import Any, Awaitable, Optional
 import pytest
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.analytics.job_demand import sector_mapping
 from app.analytics.job_demand.repository import JobDemandAnalyticsRepository
 from app.analytics.job_demand.types import JobDemandStatsResponse
 from app.server_dependencies.database_collections import Collections
@@ -34,10 +35,12 @@ def _labelless_linked_skill() -> dict:
 
 
 def _job(*, location: str, entities: Optional[list[dict]] = None,
-         uuid: Optional[str] = None) -> dict:
+         uuid: Optional[str] = None, category: Optional[str] = None) -> dict:
     doc: dict[str, Any] = {"title": "Some Job", "location": location}
     if uuid is not None:
         doc["uuid"] = uuid
+    if category is not None:
+        doc["category"] = category
     if entities is not None:
         doc["classification"] = {"entities": entities}
     return doc
@@ -183,3 +186,83 @@ class TestGetJobDemandStats:
         # j5's only skill is unlinked -> it is NOT among the 6 linked jobs.
         assert result.total_jobs == 9
         assert result.jobs_with_linked_skills == 6
+
+
+class TestSectorFilter:
+    @pytest.fixture(autouse=True)
+    def _fixed_sector_map(self, monkeypatch):
+        # Pin a known sector map so these tests don't depend on the regenerable
+        # sector_category_map.json artifact.
+        monkeypatch.setattr(sector_mapping, "_cache", {
+            "IT & Telecoms": "ICT",
+            "Banking & Financial Services": "Finance & Insurance",
+            "Tenders & RFPs": None,
+        })
+
+    @pytest.fixture(scope="function")
+    async def sectored_repository(
+        self, in_memory_jobs_database: Awaitable[AsyncIOMotorDatabase]
+    ) -> JobDemandAnalyticsRepository:
+        """
+        Jobs spanning categories that map to different institution sectors:
+
+          a (Lusaka,     "IT & Telecoms, Software")        : Python   -> ICT
+          b (Lusaka,     "IT & Telecoms")                  : Docker   -> ICT
+          c (Copperbelt, "IT & Telecoms")                  : Python   -> ICT (other province)
+          d (Lusaka,     "Banking & Financial Services")   : Excel    -> Finance & Insurance
+          e (Lusaka,     "Tenders & RFPs, IT & Telecoms")  : Python   -> leading token maps to null (excluded from all sectors)
+          f (Lusaka,     no category)                      : Python   -> excluded by any sector
+        """
+        db = await in_memory_jobs_database
+        await db.get_collection(_COLLECTION).insert_many([
+            _job(uuid="a", location="Lusaka", category="IT & Telecoms, Software",
+                 entities=[_linked_skill("Python")]),
+            _job(uuid="b", location="Lusaka", category="IT & Telecoms",
+                 entities=[_linked_skill("Docker")]),
+            _job(uuid="c", location="Copperbelt", category="IT & Telecoms",
+                 entities=[_linked_skill("Python")]),
+            _job(uuid="d", location="Lusaka", category="Banking & Financial Services",
+                 entities=[_linked_skill("Excel")]),
+            _job(uuid="e", location="Lusaka", category="Tenders & RFPs, IT & Telecoms",
+                 entities=[_linked_skill("Python")]),
+            _job(uuid="f", location="Lusaka", entities=[_linked_skill("Python")]),
+        ])
+        return JobDemandAnalyticsRepository(db, _COLLECTION)
+
+    @pytest.mark.asyncio
+    async def test_sector_filters_to_mapped_category_prefix(
+        self, sectored_repository: Awaitable[JobDemandAnalyticsRepository]
+    ):
+        repo = await sectored_repository
+        # WHEN filtering by the ICT sector
+        result = await repo.get_job_demand_stats(limit=10, sector="ICT")
+        # THEN only a, b, c (category leads with "IT & Telecoms") count;
+        # d (Finance), e (leading token "Tenders & RFPs"), f (no category) drop.
+        assert result.total_jobs == 3
+        assert result.jobs_with_linked_skills == 3
+        ranking = {e.skill_label: e.jobs_count for e in result.top_skills_in_demand}
+        assert ranking == {"Python": 2, "Docker": 1}
+
+    @pytest.mark.asyncio
+    async def test_sector_and_province_combine(
+        self, sectored_repository: Awaitable[JobDemandAnalyticsRepository]
+    ):
+        repo = await sectored_repository
+        # WHEN filtering by ICT sector AND the Lusaka province
+        result = await repo.get_job_demand_stats(limit=10, location="Lusaka", sector="ICT")
+        # THEN c (Copperbelt) also drops -> only a, b remain
+        assert result.total_jobs == 2
+        ranking = {e.skill_label: e.jobs_count for e in result.top_skills_in_demand}
+        assert ranking == {"Python": 1, "Docker": 1}
+
+    @pytest.mark.asyncio
+    async def test_no_supply_sector_returns_empty(
+        self, sectored_repository: Awaitable[JobDemandAnalyticsRepository]
+    ):
+        repo = await sectored_repository
+        # WHEN filtering by a sector with no aligned job-category supply
+        result = await repo.get_job_demand_stats(limit=10, sector="Households")
+        # THEN the chart is empty (not silently market-wide)
+        assert result.total_jobs == 0
+        assert result.jobs_with_linked_skills == 0
+        assert result.top_skills_in_demand == []

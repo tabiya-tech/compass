@@ -8,7 +8,7 @@ export interface UseJobDemandStatsResult {
   error: Error | null;
 }
 
-export function useJobDemandStats(limit = 10, location?: string): UseJobDemandStatsResult {
+export function useJobDemandStats(limit = 10, location?: string, sector?: string): UseJobDemandStatsResult {
   const [data, setData] = useState<JobDemandStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -17,7 +17,7 @@ export function useJobDemandStats(limit = 10, location?: string): UseJobDemandSt
     let isMounted = true;
     setLoading(true);
     AnalyticsService.getInstance()
-      .getJobDemandStats(limit, location)
+      .getJobDemandStats(limit, location, sector)
       .then((result) => {
         if (!isMounted) return;
         setData(result);
@@ -32,7 +32,7 @@ export function useJobDemandStats(limit = 10, location?: string): UseJobDemandSt
     return () => {
       isMounted = false;
     };
-  }, [limit, location]);
+  }, [limit, location, sector]);
 
   return { data, loading, error };
 }

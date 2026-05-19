@@ -20,19 +20,20 @@ describe("useJobDemandStats", () => {
     jest.restoreAllMocks();
   });
 
-  test("returns data and clears loading on success, forwarding limit + location", async () => {
+  test("returns data and clears loading on success, forwarding limit + location + sector", async () => {
     // GIVEN the service resolves with stats
     const spy = jest.spyOn(AnalyticsService.getInstance(), "getJobDemandStats").mockResolvedValue(SAMPLE);
 
-    // WHEN the hook is rendered with a limit and province
-    const { result } = renderHook(() => useJobDemandStats(10, "Lusaka"));
+    // WHEN the hook is rendered with a limit, province and sector
+    const { result } = renderHook(() => useJobDemandStats(10, "Lusaka", "ICT"));
 
     // THEN it starts loading, then resolves with the data and no error
     expect(result.current.loading).toBe(true);
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.data).toEqual(SAMPLE);
     expect(result.current.error).toBeNull();
-    expect(spy).toHaveBeenCalledWith(10, "Lusaka");
+    // AND the limit, province and sector are forwarded to the service
+    expect(spy).toHaveBeenCalledWith(10, "Lusaka", "ICT");
   });
 
   test("surfaces an Error and leaves data null on failure", async () => {

@@ -45,7 +45,8 @@ def add_job_demand_analytics_routes(router: APIRouter, auth: Authentication) -> 
         },
         description=(
             "Aggregate the top in-demand skills across job postings (taxonomy-linked "
-            "skills only). Optionally filter by location (province). This is an "
+            "skills only). Optionally filter by location (province) and sector "
+            "(institution sector mapped to job-category prefixes). This is an "
             "independent job-side market signal, not derived from per-user matching. "
             "Requires a valid access role (results are global — jobs are not "
             "institution-scoped, so no institution scoping is applied)."
@@ -64,10 +65,15 @@ def add_job_demand_analytics_routes(router: APIRouter, auth: Authentication) -> 
             max_length=120,
             description="Filter by province/location (job.location)",
         ),
+        sector: Optional[str] = Query(
+            default=None,
+            max_length=120,
+            description="Filter by institution sector (mapped to job.category prefixes)",
+        ),
         repo: IJobDemandAnalyticsRepository = Depends(_get_job_demand_analytics_repository),
     ) -> JobDemandStatsResponse:
         try:
-            return await repo.get_job_demand_stats(limit, location=location)
+            return await repo.get_job_demand_stats(limit, location=location, sector=sector)
         except Exception as e:
             logger.exception(e)
             raise HTTPException(

@@ -50,6 +50,19 @@ def get_data() -> dict:
     return loaded
 
 
+def get_institution_sectors() -> list[str]:
+    """Authoritative sector vocabulary: distinct, sorted ``institutions[].sectors``
+    from teveta-master.json — the single source of truth for the sector names
+    used across the app (matches the Sector dropdown's ``sectors_covered``)."""
+    data = get_data()
+    sectors: set[str] = set()
+    for inst in data.get("institutions", []):
+        for s in inst.get("sectors", []) or []:
+            if isinstance(s, str) and s.strip():
+                sectors.add(s.strip())
+    return sorted(sectors)
+
+
 def get_sector_data(sector: str) -> Optional[dict]:
     """
     Return filtered teveta data for a given sector name (as used in the knowledge hub).

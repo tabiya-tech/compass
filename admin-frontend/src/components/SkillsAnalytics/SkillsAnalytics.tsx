@@ -69,7 +69,13 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
           autoFocus
           placeholder={searchPlaceholder}
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            // Stop the inner search field's change from bubbling to MUI
+            // Select's own onChange (it reads e.target.value and crashes on
+            // this event shape) — mirrors the onKeyDown guard below.
+            e.stopPropagation();
+            setSearch(e.target.value);
+          }}
           onKeyDown={(e) => e.stopPropagation()}
           slotProps={{
             input: {
@@ -110,9 +116,13 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
     province || undefined,
     sector || undefined
   );
-  // Province only — Sector is intentionally not passed (jobs have no sector
-  // field aligned to the Sector dropdown; the students chart still uses it).
-  const { data: jobDemandData, loading: jobDemandLoading } = useJobDemandStats(10, province || undefined);
+  // Sector maps to job.category prefixes (jobs have no sector field aligned to
+  // the Sector dropdown — see backend sector_mapping); province filters job.location.
+  const { data: jobDemandData, loading: jobDemandLoading } = useJobDemandStats(
+    10,
+    province || undefined,
+    sector || undefined
+  );
 
   // Supply: top skills students actually have, as % of students with that skill vs total with any skill
   const supplyTotal = skillSupplyData?.total_students_with_skills ?? 0;

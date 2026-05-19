@@ -11,6 +11,7 @@ from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.analytics.job_demand.sector_mapping import job_category_match
 from app.analytics.job_demand.types import JobDemandEntry, JobDemandStatsResponse
 
 logger = logging.getLogger(__name__)
@@ -30,9 +31,9 @@ class IJobDemandAnalyticsRepository(ABC):
 
     @abstractmethod
     async def get_job_demand_stats(
-        self, limit: int, location: Optional[str] = None
+        self, limit: int, location: Optional[str] = None, sector: Optional[str] = None
     ) -> JobDemandStatsResponse:
-        """Return the top in-demand skills across job postings, optionally filtered by province."""
+        """Return the top in-demand skills across job postings, optionally filtered by province/sector."""
         raise NotImplementedError()
 
 
@@ -44,23 +45,26 @@ class JobDemandAnalyticsRepository(IJobDemandAnalyticsRepository):
         self._collection_name = collection_name
 
     async def get_job_demand_stats(
-        self, limit: int, location: Optional[str] = None
+        self, limit: int, location: Optional[str] = None, sector: Optional[str] = None
     ) -> JobDemandStatsResponse:
         """
         Rank taxonomy-linked skills across job postings.
 
         :param limit: max skills to return.
         :param location: optional province filter on ``job.location``.
+        :param sector: optional institution-sector filter, mapped to
+            ``job.category`` prefixes (see ``sector_mapping``).
         """
         collection = self._db.get_collection(self._collection_name)
 
-        # Province only. TODO: Sector not applied — jobs have free-text
-        # `category`, a different vocabulary than institution `sectors_covered`
-        # (the Sector dropdown source); filtering here would silently mismatch.
-        # Revisit with a curated institution_sector -> job.category mapping.
+        # Province on `location`; Sector via the generated job.category map
+        # (postings have no sector field). total_jobs = filtered set (caption denom).
         base_match: dict = {}
         if location:
             base_match["location"] = _province_location_match(location)
+        sector_constraint = job_category_match(sector)
+        if sector_constraint is not None:
+            base_match["category"] = sector_constraint
 
         # Coverage-caption denominator: every posting in the filter.
         total_jobs = await collection.count_documents(base_match)
