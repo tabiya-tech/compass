@@ -1159,6 +1159,10 @@
     "clearSearch": "Clear search",
     "tocLabel": "On this page",
     "noResults": "No questions match that search.",
+    "tutorialEyebrow": "4 min tutorial",
+    "tutorialHeading": "See how Njila works",
+    "tutorialIframeTitle": "Njila tutorial video",
+    "tutorialUnavailableOffline": "You're offline. Connect to the internet to watch this video.",
     "scrollProgressLabel": "Reading progress"
   }
 }

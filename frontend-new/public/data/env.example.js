@@ -112,6 +112,7 @@ window.tabiyaConfig = {
   FRONTEND_DARK_LOGO_URL: btoa("/njila-logo-dark.svg"),
   FRONTEND_FAVICON_URL: btoa("/favicon.svg"),
   FRONTEND_APP_ICON_URL: btoa("/compass.svg"),
+  FRONTEND_FAQ_TUTORIAL_VIDEO_URL: btoa("https://player.vimeo.com/video/1193881841?h=8ee6f6190d&title=0&byline=0&portrait=0"),
   FRONTEND_THEME_CSS_VARIABLES: btoa(
     JSON.stringify({
       "brand-primary": "0 255 145",

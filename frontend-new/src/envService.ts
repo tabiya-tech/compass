@@ -36,6 +36,7 @@ export enum EnvVariables {
   FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG = "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG",
   FRONTEND_GTM_CONTAINER_ID = "FRONTEND_GTM_CONTAINER_ID",
   FRONTEND_GTM_ENABLED = "FRONTEND_GTM_ENABLED",
+  FRONTEND_FAQ_TUTORIAL_VIDEO_URL = "FRONTEND_FAQ_TUTORIAL_VIDEO_URL",
 }
 
 export const requiredEnvVariables = [
@@ -231,6 +232,8 @@ export const getSkillsReportOutputConfigEnvVar = () => getEnv(EnvVariables.FRONT
 export const getGtmContainerId = () => getEnv(EnvVariables.FRONTEND_GTM_CONTAINER_ID);
 
 export const getGtmEnabled = () => getEnv(EnvVariables.FRONTEND_GTM_ENABLED);
+
+export const getFaqTutorialVideoUrl = () => getEnv(EnvVariables.FRONTEND_FAQ_TUTORIAL_VIDEO_URL);
 
 export const getLogoUrl = () => getEnv(EnvVariables.FRONTEND_LOGO_URL);
 

@@ -95,6 +95,9 @@
       ]
     }
   },
+  "faq": {
+    "tutorialVideoUrl": "https://player.vimeo.com/video/1193881841?h=8ee6f6190d&title=0&byline=0&portrait=0"
+  },
   "analytics": {
     "ga4AccountId": "387253059",
     "ga4PropertyId": "528078871",

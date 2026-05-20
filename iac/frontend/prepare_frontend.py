@@ -140,6 +140,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
     frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
     skills_report_config: Optional[str] = getenv("FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG", False, False)
+    frontend_faq_tutorial_video_url: Optional[str] = getenv("FRONTEND_FAQ_TUTORIAL_VIDEO_URL", False, False)
 
     # sensitive data fields config
     sensitive_data_fields_config = getenv("FRONTEND_SENSITIVE_DATA_FIELDS", False, False)
@@ -199,6 +200,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_SENSITIVE_DATA_FIELDS": base64_encode(sensitive_data_fields_config),
         "FRONTEND_GTM_CONTAINER_ID": base64_encode(frontend_gtm_container_id or ""),
         "FRONTEND_GTM_ENABLED": base64_encode(frontend_gtm_enabled or ""),
+        "FRONTEND_FAQ_TUTORIAL_VIDEO_URL": base64_encode(frontend_faq_tutorial_video_url or ""),
     }
 
     env_json_content = f"""window.tabiyaConfig = {json.dumps(frontend_env_json, indent=4)};"""

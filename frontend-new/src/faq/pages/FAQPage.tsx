@@ -14,6 +14,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { routerPaths } from "src/app/routerPaths";
 import BackLink from "src/navigation/BackLink/BackLink";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
+import { getFaqTutorialVideoUrl } from "src/envService";
 
 const uniqueId = "f6b1d3a8-9c47-4e5f-a2d1-7b9e8c4f2a13";
 
@@ -23,6 +24,7 @@ export const DATA_TEST_ID = {
   FAQ_PAGE_LEDE: `faq-page-lede-${uniqueId}`,
   FAQ_PAGE_SEARCH: `faq-page-search-${uniqueId}`,
   FAQ_PAGE_BACK_LINK: `faq-page-back-link-${uniqueId}`,
+  FAQ_PAGE_TUTORIAL: `faq-page-tutorial-${uniqueId}`,
   FAQ_PAGE_SECTION: `faq-page-section-${uniqueId}`,
   FAQ_PAGE_NO_RESULTS: `faq-page-no-results-${uniqueId}`,
   FAQ_PAGE_PROGRESS_BAR: `faq-page-progress-bar-${uniqueId}`,
@@ -31,6 +33,9 @@ export const DATA_TEST_ID = {
 const containsQuery = (haystack: string, needle: string): boolean => haystack.toLowerCase().includes(needle);
 
 const isChecklistSection = (section: FaqSection): boolean => section.isStatic && /checklist/i.test(section.title);
+
+const FAQ_TUTORIAL_VIDEO_FALLBACK_URL =
+  "https://player.vimeo.com/video/1193881841?h=8ee6f6190d&title=0&byline=0&portrait=0";
 
 const FAQPage: React.FC = () => {
   const theme = useTheme();
@@ -44,6 +49,16 @@ const FAQPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState("");
   const normalizedQuery = searchInput.trim().toLowerCase();
   const isSearching = normalizedQuery.length > 0;
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const tutorialUnavailable = !isOnline;
+
+  useEffect(() => {
+    if (!tutorialUnavailable) return;
+
+    // Pause playback when we go offline.
+    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ method: "pause" }), "https://player.vimeo.com");
+  }, [tutorialUnavailable]);
 
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(sections.length > 0 ? sections[0].id : null);
@@ -138,11 +153,12 @@ const FAQPage: React.FC = () => {
             margin: "0 auto",
             padding: { xs: "28px 16px 28px", md: "36px 32px 36px" },
             display: "flex",
-            flexDirection: "column",
-            gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+            flexDirection: { xs: "column", md: "row" },
+            gap: theme.fixedSpacing(theme.tabiyaSpacing.xl),
+            alignItems: "flex-start",
           }}
         >
-          <Box>
+          <Box sx={{ flex: "1 1 0", minWidth: 0, display: "flex", flexDirection: "column" }}>
             <BackLink
               label={user ? t("home.backToDashboard") : t("common.buttons.goBack")}
               isOnline={isOnline}
@@ -154,7 +170,7 @@ const FAQPage: React.FC = () => {
               dataTestId={DATA_TEST_ID.FAQ_PAGE_BACK_LINK}
               color={theme.palette.brandAction.main}
               sx={{
-                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.lg),
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
                 opacity: isOnline ? 1 : 0.5,
               }}
             />
@@ -183,48 +199,140 @@ const FAQPage: React.FC = () => {
             >
               {t("faq.lede")}
             </Typography>
+            <Box sx={{ maxWidth: 480, marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xl) }}>
+              <TextField
+                fullWidth
+                type="text"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder={t("faq.searchPlaceholder")}
+                inputProps={{ "aria-label": t("faq.searchAriaLabel") }}
+                data-testid={DATA_TEST_ID.FAQ_PAGE_SEARCH}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchInput ? (
+                    <InputAdornment position="end">
+                      <PrimaryIconButton
+                        onClick={() => setSearchInput("")}
+                        title={t("faq.clearSearch")}
+                        aria-label={t("faq.clearSearch")}
+                      >
+                        <CloseIcon />
+                      </PrimaryIconButton>
+                    </InputAdornment>
+                  ) : null,
+                  sx: {
+                    fontSize: "0.9375rem",
+                    backgroundColor: theme.palette.common.white,
+                    borderRadius: "10px",
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: theme.palette.primary.main },
+                    "&:hover fieldset": { borderColor: theme.palette.primary.main },
+                    "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
+                  },
+                }}
+              />
+            </Box>
           </Box>
 
-          <Box sx={{ maxWidth: 480 }}>
-            <TextField
-              fullWidth
-              type="text"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder={t("faq.searchPlaceholder")}
-              inputProps={{ "aria-label": t("faq.searchAriaLabel") }}
-              data-testid={DATA_TEST_ID.FAQ_PAGE_SEARCH}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: searchInput ? (
-                  <InputAdornment position="end">
-                    <PrimaryIconButton
-                      onClick={() => setSearchInput("")}
-                      title={t("faq.clearSearch")}
-                      aria-label={t("faq.clearSearch")}
-                    >
-                      <CloseIcon />
-                    </PrimaryIconButton>
-                  </InputAdornment>
-                ) : null,
-                sx: {
-                  fontSize: "0.9375rem",
-                  backgroundColor: theme.palette.common.white,
-                  borderRadius: "10px",
-                },
-              }}
+          <Box
+            data-testid={DATA_TEST_ID.FAQ_PAGE_TUTORIAL}
+            sx={{
+              flex: "1 1 0",
+              minWidth: 0,
+              width: { xs: "100%", md: "auto" },
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+            }}
+          >
+            <Typography
+              component="p"
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: theme.palette.primary.main },
-                  "&:hover fieldset": { borderColor: theme.palette.primary.main },
-                  "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
-                },
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: theme.palette.brandAction.main,
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
               }}
-            />
+            >
+              {t("faq.tutorialEyebrow")}
+            </Typography>
+            <Typography
+              component="h2"
+              sx={{
+                fontFamily: theme.typography.fontFamily,
+                fontSize: { xs: "1.25rem", md: "1.375rem" },
+                fontWeight: 700,
+                lineHeight: 1.2,
+                letterSpacing: "-0.01em",
+                color: theme.palette.common.black,
+                marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              }}
+            >
+              {t("faq.tutorialHeading")}
+            </Typography>
+            <Box
+              sx={{
+                position: "relative",
+                width: { xs: "100%", sm: "80%", md: "100%" },
+                alignSelf: { xs: "center", sm: "start", md: "stretch" },
+                aspectRatio: "16 / 9",
+                borderRadius: "10px",
+                overflow: "hidden",
+                boxSizing: "border-box",
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor: theme.palette.containerBackground.main,
+              }}
+            >
+              <Box
+                component="iframe"
+                ref={iframeRef}
+                src={getFaqTutorialVideoUrl() || FAQ_TUTORIAL_VIDEO_FALLBACK_URL}
+                title={t("faq.tutorialIframeTitle")}
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0,
+                }}
+              />
+              {tutorialUnavailable && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.70)",
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: theme.palette.common.white,
+                      textAlign: "center",
+                      padding: theme.fixedSpacing(theme.tabiyaSpacing.md),
+                    }}
+                  >
+                    {t("faq.tutorialUnavailableOffline")}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Box>
       </Box>
