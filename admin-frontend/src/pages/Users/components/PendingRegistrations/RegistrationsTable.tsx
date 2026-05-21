@@ -38,11 +38,6 @@ export const DATA_TEST_ID = {
   REJECT_BUTTON: `${uniqueId}-reject-button`,
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  [RegistrationRoleRequest.ADMIN]: "Cross-institution admin",
-  [RegistrationRoleRequest.INSTITUTION_STAFF]: "Instructor",
-};
-
 export interface RegistrationsTableProps {
   registrations: AdminRegistration[];
   onApprove: (registration: AdminRegistration) => void;
@@ -52,6 +47,11 @@ export interface RegistrationsTableProps {
 const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, onApprove, onReject }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+
+  const ROLE_LABELS: Record<string, string> = {
+    [RegistrationRoleRequest.ADMIN]: t("registrations.roles.admin"),
+    [RegistrationRoleRequest.INSTITUTION_STAFF]: t("registrations.roles.institutionStaff"),
+  };
 
   return (
     <TableContainer
@@ -67,12 +67,12 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, 
       <Table data-testid={DATA_TEST_ID.TABLE}>
         <TableHead>
           <TableRow>
-            <TableCell>{t("registrations.table.email", "Email")}</TableCell>
-            <TableCell>{t("registrations.table.name", "Name")}</TableCell>
-            <TableCell>{t("registrations.table.role", "Requested role")}</TableCell>
-            <TableCell>{t("registrations.table.institution", "Institution")}</TableCell>
-            <TableCell>{t("registrations.table.submittedAt", "Submitted")}</TableCell>
-            <TableCell align="right">{t("registrations.table.actions", "Actions")}</TableCell>
+            <TableCell>{t("registrations.table.email")}</TableCell>
+            <TableCell>{t("registrations.table.name")}</TableCell>
+            <TableCell>{t("registrations.table.role")}</TableCell>
+            <TableCell>{t("registrations.table.institution")}</TableCell>
+            <TableCell>{t("registrations.table.submittedAt")}</TableCell>
+            <TableCell align="right">{t("registrations.table.actions")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -84,7 +84,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, 
                 sx={{ py: 4, color: "text.secondary" }}
                 data-testid={DATA_TEST_ID.TABLE_EMPTY}
               >
-                {t("registrations.table.empty", "No pending sign-ups")}
+                {t("registrations.table.empty")}
               </TableCell>
             </TableRow>
           ) : (
@@ -97,7 +97,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, 
                 <TableCell>{new Date(registration.submitted_at).toLocaleString()}</TableCell>
                 <TableCell align="right">
                   <Box sx={{ display: "inline-flex", gap: 0.5 }}>
-                    <Tooltip title={t("registrations.actions.approve", "Approve")}>
+                    <Tooltip title={t("registrations.actions.approve")}>
                       <IconButton
                         size="small"
                         color="success"
@@ -107,7 +107,7 @@ const RegistrationsTable: React.FC<RegistrationsTableProps> = ({ registrations, 
                         <CheckCircleIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={t("registrations.actions.reject", "Reject")}>
+                    <Tooltip title={t("registrations.actions.reject")}>
                       <IconButton
                         size="small"
                         color="error"

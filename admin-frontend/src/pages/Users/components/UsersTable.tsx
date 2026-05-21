@@ -42,12 +42,6 @@ export const DATA_TEST_ID = {
   USERS_TABLE_SKELETON: `${uniqueId}-skeleton`,
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  [Role.SUPER_ADMIN]: "Super Admin",
-  [Role.ADMIN]: "Admin",
-  [Role.INSTITUTION_STAFF]: "Institution Staff",
-};
-
 const SKELETON_ROW_COUNT = 5;
 
 /**
@@ -56,6 +50,7 @@ const SKELETON_ROW_COUNT = 5;
  */
 export const UsersTableSkeleton: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   return (
     <TableContainer
       component={Paper}
@@ -70,12 +65,12 @@ export const UsersTableSkeleton: React.FC = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Email</TableCell>
-            <TableCell>Display Name</TableCell>
-            <TableCell>Role</TableCell>
-            <TableCell>Institution ID</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell align="right">Actions</TableCell>
+            <TableCell>{t("users.table.email")}</TableCell>
+            <TableCell>{t("users.table.name")}</TableCell>
+            <TableCell>{t("users.table.role")}</TableCell>
+            <TableCell>{t("users.table.institutionId")}</TableCell>
+            <TableCell>{t("users.table.status")}</TableCell>
+            <TableCell align="right">{t("users.table.actions")}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -116,6 +111,12 @@ const UsersTable: React.FC = () => {
   const { users, setUpdateUser, setDeleteUser } = useUsersContext();
   const canManage = UserStateService.getInstance().isSuperAdmin();
 
+  const ROLE_LABELS: Record<string, string> = {
+    [Role.SUPER_ADMIN]: t("users.roles.superAdmin"),
+    [Role.ADMIN]: t("users.roles.admin"),
+    [Role.INSTITUTION_STAFF]: t("users.roles.institutionStaff"),
+  };
+
   return (
     <TableContainer
       component={Paper}
@@ -130,12 +131,12 @@ const UsersTable: React.FC = () => {
       <Table data-testid={DATA_TEST_ID.USERS_TABLE}>
         <TableHead>
           <TableRow>
-            <TableCell>{t("users.table.email", "Email")}</TableCell>
-            <TableCell>{t("users.table.name", "Display Name")}</TableCell>
-            <TableCell>{t("users.table.role", "Role")}</TableCell>
-            <TableCell>{t("users.table.institutionId", "Institution ID")}</TableCell>
-            <TableCell>{t("users.table.status", "Status")}</TableCell>
-            {canManage && <TableCell align="right">{t("users.table.actions", "Actions")}</TableCell>}
+            <TableCell>{t("users.table.email")}</TableCell>
+            <TableCell>{t("users.table.name")}</TableCell>
+            <TableCell>{t("users.table.role")}</TableCell>
+            <TableCell>{t("users.table.institutionId")}</TableCell>
+            <TableCell>{t("users.table.status")}</TableCell>
+            {canManage && <TableCell align="right">{t("users.table.actions")}</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -147,7 +148,7 @@ const UsersTable: React.FC = () => {
                 sx={{ py: 4, color: "text.secondary" }}
                 data-testid={DATA_TEST_ID.USERS_TABLE_EMPTY}
               >
-                {t("users.table.empty", "No users found")}
+                {t("users.table.empty")}
               </TableCell>
             </TableRow>
           ) : (
@@ -170,12 +171,12 @@ const UsersTable: React.FC = () => {
                       fontWeight: 500,
                     }}
                   >
-                    {user.disabled ? t("users.status.inactive", "Inactive") : t("users.status.active", "Active")}
+                    {user.disabled ? t("users.status.inactive") : t("users.status.active")}
                   </Box>
                 </TableCell>
                 {canManage && (
                   <TableCell align="right">
-                    <Tooltip title={t("users.actions.editRole", "Edit Role")}>
+                    <Tooltip title={t("users.actions.editRole")}>
                       <IconButton
                         size="small"
                         onClick={() => setUpdateUser(user)}
@@ -184,7 +185,7 @@ const UsersTable: React.FC = () => {
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={t("users.actions.delete", "Delete User")}>
+                    <Tooltip title={t("users.actions.delete")}>
                       <IconButton
                         size="small"
                         onClick={() => setDeleteUser(user)}

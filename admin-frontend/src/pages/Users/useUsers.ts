@@ -29,7 +29,7 @@ const useUsers = (): UsersContextValue => {
       const response = await usersService.listUsers();
       setUsers(response.users);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("users.error.loadFailed", "Failed to load users"));
+      setError(err instanceof Error ? err.message : t("users.error.loadFailed"));
     } finally {
       setLoading(false);
     }

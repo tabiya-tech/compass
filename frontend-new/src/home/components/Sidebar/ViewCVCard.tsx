@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Box, useTheme } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useTranslation } from "react-i18next";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 
 const uniqueId = "e4f5a6b7-c8d9-0123-efab-456789012345";
@@ -15,6 +16,7 @@ interface ViewCVCardProps {
 
 const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
 
   const handleClick = () => {
@@ -82,7 +84,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
             lineHeight: 1.3,
           }}
         >
-          View my Skills Report
+          {t("home.profile.viewMyCv")}
         </Box>
         <Box
           sx={{
@@ -92,7 +94,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
             marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           }}
         >
-          Download and share your personalized Skills Report
+          {t("home.profile.viewMyCvSubtitle")}
         </Box>
       </Box>
       <ChevronRightIcon sx={{ color: theme.palette.text.secondary, fontSize: "18px", flexShrink: 0 }} />

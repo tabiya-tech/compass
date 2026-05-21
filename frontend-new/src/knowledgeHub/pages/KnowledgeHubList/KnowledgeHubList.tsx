@@ -32,21 +32,27 @@ const ICON_BY_SECTOR: Record<string, string> = {
 const SECTOR_TRANSLATION_KEYS = {
   energy: {
     title: "knowledgeHub.sectors.energy.title",
+    description: "knowledgeHub.sectors.energy.description",
   },
   mining: {
     title: "knowledgeHub.sectors.mining.title",
+    description: "knowledgeHub.sectors.mining.description",
   },
   hospitality: {
     title: "knowledgeHub.sectors.hospitality.title",
+    description: "knowledgeHub.sectors.hospitality.description",
   },
   agriculture: {
     title: "knowledgeHub.sectors.agriculture.title",
+    description: "knowledgeHub.sectors.agriculture.description",
   },
   water: {
     title: "knowledgeHub.sectors.water.title",
+    description: "knowledgeHub.sectors.water.description",
   },
   health: {
     title: "knowledgeHub.sectors.health.title",
+    description: "knowledgeHub.sectors.health.description",
   },
 } as const;
 
@@ -230,11 +236,10 @@ const KnowledgeHubList: React.FC = () => {
             <Stack spacing={theme.fixedSpacing(6)} data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_LIST}>
               {documents.map((doc) => {
                 const sectorKey = getSectorKey(doc);
+                if (!isSectorTranslationKey(sectorKey)) return null;
+                const sectorTranslation = SECTOR_TRANSLATION_KEYS[sectorKey];
                 const iconSrc = getSectorIconSrc(doc);
-                const sectorTranslation = isSectorTranslationKey(sectorKey)
-                  ? SECTOR_TRANSLATION_KEYS[sectorKey]
-                  : undefined;
-                const displayName = sectorTranslation ? t(sectorTranslation.title) : doc.title;
+                const displayName = t(sectorTranslation.title);
                 const discoverLabel = displayName.toLowerCase();
 
                 return (
@@ -268,7 +273,7 @@ const KnowledgeHubList: React.FC = () => {
                           color: theme.palette.text.primary,
                         }}
                       >
-                        {doc.description}
+                        {t(sectorTranslation.description)}
                       </Typography>
                       <Typography
                         component="button"

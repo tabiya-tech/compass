@@ -58,7 +58,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
         // Keep the dialog open with a Resend prompt.
         setEmailFailedFor(e.email);
       } else {
-        setError(e instanceof Error ? e.message : t("registrations.approve.error", "Failed to approve registration"));
+        setError(e instanceof Error ? e.message : t("registrations.approve.error"));
       }
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
 
   return (
     <Dialog open={!!registration} onClose={handleClose} maxWidth="sm" fullWidth data-testid={DATA_TEST_ID.DIALOG}>
-      <DialogTitle>{t("registrations.approve.title", "Approve Sign-up")}</DialogTitle>
+      <DialogTitle>{t("registrations.approve.title")}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -111,7 +111,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
         {showingResendState ? (
           <>
             <Button onClick={handleClose} disabled={resending} data-testid={DATA_TEST_ID.CLOSE}>
-              {t("common.close", "Close")}
+              {t("common.close")}
             </Button>
             <Button
               onClick={handleResend}
@@ -120,13 +120,13 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
               disabled={resending}
               data-testid={DATA_TEST_ID.RESEND}
             >
-              {resending ? <CircularProgress size={20} /> : t("registrations.approve.resend", "Resend email")}
+              {resending ? <CircularProgress size={20} /> : t("registrations.approve.resend")}
             </Button>
           </>
         ) : (
           <>
             <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CANCEL}>
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleConfirm}
@@ -135,7 +135,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
               disabled={loading}
               data-testid={DATA_TEST_ID.CONFIRM}
             >
-              {loading ? <CircularProgress size={20} /> : t("registrations.approve.submit", "Approve")}
+              {loading ? <CircularProgress size={20} /> : t("registrations.approve.submit")}
             </Button>
           </>
         )}

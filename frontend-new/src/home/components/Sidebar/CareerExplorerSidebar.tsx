@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import SidebarService from "src/home/components/Sidebar/SidebarService";
 import type { SectorData, SectorItem } from "src/home/components/Sidebar/SidebarService";
@@ -91,6 +92,7 @@ interface CareerExplorerSidebarProps {
 
 const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshToken = 0 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [data, setData] = useState<SectorData | null>(null);
   const cancelledRef = useRef(false);
 
@@ -112,7 +114,7 @@ const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshTo
   const sectors = data?.sectors ?? [];
 
   return (
-    <Sidebar title="Sectors Explored">
+    <Sidebar title={t("home.sidebar.careerExplorer.title")}>
       {sectors.length === 0 ? (
         <Box
           data-testid={DATA_TEST_ID.CAREER_EXPLORER_SIDEBAR_EMPTY}
@@ -122,7 +124,7 @@ const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshTo
             color: theme.palette.text.secondary,
           }}
         >
-          Sectors will appear here as you explore careers with Njila.
+          {t("home.sidebar.careerExplorer.emptyState")}
         </Box>
       ) : (
         <Box>

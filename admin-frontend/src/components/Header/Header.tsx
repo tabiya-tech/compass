@@ -45,7 +45,7 @@ const Header: React.FC = () => {
     () => [
       {
         id: "profile",
-        text: t("header.profile", "profile"),
+        text: t("header.profile"),
         disabled: false,
         action: () => {
           setAnchorEl(null);
@@ -135,7 +135,7 @@ const Header: React.FC = () => {
                 overlap="rectangular"
                 sx={{ pr: pendingCount > 0 ? 1.5 : 0 }}
               >
-                {t("header.users", "Users")}
+                {t("header.users")}
               </Badge>
             </NavLink>
           )}

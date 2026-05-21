@@ -99,11 +99,11 @@ const InstitutionAutocomplete: React.FC<InstitutionAutocompleteProps> = ({
       renderInput={(params) => (
         <TextField
           {...params}
-          label={t("users.institutionAutocomplete.label", "Institution")}
+          label={t("users.institutionAutocomplete.label")}
           margin="normal"
           required={required}
           error={!!error}
-          helperText={error ? t("users.institutionAutocomplete.loadError", "Failed to load institutions") : undefined}
+          helperText={error ? t("users.institutionAutocomplete.loadError") : undefined}
           data-testid={DATA_TEST_ID.INSTITUTION_AUTOCOMPLETE_INPUT}
           slotProps={{
             input: {

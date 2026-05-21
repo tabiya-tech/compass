@@ -689,7 +689,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 addMessageToChat(
                   generateCompassMessage(
                     `bws-transition-${messageItem.message_id}`,
-                    "Now I'd like to understand what you value most in a job. I'll show you a few sets of work activities — for each, choose the one you'd **most** prefer and the one you'd **least** prefer.",
+                    t("chat.chat.bwsTransitionMessage"),
                     messageItem.sent_at,
                     null
                   )
@@ -841,7 +841,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                   return [
                     generateCompassMessage(
                       `bws-transition-${message.message_id}`,
-                      "Now I'd like to understand what you value most in a job. I'll show you a few sets of work activities — for each, choose the one you'd **most** prefer and the one you'd **least** prefer.",
+                      t("chat.chat.bwsTransitionMessage"),
                       message.sent_at,
                       null
                     ),
@@ -930,6 +930,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
       setConversationConductedAt,
       theme,
       newSessionEnabled,
+      t,
     ]
   );
 

@@ -48,17 +48,17 @@ const Login: React.FC<LoginProps> = () => {
       case FirebaseErrorCodes.USER_NOT_FOUND:
       case FirebaseErrorCodes.WRONG_PASSWORD:
       case FirebaseErrorCodes.INVALID_CREDENTIAL:
-        return t("login.errors.invalidCredentials", "Invalid email or password");
+        return t("login.errors.invalidCredentials");
       case FirebaseErrorCodes.USER_DISABLED:
-        return t("login.errors.userDisabled", "This account has been disabled");
+        return t("login.errors.userDisabled");
       case FirebaseErrorCodes.TOO_MANY_REQUESTS:
-        return t("login.errors.tooManyRequests", "Too many failed attempts. Please try again later");
+        return t("login.errors.tooManyRequests");
       case FirebaseErrorCodes.NETWORK_REQUEST_FAILED:
-        return t("login.errors.networkError", "Network error. Please check your connection");
+        return t("login.errors.networkError");
       case FirebaseErrorCodes.INVALID_EMAIL:
-        return t("login.errors.invalidEmail", "Please enter a valid email address");
+        return t("login.errors.invalidEmail");
       default:
-        return t("login.errors.generic", "Login failed. Please try again");
+        return t("login.errors.generic");
     }
   };
 
@@ -66,7 +66,7 @@ const Login: React.FC<LoginProps> = () => {
     event.preventDefault();
 
     if (!email || !password) {
-      enqueueSnackbar(t("login.errors.fillAllFields", "Please fill in all fields"), { variant: "warning" });
+      enqueueSnackbar(t("login.errors.fillAllFields"), { variant: "warning" });
       return;
     }
 
@@ -119,7 +119,7 @@ const Login: React.FC<LoginProps> = () => {
       if (error instanceof FirebaseError) {
         enqueueSnackbar(getErrorMessage(error), { variant: "error" });
       } else {
-        enqueueSnackbar(t("login.errors.generic", "Login failed. Please try again"), { variant: "error" });
+        enqueueSnackbar(t("login.errors.generic"), { variant: "error" });
       }
     } finally {
       setIsLoading(false);
@@ -157,7 +157,7 @@ const Login: React.FC<LoginProps> = () => {
             <Box
               component="img"
               src={logoSrc}
-              alt={t("login.logoAlt", "Logo")}
+              alt={t("login.logoAlt")}
               data-testid={DATA_TEST_ID.LOGIN_PAGE_LOGO}
               onError={() => {
                 setLogoSrc((prev) => (prev === preferredLocal ? prev : preferredLocal));
@@ -177,7 +177,7 @@ const Login: React.FC<LoginProps> = () => {
             textAlign="center"
             data-testid={DATA_TEST_ID.LOGIN_PAGE_TITLE}
           >
-            {t("login.title", "Admin Login")}
+            {t("login.title")}
           </Typography>
 
           <Typography
@@ -186,13 +186,13 @@ const Login: React.FC<LoginProps> = () => {
             textAlign="center"
             sx={{ marginBottom: theme.tabiyaSpacing.lg }}
           >
-            {t("login.subtitle", "Sign in to access the admin portal")}
+            {t("login.subtitle")}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <TextField
               fullWidth
-              label={t("login.email", "Email")}
+              label={t("login.email")}
               type="email"
               margin="normal"
               required
@@ -205,7 +205,7 @@ const Login: React.FC<LoginProps> = () => {
             />
             <TextField
               fullWidth
-              label={t("login.password", "Password")}
+              label={t("login.password")}
               type="password"
               margin="normal"
               required
@@ -226,15 +226,15 @@ const Login: React.FC<LoginProps> = () => {
               {isLoading ? (
                 <CircularProgress size={24} color="inherit" data-testid={DATA_TEST_ID.LOGIN_PAGE_LOADING_SPINNER} />
               ) : (
-                t("login.submit", "Sign In")
+                t("login.submit")
               )}
             </Button>
             <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
               <Link component="button" type="button" onClick={() => navigate(routerPaths.FORGOT_PASSWORD)}>
-                {t("login.forgotPassword", "Forgot password?")}
+                {t("login.forgotPassword")}
               </Link>
               <Link component="button" type="button" onClick={() => navigate(routerPaths.REGISTER)}>
-                {t("login.requestAccess", "Request access")}
+                {t("login.requestAccess")}
               </Link>
             </Box>
           </Box>

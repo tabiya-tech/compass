@@ -36,11 +36,6 @@ export const DATA_TEST_ID = {
   REGISTER_PAGE_SUCCESS: `${uniqueId}-success`,
 };
 
-const ROLE_LABELS: Record<RegistrationRoleRequest, string> = {
-  [RegistrationRoleRequest.ADMIN]: "Cross-institution admin",
-  [RegistrationRoleRequest.INSTITUTION_STAFF]: "Instructor",
-};
-
 const Register: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -74,9 +69,9 @@ const Register: React.FC = () => {
       setSubmitted(true);
     } catch (err: unknown) {
       if (err instanceof HttpError && err.status === 409) {
-        setError(t("register.errors.alreadyExists", "An active registration already exists for this email."));
+        setError(t("register.errors.alreadyExists"));
       } else {
-        setError(t("register.errors.generic", "Failed to submit registration. Please try again."));
+        setError(t("register.errors.generic"));
       }
     } finally {
       setSubmitting(false);
@@ -112,7 +107,7 @@ const Register: React.FC = () => {
             <Box
               component="img"
               src={preferredSrc}
-              alt={t("register.logoAlt", "Logo")}
+              alt={t("register.logoAlt")}
               data-testid={DATA_TEST_ID.REGISTER_PAGE_LOGO}
               sx={{ height: 64, width: "auto", maxWidth: "100%" }}
             />
@@ -125,15 +120,12 @@ const Register: React.FC = () => {
             textAlign="center"
             data-testid={DATA_TEST_ID.REGISTER_PAGE_TITLE}
           >
-            {t("register.title", "Request Access")}
+            {t("register.title")}
           </Typography>
 
           {submitted ? (
             <Alert severity="success" sx={{ mt: 2 }} data-testid={DATA_TEST_ID.REGISTER_PAGE_SUCCESS}>
-              {t(
-                "register.success",
-                "Thanks — we received your request. You'll get an email once a super admin reviews and approves your account."
-              )}
+              {t("register.success")}
             </Alert>
           ) : (
             <>
@@ -143,10 +135,7 @@ const Register: React.FC = () => {
                 textAlign="center"
                 sx={{ marginBottom: theme.tabiyaSpacing.lg }}
               >
-                {t(
-                  "register.subtitle",
-                  "Sign up as an instructor or cross-institution admin. A super admin will review your request."
-                )}
+                {t("register.subtitle")}
               </Typography>
 
               {error && (
@@ -158,7 +147,7 @@ const Register: React.FC = () => {
               <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <TextField
                   fullWidth
-                  label={t("register.email", "Email")}
+                  label={t("register.email")}
                   type="email"
                   margin="normal"
                   required
@@ -170,7 +159,7 @@ const Register: React.FC = () => {
                 />
                 <TextField
                   fullWidth
-                  label={t("register.name", "Full name")}
+                  label={t("register.name")}
                   margin="normal"
                   required
                   value={name}
@@ -180,20 +169,18 @@ const Register: React.FC = () => {
                 />
 
                 <FormControl fullWidth margin="normal" required>
-                  <InputLabel>{t("register.role", "Role")}</InputLabel>
+                  <InputLabel>{t("register.role")}</InputLabel>
                   <Select
                     value={role}
-                    label={t("register.role", "Role")}
+                    label={t("register.role")}
                     onChange={(e) => setRole(e.target.value as RegistrationRoleRequest)}
                     disabled={submitting}
                     data-testid={DATA_TEST_ID.REGISTER_PAGE_ROLE}
                   >
                     <MenuItem value={RegistrationRoleRequest.INSTITUTION_STAFF}>
-                      {ROLE_LABELS[RegistrationRoleRequest.INSTITUTION_STAFF]}
+                      {t("registrations.roles.institutionStaff")}
                     </MenuItem>
-                    <MenuItem value={RegistrationRoleRequest.ADMIN}>
-                      {ROLE_LABELS[RegistrationRoleRequest.ADMIN]}
-                    </MenuItem>
+                    <MenuItem value={RegistrationRoleRequest.ADMIN}>{t("registrations.roles.admin")}</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -217,7 +204,7 @@ const Register: React.FC = () => {
                   sx={{ mt: 3, mb: 2, height: 48 }}
                   data-testid={DATA_TEST_ID.REGISTER_PAGE_SUBMIT}
                 >
-                  {submitting ? <CircularProgress size={24} color="inherit" /> : t("register.submit", "Submit request")}
+                  {submitting ? <CircularProgress size={24} color="inherit" /> : t("register.submit")}
                 </Button>
               </Box>
             </>
@@ -225,7 +212,7 @@ const Register: React.FC = () => {
 
           <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
             <Link component="button" type="button" onClick={() => navigate(routerPaths.LOGIN)}>
-              {t("register.backToLogin", "Back to login")}
+              {t("register.backToLogin")}
             </Link>
           </Typography>
         </Box>

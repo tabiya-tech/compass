@@ -36,13 +36,26 @@
         "unableToProcessRequest": "Unable to process the request. Please try again."
       }
     },
+    "dataTable": {
+      "sortAscending": "Sort ascending",
+      "sortDescending": "Sort descending",
+      "sortAscText": "Sort A-Z",
+      "sortDescText": "Sort Z-A",
+      "noData": "No data",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageAriaLabel": "Page {{page}}",
+      "filterAriaLabel": "Filter {{column}}"
+    },
     "status": {
       "loading": "Loading...",
       "saving": "Saving..."
     },
     "modal": {
       "areYouSure": "Are you sure?"
-    }
+    },
+    "cancel": "Cancel",
+    "close": "Close"
   },
   "auth": {
     "pages": {
@@ -111,14 +124,19 @@
     "role": {
       "admin": "Admin",
       "institutionStaff": "Institution Staff"
-    }
+    },
+    "profile": "Profile",
+    "users": "Users"
   },
   "footer": {
     "privacyPolicy": "Privacy Policy",
     "termsOfUse": "Terms of Use",
     "accessibility": "Accessibility",
     "contact": "Contact",
-    "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya."
+    "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya.",
+    "worldBankLogoAlt": "World Bank Group Logo",
+    "ministryTechLogoAlt": "Ministry of Technology Logo",
+    "tabiyaLogoAlt": "Tabiya Logo"
   },
   "dashboard": {
     "sectionTitle": "Administrator dashboard — cross-institutional monitoring and analytics",
@@ -130,7 +148,8 @@
       "institutions": "Institutions",
       "modules": "Modules",
       "skillsAnalytics": "Skills Analytics",
-      "jobPostings": "Job Postings"
+      "jobPostings": "Job Postings",
+      "ariaLabel": "Dashboard tabs"
     },
     "dataTable": {
       "clearSorting": "Clear sorting"
@@ -228,7 +247,9 @@
       },
       "filters": {
         "allProvinces": "All Provinces",
-        "allSectors": "All Sectors"
+        "allSectors": "All Sectors",
+        "searchProvinces": "Search provinces...",
+        "searchSectors": "Search sectors..."
       }
     },
     "pagination": {
@@ -366,7 +387,20 @@
     "title": "Admin Login",
     "email": "Email",
     "password": "Password",
-    "submit": "Sign In"
+    "submit": "Sign In",
+    "subtitle": "Sign in to access the admin portal",
+    "logoAlt": "Logo",
+    "forgotPassword": "Forgot password?",
+    "requestAccess": "Request access",
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "userDisabled": "This account has been disabled",
+      "tooManyRequests": "Too many failed attempts. Please try again later",
+      "networkError": "Network error. Please check your connection",
+      "invalidEmail": "Please enter a valid email address",
+      "generic": "Login failed. Please try again",
+      "fillAllFields": "Please fill in all fields"
+    }
   },
   "notFound": {
     "message": "Page Not Found",
@@ -399,7 +433,10 @@
       "name": "Display Name",
       "role": "Role",
       "institutionId": "Institution ID",
-      "submit": "Create User"
+      "submit": "Create User",
+      "emailAlreadyExists": "A user with this email already exists",
+      "emailFailed": "Created {{email}}, but the password-reset email failed to send. You can retry now or send it later from the Forgot Password page.",
+      "resend": "Resend email"
     },
     "updateRoleModal": {
       "title": "Update Role",
@@ -417,6 +454,114 @@
       "createFailed": "Failed to create user",
       "updateFailed": "Failed to update role",
       "deleteFailed": "Failed to delete user"
+    },
+    "roles": {
+      "superAdmin": "Super Admin",
+      "admin": "Admin",
+      "institutionStaff": "Institution Staff"
+    },
+    "tabs": {
+      "active": "Active Users",
+      "pending": "Pending Sign-ups"
+    },
+    "institutionAutocomplete": {
+      "label": "Institution",
+      "loadError": "Failed to load institutions"
+    }
+  },
+  "register": {
+    "title": "Request Access",
+    "subtitle": "Sign up as an instructor or cross-institution admin. A super admin will review your request.",
+    "email": "Email",
+    "name": "Full name",
+    "role": "Role",
+    "submit": "Submit request",
+    "success": "Thanks — we received your request. You'll get an email once a super admin reviews and approves your account.",
+    "backToLogin": "Back to login",
+    "logoAlt": "Logo",
+    "roles": {
+      "admin": "Cross-institution admin",
+      "institutionStaff": "Instructor"
+    },
+    "errors": {
+      "alreadyExists": "An active registration already exists for this email.",
+      "generic": "Failed to submit registration. Please try again."
+    }
+  },
+  "registrations": {
+    "table": {
+      "email": "Email",
+      "name": "Name",
+      "role": "Requested role",
+      "institution": "Institution",
+      "submittedAt": "Submitted",
+      "actions": "Actions",
+      "empty": "No pending sign-ups"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "roles": {
+      "admin": "Cross-institution admin",
+      "institutionStaff": "Instructor"
+    },
+    "loading": "Loading…",
+    "approve": {
+      "title": "Approve Sign-up",
+      "error": "Failed to approve registration",
+      "resend": "Resend email",
+      "submit": "Approve"
+    },
+    "reject": {
+      "title": "Reject Sign-up",
+      "error": "Failed to reject registration",
+      "reasonLabel": "Reason",
+      "submit": "Reject"
+    }
+  },
+  "forgotPassword": {
+    "logoAlt": "Logo",
+    "title": "Reset your password",
+    "success": "If an account exists for that email, we've sent reset instructions.",
+    "subtitle": "Enter your email and we'll send a link to reset your password.",
+    "email": "Email",
+    "submit": "Send reset link",
+    "backToLogin": "Back to login"
+  },
+  "profile": {
+    "title": "My Profile",
+    "section": {
+      "profileInfo": "Profile Information",
+      "changePassword": "Change Password"
+    },
+    "field": {
+      "name": "Display Name",
+      "email": "Email",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password"
+    },
+    "action": {
+      "save": "Save Changes",
+      "changePassword": "Change Password"
+    },
+    "success": {
+      "profileUpdated": "Profile updated successfully.",
+      "passwordChanged": "Password changed successfully."
+    },
+    "error": {
+      "noUser": "User not found. Please log in again.",
+      "nameEmailRequired": "Name and email are required.",
+      "emailAlreadyExists": "A user with this email already exists.",
+      "saveFailed": "Failed to update profile.",
+      "currentPasswordRequired": "Current password is required.",
+      "newPasswordRequired": "New password is required.",
+      "passwordMismatch": "New passwords do not match.",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "wrongPassword": "Current password is incorrect.",
+      "requiresRecentLogin": "Please log out and log back in before changing your password.",
+      "passwordChangeFailed": "Failed to change password."
     }
   }
 }

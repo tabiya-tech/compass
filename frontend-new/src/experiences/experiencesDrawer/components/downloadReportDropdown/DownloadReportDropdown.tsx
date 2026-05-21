@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Experience } from "src/experiences/experienceService/experiences.types";
 import { MenuItemConfig } from "src/theme/ContextMenu/menuItemConfig.types";
 import DownloadReportButton from "src/experiences/experiencesDrawer/components/downloadReportButton/DownloadReportButton";
@@ -39,12 +40,8 @@ export const MENU_ITEM_ID = {
   DOCX: `${uniqueId}-docx`,
 };
 
-export const MENU_ITEM_TEXT = {
-  PDF: "PDF",
-  DOCX: "DOCX",
-};
-
 const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) => {
+  const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,13 +96,13 @@ const DownloadReportDropdown: React.FC<DownloadReportDropdownProps> = (props) =>
   const allMenuItems: Record<DownloadFormat, MenuItemConfig> = {
     [DownloadFormat.PDF]: {
       id: MENU_ITEM_ID.PDF,
-      text: MENU_ITEM_TEXT.PDF,
+      text: t("experiences.report.format.pdf"),
       disabled: !isOnline,
       action: () => handleDownload(pdfReportProvider, CVFormat.PDF),
     },
     [DownloadFormat.DOCX]: {
       id: MENU_ITEM_ID.DOCX,
-      text: MENU_ITEM_TEXT.DOCX,
+      text: t("experiences.report.format.docx"),
       disabled: !isOnline,
       action: () => handleDownload(docxsReportProvider, CVFormat.DOCX),
     },

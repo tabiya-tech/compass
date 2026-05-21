@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import SidebarService from "src/home/components/Sidebar/SidebarService";
 import type { SkillsData } from "src/home/components/Sidebar/SidebarService";
@@ -59,6 +60,7 @@ interface SkillsDiscoverySidebarProps {
 }
 
 const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ currentPhase, refreshToken = 0 }) => {
+  const { t } = useTranslation();
   const [data, setData] = useState<SkillsData | null>(null);
   const [programmeSkills, setProgrammeSkills] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
@@ -89,7 +91,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
   const hasAnySkills = workSkills.length > 0 || programmeSkills.length > 0;
 
   return (
-    <Sidebar title="Skills Identified" width="100%">
+    <Sidebar title={t("home.sidebar.skillsDiscovery.title")} width="100%">
       {/* Progress bar */}
       <ChatProgressBar {...currentPhase} />
 
@@ -140,7 +142,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
               wordBreak: "break-word",
             }}
           >
-            Skills will appear here as you complete the "Build Your Profile" chat
+            {t("home.sidebar.skillsDiscovery.emptyState")}
           </Box>
         </Box>
       ) : (
@@ -148,7 +150,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
           {/* Work & life skills */}
           {workSkills.length > 0 && (
             <Box>
-              <Box sx={subsectionLabelSx}>From work &amp; life</Box>
+              <Box sx={subsectionLabelSx}>{t("home.sidebar.skillsDiscovery.fromWorkAndLife")}</Box>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {visibleWorkSkills.map((label, i) => (
                   <Box
@@ -179,7 +181,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
                     "&:hover": { textDecoration: "underline" },
                   }}
                 >
-                  {expanded ? "Show Less" : `See All ${workSkills.length} →`}
+                  {expanded ? t("home.sidebar.showLess") : t("home.sidebar.seeAll", { count: workSkills.length })}
                 </Box>
               )}
             </Box>
@@ -188,7 +190,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
           {/* Programme skills */}
           {programmeSkills.length > 0 && (
             <Box>
-              <Box sx={subsectionLabelSx}>From TEVET programme</Box>
+              <Box sx={subsectionLabelSx}>{t("home.sidebar.skillsDiscovery.fromTEVET")}</Box>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {programmeSkills.map((label, i) => (
                   <Box key={i} sx={tagSx(TOKEN.amberBg, TOKEN.amberText)}>

@@ -49,7 +49,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ registration, onClose, onConf
       setReason("");
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("registrations.reject.error", "Failed to reject registration"));
+      setError(e instanceof Error ? e.message : t("registrations.reject.error"));
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ registration, onClose, onConf
 
   return (
     <Dialog open={!!registration} onClose={handleClose} maxWidth="sm" fullWidth data-testid={DATA_TEST_ID.DIALOG}>
-      <DialogTitle>{t("registrations.reject.title", "Reject Sign-up")}</DialogTitle>
+      <DialogTitle>{t("registrations.reject.title")}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -77,7 +77,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ registration, onClose, onConf
           required
           multiline
           rows={3}
-          label={t("registrations.reject.reasonLabel", "Reason")}
+          label={t("registrations.reject.reasonLabel")}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           disabled={loading}
@@ -87,7 +87,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ registration, onClose, onConf
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CANCEL}>
-          {t("common.cancel", "Cancel")}
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleConfirm}
@@ -96,7 +96,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ registration, onClose, onConf
           disabled={loading || reason.trim() === ""}
           data-testid={DATA_TEST_ID.CONFIRM}
         >
-          {loading ? <CircularProgress size={20} /> : t("registrations.reject.submit", "Reject")}
+          {loading ? <CircularProgress size={20} /> : t("registrations.reject.submit")}
         </Button>
       </DialogActions>
     </Dialog>

@@ -14,6 +14,7 @@ import {
   TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useTranslation } from "react-i18next";
 
 const SEARCHABLE_THRESHOLD = 5;
 import { MultipleSelectFieldDefinition } from "src/sensitiveData/components/sensitiveDataForm/config/types";
@@ -40,6 +41,7 @@ interface MultipleFieldProps {
  * Component for rendering dropdown/select fields with multiple selection
  */
 const MultipleSelectField: React.FC<MultipleFieldProps> = ({ field, dataTestId, initialValue = [], onChange }) => {
+  const { t } = useTranslation();
   const [selectedValues, setSelectedValues] = useState<string[]>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,7 +57,9 @@ const MultipleSelectField: React.FC<MultipleFieldProps> = ({ field, dataTestId, 
     if (field.required && (!values || values.length === 0)) {
       return {
         isValid: false,
-        errorMessage: `Please select at least one ${field.label.toLowerCase()}`,
+        errorMessage: t("sensitiveData.components.multipleSelectField.selectAtLeastOne", {
+          field: field.label.toLowerCase(),
+        }),
       };
     }
 
@@ -131,13 +135,13 @@ const MultipleSelectField: React.FC<MultipleFieldProps> = ({ field, dataTestId, 
               <TextField
                 size="small"
                 autoFocus
-                placeholder="Search…"
+                placeholder={t("sensitiveData.components.multipleSelectField.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.stopPropagation()}
                 slotProps={{
                   input: { startAdornment: <SearchIcon fontSize="small" sx={{ mr: 0.5, color: "text.disabled" }} /> },
-                  htmlInput: { "aria-label": "search options" },
+                  htmlInput: { "aria-label": t("sensitiveData.components.multipleSelectField.searchAriaLabel") },
                 }}
                 sx={{ width: "100%" }}
               />

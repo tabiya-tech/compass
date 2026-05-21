@@ -79,7 +79,7 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
             <Box
               component="img"
               src={`${process.env.PUBLIC_URL}/world-bank-logo.svg`}
-              alt="World Bank Group Logo"
+              alt={t("home.footer.worldBankLogoAlt")}
               data-testid={DATA_TEST_ID.FOOTER_WORLD_BANK_LOGO}
               sx={{
                 height: 28,
@@ -92,7 +92,7 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
             <Box
               component="img"
               src={`${process.env.PUBLIC_URL}/ministry-tech.png`}
-              alt="Ministry of Technology Logo"
+              alt={t("home.footer.ministryTechLogoAlt")}
               data-testid={DATA_TEST_ID.FOOTER_MINISTRY_TECH_LOGO}
               sx={{
                 height: 36,
@@ -103,7 +103,7 @@ const Footer: React.FC<FooterProps> = ({ sx }) => {
             <Box
               component="img"
               src={`${process.env.PUBLIC_URL}/tabiya-logo.svg`}
-              alt="Tabiya Logo"
+              alt={t("home.footer.tabiyaLogoAlt")}
               data-testid={DATA_TEST_ID.FOOTER_TABIYA_LOGO}
               sx={{ height: 46, width: "auto", objectFit: "contain" }}
             />

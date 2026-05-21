@@ -23,6 +23,7 @@ import {
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import { useTranslation } from "react-i18next";
 import { useSortableData } from "src/hooks/useSortableData";
 
 // ─── Column & Group definitions ──────────────────────────────────────────────
@@ -116,6 +117,7 @@ function FilterIconButton<T>({
   onSortClear,
   sortClearLabel,
 }: FilterIconButtonProps<T>) {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
   const theme = useTheme();
@@ -124,8 +126,10 @@ function FilterIconButton<T>({
   const isFiltered = hasFilter && col.filter!.value !== "all" && col.filter!.value !== "";
   const isActive = isFiltered || isActiveSortKey;
 
-  const ascendingLabel = col.sortType === "number" ? "Sort ascending" : "Sort A-Z";
-  const descendingLabel = col.sortType === "number" ? "Sort descending" : "Sort Z-A";
+  const ascendingLabel =
+    col.sortType === "number" ? t("common.dataTable.sortAscending") : t("common.dataTable.sortAscText");
+  const descendingLabel =
+    col.sortType === "number" ? t("common.dataTable.sortDescending") : t("common.dataTable.sortDescText");
 
   return (
     <>
@@ -143,7 +147,7 @@ function FilterIconButton<T>({
           "&:hover": { opacity: 1, color: "text.primary" },
           flexShrink: 0,
         }}
-        aria-label={`filter ${String(col.key)}`}
+        aria-label={t("common.dataTable.filterAriaLabel", { column: String(col.key) })}
       >
         <FilterAltIcon sx={{ fontSize: "0.82rem" }} />
       </IconButton>
@@ -251,13 +255,13 @@ function DataTable<T extends { id: string }>({
   columnGroups,
   loading = false,
   skeletonRows = 8,
-  emptyMessage = "No data",
+  emptyMessage,
   search,
   page,
   totalPages,
   onPageChange,
-  prevPageLabel = "Previous page",
-  nextPageLabel = "Next page",
+  prevPageLabel,
+  nextPageLabel,
   pageLabel,
   externalSortKey,
   externalSortDir,
@@ -270,6 +274,10 @@ function DataTable<T extends { id: string }>({
   tableMinWidth,
 }: DataTableProps<T>): React.ReactElement {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t("common.dataTable.noData");
+  const resolvedPrevPageLabel = prevPageLabel ?? t("common.dataTable.prevPage");
+  const resolvedNextPageLabel = nextPageLabel ?? t("common.dataTable.nextPage");
 
   // ── Sorting ───────────────────────────────────────────────────────────────
   const controlled = externalSortKey !== undefined;
@@ -614,7 +622,7 @@ function DataTable<T extends { id: string }>({
                   sx={{ py: theme.fixedSpacing(theme.tabiyaSpacing.xl), borderBottom: 0 }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    {emptyMessage}
+                    {resolvedEmptyMessage}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -699,9 +707,9 @@ function DataTable<T extends { id: string }>({
               showFirstButton={false}
               showLastButton={false}
               getItemAriaLabel={(type, p) => {
-                if (type === "previous") return prevPageLabel;
-                if (type === "next") return nextPageLabel;
-                if (type === "page") return `Page ${p}`;
+                if (type === "previous") return resolvedPrevPageLabel;
+                if (type === "next") return resolvedNextPageLabel;
+                if (type === "page") return t("common.dataTable.pageAriaLabel", { page: p });
                 return type;
               }}
               sx={{

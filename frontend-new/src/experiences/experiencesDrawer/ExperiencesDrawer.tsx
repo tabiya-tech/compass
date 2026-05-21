@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next";
 import { getSkillsReportOutputConfig } from "../report/config/getConfig";
 import ShareReportButton from "src/experiences/experiencesDrawer/components/shareReportButton/ShareReportButton";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
+import i18n from "src/i18n/i18n";
 
 const LazyLoadedDownloadDropdown = lazyWithPreload(
   () => import("src/experiences/experiencesDrawer/components/downloadReportDropdown/DownloadReportDropdown")
@@ -60,10 +61,8 @@ export const DATA_TEST_ID = {
   PERSONAL_INFORMATION_TITLE: `personal-information-title-${uniqueId}`,
 };
 
-const notAvailable = "Not available";
-
 const emptyIfNotAvailable = (value: string | null | undefined): string =>
-  value && value !== notAvailable ? value : "";
+  value && value !== i18n.t("home.profile.notAvailable") ? value : "";
 
 const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   isOpen,
@@ -334,7 +333,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xl)}>
             <ExperiencesDrawerHeader
               notifyOnClose={handleClose}
-              title="Your Njila Skills Report"
+              title={t("experiences.experiencesDrawer.reportTitle")}
               lastUpdated={conversationConductedAt}
             />
             <Box
@@ -389,7 +388,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           {profileDisplay.school && (
             <Box display="flex" flexDirection="column" gap={theme.tabiyaSpacing.sm}>
               <Typography variant="overline" fontWeight="800" color={theme.palette.text.secondary}>
-                EDUCATION
+                {t("experiences.experiencesDrawer.educationLabel")}
               </Typography>
               <Box>
                 <Typography variant="body2">
@@ -426,7 +425,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
               <Box>
                 {experiences.length > 0 && (
                   <Typography variant="overline" fontWeight="800" color={theme.palette.text.secondary}>
-                    EXPERIENCES AND SKILLS
+                    {t("experiences.experiencesDrawer.experiencesAndSkillsLabel")}
                   </Typography>
                 )}
                 <Box display="flex" flexDirection="column" gap={isSmallMobile ? 8 : 4} paddingTop={2}>

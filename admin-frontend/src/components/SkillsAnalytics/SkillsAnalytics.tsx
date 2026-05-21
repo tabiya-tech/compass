@@ -202,14 +202,14 @@ const SkillsAnalytics: React.FC<SkillsAnalyticsProps> = ({ institution }) => {
               onChange={setProvince}
               allLabel={t("dashboard.skillsAnalytics.filters.allProvinces")}
               options={MODULE_FILTER_LOCATIONS}
-              searchPlaceholder="Search provinces..."
+              searchPlaceholder={t("dashboard.skillsAnalytics.filters.searchProvinces")}
             />
             <SearchableSelect
               value={sector}
               onChange={setSector}
               allLabel={t("dashboard.skillsAnalytics.filters.allSectors")}
               options={sectors}
-              searchPlaceholder="Search sectors..."
+              searchPlaceholder={t("dashboard.skillsAnalytics.filters.searchSectors")}
             />
           </Box>
         </Box>

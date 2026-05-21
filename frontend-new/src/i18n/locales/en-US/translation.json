@@ -224,7 +224,8 @@
         "question": "Would you like to wait for {{appName}} to finish, or refresh anyway?",
         "waitButton": "Wait for {{appName}}",
         "refreshButton": "Refresh"
-      }
+      },
+      "bwsTransitionMessage": "Now I'd like to understand what you value most in a job. I'll show you a few sets of work activities — for each, choose the one you'd **most** prefer and the one you'd **least** prefer."
     },
     "chatProgressbar": {
       "labels": {
@@ -544,7 +545,8 @@
           "shareTitle": "Experience Report",
           "shareText": "Check out my Experience Report",
           "shareFailed": "We couldn't share your report. You can still download it and share the file directly.",
-          "shareCanceled": "Sharing canceled because of user's request"
+          "shareCanceled": "Sharing canceled because of user's request",
+          "share": "Share"
         }
       },
       "deleteSuccess": "Experience deleted successfully!",
@@ -598,7 +600,10 @@
           "summaryMaxLength": "Maximum {{max}} characters allowed.",
           "timelineMaxLength": "Maximum {{max}} characters allowed."
         }
-      }
+      },
+      "reportTitle": "Your Njila Skills Report",
+      "educationLabel": "EDUCATION",
+      "experiencesAndSkillsLabel": "EXPERIENCES AND SKILLS"
     },
     "report": {
       "skillsReportTitle": "Skills Report",
@@ -616,7 +621,11 @@
         "part2": "Listed skills are based on a conversation with the candidate, are not verified or validated by Tabiya, and may be inaccurate. ",
         "part3": "Information should be checked before use for job search, job interviews, or for creating a CV. To revise this information, speak with {{appName}} again or create a complete CV based on this report."
       },
-      "bodyText": "This report summarizes the key information gathered during a conversation with {{appName}} on {{date}}. {{appName}} is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV."
+      "bodyText": "This report summarizes the key information gathered during a conversation with {{appName}} on {{date}}. {{appName}} is an AI chatbot that assists job-seekers in exploring their skills and experiences. This report presents the candidate’s work experience and the skills identified from each experience. This information can be used to guide job search and highlight their skills when applying for jobs, especially during interviews with potential employers. It can be a good starting point for creating a complete CV.",
+      "format": {
+        "pdf": "PDF",
+        "docx": "DOCX"
+      }
     }
   },
   "features": {
@@ -731,11 +740,41 @@
         "yesSkip": "Yes, skip",
         "shareData": "Share data",
         "skipping": "Skipping...",
-        "refreshPage": "Refresh Page"
+        "refreshPage": "Refresh Page",
+        "fields": {
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "institution": "Institution",
+          "institutionSearchPlaceholder": "Start typing to search...",
+          "programme": "Programme",
+          "programmeSelectPlaceholder": "Select programme",
+          "programmeSelectFirstPlaceholder": "Select an institution first",
+          "schoolYear": "School Year",
+          "typeAtLeastXChars": "Type at least 2 characters to search",
+          "searching": "Searching...",
+          "noInstitutionsFound": "No institutions found",
+          "selectInstitutionFirst": "Select an institution first",
+          "loadingProgrammes": "Loading programmes...",
+          "noProgrammesAvailable": "No programmes available"
+        },
+        "loadingForm": "Loading form...",
+        "schoolYearOptions": {
+          "year1": "Year 1",
+          "year2": "Year 2",
+          "year3": "Year 3",
+          "year4": "Year 4"
+        }
       },
       "enumField": {
         "pleaseSelectX": "Please select a {{x}}",
-        "clearSelection": "Clear selection"
+        "clearSelection": "Clear selection",
+        "searchPlaceholder": "Search…",
+        "searchAriaLabel": "Search options"
+      },
+      "multipleSelectField": {
+        "searchPlaceholder": "Search…",
+        "searchAriaLabel": "Search options",
+        "selectAtLeastOne": "Please select at least one {{field}}"
       }
     }
   },
@@ -1043,7 +1082,11 @@
           "title": "Health Sciences",
           "description": "Allied health, diagnostics, pharmacy, physiotherapy"
         }
-      }
+      },
+      "profileStrengthProgressAriaLabel": "Profile strength progress",
+      "educationSkillsProgressAriaLabel": "Education skills progress",
+      "workSkillsProgressAriaLabel": "Work skills progress",
+      "viewMyCvSubtitle": "Download and share your personalized Skills Report"
     },
     "modules": {
       "skillsDiscovery": "Build Your Profile",
@@ -1067,7 +1110,38 @@
       "termsOfUse": "Terms of Use",
       "accessibility": "Accessibility",
       "contact": "Contact",
-      "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya."
+      "collaboration": "{{appName}} is a free career guidance tool offered by the Zambia Ministry of Technology and Science, built in partnership with the World Bank Group and Tabiya.",
+      "worldBankLogoAlt": "World Bank Group Logo",
+      "ministryTechLogoAlt": "Ministry of Technology Logo",
+      "tabiyaLogoAlt": "Tabiya Logo"
+    },
+    "sidebar": {
+      "showLess": "Show Less",
+      "seeAll": "See All {{count}} →",
+      "skillsDiscovery": {
+        "title": "Skills Identified",
+        "emptyState": "Skills will appear here as you complete the \"Build Your Profile\" chat",
+        "fromWorkAndLife": "From work & life",
+        "fromTEVET": "From TEVET programme"
+      },
+      "careerExplorer": {
+        "title": "Sectors Explored",
+        "emptyState": "Sectors will appear here as you explore careers with Njila."
+      },
+      "careerReadiness": {
+        "title": "Topics"
+      },
+      "home": {
+        "skillsFromWork": "Skills From Work",
+        "skillsFromTEVET": "Skills from TEVET Program",
+        "myExperience": "My Experience",
+        "workSkillsEmpty": "Skills will appear here as you complete the \"Build Your Profile\" chat",
+        "programmeSkillsEmpty": "Programme skills will appear as you complete modules."
+      }
+    },
+    "moduleHandoff": {
+      "message": "Great work! Ready to keep going?",
+      "continueWith": "Continue with {{moduleLabel}}"
     }
   },
   "careerExplorer": {
@@ -1086,22 +1160,28 @@
     "discoverSectorCta": "Discover the {{sector}} sector →",
     "sectors": {
       "energy": {
-        "title": "Energy"
+        "title": "Energy",
+        "description": "Zambia's energy sector is undergoing a massive transformation, shifting towards renewable energy sources like solar and wind to complement its strong hydroelectric base."
       },
       "mining": {
-        "title": "Mining"
+        "title": "Mining",
+        "description": "The mining sector remains the economic backbone of Zambia, driving export earnings and technological advancement."
       },
       "hospitality": {
-        "title": "Hospitality & Tourism"
+        "title": "Hospitality & Tourism",
+        "description": "Zambia's rich natural heritage and growing business hubs make hospitality a vibrant sector."
       },
       "agriculture": {
-        "title": "Agriculture"
+        "title": "Agriculture",
+        "description": "Agriculture is the largest employer in Zambia, but it is shifting from subsistence farming to commercial agribusiness and technology-driven production."
       },
       "water": {
-        "title": "Water & Sanitation"
+        "title": "Water & Sanitation",
+        "description": "Water treatment, supply networks, sanitation infrastructure and waste management operations."
       },
       "health": {
-        "title": "Health Sciences"
+        "title": "Health Sciences",
+        "description": "Allied health sciences supports clinical care through diagnostics, rehabilitation, dispensing, laboratory work, and environmental health."
       }
     },
     "noDocumentsAvailable": "No documents available yet.",
@@ -1132,7 +1212,31 @@
     "navProgrammes": "Programmes",
     "navCriticalSkills": "Critical skills",
     "navInDevelopment": "In development",
-    "navKeepInMind": "Keep in mind"
+    "navKeepInMind": "Keep in mind",
+    "pageSectionsAriaLabel": "Page sections",
+    "programmeCount": "{{count}} programmes",
+    "zqf": {
+      "skillsAward": {
+        "label": "Skills Award",
+        "duration": "Short course"
+      },
+      "level3": {
+        "label": "Certificate Level 3",
+        "duration": "1 year"
+      },
+      "craftCertificate": {
+        "label": "Craft Certificate",
+        "duration": "2 years"
+      },
+      "advancedCertificate": {
+        "label": "Advanced Certificate",
+        "duration": "2.5 years"
+      },
+      "diploma": {
+        "label": "Diploma",
+        "duration": "3 years"
+      }
+    }
   },
   "jobMatching": {
     "pageTitle": "Job Matching",
@@ -1142,6 +1246,45 @@
       "emptyNoSkills": "Matched jobs are not available yet. Complete the \"Build Your Profile\" section to unlock personalised recommendations.",
       "emptyProgrammeNoMatches": "No matches yet. Complete the Build Your Profile chat to find jobs that fit your skills.",
       "emptySiNoMatches": "We don't have matches for you right now — check back later."
+    },
+    "tabs": {
+      "browse": "Browse Jobs",
+      "matched": "Matched for You"
+    },
+    "table": {
+      "sortAscending": "Sort ascending",
+      "sortDescending": "Sort descending",
+      "filterSearchPlaceholder": "Search…",
+      "filterSearchAriaLabel": "Search filter options",
+      "sortClear": "Clear sorting",
+      "browseAriaLabel": "Browse jobs table",
+      "matchedAriaLabel": "Matched jobs table",
+      "noJobsFound": "No jobs found.",
+      "noData": "No data",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "searchPlaceholder": "Search job titles or companies...",
+      "searchAriaLabel": "Search jobs",
+      "pageAriaLabel": "Page {{page}}",
+      "pageRange": "Page {{start}}–{{end}} of {{total}}"
+    },
+    "columns": {
+      "jobTitle": "Job Title",
+      "company": "Company",
+      "category": "Category",
+      "type": "Type",
+      "location": "Location",
+      "posted": "Posted",
+      "match": "Match",
+      "filterAll": "All"
+    },
+    "jobDetail": {
+      "closeButton": "Close",
+      "applyNow": "Apply Now",
+      "category": "Category:",
+      "matchScore": "Match Score:",
+      "extractedSkills": "Extracted Skills ({{count}})",
+      "posted": "Posted {{date}}"
     }
   },
   "nav": {

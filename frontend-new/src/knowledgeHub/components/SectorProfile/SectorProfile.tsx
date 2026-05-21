@@ -38,12 +38,20 @@ interface SectorData {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const ZQF_CONFIG = [
-  { zqf: "1-2", label: "Skills Award", dur: "Short course" },
-  { zqf: "3", label: "Certificate Level 3", dur: "1 year" },
-  { zqf: "4", label: "Craft Certificate", dur: "2 years" },
-  { zqf: "5", label: "Advanced Certificate", dur: "2.5 years" },
-  { zqf: "6", label: "Diploma", dur: "3 years" },
-];
+  { zqf: "1-2", labelKey: "knowledgeHub.zqf.skillsAward.label", durKey: "knowledgeHub.zqf.skillsAward.duration" },
+  { zqf: "3", labelKey: "knowledgeHub.zqf.level3.label", durKey: "knowledgeHub.zqf.level3.duration" },
+  {
+    zqf: "4",
+    labelKey: "knowledgeHub.zqf.craftCertificate.label",
+    durKey: "knowledgeHub.zqf.craftCertificate.duration",
+  },
+  {
+    zqf: "5",
+    labelKey: "knowledgeHub.zqf.advancedCertificate.label",
+    durKey: "knowledgeHub.zqf.advancedCertificate.duration",
+  },
+  { zqf: "6", labelKey: "knowledgeHub.zqf.diploma.label", durKey: "knowledgeHub.zqf.diploma.duration" },
+] as const;
 
 const FILTER_ZQF_LEVELS = ["3", "4", "5", "6"];
 
@@ -554,7 +562,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData, topContent })
                           >
                             ZQF {row.zqf}
                           </div>
-                          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>{row.dur}</div>
+                          <div style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>{t(row.durKey)}</div>
                         </div>
                         <div style={{ background: WHITE, padding: "14px 18px" }}>
                           <div
@@ -567,7 +575,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData, topContent })
                               marginBottom: 6,
                             }}
                           >
-                            {row.label} ({row.names.length} programmes)
+                            {t(row.labelKey)} ({t("knowledgeHub.programmeCount", { count: row.names.length })})
                           </div>
                           <ul
                             style={{
@@ -850,7 +858,7 @@ const SectorProfile: React.FC<SectorProfileProps> = ({ staticData, topContent })
       {/* ── Absolute right sidebar (matches ChatPage pattern) ── */}
       <Box
         component="aside"
-        aria-label="Page sections"
+        aria-label={t("knowledgeHub.pageSectionsAriaLabel")}
         sx={{
           position: "absolute",
           top: 0,

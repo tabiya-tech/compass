@@ -24,6 +24,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import SearchIcon from "@mui/icons-material/Search";
+import { useTranslation } from "react-i18next";
 import { useSortableData } from "src/jobMatching/hooks/useSortableData";
 
 // ─── Column & Group definitions ──────────────────────────────────────────────
@@ -114,6 +115,7 @@ function FilterIconButton<T>({
   const [filterSearch, setFilterSearch] = useState("");
   const open = Boolean(anchorEl);
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const hasFilter = !!col.filter;
   const isFiltered = hasFilter && col.filter!.value !== "all" && col.filter!.value !== "";
@@ -177,14 +179,14 @@ function FilterIconButton<T>({
               >
                 <TextField
                   size="small"
-                  placeholder="Search…"
+                  placeholder={t("jobMatching.table.filterSearchPlaceholder")}
                   value={filterSearch}
                   autoFocus
                   onChange={(e) => setFilterSearch(e.target.value)}
                   onKeyDown={(e) => e.stopPropagation()}
                   slotProps={{
                     input: { startAdornment: <SearchIcon fontSize="small" sx={{ mr: 0.5, color: "text.disabled" }} /> },
-                    htmlInput: { "aria-label": "search filter options" },
+                    htmlInput: { "aria-label": t("jobMatching.table.filterSearchAriaLabel") },
                   }}
                   sx={{ width: "100%" }}
                 />
@@ -206,7 +208,7 @@ function FilterIconButton<T>({
                 sx={{ gap: theme.fixedSpacing(theme.tabiyaSpacing.sm), fontSize: "0.78rem", color: "text.primary" }}
               >
                 <ArrowUpwardIcon sx={{ fontSize: "0.85rem", flexShrink: 0 }} />
-                Sort ascending
+                {t("jobMatching.table.sortAscending")}
               </MenuItem>
               <MenuItem
                 dense
@@ -218,7 +220,7 @@ function FilterIconButton<T>({
                 sx={{ gap: theme.fixedSpacing(theme.tabiyaSpacing.sm), fontSize: "0.78rem", color: "text.primary" }}
               >
                 <ArrowDownwardIcon sx={{ fontSize: "0.85rem", flexShrink: 0 }} />
-                Sort descending
+                {t("jobMatching.table.sortDescending")}
               </MenuItem>
               {showSortClear && onSortClear && sortClearLabel && (
                 <>
@@ -284,13 +286,13 @@ function DataTable<T extends { id: string }>({
   columns,
   loading = false,
   skeletonRows = 8,
-  emptyMessage = "No data",
+  emptyMessage,
   search,
   page,
   totalPages,
   onPageChange,
-  prevPageLabel = "Previous page",
-  nextPageLabel = "Next page",
+  prevPageLabel,
+  nextPageLabel,
   pageLabel,
   externalSortKey,
   externalSortDir,
@@ -304,6 +306,10 @@ function DataTable<T extends { id: string }>({
   onRowClick,
 }: DataTableProps<T>): React.ReactElement {
   const theme = useTheme();
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t("jobMatching.table.noData");
+  const resolvedPrevPageLabel = prevPageLabel ?? t("jobMatching.table.prevPage");
+  const resolvedNextPageLabel = nextPageLabel ?? t("jobMatching.table.nextPage");
 
   // ── Sorting ───────────────────────────────────────────────────────────────
   const controlled = externalSortKey !== undefined;
@@ -487,7 +493,7 @@ function DataTable<T extends { id: string }>({
                   sx={{ py: theme.fixedSpacing(theme.tabiyaSpacing.xl), borderBottom: 0 }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    {emptyMessage}
+                    {resolvedEmptyMessage}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -574,9 +580,9 @@ function DataTable<T extends { id: string }>({
               showFirstButton={false}
               showLastButton={false}
               getItemAriaLabel={(type, p) => {
-                if (type === "previous") return prevPageLabel;
-                if (type === "next") return nextPageLabel;
-                if (type === "page") return `Page ${p}`;
+                if (type === "previous") return resolvedPrevPageLabel;
+                if (type === "next") return resolvedNextPageLabel;
+                if (type === "page") return t("jobMatching.table.pageAriaLabel", { page: p });
                 return type;
               }}
               sx={{

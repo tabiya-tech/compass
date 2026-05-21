@@ -97,7 +97,7 @@ const LoadingScreen: React.FC = () => {
     >
       <CircularProgress />
       <Typography variant="body2" color="text.secondary">
-        {t("common.status.loading", "Loading...")}
+        {t("common.status.loading")}
       </Typography>
     </Box>
   );

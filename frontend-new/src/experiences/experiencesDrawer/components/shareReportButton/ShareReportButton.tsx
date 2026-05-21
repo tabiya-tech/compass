@@ -147,7 +147,9 @@ const ShareReportButton: React.FC<ShareReportButtonProps> = ({
         }
         data-testid={DATA_TEST_ID.SHARE_REPORT_BUTTON}
       >
-        {isSharing ? t("experiences.experiencesDrawer.components.shareReportButton.preparingPdf") : "Share"}
+        {isSharing
+          ? t("experiences.experiencesDrawer.components.shareReportButton.preparingPdf")
+          : t("experiences.experiencesDrawer.components.shareReportButton.share")}
       </SecondaryButton>
     </Box>
   );

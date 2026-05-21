@@ -12,6 +12,7 @@ import {
   Divider,
 } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
+import { useTranslation } from "react-i18next";
 import CloseIcon from "@mui/icons-material/Close";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
 import SecondaryButton from "src/theme/SecondaryButton/SecondaryButton";
@@ -33,6 +34,7 @@ const capitalize = (s: string) =>
 
 const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isSmallMobile = useMediaQuery((t: Theme) => t.breakpoints.down("sm"));
 
   if (!job) return null;
@@ -73,7 +75,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
           )}
         </Box>
         <PrimaryIconButton
-          title="Close"
+          title={t("jobMatching.jobDetail.closeButton")}
           onClick={onClose}
           sx={{ color: theme.palette.common.black, flexShrink: 0, mt: -0.5 }}
         >
@@ -112,7 +114,12 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
             />
           )}
           {job.posted && (
-            <Chip label={`Posted ${job.posted}`} size="small" variant="outlined" sx={{ fontSize: "0.75rem" }} />
+            <Chip
+              label={t("jobMatching.jobDetail.posted", { date: job.posted })}
+              size="small"
+              variant="outlined"
+              sx={{ fontSize: "0.75rem" }}
+            />
           )}
         </Box>
 
@@ -120,7 +127,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
         {job.category && (
           <Typography variant="body2" color="text.secondary" mb={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <Box component="span" fontWeight={700} color="text.primary">
-              Category:{" "}
+              {t("jobMatching.jobDetail.category")}{" "}
             </Box>
             {capitalize(job.category)}
           </Typography>
@@ -130,7 +137,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
         {job.matchScore != null && (
           <Typography variant="body2" color="text.secondary" mb={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <Box component="span" fontWeight={700} color="text.primary">
-              Match Score:{" "}
+              {t("jobMatching.jobDetail.matchScore")}{" "}
             </Box>
             {job.matchScore}%
           </Typography>
@@ -146,7 +153,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
               color="text.primary"
               mb={theme.fixedSpacing(theme.tabiyaSpacing.xs)}
             >
-              Extracted Skills ({job.skills.length})
+              {t("jobMatching.jobDetail.extractedSkills", { count: job.skills.length })}
             </Typography>
             <Box display="flex" flexWrap="wrap" gap={theme.fixedSpacing(theme.tabiyaSpacing.xs)}>
               {job.skills.map((skill) => (
@@ -170,9 +177,9 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
 
       {/* Actions */}
       <DialogActions sx={{ padding: 0 }}>
-        <SecondaryButton onClick={onClose}>Close</SecondaryButton>
+        <SecondaryButton onClick={onClose}>{t("jobMatching.jobDetail.closeButton")}</SecondaryButton>
         <PrimaryButton onClick={handleApply} disabled={!job.jobUrl}>
-          Apply Now
+          {t("jobMatching.jobDetail.applyNow")}
         </PrimaryButton>
       </DialogActions>
     </Dialog>

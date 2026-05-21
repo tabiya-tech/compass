@@ -13,6 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import type { TranslationKey } from "src/react-i18next";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
 import { Backdrop } from "src/theme/Backdrop/Backdrop";
@@ -117,7 +118,7 @@ const STATIC_FIELDS: FieldDefinition[] = [
     required: true,
     label: "School Year",
     encrypt: false,
-    values: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"],
+    values: ["Year 1", "Year 2", "Year 3", "Year 4"] as const,
   }),
 ];
 
@@ -137,6 +138,15 @@ const sanitize = (data: SensitivePersonalData): SensitivePersonalData => {
 
 const INSTITUTION_SEARCH_MIN_CHARS = 2;
 const INSTITUTION_SEARCH_DEBOUNCE_MS = 400;
+
+const SCHOOL_YEAR_VALUES = ["Year 1", "Year 2", "Year 3", "Year 4"] as const;
+
+const SCHOOL_YEAR_LABEL_KEYS: Record<(typeof SCHOOL_YEAR_VALUES)[number], TranslationKey> = {
+  "Year 1": "sensitiveData.components.sensitiveDataForm.schoolYearOptions.year1",
+  "Year 2": "sensitiveData.components.sensitiveDataForm.schoolYearOptions.year2",
+  "Year 3": "sensitiveData.components.sensitiveDataForm.schoolYearOptions.year3",
+  "Year 4": "sensitiveData.components.sensitiveDataForm.schoolYearOptions.year4",
+};
 
 const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
@@ -479,7 +489,7 @@ const SensitiveDataForm: React.FC = () => {
               <TextField
                 fullWidth
                 required
-                label="First Name"
+                label={t("sensitiveData.components.sensitiveDataForm.fields.firstName")}
                 autoComplete="given-name"
                 value={firstName}
                 onChange={(e) => {
@@ -500,7 +510,7 @@ const SensitiveDataForm: React.FC = () => {
               <TextField
                 fullWidth
                 required
-                label="Last Name"
+                label={t("sensitiveData.components.sensitiveDataForm.fields.lastName")}
                 autoComplete="family-name"
                 value={lastName}
                 onChange={(e) => {
@@ -522,7 +532,7 @@ const SensitiveDataForm: React.FC = () => {
                 <TextField
                   fullWidth
                   required
-                  label="Institution"
+                  label={t("sensitiveData.components.sensitiveDataForm.fields.institution")}
                   value={assignedInstitution.name}
                   inputRef={institutionRef}
                   slotProps={{ input: { readOnly: true } }}
@@ -541,10 +551,10 @@ const SensitiveDataForm: React.FC = () => {
                   onChange={handleInstitutionSelect}
                   noOptionsText={
                     institutionInputValue.length < INSTITUTION_SEARCH_MIN_CHARS
-                      ? "Type at least 2 characters to search"
+                      ? t("sensitiveData.components.sensitiveDataForm.fields.typeAtLeastXChars")
                       : institutionLoading
-                        ? "Searching..."
-                        : "No institutions found"
+                        ? t("sensitiveData.components.sensitiveDataForm.fields.searching")
+                        : t("sensitiveData.components.sensitiveDataForm.fields.noInstitutionsFound")
                   }
                   renderOption={(props, option) => (
                     <li {...props} key={option.name}>
@@ -562,8 +572,8 @@ const SensitiveDataForm: React.FC = () => {
                     <TextField
                       {...params}
                       required
-                      label="Institution"
-                      placeholder="Start typing to search..."
+                      label={t("sensitiveData.components.sensitiveDataForm.fields.institution")}
+                      placeholder={t("sensitiveData.components.sensitiveDataForm.fields.institutionSearchPlaceholder")}
                       inputRef={institutionRef}
                       error={showFieldErrors && !validationErrors.institution}
                       helperText={
@@ -600,17 +610,21 @@ const SensitiveDataForm: React.FC = () => {
                 }}
                 noOptionsText={
                   !selectedInstitution
-                    ? "Select an institution first"
+                    ? t("sensitiveData.components.sensitiveDataForm.fields.selectInstitutionFirst")
                     : programmesLoading
-                      ? "Loading programmes..."
-                      : "No programmes available"
+                      ? t("sensitiveData.components.sensitiveDataForm.fields.loadingProgrammes")
+                      : t("sensitiveData.components.sensitiveDataForm.fields.noProgrammesAvailable")
                 }
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     required
-                    label="Programme"
-                    placeholder={selectedInstitution ? "Select programme" : "Select an institution first"}
+                    label={t("sensitiveData.components.sensitiveDataForm.fields.programme")}
+                    placeholder={
+                      selectedInstitution
+                        ? t("sensitiveData.components.sensitiveDataForm.fields.programmeSelectPlaceholder")
+                        : t("sensitiveData.components.sensitiveDataForm.fields.programmeSelectFirstPlaceholder")
+                    }
                     inputRef={programmeRef}
                     error={showFieldErrors && !validationErrors.programme}
                     helperText={
@@ -635,10 +649,12 @@ const SensitiveDataForm: React.FC = () => {
 
               {/* School Year */}
               <FormControl fullWidth required error={showFieldErrors && !validationErrors.schoolYear}>
-                <InputLabel id="school-year-label">School Year</InputLabel>
+                <InputLabel id="school-year-label">
+                  {t("sensitiveData.components.sensitiveDataForm.fields.schoolYear")}
+                </InputLabel>
                 <Select
                   value={schoolYear}
-                  label="School Year"
+                  label={t("sensitiveData.components.sensitiveDataForm.fields.schoolYear")}
                   labelId="school-year-label"
                   inputRef={schoolYearRef}
                   SelectDisplayProps={
@@ -651,9 +667,9 @@ const SensitiveDataForm: React.FC = () => {
                     setFieldValid("schoolYear", !!e.target.value);
                   }}
                 >
-                  {["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"].map((yr) => (
+                  {SCHOOL_YEAR_VALUES.map((yr) => (
                     <MenuItem key={yr} value={yr}>
-                      {yr}
+                      {t(SCHOOL_YEAR_LABEL_KEYS[yr])}
                     </MenuItem>
                   ))}
                 </Select>
@@ -707,11 +723,11 @@ const SensitiveDataForm: React.FC = () => {
               >
                 {isSavingSensitiveData ? (
                   <CircularProgress
-                    title={"Saving"}
+                    title={t("common.status.saving")}
                     color={"secondary"}
                     size={theme.typography.h5.fontSize}
                     sx={{ marginTop: theme.tabiyaSpacing.xs, marginBottom: theme.tabiyaSpacing.xs }}
-                    aria-label={"Saving"}
+                    aria-label={t("common.status.saving")}
                     data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_BUTTON_CIRCULAR_PROGRESS}
                   />
                 ) : (

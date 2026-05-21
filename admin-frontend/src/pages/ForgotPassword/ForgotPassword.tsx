@@ -66,19 +66,19 @@ const ForgotPassword: React.FC = () => {
             <Box
               component="img"
               src={preferredSrc}
-              alt={t("forgotPassword.logoAlt", "Logo")}
+              alt={t("forgotPassword.logoAlt")}
               data-testid={DATA_TEST_ID.FORGOT_PAGE_LOGO}
               sx={{ height: 64, width: "auto", maxWidth: "100%" }}
             />
           </Box>
 
           <Typography variant="h4" component="h1" gutterBottom textAlign="center">
-            {t("forgotPassword.title", "Reset your password")}
+            {t("forgotPassword.title")}
           </Typography>
 
           {submitted ? (
             <Alert severity="success" sx={{ mt: 2 }} data-testid={DATA_TEST_ID.FORGOT_PAGE_SUCCESS}>
-              {t("forgotPassword.success", "If an account exists for that email, we've sent reset instructions.")}
+              {t("forgotPassword.success")}
             </Alert>
           ) : (
             <>
@@ -88,13 +88,13 @@ const ForgotPassword: React.FC = () => {
                 textAlign="center"
                 sx={{ marginBottom: theme.tabiyaSpacing.lg }}
               >
-                {t("forgotPassword.subtitle", "Enter your email and we'll send a link to reset your password.")}
+                {t("forgotPassword.subtitle")}
               </Typography>
 
               <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                 <TextField
                   fullWidth
-                  label={t("forgotPassword.email", "Email")}
+                  label={t("forgotPassword.email")}
                   type="email"
                   margin="normal"
                   required
@@ -112,11 +112,7 @@ const ForgotPassword: React.FC = () => {
                   sx={{ mt: 3, mb: 2, height: 48 }}
                   data-testid={DATA_TEST_ID.FORGOT_PAGE_SUBMIT}
                 >
-                  {submitting ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    t("forgotPassword.submit", "Send reset link")
-                  )}
+                  {submitting ? <CircularProgress size={24} color="inherit" /> : t("forgotPassword.submit")}
                 </Button>
               </Box>
             </>
@@ -124,7 +120,7 @@ const ForgotPassword: React.FC = () => {
 
           <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
             <Link component="button" type="button" onClick={() => navigate(routerPaths.LOGIN)}>
-              {t("forgotPassword.backToLogin", "Back to login")}
+              {t("forgotPassword.backToLogin")}
             </Link>
           </Typography>
         </Box>

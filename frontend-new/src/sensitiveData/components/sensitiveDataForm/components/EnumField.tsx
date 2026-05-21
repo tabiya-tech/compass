@@ -151,13 +151,13 @@ const EnumField: React.FC<EnumFieldProps> = ({ field, dataTestId, initialValue =
               <TextField
                 size="small"
                 autoFocus
-                placeholder="Search…"
+                placeholder={t("sensitiveData.components.enumField.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.stopPropagation()}
                 slotProps={{
                   input: { startAdornment: <SearchIcon fontSize="small" sx={{ mr: 0.5, color: "text.disabled" }} /> },
-                  htmlInput: { "aria-label": "search options" },
+                  htmlInput: { "aria-label": t("sensitiveData.components.enumField.searchAriaLabel") },
                 }}
                 sx={{ width: "100%" }}
               />

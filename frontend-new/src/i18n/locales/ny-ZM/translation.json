@@ -224,7 +224,8 @@
         "question": "Mukufuna kudikira {{appName}} imalize, kapena tsitsani kenako?",
         "waitButton": "Dikirani {{appName}}",
         "refreshButton": "Tsitsani"
-      }
+      },
+      "bwsTransitionMessage": "Tsopano ndikufuna kumvetsa zomwe mumakonda kwambiri pa ntchito. Ndikuonetsani mitundu imingapo ya ntchito — pa yiliyonse, sankhani imodzi yomwe mumakonda **kwambiri** ndi imodzi yomwe mumakonda **pang'ono** kwambiri."
     },
     "chatProgressbar": {
       "labels": {
@@ -544,7 +545,8 @@
           "shareTitle": "Report ya Zochitika",
           "shareText": "Onani report yanga ya zochitika",
           "shareFailed": "Sitinathe kugawana lipoti lanu. Mukhoza kuitsitsa ndi kugawana fayilo mwachindunji.",
-          "shareCanceled": "Kugawa kwaletetsedwa chifukwa cha pempho la wogwiritsa ntchito"
+          "shareCanceled": "Kugawa kwaletetsedwa chifukwa cha pempho la wogwiritsa ntchito",
+          "share": "Gawani"
         }
       },
       "deleteSuccess": "Chitukuko chachotsedwa bwino!",
@@ -598,7 +600,10 @@
           "summaryMaxLength": "Zilembo {{max}} pamwamba zololedwa.",
           "timelineMaxLength": "Zilembo {{max}} pamwamba zololedwa."
         }
-      }
+      },
+      "reportTitle": "Malipoti Anu a Luso la Njila",
+      "educationLabel": "MAPHUNZIRO",
+      "experiencesAndSkillsLabel": "CHIDZIWITSO NDI LUSO"
     },
     "report": {
       "skillsReportTitle": "Report ya Nzeru",
@@ -616,7 +621,11 @@
         "part2": "Nzeru zolembedwa zimakhudza nkhani ndi wogwiritsa, sizitsimikizidwa ndi Tabiya, ndipo zingakhale zolakwika. ",
         "part3": "Zobisika ziyenera kuyang'aniridwa musanagwiritsidwe ntchito kufufuza ntchito, mafunso a ntchito, kapena kupanga CV. Kusintha zobisikazi, kambiranani ndi {{appName}} kenako kapena pangani CV yathunthu kutengera report iyi."
       },
-      "bodyText": "Report iyi imafupikiza zobisika zofunika zomwe zinasonkhanitsidwa pamene mukukambirana ndi {{appName}} pa {{date}}. {{appName}} ndi chatbot ya AI yomwe imathandiza oyenera ntchito kufufuza nzeru ndi zochitika zawo. Report iyi imaonetsa chitukuko cha ntchito cha wogwiritsa ndi nzeru zinapezeka kuchokera pa chitukuko chilichonse. Zobisikazi zingagwiritsidwe ntchito kutsogolera kufufuza ntchito ndi kuonetsa nzeru zawo pamene akupempha ntchito, makamaka pamene akukambirana ndi ogwiritsa angapo. Zingakhale yoyamba yabwino yopanga CV yathunthu."
+      "bodyText": "Report iyi imafupikiza zobisika zofunika zomwe zinasonkhanitsidwa pamene mukukambirana ndi {{appName}} pa {{date}}. {{appName}} ndi chatbot ya AI yomwe imathandiza oyenera ntchito kufufuza nzeru ndi zochitika zawo. Report iyi imaonetsa chitukuko cha ntchito cha wogwiritsa ndi nzeru zinapezeka kuchokera pa chitukuko chilichonse. Zobisikazi zingagwiritsidwe ntchito kutsogolera kufufuza ntchito ndi kuonetsa nzeru zawo pamene akupempha ntchito, makamaka pamene akukambirana ndi ogwiritsa angapo. Zingakhale yoyamba yabwino yopanga CV yathunthu.",
+      "format": {
+        "pdf": "PDF",
+        "docx": "DOCX"
+      }
     }
   },
   "features": {
@@ -731,11 +740,41 @@
         "yesSkip": "Inde, siyani",
         "shareData": "Gawani data",
         "skipping": "Kusiya...",
-        "refreshPage": "Tsitsani Tsamba"
+        "refreshPage": "Tsitsani Tsamba",
+        "fields": {
+          "firstName": "Dzina Loyamba",
+          "lastName": "Dzina la Famu",
+          "institution": "Sukulu",
+          "institutionSearchPlaceholder": "Yambani kulembera kusaka...",
+          "programme": "Pulogalamu",
+          "programmeSelectPlaceholder": "Sankhani pulogalamu",
+          "programmeSelectFirstPlaceholder": "Sankhani sukulu choyamba",
+          "schoolYear": "Chaka cha Sukulu",
+          "typeAtLeastXChars": "Lemba zilembo ziwiri mwachochepa kufunafuna",
+          "searching": "Kufunafuna...",
+          "noInstitutionsFound": "Masukulu alibe",
+          "selectInstitutionFirst": "Sankhani sukulu choyamba",
+          "loadingProgrammes": "Kukweza mapulogalamu...",
+          "noProgrammesAvailable": "Mapulogalamu alibe"
+        },
+        "loadingForm": "Kukweza fomu...",
+        "schoolYearOptions": {
+          "year1": "Chaka 1",
+          "year2": "Chaka 2",
+          "year3": "Chaka 3",
+          "year4": "Chaka 4"
+        }
       },
       "enumField": {
         "pleaseSelectX": "Chonde sankhani {{x}}",
-        "clearSelection": "Chotsani chosankha"
+        "clearSelection": "Chotsani chosankha",
+        "searchPlaceholder": "Sakani…",
+        "searchAriaLabel": "Sakani zisankho"
+      },
+      "multipleSelectField": {
+        "searchPlaceholder": "Sakani…",
+        "searchAriaLabel": "Sakani zisankho",
+        "selectAtLeastOne": "Chonde sankhani {{field}} imodzi mwachochepa"
       }
     }
   },
@@ -1049,7 +1088,11 @@
           "title": "Sayansi ya Zachipatala",
           "description": "Zachipatala, mankhwala, physiotherapy"
         }
-      }
+      },
+      "profileStrengthProgressAriaLabel": "Mapambano a mphamvu ya profaili",
+      "educationSkillsProgressAriaLabel": "Mapambano a luso la maphunziro",
+      "workSkillsProgressAriaLabel": "Mapambano a luso la ntchito",
+      "viewMyCvSubtitle": "Tsitsani ndi kugawana Malipoti Anu a Luso"
     },
     "modules": {
       "skillsDiscovery": "Pangani mbiri yanu",
@@ -1073,7 +1116,38 @@
       "termsOfUse": "Malamulo a Ntchito",
       "accessibility": "Kufikira",
       "contact": "Lumikizani",
-      "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya."
+      "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya.",
+      "worldBankLogoAlt": "Chizindikiro cha Gulu la World Bank",
+      "ministryTechLogoAlt": "Chizindikiro cha Unduna wa Teknoloji",
+      "tabiyaLogoAlt": "Chizindikiro cha Tabiya"
+    },
+    "sidebar": {
+      "showLess": "Onetsa Pang'ono",
+      "seeAll": "Ona Zonse {{count}} →",
+      "skillsDiscovery": {
+        "title": "Maluso Apezeka",
+        "emptyState": "Maluso adzaonekera apa mukamaliza kucheza kwa \"Imanizani Profaili Yanu\"",
+        "fromWorkAndLife": "Kuchokera ku ntchito ndi moyo",
+        "fromTEVET": "Kuchokera ku pulogalamu ya TEVET"
+      },
+      "careerExplorer": {
+        "title": "Zigawo Zofufuzidwa",
+        "emptyState": "Zigawo zidzaonekera apa mukafufuza ntchito ndi Njila."
+      },
+      "careerReadiness": {
+        "title": "Zitenga"
+      },
+      "home": {
+        "skillsFromWork": "Maluso Kuchokera Ku Ntchito",
+        "skillsFromTEVET": "Maluso Kuchokera Ku Pulogalamu ya TEVET",
+        "myExperience": "Chidziwitso Changa",
+        "workSkillsEmpty": "Maluso adzaonekera apa mukamaliza kucheza kwa \"Imanizani Profaili Yanu\"",
+        "programmeSkillsEmpty": "Maluso a pulogalamu adzaonekera mukamaliza mamojiyu."
+      }
+    },
+    "moduleHandoff": {
+      "message": "Ntchito yabwino! Muli okonzeka kupitirira?",
+      "continueWith": "Pitirizani ndi {{moduleLabel}}"
     }
   },
   "knowledgeHub": {
@@ -1086,22 +1160,28 @@
     "discoverSectorCta": "Dziwani zambiri za gawo la {{sector}} →",
     "sectors": {
       "energy": {
-        "title": "Mphamvu"
+        "title": "Mphamvu",
+        "description": "Gawo la mphamvu ku Zambia likusintha kwambiri, likusamuka kupita ku mphamvu zachilengedwe monga dzuwa ndi mphepo kuti lithandizire malo ake owuka a madzi."
       },
       "mining": {
-        "title": "Migodi"
+        "title": "Migodi",
+        "description": "Gawo la kukwera ndi mgodi limakhala mutu wa chuma cha Zambia, likulimbikitsa phindu la kutumiza panja ndi mapinduzi a tekinoloji."
       },
       "hospitality": {
-        "title": "Alendo ndi Ulendo"
+        "title": "Alendo ndi Ulendo",
+        "description": "Cholowa chofunikira cha chilengedwe ndi malo okura a bizinesi ku Zambia zimapanga gawo la ukondwereka kukhala losangalatsa."
       },
       "agriculture": {
-        "title": "Ulimi"
+        "title": "Ulimi",
+        "description": "Ulimi ndi gwero lalikulu la ntchito ku Zambia, koma likusintha kuchoka ku ulimi wa pakhomo kupita ku bizinesi yamakono ndi ulimi wogwiritsa ntchito tekinoloji."
       },
       "water": {
-        "title": "Madzi ndi Ukhondo"
+        "title": "Madzi ndi Ukhondo",
+        "description": "Kukonza madzi, maukwaju a madzi, maziko a ukhondo ndi ntchito zosamala zinyalala."
       },
       "health": {
-        "title": "Sayansi ya Zachipatala"
+        "title": "Sayansi ya Zachipatala",
+        "description": "Sayansi za zaumoyo zothandizira zimakhudza chisamaliro cha mankhwala kudzera mu kuzindikira, kukonzanso, kugawa mankhwala, ntchito ya labotale, ndi zaumoyo wa chilengedwe."
       }
     },
     "noDocumentsAvailable": "Palibe zikalata zomwe zilipo pakadali pano.",
@@ -1132,7 +1212,31 @@
     "navProgrammes": "Mapulogalamu",
     "navCriticalSkills": "Maluso ovuta",
     "navInDevelopment": "Mu chitukuko",
-    "navKeepInMind": "Kumbukirani"
+    "navKeepInMind": "Kumbukirani",
+    "pageSectionsAriaLabel": "Zigawo za peji",
+    "programmeCount": "Mapulogalamu {{count}}",
+    "zqf": {
+      "skillsAward": {
+        "label": "Mphotho ya Luso",
+        "duration": "Maphunziro achifupi"
+      },
+      "level3": {
+        "label": "Chiphaso Mlingo 3",
+        "duration": "Chaka 1"
+      },
+      "craftCertificate": {
+        "label": "Chiphaso cha Luso",
+        "duration": "Zaka 2"
+      },
+      "advancedCertificate": {
+        "label": "Chiphaso cha Padera",
+        "duration": "Zaka 2.5"
+      },
+      "diploma": {
+        "label": "Diploma",
+        "duration": "Zaka 3"
+      }
+    }
   },
   "jobMatching": {
     "pageTitle": "Kufunana Ntchito",
@@ -1142,6 +1246,45 @@
       "emptyNoSkills": "Ntchito zofanana sizinapezeke pano. Malizani gawo la \"Pangani mbiri yanu\" kuti mutsegule malingaliro opangidwa mwamakonda.",
       "emptyProgrammeNoMatches": "Palibe zofanana pano. Malizani kucheza kwa Pangani mbiri yanu kuti mupeze ntchito zogwirizana ndi maluso anu.",
       "emptySiNoMatches": "Pakali pano tilibe zofanana kwa inu — bwerani mudzayang'anenso mtsogolo."
+    },
+    "tabs": {
+      "browse": "Sakani Ntchito",
+      "matched": "Zosankhulidwa Kwa Inu"
+    },
+    "table": {
+      "sortAscending": "Sungulani kukwera",
+      "sortDescending": "Sungulani kutsika",
+      "filterSearchPlaceholder": "Sakani…",
+      "filterSearchAriaLabel": "Sakani zisankho za chosefa",
+      "sortClear": "Chotsani kusungula",
+      "browseAriaLabel": "Tebulo losakia ntchito",
+      "matchedAriaLabel": "Tebulo la ntchito zosankhulidwa",
+      "noJobsFound": "Ntchito zilibe.",
+      "noData": "Chilibe chidziwitso",
+      "prevPage": "Peji yapitayo",
+      "nextPage": "Peji yotsatira",
+      "searchPlaceholder": "Sakani maina a ntchito kapena makampani...",
+      "searchAriaLabel": "Sakani ntchito",
+      "pageAriaLabel": "Peji {{page}}",
+      "pageRange": "Peji {{start}}–{{end}} mwa {{total}}"
+    },
+    "columns": {
+      "jobTitle": "Mutu wa Ntchito",
+      "company": "Kampani",
+      "category": "Mategori",
+      "type": "Mtundu",
+      "location": "Malo",
+      "posted": "Adalembedwa",
+      "match": "Kuyerekeza",
+      "filterAll": "Zonse"
+    },
+    "jobDetail": {
+      "closeButton": "Tsekani",
+      "applyNow": "Iperekeni Tsopano",
+      "category": "Mategori:",
+      "matchScore": "Kuyerekeza:",
+      "extractedSkills": "Maluso Opezedwa ({{count}})",
+      "posted": "Adalembedwa {{date}}"
     }
   },
   "nav": {

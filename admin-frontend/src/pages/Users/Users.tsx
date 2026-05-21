@@ -51,7 +51,7 @@ const PendingTabContent: React.FC<PendingTabContentProps> = ({ pending }) => {
         </Alert>
       )}
       {loading ? (
-        <Typography color="text.secondary">{t("registrations.loading", "Loading…")}</Typography>
+        <Typography color="text.secondary">{t("registrations.loading")}</Typography>
       ) : (
         <RegistrationsTable registrations={registrations} onApprove={setApproveTarget} onReject={setRejectTarget} />
       )}
@@ -104,7 +104,7 @@ const UsersContent: React.FC = () => {
         <Box sx={{ py: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
             <Typography variant="h4" component="h1" data-testid={DATA_TEST_ID.USERS_PAGE_TITLE}>
-              {t("users.title", "Users")}
+              {t("users.title")}
             </Typography>
             {isSuperAdmin && activeTab === "active" && (
               <Button
@@ -113,26 +113,22 @@ const UsersContent: React.FC = () => {
                 onClick={() => usersContext.setCreateModalOpen(true)}
                 data-testid={DATA_TEST_ID.USERS_PAGE_ADD_BUTTON}
               >
-                {t("users.addUser", "Add User")}
+                {t("users.addUser")}
               </Button>
             )}
           </Box>
 
           {isSuperAdmin && (
             <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}>
-              <Tab
-                label={t("users.tabs.active", "Active Users")}
-                value="active"
-                data-testid={DATA_TEST_ID.USERS_TAB_ACTIVE}
-              />
+              <Tab label={t("users.tabs.active")} value="active" data-testid={DATA_TEST_ID.USERS_TAB_ACTIVE} />
               <Tab
                 label={
                   pendingCount > 0 ? (
                     <Badge color="warning" badgeContent={pendingCount} sx={{ pr: 2 }}>
-                      {t("users.tabs.pending", "Pending Sign-ups")}
+                      {t("users.tabs.pending")}
                     </Badge>
                   ) : (
-                    t("users.tabs.pending", "Pending Sign-ups")
+                    t("users.tabs.pending")
                   )
                 }
                 value="pending"

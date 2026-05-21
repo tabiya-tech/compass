@@ -42,6 +42,19 @@
     },
     "modal": {
       "areYouSure": "Una uhakika?"
+    },
+    "cancel": "Ghairi",
+    "close": "Funga",
+    "dataTable": {
+      "sortAscending": "Panga kupanda",
+      "sortDescending": "Panga kushuka",
+      "sortAscText": "Panga A-Z",
+      "sortDescText": "Panga Z-A",
+      "noData": "Hakuna data",
+      "prevPage": "Ukurasa uliopita",
+      "nextPage": "Ukurasa unaofuata",
+      "pageAriaLabel": "Ukurasa {{page}}",
+      "filterAriaLabel": "Chuja {{column}}"
     }
   },
   "auth": {
@@ -107,7 +120,13 @@
   },
   "header": {
     "logout": "Ondoka",
-    "user": "Mtumiaji"
+    "user": "Mtumiaji",
+    "profile": "Wasifu",
+    "users": "Watumiaji",
+    "role": {
+      "admin": "Msimamizi",
+      "institutionStaff": "Wafanyakazi wa Taasisi"
+    }
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -123,7 +142,10 @@
     "termsOfUse": "Masharti ya Matumizi",
     "accessibility": "Ufikivu",
     "contact": "Wasiliana",
-    "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya."
+    "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya.",
+    "worldBankLogoAlt": "Nembo ya Kundi la Benki ya Dunia",
+    "ministryTechLogoAlt": "Nembo ya Wizara ya Teknolojia",
+    "tabiyaLogoAlt": "Nembo ya Tabiya"
   },
   "dashboard": {
     "sectionTitle": "Dashibodi ya msimamizi - ufuatiliaji na uchanganuzi wa taasisi mbalimbali",
@@ -135,7 +157,8 @@
       "institutions": "Taasisi",
       "modules": "Moduli",
       "skillsAnalytics": "Uchambuzi wa Ujuzi",
-      "jobPostings": "Machapisho ya Kazi"
+      "jobPostings": "Machapisho ya Kazi",
+      "ariaLabel": "Vichupo vya dashibodi"
     },
     "dataTable": {
       "clearSorting": "Upangaji wazi"
@@ -233,7 +256,9 @@
       },
       "filters": {
         "allProvinces": "Mikoa Yote",
-        "allSectors": "Sekta Zote"
+        "allSectors": "Sekta Zote",
+        "searchProvinces": "Tafuta majimbo...",
+        "searchSectors": "Tafuta sekta..."
       }
     },
     "jobPostings": {
@@ -282,7 +307,8 @@
         "candidatePoolValue": "Wanafunzi {{count}} (50%+ mechi)",
         "skillsExtracted": "Ujuzi Umetolewa ({{count}})",
         "viewOriginalPosting": "Tazama Chapisho Halisi"
-      }
+      },
+      "page": "Ukurasa {{page}} wa {{totalPages}}"
     },
     "institutionsTable": {
       "headers": {
@@ -291,7 +317,7 @@
         "active7Days": "Inayotumika (7D)",
         "skillsDiscovery": "Jenga wasifu wako",
         "careerReadiness": "Kujiandaa kwa Kazi",
-        "careerExplorer": "Career Explorer"
+        "careerExplorer": "Mchunguzi wa Kazi"
       },
       "subHeaders": {
         "started": "Imeanza",
@@ -304,7 +330,10 @@
       "nextPage": "Ukurasa unaofuata",
       "page": "Ukurasa {{page}}"
     },
-    "comingSoon": "Hakuna data hadi sasa."
+    "comingSoon": "Hakuna data hadi sasa.",
+    "pagination": {
+      "range": "Ukurasa {{start}}–{{end}} wa {{total}}"
+    }
   },
   "instructorDashboard": {
     "sectionTitle": "Dashibodi ya mwalimu - fuatilia ushiriki wa wanafunzi na maendeleo",
@@ -367,7 +396,20 @@
     "title": "Kuingia kwa Msimamizi",
     "email": "Barua pepe",
     "password": "Nenosiri",
-    "submit": "Ingia"
+    "submit": "Ingia",
+    "subtitle": "Ingia ili kupata ufikiaji wa dashibodi ya msimamizi",
+    "logoAlt": "Logo",
+    "forgotPassword": "Umesahau neno la siri?",
+    "requestAccess": "Omba ufikiaji",
+    "errors": {
+      "invalidCredentials": "Barua pepe au neno la siri si sahihi",
+      "userDisabled": "Akaunti hii imezuiwa",
+      "tooManyRequests": "Majaribio mengi yameshindwa. Tafadhali jaribu tena baadaye",
+      "networkError": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wako",
+      "invalidEmail": "Tafadhali ingiza anwani sahihi ya barua pepe",
+      "generic": "Kuingia kumeshindwa. Tafadhali jaribu tena",
+      "fillAllFields": "Tafadhali jaza sehemu zote"
+    }
   },
   "notFound": {
     "message": "Ukurasa Haujapatikana",
@@ -400,7 +442,10 @@
       "name": "Jina la Kuonyesha",
       "role": "Jukumu",
       "institutionId": "Kitambulisho cha Taasisi",
-      "submit": "Unda Mtumiaji"
+      "submit": "Unda Mtumiaji",
+      "emailAlreadyExists": "Mtumiaji mwenye barua pepe hii tayari yupo",
+      "emailFailed": "Imetengenezwa {{email}}, lakini barua pepe ya kuweka upya nywila haikutumwa. Unaweza kujaribu tena sasa au uitume baadaye kutoka ukurasa wa Nywila Iliyosahauliwa.",
+      "resend": "Tuma tena barua pepe"
     },
     "updateRoleModal": {
       "title": "Sasisha Jukumu",
@@ -418,6 +463,114 @@
       "createFailed": "Imeshindwa kuunda mtumiaji",
       "updateFailed": "Imeshindwa kusasisha jukumu",
       "deleteFailed": "Imeshindwa kufuta mtumiaji"
+    },
+    "roles": {
+      "superAdmin": "Msimamizi Mkuu",
+      "admin": "Msimamizi",
+      "institutionStaff": "Wafanyakazi wa Taasisi"
+    },
+    "tabs": {
+      "active": "Watumiaji Wanaofanya Kazi",
+      "pending": "Usajili Unaongoja"
+    },
+    "institutionAutocomplete": {
+      "label": "Taasisi",
+      "loadError": "Imeshindwa kupakia taasisi"
+    }
+  },
+  "register": {
+    "title": "Omba Ufikiaji",
+    "subtitle": "Jisajili kama mwalimu au msimamizi wa taasisi nyingi. Msimamizi mkuu atakagua ombi lako.",
+    "email": "Barua pepe",
+    "name": "Jina kamili",
+    "role": "Jukumu",
+    "submit": "Wasilisha ombi",
+    "success": "Asante — tumepokea ombi lako. Utapata barua pepe baada ya msimamizi mkuu kukagua na kuidhinisha akaunti yako.",
+    "backToLogin": "Rudi kuingia",
+    "logoAlt": "Logo",
+    "roles": {
+      "admin": "Msimamizi wa taasisi nyingi",
+      "institutionStaff": "Mwalimu"
+    },
+    "errors": {
+      "alreadyExists": "Usajili unaofanya kazi tayari upo kwa barua pepe hii.",
+      "generic": "Imeshindwa kuwasilisha usajili. Tafadhali jaribu tena."
+    }
+  },
+  "registrations": {
+    "table": {
+      "email": "Barua pepe",
+      "name": "Jina",
+      "role": "Jukumu lililoombiwa",
+      "institution": "Taasisi",
+      "submittedAt": "Iliwasilishwa",
+      "actions": "Vitendo",
+      "empty": "Hakuna usajili unaongoja"
+    },
+    "actions": {
+      "approve": "Idhinisha",
+      "reject": "Kataa"
+    },
+    "roles": {
+      "admin": "Msimamizi wa taasisi nyingi",
+      "institutionStaff": "Mwalimu"
+    },
+    "loading": "Inapakia…",
+    "approve": {
+      "title": "Idhinisha Usajili",
+      "error": "Imeshindwa kuidhinisha usajili",
+      "resend": "Tuma tena barua pepe",
+      "submit": "Idhinisha"
+    },
+    "reject": {
+      "title": "Kataa Usajili",
+      "error": "Imeshindwa kukataa usajili",
+      "reasonLabel": "Sababu",
+      "submit": "Kataa"
+    }
+  },
+  "forgotPassword": {
+    "logoAlt": "Logo",
+    "title": "Weka upya nywila yako",
+    "success": "Ikiwa akaunti ipo kwa barua pepe hiyo, tumetuma maelekezo ya kuweka upya.",
+    "subtitle": "Ingiza barua pepe yako na tutatuma kiungo cha kuweka upya nywila yako.",
+    "email": "Barua pepe",
+    "submit": "Tuma kiungo cha kuweka upya",
+    "backToLogin": "Rudi kuingia"
+  },
+  "profile": {
+    "title": "Wasifu Wangu",
+    "section": {
+      "profileInfo": "Maelezo ya Wasifu",
+      "changePassword": "Badilisha Nywila"
+    },
+    "field": {
+      "name": "Jina la Kuonyesha",
+      "email": "Barua pepe",
+      "currentPassword": "Nywila ya Sasa",
+      "newPassword": "Nywila Mpya",
+      "confirmPassword": "Thibitisha Nywila Mpya"
+    },
+    "action": {
+      "save": "Hifadhi Mabadiliko",
+      "changePassword": "Badilisha Nywila"
+    },
+    "success": {
+      "profileUpdated": "Wasifu umesasishwa.",
+      "passwordChanged": "Nywila imebadilishwa."
+    },
+    "error": {
+      "noUser": "Mtumiaji hakupatikana. Tafadhali ingia tena.",
+      "nameEmailRequired": "Jina na barua pepe zinahitajika.",
+      "emailAlreadyExists": "Mtumiaji mwenye barua pepe hii tayari yupo.",
+      "saveFailed": "Imeshindwa kusasisha wasifu.",
+      "currentPasswordRequired": "Nywila ya sasa inahitajika.",
+      "newPasswordRequired": "Nywila mpya inahitajika.",
+      "passwordMismatch": "Nywila mpya hazifanani.",
+      "passwordTooShort": "Nywila lazima iwe na herufi 6 au zaidi.",
+      "wrongPassword": "Nywila ya sasa si sahihi.",
+      "requiresRecentLogin": "Tafadhali toka na uingie tena kabla ya kubadilisha nywila yako.",
+      "passwordChangeFailed": "Imeshindwa kubadilisha nywila."
     }
   }
 }

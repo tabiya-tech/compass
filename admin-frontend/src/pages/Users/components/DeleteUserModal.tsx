@@ -44,7 +44,7 @@ const DeleteUserModal: React.FC = () => {
       handleClose();
       fetchUsers();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("users.error.deleteFailed", "Failed to delete user"));
+      setError(err instanceof Error ? err.message : t("users.error.deleteFailed"));
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ const DeleteUserModal: React.FC = () => {
       fullWidth
       data-testid={DATA_TEST_ID.DELETE_USER_MODAL_DIALOG}
     >
-      <DialogTitle>{t("users.deleteModal.title", "Delete User")}</DialogTitle>
+      <DialogTitle>{t("users.deleteModal.title")}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -73,7 +73,7 @@ const DeleteUserModal: React.FC = () => {
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.DELETE_USER_MODAL_CANCEL}>
-          {t("common.cancel", "Cancel")}
+          {t("common.cancel")}
         </Button>
         <Button
           variant="contained"
@@ -82,7 +82,7 @@ const DeleteUserModal: React.FC = () => {
           disabled={loading}
           data-testid={DATA_TEST_ID.DELETE_USER_MODAL_CONFIRM}
         >
-          {loading ? <CircularProgress size={20} /> : t("users.deleteModal.confirm", "Delete")}
+          {loading ? <CircularProgress size={20} /> : t("users.deleteModal.confirm")}
         </Button>
       </DialogActions>
     </Dialog>

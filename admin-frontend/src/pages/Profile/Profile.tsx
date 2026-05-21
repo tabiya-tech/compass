@@ -56,14 +56,14 @@ const Profile: React.FC = () => {
 
     const userId = userStateService.getUserId();
     if (!userId) {
-      setProfileError(t("profile.error.noUser", "User not found. Please log in again."));
+      setProfileError(t("profile.error.noUser"));
       return;
     }
 
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     if (!trimmedName || !trimmedEmail) {
-      setProfileError(t("profile.error.nameEmailRequired", "Name and email are required."));
+      setProfileError(t("profile.error.nameEmailRequired"));
       return;
     }
 
@@ -93,11 +93,9 @@ const Profile: React.FC = () => {
       setProfileSuccess(true);
     } catch (err: unknown) {
       if (err instanceof HttpError && err.status === 409) {
-        setProfileError(t("profile.error.emailAlreadyExists", "A user with this email already exists."));
+        setProfileError(t("profile.error.emailAlreadyExists"));
       } else {
-        setProfileError(
-          err instanceof Error ? err.message : t("profile.error.saveFailed", "Failed to update profile.")
-        );
+        setProfileError(err instanceof Error ? err.message : t("profile.error.saveFailed"));
       }
     } finally {
       setProfileLoading(false);
@@ -109,19 +107,19 @@ const Profile: React.FC = () => {
     setPasswordSuccess(false);
 
     if (!currentPassword) {
-      setPasswordError(t("profile.error.currentPasswordRequired", "Current password is required."));
+      setPasswordError(t("profile.error.currentPasswordRequired"));
       return;
     }
     if (!newPassword) {
-      setPasswordError(t("profile.error.newPasswordRequired", "New password is required."));
+      setPasswordError(t("profile.error.newPasswordRequired"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPasswordError(t("profile.error.passwordMismatch", "New passwords do not match."));
+      setPasswordError(t("profile.error.passwordMismatch"));
       return;
     }
     if (newPassword.length < 6) {
-      setPasswordError(t("profile.error.passwordTooShort", "Password must be at least 6 characters."));
+      setPasswordError(t("profile.error.passwordTooShort"));
       return;
     }
 
@@ -129,7 +127,7 @@ const Profile: React.FC = () => {
     try {
       const currentUser = firebaseAuth.currentUser;
       if (!currentUser || !currentUser.email) {
-        throw new Error(t("profile.error.noUser", "User not found. Please log in again."));
+        throw new Error(t("profile.error.noUser"));
       }
 
       const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, currentPassword);
@@ -143,13 +141,11 @@ const Profile: React.FC = () => {
     } catch (err: unknown) {
       const firebaseErr = err as { code?: string; message?: string };
       if (firebaseErr?.code === "auth/wrong-password" || firebaseErr?.code === "auth/invalid-credential") {
-        setPasswordError(t("profile.error.wrongPassword", "Current password is incorrect."));
+        setPasswordError(t("profile.error.wrongPassword"));
       } else if (firebaseErr?.code === "auth/requires-recent-login") {
-        setPasswordError(
-          t("profile.error.requiresRecentLogin", "Please log out and log back in before changing your password.")
-        );
+        setPasswordError(t("profile.error.requiresRecentLogin"));
       } else {
-        setPasswordError(firebaseErr?.message ?? t("profile.error.passwordChangeFailed", "Failed to change password."));
+        setPasswordError(firebaseErr?.message ?? t("profile.error.passwordChangeFailed"));
       }
     } finally {
       setPasswordLoading(false);
@@ -173,7 +169,7 @@ const Profile: React.FC = () => {
 
       <Container maxWidth="sm" sx={{ py: theme.fixedSpacing(theme.tabiyaSpacing.xl) }}>
         <Typography variant="h4" sx={{ fontWeight: 700, mb: theme.fixedSpacing(theme.tabiyaSpacing.lg) }}>
-          {t("profile.title", "My Profile")}
+          {t("profile.title")}
         </Typography>
 
         {/* Profile Information */}
@@ -186,7 +182,7 @@ const Profile: React.FC = () => {
           }}
         >
           <Typography variant="h6" sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.md) }}>
-            {t("profile.section.profileInfo", "Profile Information")}
+            {t("profile.section.profileInfo")}
           </Typography>
 
           {profileError && (
@@ -196,12 +192,12 @@ const Profile: React.FC = () => {
           )}
           {profileSuccess && (
             <Alert severity="success" sx={{ mb: 2 }} onClose={() => setProfileSuccess(false)}>
-              {t("profile.success.profileUpdated", "Profile updated successfully.")}
+              {t("profile.success.profileUpdated")}
             </Alert>
           )}
 
           <TextField
-            label={t("profile.field.name", "Display Name")}
+            label={t("profile.field.name")}
             fullWidth
             margin="normal"
             value={name}
@@ -213,7 +209,7 @@ const Profile: React.FC = () => {
             data-testid={DATA_TEST_ID.PROFILE_NAME_INPUT}
           />
           <TextField
-            label={t("profile.field.email", "Email")}
+            label={t("profile.field.email")}
             type="email"
             fullWidth
             margin="normal"
@@ -233,7 +229,7 @@ const Profile: React.FC = () => {
               disabled={profileLoading || !isProfileChanged}
               data-testid={DATA_TEST_ID.PROFILE_SAVE_BUTTON}
             >
-              {profileLoading ? <CircularProgress size={20} /> : t("profile.action.save", "Save Changes")}
+              {profileLoading ? <CircularProgress size={20} /> : t("profile.action.save")}
             </Button>
           </Box>
         </Box>
@@ -249,7 +245,7 @@ const Profile: React.FC = () => {
           }}
         >
           <Typography variant="h6" sx={{ mb: theme.fixedSpacing(theme.tabiyaSpacing.md) }}>
-            {t("profile.section.changePassword", "Change Password")}
+            {t("profile.section.changePassword")}
           </Typography>
 
           {passwordError && (
@@ -259,12 +255,12 @@ const Profile: React.FC = () => {
           )}
           {passwordSuccess && (
             <Alert severity="success" sx={{ mb: 2 }} onClose={() => setPasswordSuccess(false)}>
-              {t("profile.success.passwordChanged", "Password changed successfully.")}
+              {t("profile.success.passwordChanged")}
             </Alert>
           )}
 
           <TextField
-            label={t("profile.field.currentPassword", "Current Password")}
+            label={t("profile.field.currentPassword")}
             type="password"
             fullWidth
             margin="normal"
@@ -277,7 +273,7 @@ const Profile: React.FC = () => {
             data-testid={DATA_TEST_ID.PROFILE_CURRENT_PASSWORD_INPUT}
           />
           <TextField
-            label={t("profile.field.newPassword", "New Password")}
+            label={t("profile.field.newPassword")}
             type="password"
             fullWidth
             margin="normal"
@@ -290,7 +286,7 @@ const Profile: React.FC = () => {
             data-testid={DATA_TEST_ID.PROFILE_NEW_PASSWORD_INPUT}
           />
           <TextField
-            label={t("profile.field.confirmPassword", "Confirm New Password")}
+            label={t("profile.field.confirmPassword")}
             type="password"
             fullWidth
             margin="normal"
@@ -310,7 +306,7 @@ const Profile: React.FC = () => {
               disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
               data-testid={DATA_TEST_ID.PROFILE_CHANGE_PASSWORD_BUTTON}
             >
-              {passwordLoading ? <CircularProgress size={20} /> : t("profile.action.changePassword", "Change Password")}
+              {passwordLoading ? <CircularProgress size={20} /> : t("profile.action.changePassword")}
             </Button>
           </Box>
         </Box>

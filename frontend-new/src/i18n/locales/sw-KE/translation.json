@@ -224,7 +224,8 @@
         "question": "Ungependa kusubiri {{appName}} imalize, au upakie upya?",
         "waitButton": "Subiri {{appName}}",
         "refreshButton": "Paisha upya"
-      }
+      },
+      "bwsTransitionMessage": "Sasa ningependa kuelewa unachothamini zaidi katika kazi. Nitakuonyesha seti kadhaa za shughuli za kazi — kwa kila moja, chagua ile unayoipendelea **zaidi** na ile unayoipendelea **kidogo** zaidi."
     },
     "chatProgressbar": {
       "labels": {
@@ -526,7 +527,8 @@
           "shareTitle": "Ripoti ya Uzoefu",
           "shareText": "Angalia ripoti yangu ya uzoefu",
           "shareFailed": "Hatukuweza kushiriki ripoti yako. Unaweza kuipakua na kushiriki faili moja kwa moja.",
-          "shareCanceled": "Kushiriki kumeghairiwa kwa ombi la mtumiaji"
+          "shareCanceled": "Kushiriki kumeghairiwa kwa ombi la mtumiaji",
+          "share": "Shiriki"
         }
       },
       "deleteSuccess": "Uzoefu umefutwa kwa mafanikio!",
@@ -580,7 +582,10 @@
           "summaryMaxLength": "Upeo wa herufi {{max}} unaruhusiwa.",
           "timelineMaxLength": "Upeo wa herufi {{max}} unaruhusiwa."
         }
-      }
+      },
+      "reportTitle": "Ripoti Yako ya Ujuzi wa Njila",
+      "educationLabel": "ELIMU",
+      "experiencesAndSkillsLabel": "UZOEFU NA UJUZI"
     },
     "report": {
       "skillsReportTitle": "Ripoti ya Ujuzi",
@@ -598,7 +603,11 @@
         "part2": "Ujuzi ulioorodheshwa unategemea mazungumzo na mgombea, haujathibitishwa na Tabiya, na unaweza kuwa si sahihi. ",
         "part3": "Taarifa inapaswa kukaguliwa kabla ya kutumika kwa kutafuta kazi, mahojiano ya kazi, au kuunda CV."
       },
-      "bodyText": "Ripoti hii inafupisha taarifa muhimu zilizokusanywa wakati wa mazungumzo na {{appName}} tarehe {{date}}. {{appName}} ni chatbot ya AI inayosaidia watafutaji wa kazi kuchunguza ujuzi na uzoefu wao."
+      "bodyText": "Ripoti hii inafupisha taarifa muhimu zilizokusanywa wakati wa mazungumzo na {{appName}} tarehe {{date}}. {{appName}} ni chatbot ya AI inayosaidia watafutaji wa kazi kuchunguza ujuzi na uzoefu wao.",
+      "format": {
+        "pdf": "PDF",
+        "docx": "DOCX"
+      }
     }
   },
   "features": {
@@ -713,11 +722,41 @@
         "yesSkip": "Ndio, ruka",
         "shareData": "Shiriki data",
         "skipping": "Inaruka...",
-        "refreshPage": "Paisha Upya Ukurasa"
+        "refreshPage": "Paisha Upya Ukurasa",
+        "fields": {
+          "firstName": "Jina la Kwanza",
+          "lastName": "Jina la Familia",
+          "institution": "Taasisi",
+          "institutionSearchPlaceholder": "Anza kuandika kutafuta...",
+          "programme": "Programu",
+          "programmeSelectPlaceholder": "Chagua programu",
+          "programmeSelectFirstPlaceholder": "Chagua taasisi kwanza",
+          "schoolYear": "Mwaka wa Shule",
+          "typeAtLeastXChars": "Andika angalau herufi 2 kutafuta",
+          "searching": "Inatafuta...",
+          "noInstitutionsFound": "Hakuna taasisi zilizopatikana",
+          "selectInstitutionFirst": "Chagua taasisi kwanza",
+          "loadingProgrammes": "Inapakia programu...",
+          "noProgrammesAvailable": "Hakuna programu zinazopatikana"
+        },
+        "loadingForm": "Inapakia fomu...",
+        "schoolYearOptions": {
+          "year1": "Mwaka 1",
+          "year2": "Mwaka 2",
+          "year3": "Mwaka 3",
+          "year4": "Mwaka 4"
+        }
       },
       "enumField": {
         "pleaseSelectX": "Tafadhali chagua {{x}}",
-        "clearSelection": "Futa chaguo"
+        "clearSelection": "Futa chaguo",
+        "searchPlaceholder": "Tafuta…",
+        "searchAriaLabel": "Tafuta chaguzi"
+      },
+      "multipleSelectField": {
+        "searchPlaceholder": "Tafuta…",
+        "searchAriaLabel": "Tafuta chaguzi",
+        "selectAtLeastOne": "Tafadhali chagua angalau {{field}} moja"
       }
     }
   },
@@ -1049,7 +1088,11 @@
           "title": "Sayansi ya Afya",
           "description": "Afya msaidizi, utambuzi, famasia, fizioterapia"
         }
-      }
+      },
+      "profileStrengthProgressAriaLabel": "Maendeleo ya nguvu ya wasifu",
+      "educationSkillsProgressAriaLabel": "Maendeleo ya ujuzi wa elimu",
+      "workSkillsProgressAriaLabel": "Maendeleo ya ujuzi wa kazi",
+      "viewMyCvSubtitle": "Pakua na kushiriki Ripoti Yako ya Ujuzi"
     },
     "modules": {
       "skillsDiscovery": "Jenga wasifu wako",
@@ -1073,7 +1116,38 @@
       "termsOfUse": "Sheria za Matumizi",
       "accessibility": "Ufikiaji",
       "contact": "Wasiliana",
-      "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya."
+      "collaboration": "{{appName}} ni zana ya bure ya mwongozo wa kazi inayotolewa na Wizara ya Teknolojia na Sayansi ya Zambia, iliyojengwa kwa ushirikiano na Kundi la Benki ya Dunia na Tabiya.",
+      "worldBankLogoAlt": "Nembo ya Kundi la Benki ya Dunia",
+      "ministryTechLogoAlt": "Nembo ya Wizara ya Teknolojia",
+      "tabiyaLogoAlt": "Nembo ya Tabiya"
+    },
+    "sidebar": {
+      "showLess": "Onyesha Kidogo",
+      "seeAll": "Ona Yote {{count}} →",
+      "skillsDiscovery": {
+        "title": "Ujuzi Uliotambuliwa",
+        "emptyState": "Ujuzi utaonekana hapa unapomaliza mazungumzo ya \"Jenga Wasifu Wako\"",
+        "fromWorkAndLife": "Kutoka kazi na maisha",
+        "fromTEVET": "Kutoka programu ya TEVET"
+      },
+      "careerExplorer": {
+        "title": "Sekta Zilizochunguzwa",
+        "emptyState": "Sekta zitaonekana hapa unapochunguza kazi na Njila."
+      },
+      "careerReadiness": {
+        "title": "Mada"
+      },
+      "home": {
+        "skillsFromWork": "Ujuzi Kutoka Kazini",
+        "skillsFromTEVET": "Ujuzi Kutoka Programu ya TEVET",
+        "myExperience": "Uzoefu Wangu",
+        "workSkillsEmpty": "Ujuzi utaonekana hapa unapomaliza mazungumzo ya \"Jenga Wasifu Wako\"",
+        "programmeSkillsEmpty": "Ujuzi wa programu utaonekana unapomaliza moduli."
+      }
+    },
+    "moduleHandoff": {
+      "message": "Kazi nzuri! Uko tayari kuendelea?",
+      "continueWith": "Endelea na {{moduleLabel}}"
     }
   },
   "knowledgeHub": {
@@ -1086,22 +1160,28 @@
     "discoverSectorCta": "Chunguza sekta ya {{sector}} →",
     "sectors": {
       "energy": {
-        "title": "Nishati"
+        "title": "Nishati",
+        "description": "Sekta ya nishati ya Zambia inakabiliwa na mabadiliko makubwa, ikielekea vyanzo vya nishati mbadala kama vile jua na upepo ili kukamilisha msingi wake imara wa umeme wa maji."
       },
       "mining": {
-        "title": "Uchimbaji Madini"
+        "title": "Uchimbaji Madini",
+        "description": "Sekta ya uchimbaji inabaki kuwa uti wa mgongo wa uchumi wa Zambia, ikihamasisha mapato ya mauzo ya nje na maendeleo ya kiteknolojia."
       },
       "hospitality": {
-        "title": "Ukarimu na Utalii"
+        "title": "Ukarimu na Utalii",
+        "description": "Urithi tajiri wa asili na vitovu vya biashara vinavyokua nchini Zambia hufanya sekta ya ukarimu kuwa hai na yenye nguvu."
       },
       "agriculture": {
-        "title": "Kilimo"
+        "title": "Kilimo",
+        "description": "Kilimo ndicho chanzo kikuu cha ajira nchini Zambia, lakini kinabadilika kutoka kilimo cha kujikimu hadi biashara ya kilimo na uzalishaji unaozingatia teknolojia."
       },
       "water": {
-        "title": "Maji na Usafi wa Mazingira"
+        "title": "Maji na Usafi wa Mazingira",
+        "description": "Usafishaji wa maji, mitandao ya usambazaji, miundombinu ya usafi na shughuli za usimamizi wa taka."
       },
       "health": {
-        "title": "Sayansi ya Afya"
+        "title": "Sayansi ya Afya",
+        "description": "Sayansi ya afya inayosaidia inaunga mkono huduma ya kliniki kupitia utambuzi, ukarabati, ugawaji wa dawa, kazi za maabara, na afya ya mazingira."
       }
     },
     "noDocumentsAvailable": "Bado hakuna waraka zinazopatikana.",
@@ -1132,7 +1212,31 @@
     "navProgrammes": "Mipango",
     "navCriticalSkills": "Ujuzi muhimu",
     "navInDevelopment": "Katika maendeleo",
-    "navKeepInMind": "Kumbuka"
+    "navKeepInMind": "Kumbuka",
+    "pageSectionsAriaLabel": "Sehemu za ukurasa",
+    "programmeCount": "Programu {{count}}",
+    "zqf": {
+      "skillsAward": {
+        "label": "Tuzo ya Ujuzi",
+        "duration": "Kozi fupi"
+      },
+      "level3": {
+        "label": "Cheti Kiwango cha 3",
+        "duration": "Mwaka 1"
+      },
+      "craftCertificate": {
+        "label": "Cheti cha Ufundi",
+        "duration": "Miaka 2"
+      },
+      "advancedCertificate": {
+        "label": "Cheti cha Juu",
+        "duration": "Miaka 2.5"
+      },
+      "diploma": {
+        "label": "Stashahada",
+        "duration": "Miaka 3"
+      }
+    }
   },
   "jobMatching": {
     "pageTitle": "Kuoanisha Kazi",
@@ -1142,6 +1246,45 @@
       "emptyNoSkills": "Kazi zinazooana bado hazipatikani. Kamilisha sehemu ya \"Jenga Wasifu Wako\" ili kufungua mapendekezo yaliyobinafsishwa.",
       "emptyProgrammeNoMatches": "Bado hakuna uoanifu. Kamilisha gumzo la Jenga Wasifu Wako ili kupata kazi zinazolingana na ujuzi wako.",
       "emptySiNoMatches": "Kwa sasa hatuna uoanifu kwa ajili yako — rudi uangalie baadaye."
+    },
+    "tabs": {
+      "browse": "Vinjari Kazi",
+      "matched": "Zilizolingana Nawe"
+    },
+    "table": {
+      "sortAscending": "Panga kupanda",
+      "sortDescending": "Panga kushuka",
+      "filterSearchPlaceholder": "Tafuta…",
+      "filterSearchAriaLabel": "Tafuta chaguzi za kichujio",
+      "sortClear": "Futa upangaji",
+      "browseAriaLabel": "Jedwali la kuvinjari kazi",
+      "matchedAriaLabel": "Jedwali la kazi zilizolingana",
+      "noJobsFound": "Hakuna kazi zilizopatikana.",
+      "noData": "Hakuna data",
+      "prevPage": "Ukurasa uliopita",
+      "nextPage": "Ukurasa unaofuata",
+      "searchPlaceholder": "Tafuta majina ya kazi au makampuni...",
+      "searchAriaLabel": "Tafuta kazi",
+      "pageAriaLabel": "Ukurasa {{page}}",
+      "pageRange": "Ukurasa {{start}}–{{end}} wa {{total}}"
+    },
+    "columns": {
+      "jobTitle": "Jina la Kazi",
+      "company": "Kampuni",
+      "category": "Kategoria",
+      "type": "Aina",
+      "location": "Eneo",
+      "posted": "Ilisajiliwa",
+      "match": "Mechi",
+      "filterAll": "Yote"
+    },
+    "jobDetail": {
+      "closeButton": "Funga",
+      "applyNow": "Omba Sasa",
+      "category": "Kategoria:",
+      "matchScore": "Alama za Mechi:",
+      "extractedSkills": "Ujuzi Uliotolewa ({{count}})",
+      "posted": "Ilisajiliwa {{date}}"
     }
   },
   "nav": {

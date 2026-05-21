@@ -182,7 +182,8 @@
         "question": "¿Querés esperar a que {{appName}} termine o actualizar de todos modos?",
         "waitButton": "Esperar a {{appName}}",
         "refreshButton": "Actualizar"
-      }
+      },
+      "bwsTransitionMessage": "Ahora me gustaría entender qué es lo que más valorás en un trabajo. Te voy a mostrar algunos conjuntos de actividades laborales — para cada uno, elegí la que **más** preferís y la que **menos** preferís."
     },
     "chatProgressbar": {
       "labels": {
@@ -544,7 +545,8 @@
           "shareTitle": "Informe de experiencias",
           "shareText": "Mirá mi informe de experiencias",
           "shareFailed": "No pudimos compartir tu informe. Podés descargarlo y compartir el archivo directamente.",
-          "shareCanceled": "Se canceló el compartir por solicitud del usuario"
+          "shareCanceled": "Se canceló el compartir por solicitud del usuario",
+          "share": "Compartir"
         }
       },
       "deleteSuccess": "¡Experiencia eliminada con éxito!",
@@ -598,7 +600,10 @@
           "summaryMaxLength": "Máximo {{max}} de caracteres permitido.",
           "timelineMaxLength": "Máximo {{max}} de caracteres permitido."
         }
-      }
+      },
+      "reportTitle": "Tu Informe de Habilidades de Njila",
+      "educationLabel": "EDUCACIÓN",
+      "experiencesAndSkillsLabel": "EXPERIENCIAS Y HABILIDADES"
     },
     "report": {
       "skillsReportTitle": "Informe de habilidades",
@@ -616,7 +621,11 @@
         "part2": "Las habilidades listadas se basan en una conversación con la persona candidata, no han sido verificadas ni validadas por Tabiya y pueden ser inexactas. ",
         "part3": "La información debe ser verificada antes de usarla para la búsqueda de empleo, entrevistas o para crear un CV. Para revisar esta información, volvé a hablar con {{appName}} o creá un CV completo basado en este informe."
       },
-      "bodyText": "Este informe resume la información clave recopilada durante una conversación con {{appName}} el {{date}}. {{appName}} es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral de la persona candidata y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo."
+      "bodyText": "Este informe resume la información clave recopilada durante una conversación con {{appName}} el {{date}}. {{appName}} es un chatbot de IA que ayuda a las personas que buscan empleo a explorar sus habilidades y experiencias. Este informe presenta la experiencia laboral de la persona candidata y las habilidades identificadas en cada experiencia. Esta información puede usarse para guiar la búsqueda de empleo y resaltar sus habilidades al postular, especialmente durante entrevistas con posibles empleadores. Puede ser un buen punto de partida para crear un CV completo.",
+      "format": {
+        "pdf": "PDF",
+        "docx": "DOCX"
+      }
     }
   },
   "features": {
@@ -731,11 +740,41 @@
         "yesSkip": "Sí, omitir",
         "shareData": "Compartir datos",
         "skipping": "Omitiendo...",
-        "refreshPage": "Actualizar página"
+        "refreshPage": "Actualizar página",
+        "fields": {
+          "firstName": "Nombre",
+          "lastName": "Apellido",
+          "institution": "Institución",
+          "institutionSearchPlaceholder": "Empezá a escribir para buscar...",
+          "programme": "Programa",
+          "programmeSelectPlaceholder": "Seleccioná un programa",
+          "programmeSelectFirstPlaceholder": "Seleccioná una institución primero",
+          "schoolYear": "Año Escolar",
+          "typeAtLeastXChars": "Escribí al menos 2 caracteres para buscar",
+          "searching": "Buscando...",
+          "noInstitutionsFound": "No se encontraron instituciones",
+          "selectInstitutionFirst": "Seleccioná una institución primero",
+          "loadingProgrammes": "Cargando programas...",
+          "noProgrammesAvailable": "No hay programas disponibles"
+        },
+        "loadingForm": "Cargando formulario...",
+        "schoolYearOptions": {
+          "year1": "Año 1",
+          "year2": "Año 2",
+          "year3": "Año 3",
+          "year4": "Año 4"
+        }
       },
       "enumField": {
         "pleaseSelectX": "Por favor, seleccioná {{x}}",
-        "clearSelection": "Limpiar selección"
+        "clearSelection": "Limpiar selección",
+        "searchPlaceholder": "Buscar…",
+        "searchAriaLabel": "Buscar opciones"
+      },
+      "multipleSelectField": {
+        "searchPlaceholder": "Buscar…",
+        "searchAriaLabel": "Buscar opciones",
+        "selectAtLeastOne": "Por favor seleccioná al menos un {{field}}"
       }
     }
   },
@@ -891,22 +930,28 @@
     "discoverSectorCta": "Descubrí el sector de {{sector}} →",
     "sectors": {
       "energy": {
-        "title": "Energía"
+        "title": "Energía",
+        "description": "El sector energético de Zambia está experimentando una transformación masiva, virando hacia fuentes de energía renovable como la solar y la eólica para complementar su sólida base hidroeléctrica."
       },
       "mining": {
-        "title": "Minería"
+        "title": "Minería",
+        "description": "El sector minero sigue siendo la columna vertebral de la economía de Zambia, impulsando los ingresos por exportaciones y el avance tecnológico."
       },
       "hospitality": {
-        "title": "Hospitalidad y Turismo"
+        "title": "Hospitalidad y Turismo",
+        "description": "El rico patrimonio natural de Zambia y sus crecientes centros de negocios hacen del sector hotelero un ámbito vibrante."
       },
       "agriculture": {
-        "title": "Agricultura"
+        "title": "Agricultura",
+        "description": "La agricultura es el mayor empleador de Zambia, pero está evolucionando de la agricultura de subsistencia hacia la agroindustria comercial y la producción tecnológica."
       },
       "water": {
-        "title": "Agua y Saneamiento"
+        "title": "Agua y Saneamiento",
+        "description": "Tratamiento de agua, redes de suministro, infraestructura de saneamiento y operaciones de gestión de residuos."
       },
       "health": {
-        "title": "Ciencias de la Salud"
+        "title": "Ciencias de la Salud",
+        "description": "Las ciencias de la salud aliadas brindan apoyo a la atención clínica a través del diagnóstico, la rehabilitación, la dispensación, el trabajo de laboratorio y la salud ambiental."
       }
     },
     "noDocumentsAvailable": "Aún no hay documentos disponibles.",
@@ -937,7 +982,31 @@
     "navProgrammes": "Programas",
     "navCriticalSkills": "Habilidades críticas",
     "navInDevelopment": "En desarrollo",
-    "navKeepInMind": "Tener en mente"
+    "navKeepInMind": "Tener en mente",
+    "pageSectionsAriaLabel": "Secciones de la página",
+    "programmeCount": "{{count}} programas",
+    "zqf": {
+      "skillsAward": {
+        "label": "Premio de Habilidades",
+        "duration": "Curso corto"
+      },
+      "level3": {
+        "label": "Certificado Nivel 3",
+        "duration": "1 año"
+      },
+      "craftCertificate": {
+        "label": "Certificado de Oficio",
+        "duration": "2 años"
+      },
+      "advancedCertificate": {
+        "label": "Certificado Avanzado",
+        "duration": "2,5 años"
+      },
+      "diploma": {
+        "label": "Diploma",
+        "duration": "3 años"
+      }
+    }
   },
   "careerReadiness": {
     "backToModules": "Volver a todos los módulos",
@@ -1107,7 +1176,11 @@
           "title": "Ciencias de la Salud",
           "description": "Salud aliada, diagnóstico, farmacia, fisioterapia"
         }
-      }
+      },
+      "profileStrengthProgressAriaLabel": "Progreso de la fortaleza del perfil",
+      "educationSkillsProgressAriaLabel": "Progreso de habilidades educativas",
+      "workSkillsProgressAriaLabel": "Progreso de habilidades laborales",
+      "viewMyCvSubtitle": "Descargá y compartí tu Informe de Habilidades personalizado"
     },
     "modules": {
       "skillsDiscovery": "Construí tu perfil",
@@ -1131,7 +1204,38 @@
       "termsOfUse": "Términos de Uso",
       "accessibility": "Accesibilidad",
       "contact": "Contacto",
-      "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional ofrecida por el Ministerio de Tecnología y Ciencia de Zambia, desarrollada en colaboración con el Grupo del Banco Mundial y Tabiya."
+      "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional ofrecida por el Ministerio de Tecnología y Ciencia de Zambia, desarrollada en colaboración con el Grupo del Banco Mundial y Tabiya.",
+      "worldBankLogoAlt": "Logo del Grupo Banco Mundial",
+      "ministryTechLogoAlt": "Logo del Ministerio de Tecnología",
+      "tabiyaLogoAlt": "Logo de Tabiya"
+    },
+    "sidebar": {
+      "showLess": "Mostrar Menos",
+      "seeAll": "Ver todos {{count}} →",
+      "skillsDiscovery": {
+        "title": "Habilidades Identificadas",
+        "emptyState": "Las habilidades aparecerán aquí cuando completés el chat \"Construí tu Perfil\"",
+        "fromWorkAndLife": "Del trabajo y la vida",
+        "fromTEVET": "Del programa TEVET"
+      },
+      "careerExplorer": {
+        "title": "Sectores Explorados",
+        "emptyState": "Los sectores aparecerán aquí cuando explorés carreras con Njila."
+      },
+      "careerReadiness": {
+        "title": "Temas"
+      },
+      "home": {
+        "skillsFromWork": "Habilidades del Trabajo",
+        "skillsFromTEVET": "Habilidades del Programa TEVET",
+        "myExperience": "Mi Experiencia",
+        "workSkillsEmpty": "Las habilidades aparecerán aquí cuando completés el chat \"Construí tu Perfil\"",
+        "programmeSkillsEmpty": "Las habilidades del programa aparecerán cuando completés los módulos."
+      }
+    },
+    "moduleHandoff": {
+      "message": "¡Excelente trabajo! ¿Estás listo/a para seguir?",
+      "continueWith": "Continuá con {{moduleLabel}}"
     }
   },
   "jobMatching": {
@@ -1142,6 +1246,45 @@
       "emptyNoSkills": "Las ofertas que coinciden todavía no están disponibles. Completá la sección \"Construí tu perfil\" para desbloquear recomendaciones personalizadas.",
       "emptyProgrammeNoMatches": "Todavía no hay coincidencias. Completá el chat de Construí tu perfil para encontrar trabajos que se ajusten a tus habilidades.",
       "emptySiNoMatches": "Por ahora no tenemos coincidencias para vos — volvé a revisar más tarde."
+    },
+    "tabs": {
+      "browse": "Buscar Empleos",
+      "matched": "Coincidencias para Vos"
+    },
+    "table": {
+      "sortAscending": "Ordenar ascendente",
+      "sortDescending": "Ordenar descendente",
+      "filterSearchPlaceholder": "Buscar…",
+      "filterSearchAriaLabel": "Buscar opciones de filtro",
+      "sortClear": "Limpiar orden",
+      "browseAriaLabel": "Tabla de exploración de empleos",
+      "matchedAriaLabel": "Tabla de empleos coincidentes",
+      "noJobsFound": "No se encontraron empleos.",
+      "noData": "Sin datos",
+      "prevPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "searchPlaceholder": "Buscá títulos de empleo o empresas...",
+      "searchAriaLabel": "Buscar empleos",
+      "pageAriaLabel": "Página {{page}}",
+      "pageRange": "Página {{start}}–{{end}} de {{total}}"
+    },
+    "columns": {
+      "jobTitle": "Título del Empleo",
+      "company": "Empresa",
+      "category": "Categoría",
+      "type": "Tipo",
+      "location": "Ubicación",
+      "posted": "Publicado",
+      "match": "Coincidencia",
+      "filterAll": "Todos"
+    },
+    "jobDetail": {
+      "closeButton": "Cerrar",
+      "applyNow": "Postularme Ahora",
+      "category": "Categoría:",
+      "matchScore": "Puntuación de Coincidencia:",
+      "extractedSkills": "Habilidades Extraídas ({{count}})",
+      "posted": "Publicado {{date}}"
     }
   },
   "nav": {
@@ -1149,7 +1292,7 @@
     "dashboard": "Panel",
     "pathways": "Rutas",
     "needHelp": "Ayuda",
-    "faq": "FAQ",
+    "faq": "Preguntas Frecuentes",
     "faqAriaLabel": "Ayuda y preguntas frecuentes"
   },
   "faq": {

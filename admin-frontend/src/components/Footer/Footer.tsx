@@ -72,13 +72,13 @@ const Footer: React.FC = () => {
           >
             <img
               src={`${process.env.PUBLIC_URL}/world-bank-logo.svg`}
-              alt="World Bank Group Logo"
+              alt={t("footer.worldBankLogoAlt")}
               style={{ height: 28, width: "auto", objectFit: "contain", marginRight: 10 }}
               data-testid={DATA_TEST_ID.FOOTER_WORLD_BANK_LOGO}
             />
             <img
               src={`${process.env.PUBLIC_URL}/ministry-tech.png`}
-              alt="Ministry of Technology Logo"
+              alt={t("footer.ministryTechLogoAlt")}
               style={{
                 height: 36,
                 width: "auto",
@@ -88,7 +88,7 @@ const Footer: React.FC = () => {
             />
             <img
               src={`${process.env.PUBLIC_URL}/tabiya-logo.svg`}
-              alt="Tabiya Logo"
+              alt={t("footer.tabiyaLogoAlt")}
               style={{ height: 46, width: "auto", objectFit: "contain" }}
               data-testid={DATA_TEST_ID.FOOTER_TABIYA_LOGO}
             />

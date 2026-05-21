@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import type { ObjectiveItem } from "src/home/components/Sidebar/SidebarService";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
@@ -73,6 +74,7 @@ interface CareerReadinessSidebarProps {
 
 const CareerReadinessSidebar: React.FC<CareerReadinessSidebarProps> = ({ moduleId, coveredTopics = [] }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const accentColor = theme.palette.warning.main;
 
   const { profileData } = useUserProfileContext();
@@ -91,7 +93,7 @@ const CareerReadinessSidebar: React.FC<CareerReadinessSidebarProps> = ({ moduleI
   const progressPct = objectives.length > 0 ? Math.round((completedCount / objectives.length) * 100) : 0;
 
   return (
-    <Sidebar title="Topics" width={300}>
+    <Sidebar title={t("home.sidebar.careerReadiness.title")} width={300}>
       <Box sx={{ display: "flex", flexDirection: "column", gap: theme.fixedSpacing(theme.tabiyaSpacing.sm * 1.5) }}>
         <Box
           data-testid={DATA_TEST_ID.CAREER_READINESS_SIDEBAR_PROGRESS_BAR}

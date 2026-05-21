@@ -42,6 +42,19 @@
     },
     "modal": {
       "areYouSure": "¿Estás seguro?"
+    },
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "dataTable": {
+      "sortAscending": "Ordenar ascendente",
+      "sortDescending": "Ordenar descendente",
+      "sortAscText": "Ordenar A-Z",
+      "sortDescText": "Ordenar Z-A",
+      "noData": "Sin datos",
+      "prevPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "pageAriaLabel": "Página {{page}}",
+      "filterAriaLabel": "Filtrar {{column}}"
     }
   },
   "auth": {
@@ -107,7 +120,13 @@
   },
   "header": {
     "logout": "Cerrar sesión",
-    "user": "Usuario"
+    "user": "Usuario",
+    "profile": "Perfil",
+    "users": "Usuarios",
+    "role": {
+      "admin": "Administrador",
+      "institutionStaff": "Personal de Institución"
+    }
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -123,7 +142,10 @@
     "termsOfUse": "Condiciones de uso",
     "accessibility": "Accesibilidad",
     "contact": "Contacto",
-    "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional ofrecida por el Ministerio de Tecnología y Ciencia de Zambia, desarrollada en colaboración con el Grupo del Banco Mundial y Tabiya."
+    "collaboration": "{{appName}} es una herramienta gratuita de orientación profesional ofrecida por el Ministerio de Tecnología y Ciencia de Zambia, desarrollada en colaboración con el Grupo del Banco Mundial y Tabiya.",
+    "worldBankLogoAlt": "Logo del Grupo Banco Mundial",
+    "ministryTechLogoAlt": "Logo del Ministerio de Tecnología",
+    "tabiyaLogoAlt": "Logo de Tabiya"
   },
   "dashboard": {
     "sectionTitle": "Panel de administrador: seguimiento y análisis interinstitucionales",
@@ -135,7 +157,8 @@
       "institutions": "Instituciones",
       "modules": "Módulos",
       "skillsAnalytics": "Análisis de habilidades",
-      "jobPostings": "Ofertas de empleo"
+      "jobPostings": "Ofertas de empleo",
+      "ariaLabel": "Pestañas del tablero"
     },
     "dataTable": {
       "clearSorting": "Quitar ordenación"
@@ -233,7 +256,9 @@
       },
       "filters": {
         "allProvinces": "Todas las provincias",
-        "allSectors": "Todos los sectores"
+        "allSectors": "Todos los sectores",
+        "searchProvinces": "Buscar provincias...",
+        "searchSectors": "Buscar sectores..."
       }
     },
     "jobPostings": {
@@ -282,7 +307,8 @@
         "candidatePoolValue": "{{count}} estudiantes (coincidencia de 50%+)",
         "skillsExtracted": "Habilidades extraidas ({{count}})",
         "viewOriginalPosting": "Ver oferta original"
-      }
+      },
+      "page": "Página {{page}} de {{totalPages}}"
     },
     "institutionsTable": {
       "headers": {
@@ -291,7 +317,7 @@
         "active7Days": "Activo (7D)",
         "skillsDiscovery": "Construí tu perfil",
         "careerReadiness": "Preparación profesional",
-        "careerExplorer": "Career Explorer"
+        "careerExplorer": "Explorador de Carreras"
       },
       "subHeaders": {
         "started": "Comenzó",
@@ -304,14 +330,17 @@
       "nextPage": "Página siguiente",
       "page": "Página {{page}}"
     },
-    "comingSoon": "No hay datos hasta el momento."
+    "comingSoon": "No hay datos hasta el momento.",
+    "pagination": {
+      "range": "Página {{start}}–{{end}} de {{total}}"
+    }
   },
   "instructorDashboard": {
     "sectionTitle": "Panel del instructor: supervise la participación y el progreso de los estudiantes",
     "header": {
       "welcome": "Bienvenido, {{name}}",
       "institutionFallback": "Tu Institución",
-      "defaultName": "Instructor",
+      "defaultName": "Instructor/a",
       "school": "Evelyn Hone College of Applied Art and Commerce"
     },
     "tabs": {
@@ -367,7 +396,20 @@
     "title": "Inicio de sesión de administrador",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "submit": "Iniciar sesión"
+    "submit": "Iniciar sesión",
+    "subtitle": "Iniciá sesión para acceder al portal de administración",
+    "logoAlt": "Logo",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "requestAccess": "Solicitá acceso",
+    "errors": {
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos",
+      "userDisabled": "Esta cuenta ha sido deshabilitada",
+      "tooManyRequests": "Demasiados intentos fallidos. Por favor, intentá más tarde",
+      "networkError": "Error de red. Por favor, verificá tu conexión",
+      "invalidEmail": "Por favor, ingresá una dirección de correo electrónico válida",
+      "generic": "Error al iniciar sesión. Por favor, intentá de nuevo",
+      "fillAllFields": "Por favor, completá todos los campos"
+    }
   },
   "notFound": {
     "message": "Página no encontrada",
@@ -400,7 +442,10 @@
       "name": "Nombre",
       "role": "Rol",
       "institutionId": "ID de Institución",
-      "submit": "Crear Usuario"
+      "submit": "Crear Usuario",
+      "emailAlreadyExists": "Ya existe un usuario con este correo electrónico",
+      "emailFailed": "Se creó {{email}}, pero el correo de restablecimiento de contraseña no se pudo enviar. Podés reintentarlo ahora o enviarlo más tarde desde la página de Contraseña Olvidada.",
+      "resend": "Reenviar correo"
     },
     "updateRoleModal": {
       "title": "Actualizar Rol",
@@ -418,6 +463,114 @@
       "createFailed": "Error al crear usuario",
       "updateFailed": "Error al actualizar rol",
       "deleteFailed": "Error al eliminar usuario"
+    },
+    "roles": {
+      "superAdmin": "Super Administrador",
+      "admin": "Administrador",
+      "institutionStaff": "Personal de Institución"
+    },
+    "tabs": {
+      "active": "Usuarios Activos",
+      "pending": "Registros Pendientes"
+    },
+    "institutionAutocomplete": {
+      "label": "Institución",
+      "loadError": "Error al cargar instituciones"
+    }
+  },
+  "register": {
+    "title": "Solicitar Acceso",
+    "subtitle": "Registrate como instructor/a o administrador/a interinstitucional. Un super administrador revisará tu solicitud.",
+    "email": "Correo electrónico",
+    "name": "Nombre completo",
+    "role": "Rol",
+    "submit": "Enviar solicitud",
+    "success": "Gracias — recibimos tu solicitud. Recibirás un correo cuando un super administrador revise y apruebe tu cuenta.",
+    "backToLogin": "Volver al inicio de sesión",
+    "logoAlt": "Logo",
+    "roles": {
+      "admin": "Administrador/a interinstitucional",
+      "institutionStaff": "Instructor/a"
+    },
+    "errors": {
+      "alreadyExists": "Ya existe un registro activo para este correo electrónico.",
+      "generic": "Error al enviar el registro. Por favor, intentá de nuevo."
+    }
+  },
+  "registrations": {
+    "table": {
+      "email": "Correo electrónico",
+      "name": "Nombre",
+      "role": "Rol solicitado",
+      "institution": "Institución",
+      "submittedAt": "Enviado",
+      "actions": "Acciones",
+      "empty": "No hay registros pendientes"
+    },
+    "actions": {
+      "approve": "Aprobar",
+      "reject": "Rechazar"
+    },
+    "roles": {
+      "admin": "Administrador/a interinstitucional",
+      "institutionStaff": "Instructor/a"
+    },
+    "loading": "Cargando…",
+    "approve": {
+      "title": "Aprobar Registro",
+      "error": "Error al aprobar el registro",
+      "resend": "Reenviar correo",
+      "submit": "Aprobar"
+    },
+    "reject": {
+      "title": "Rechazar Registro",
+      "error": "Error al rechazar el registro",
+      "reasonLabel": "Motivo",
+      "submit": "Rechazar"
+    }
+  },
+  "forgotPassword": {
+    "logoAlt": "Logo",
+    "title": "Restablecé tu contraseña",
+    "success": "Si existe una cuenta para ese correo electrónico, enviamos las instrucciones de restablecimiento.",
+    "subtitle": "Ingresá tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
+    "email": "Correo electrónico",
+    "submit": "Enviar enlace de restablecimiento",
+    "backToLogin": "Volver al inicio de sesión"
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "section": {
+      "profileInfo": "Información del Perfil",
+      "changePassword": "Cambiar Contraseña"
+    },
+    "field": {
+      "name": "Nombre visible",
+      "email": "Correo electrónico",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmá la nueva contraseña"
+    },
+    "action": {
+      "save": "Guardar cambios",
+      "changePassword": "Cambiar contraseña"
+    },
+    "success": {
+      "profileUpdated": "Perfil actualizado correctamente.",
+      "passwordChanged": "Contraseña cambiada correctamente."
+    },
+    "error": {
+      "noUser": "Usuario no encontrado. Por favor, iniciá sesión de nuevo.",
+      "nameEmailRequired": "El nombre y el correo electrónico son obligatorios.",
+      "emailAlreadyExists": "Ya existe un usuario con este correo electrónico.",
+      "saveFailed": "Error al actualizar el perfil.",
+      "currentPasswordRequired": "La contraseña actual es obligatoria.",
+      "newPasswordRequired": "La nueva contraseña es obligatoria.",
+      "passwordMismatch": "Las nuevas contraseñas no coinciden.",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+      "wrongPassword": "La contraseña actual es incorrecta.",
+      "requiresRecentLogin": "Por favor, cerrá sesión y volvé a iniciarla antes de cambiar tu contraseña.",
+      "passwordChangeFailed": "Error al cambiar la contraseña."
     }
   }
 }

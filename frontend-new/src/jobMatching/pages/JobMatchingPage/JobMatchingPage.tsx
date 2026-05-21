@@ -156,18 +156,16 @@ const JobMatchingPage: React.FC = () => {
   };
 
   const browsePageLabel = useMemo(() => {
-    const enDash = "\u2013";
-    if (totalItems === 0) return `Page 0${enDash}0 of 0`;
-    const start = (page - 1) * PAGE_SIZE + 1;
-    const end = Math.min(page * PAGE_SIZE, totalItems);
-    return `Page ${start}${enDash}${end} of ${totalItems}`;
-  }, [page, totalItems]);
+    const start = totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+    const end = totalItems === 0 ? 0 : Math.min(page * PAGE_SIZE, totalItems);
+    return t("jobMatching.table.pageRange", { start, end, total: totalItems });
+  }, [page, totalItems, t]);
 
   const columns: ColumnDef<JobRow>[] = useMemo(
     () => [
       {
         key: "jobTitle",
-        label: "Job Title",
+        label: t("jobMatching.columns.jobTitle"),
         sortable: true,
         align: "left",
         minWidth: 180,
@@ -182,7 +180,7 @@ const JobMatchingPage: React.FC = () => {
       },
       {
         key: "company",
-        label: "Company",
+        label: t("jobMatching.columns.company"),
         sortable: false,
         align: "left",
         minWidth: 140,
@@ -194,7 +192,7 @@ const JobMatchingPage: React.FC = () => {
       },
       {
         key: "category",
-        label: "Category",
+        label: t("jobMatching.columns.category"),
         sortable: true,
         align: "left",
         minWidth: 120,
@@ -211,7 +209,7 @@ const JobMatchingPage: React.FC = () => {
       },
       {
         key: "employmentType",
-        label: "Type",
+        label: t("jobMatching.columns.type"),
         sortable: false,
         align: "left",
         minWidth: 100,
@@ -244,7 +242,7 @@ const JobMatchingPage: React.FC = () => {
       },
       {
         key: "location",
-        label: "Location",
+        label: t("jobMatching.columns.location"),
         sortable: true,
         align: "left",
         minWidth: 110,
@@ -261,7 +259,7 @@ const JobMatchingPage: React.FC = () => {
       },
       {
         key: "posted",
-        label: "Posted",
+        label: t("jobMatching.columns.posted"),
         sortable: true,
         align: "left",
         minWidth: 120,
@@ -272,7 +270,7 @@ const JobMatchingPage: React.FC = () => {
         ),
       },
     ],
-    [browseFilters, categoryOptions, employmentTypeOptions, locationOptions, theme]
+    [browseFilters, categoryOptions, employmentTypeOptions, locationOptions, theme, t]
   );
 
   const matchedColumns: ColumnDef<JobRow>[] = useMemo(
@@ -280,7 +278,7 @@ const JobMatchingPage: React.FC = () => {
       ...columns,
       {
         key: "matchScore",
-        label: "Match",
+        label: t("jobMatching.columns.match"),
         align: "center",
         minWidth: 80,
         render: (val) => {
@@ -311,7 +309,7 @@ const JobMatchingPage: React.FC = () => {
         },
       },
     ],
-    [columns, theme]
+    [columns, theme, t]
   );
   const hasError = Boolean(error);
   const isConnectionFailure = hasError && isConnectionError(error);
@@ -375,8 +373,8 @@ const JobMatchingPage: React.FC = () => {
             },
           }}
         >
-          <Tab label="Browse Jobs" />
-          <Tab label="Matched for You" />
+          <Tab label={t("jobMatching.tabs.browse")} />
+          <Tab label={t("jobMatching.tabs.matched")} />
         </Tabs>
 
         {/* Browse Jobs tab */}
@@ -411,13 +409,13 @@ const JobMatchingPage: React.FC = () => {
               externalSortDir={sortDir}
               onSortChange={(key, dir) => onSortChange(key as JobSortKey, dir)}
               onSortClear={onSortClear}
-              sortClearLabel="Clear sorting"
+              sortClearLabel={t("jobMatching.table.sortClear")}
               tableMinWidth={750}
-              ariaLabel="browse jobs table"
-              emptyMessage="No jobs found."
+              ariaLabel={t("jobMatching.table.browseAriaLabel")}
+              emptyMessage={t("jobMatching.table.noJobsFound")}
               search={{
-                placeholder: "Search job titles or companies...",
-                ariaLabel: "search jobs",
+                placeholder: t("jobMatching.table.searchPlaceholder"),
+                ariaLabel: t("jobMatching.table.searchAriaLabel"),
                 value: browseFilters.search,
                 onChange: (v) => setBrowseFilters((f) => ({ ...f, search: v })),
               }}
@@ -466,7 +464,7 @@ const JobMatchingPage: React.FC = () => {
               columns={matchedColumns}
               loading={matchedLoading}
               tableMinWidth={750}
-              ariaLabel="matched jobs table"
+              ariaLabel={t("jobMatching.table.matchedAriaLabel")}
               emptyMessage={
                 matchedSkillsSource === "programme"
                   ? t("jobMatching.matched.emptyProgrammeNoMatches")

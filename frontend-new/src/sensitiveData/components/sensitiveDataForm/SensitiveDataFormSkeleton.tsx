@@ -1,6 +1,7 @@
 import { Box, Container, Skeleton, useMediaQuery, useTheme } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import AuthHeader from "src/auth/components/AuthHeader/AuthHeader";
+import { useTranslation } from "react-i18next";
 
 const uniqueId = "ac78f5a9-ee1e-4735-841a-7f5e5939ea6b";
 
@@ -10,11 +11,12 @@ export const DATA_TEST_ID = {
 
 const SensitiveDataFormSkeleton = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
   return (
     <Container maxWidth="xs" sx={{ height: "100%" }} data-testid={DATA_TEST_ID.SENSITIVE_DATA_FORM_SKELETON}>
-      <AuthHeader title={"Loading form..."} subtitle={<></>} />
+      <AuthHeader title={t("sensitiveData.components.sensitiveDataForm.loadingForm")} subtitle={<></>} />
       <Box
         display="flex"
         flexDirection="column"

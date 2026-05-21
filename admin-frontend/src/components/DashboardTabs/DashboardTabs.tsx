@@ -22,7 +22,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({ value, onChange }) => {
       <Tabs
         value={value}
         onChange={(_, v) => onChange(v as DashboardTabValue)}
-        aria-label="dashboard tabs"
+        aria-label={t("dashboard.tabs.ariaLabel")}
         textColor="inherit"
         sx={{
           "& .MuiTab-root": {

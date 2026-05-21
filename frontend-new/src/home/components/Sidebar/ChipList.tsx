@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const COLLAPSE_AFTER = 8;
 
@@ -25,6 +26,7 @@ const ChipList: React.FC<ChipListProps> = ({
   expandButtonTestId,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const hasMore = chips.length > COLLAPSE_AFTER;
   const visibleChips = hasMore && !expanded ? chips.slice(0, COLLAPSE_AFTER) : chips;
@@ -88,7 +90,7 @@ const ChipList: React.FC<ChipListProps> = ({
             "&:hover": { textDecoration: "underline" },
           }}
         >
-          {expanded ? "Show Less" : `See All ${chips.length} →`}
+          {expanded ? t("home.sidebar.showLess") : t("home.sidebar.seeAll", { count: chips.length })}
         </Box>
       )}
     </Box>

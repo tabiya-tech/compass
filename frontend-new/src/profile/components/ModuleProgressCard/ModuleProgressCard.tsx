@@ -61,7 +61,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
             <LinearProgress
               variant="determinate"
               value={safeOverallProgress}
-              aria-label="Profile strength progress"
+              aria-label={t("home.profile.profileStrengthProgressAriaLabel")}
               data-testid={DATA_TEST_ID.MODULE_PROGRESS(0)}
               sx={{
                 height: 12,
@@ -77,12 +77,12 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
               <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-                {t("home.profile.educationSkills" as any, { defaultValue: "Education Skills" })}
+                {t("home.profile.educationSkills")}
               </Typography>
               <LinearProgress
                 variant="determinate"
                 value={safeEducationProgress}
-                aria-label="Education skills progress"
+                aria-label={t("home.profile.educationSkillsProgressAriaLabel")}
                 sx={{
                   flex: 1,
                   height: 6,
@@ -106,12 +106,12 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
 
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
               <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-                {t("home.profile.workSkills" as any, { defaultValue: "Work & Other Skills" })}
+                {t("home.profile.workSkills")}
               </Typography>
               <LinearProgress
                 variant="determinate"
                 value={safeWorkProgress}
-                aria-label="Work skills progress"
+                aria-label={t("home.profile.workSkillsProgressAriaLabel")}
                 sx={{
                   flex: 1,
                   height: 6,

@@ -28,11 +28,6 @@ export const DATA_TEST_ID = {
   UPDATE_ROLE_MODAL_SUBMIT: `${uniqueId}-submit`,
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  [Role.ADMIN]: "Admin",
-  [Role.INSTITUTION_STAFF]: "Institution Staff",
-};
-
 const UpdateRoleModal: React.FC = () => {
   const { t } = useTranslation();
   const { updateUser, setUpdateUser, fetchUsers } = useUsersContext();
@@ -75,7 +70,7 @@ const UpdateRoleModal: React.FC = () => {
       handleClose();
       fetchUsers();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("users.error.updateFailed", "Failed to update role"));
+      setError(err instanceof Error ? err.message : t("users.error.updateFailed"));
     } finally {
       setLoading(false);
     }
@@ -91,7 +86,7 @@ const UpdateRoleModal: React.FC = () => {
       fullWidth
       data-testid={DATA_TEST_ID.UPDATE_ROLE_MODAL_DIALOG}
     >
-      <DialogTitle>{t("users.updateRoleModal.title", "Update Role")}</DialogTitle>
+      <DialogTitle>{t("users.updateRoleModal.title")}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -102,16 +97,16 @@ const UpdateRoleModal: React.FC = () => {
           {updateUser?.email}
         </Typography>
         <FormControl fullWidth margin="normal" required>
-          <InputLabel>{t("users.updateRoleModal.role", "Role")}</InputLabel>
+          <InputLabel>{t("users.updateRoleModal.role")}</InputLabel>
           <Select
             value={role}
-            label={t("users.updateRoleModal.role", "Role")}
+            label={t("users.updateRoleModal.role")}
             onChange={(e) => setRole(e.target.value as Role)}
             disabled={loading}
             data-testid={DATA_TEST_ID.UPDATE_ROLE_MODAL_ROLE}
           >
-            <MenuItem value={Role.ADMIN}>{ROLE_LABELS[Role.ADMIN]}</MenuItem>
-            <MenuItem value={Role.INSTITUTION_STAFF}>{ROLE_LABELS[Role.INSTITUTION_STAFF]}</MenuItem>
+            <MenuItem value={Role.ADMIN}>{t("users.roles.admin")}</MenuItem>
+            <MenuItem value={Role.INSTITUTION_STAFF}>{t("users.roles.institutionStaff")}</MenuItem>
           </Select>
         </FormControl>
         {role === Role.INSTITUTION_STAFF && (
@@ -128,7 +123,7 @@ const UpdateRoleModal: React.FC = () => {
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.UPDATE_ROLE_MODAL_CANCEL}>
-          {t("common.cancel", "Cancel")}
+          {t("common.cancel")}
         </Button>
         <Button
           variant="contained"
@@ -136,7 +131,7 @@ const UpdateRoleModal: React.FC = () => {
           disabled={loading || !isValid}
           data-testid={DATA_TEST_ID.UPDATE_ROLE_MODAL_SUBMIT}
         >
-          {loading ? <CircularProgress size={20} /> : t("users.updateRoleModal.submit", "Update Role")}
+          {loading ? <CircularProgress size={20} /> : t("users.updateRoleModal.submit")}
         </Button>
       </DialogActions>
     </Dialog>

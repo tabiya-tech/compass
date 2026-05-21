@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Box, useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import { useWorkSkills } from "src/experiences/hooks/useWorkSkills";
 import { useExperiencesDrawer } from "src/experiences/ExperiencesDrawerProvider";
@@ -25,6 +26,7 @@ interface HomeSidebarProps {
 
 const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { openExperiencesDrawer } = useExperiencesDrawer();
   const drawerWorkSkills = useWorkSkills();
   const { profileData } = useUserProfileContext();
@@ -44,26 +46,26 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
   return (
     <Sidebar width="100%" disablePadding>
       <Box>
-        <SectionTitle>Skills From Work</SectionTitle>
+        <SectionTitle>{t("home.sidebar.home.skillsFromWork")}</SectionTitle>
         <ChipList
           chips={workSkills}
           chipBgColor={tealBg}
           chipTextColor={accentColor}
           accentColor={accentColor}
-          emptyText='Skills will appear here as you complete the "Build Your Profile" chat'
+          emptyText={t("home.sidebar.home.workSkillsEmpty")}
           emptyTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_EMPTY}
           chipTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_CHIP}
           expandButtonTestId={DATA_TEST_ID.HOME_SIDEBAR_SKILLS_FROM_WORK_EXPAND_BUTTON}
         />
       </Box>
       <Box>
-        <SectionTitle>Skills from TEVET Program</SectionTitle>
+        <SectionTitle>{t("home.sidebar.home.skillsFromTEVET")}</SectionTitle>
         <ChipList
           chips={programmeSkills}
           chipBgColor={amberBg}
           chipTextColor={theme.palette.common.black}
           accentColor={accentColor}
-          emptyText="Programme skills will appear as you complete modules."
+          emptyText={t("home.sidebar.home.programmeSkillsEmpty")}
           emptyTestId={DATA_TEST_ID.HOME_SIDEBAR_PROGRAMME_SKILLS_EMPTY}
           chipTestId={DATA_TEST_ID.HOME_SIDEBAR_PROGRAMME_SKILLS_CHIP}
           expandButtonTestId={DATA_TEST_ID.HOME_SIDEBAR_PROGRAMME_SKILLS_EXPAND_BUTTON}
@@ -71,7 +73,7 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
       </Box>
       {showViewCvButton && (
         <Box>
-          <SectionTitle>My Experience</SectionTitle>
+          <SectionTitle>{t("home.sidebar.home.myExperience")}</SectionTitle>
           <ViewCVCard onClick={handleViewCV} />
         </Box>
       )}

@@ -2,6 +2,7 @@ import React, { startTransition } from "react";
 import { Box, Button, Typography, useTheme } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export interface ModuleHandoffBannerProps {
   /** Human-readable name of the next module (e.g. "Career Explorer") */
@@ -23,6 +24,7 @@ export const DATA_TEST_ID = {
  */
 const ModuleHandoffBanner: React.FC<ModuleHandoffBannerProps> = ({ nextModuleLabel, nextModuleRoute }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -38,7 +40,7 @@ const ModuleHandoffBanner: React.FC<ModuleHandoffBannerProps> = ({ nextModuleLab
       }}
     >
       <Typography variant="body2" color="text.secondary" textAlign="center">
-        Great work! Ready to keep going?
+        {t("home.moduleHandoff.message")}
       </Typography>
       <Button
         variant="contained"
@@ -47,7 +49,7 @@ const ModuleHandoffBanner: React.FC<ModuleHandoffBannerProps> = ({ nextModuleLab
         data-testid={DATA_TEST_ID.BUTTON}
         sx={{ textTransform: "none" }}
       >
-        Continue with {nextModuleLabel}
+        {t("home.moduleHandoff.continueWith", { moduleLabel: nextModuleLabel })}
       </Button>
     </Box>
   );

@@ -35,12 +35,6 @@ export const DATA_TEST_ID = {
   CREATE_USER_MODAL_CLOSE: `${uniqueId}-close`,
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  [Role.SUPER_ADMIN]: "Super Admin",
-  [Role.ADMIN]: "Admin",
-  [Role.INSTITUTION_STAFF]: "Institution Staff",
-};
-
 const CreateUserModal: React.FC = () => {
   const { t } = useTranslation();
   const { createModalOpen, setCreateModalOpen, fetchUsers } = useUsersContext();
@@ -96,9 +90,9 @@ const CreateUserModal: React.FC = () => {
       }
     } catch (err: unknown) {
       if (err instanceof HttpError && err.status === 409) {
-        setEmailError(t("users.error.emailAlreadyExists", "A user with this email already exists"));
+        setEmailError(t("users.error.emailAlreadyExists"));
       } else {
-        setError(err instanceof Error ? err.message : t("users.error.createFailed", "Failed to create user"));
+        setError(err instanceof Error ? err.message : t("users.error.createFailed"));
       }
     } finally {
       setLoading(false);
@@ -131,7 +125,7 @@ const CreateUserModal: React.FC = () => {
       fullWidth
       data-testid={DATA_TEST_ID.CREATE_USER_MODAL_DIALOG}
     >
-      <DialogTitle>{t("users.createModal.title", "Add New User")}</DialogTitle>
+      <DialogTitle>{t("users.createModal.title")}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -140,16 +134,12 @@ const CreateUserModal: React.FC = () => {
         )}
         {showingResendState ? (
           <Alert severity="warning" sx={{ mb: 2 }} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL_FAILED_ALERT}>
-            {t(
-              "users.createModal.emailFailed",
-              "Created {{email}}, but the password-reset email failed to send. You can retry now or send it later from the Forgot Password page.",
-              { email: emailFailedFor }
-            )}
+            {t("users.createModal.emailFailed", { email: emailFailedFor })}
           </Alert>
         ) : (
           <>
             <TextField
-              label={t("users.createModal.email", "Email")}
+              label={t("users.createModal.email")}
               type="email"
               fullWidth
               margin="normal"
@@ -165,7 +155,7 @@ const CreateUserModal: React.FC = () => {
               data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL}
             />
             <TextField
-              label={t("users.createModal.name", "Display Name")}
+              label={t("users.createModal.name")}
               fullWidth
               margin="normal"
               value={name}
@@ -175,17 +165,17 @@ const CreateUserModal: React.FC = () => {
               data-testid={DATA_TEST_ID.CREATE_USER_MODAL_NAME}
             />
             <FormControl fullWidth margin="normal" required>
-              <InputLabel>{t("users.createModal.role", "Role")}</InputLabel>
+              <InputLabel>{t("users.createModal.role")}</InputLabel>
               <Select
                 value={role}
-                label={t("users.createModal.role", "Role")}
+                label={t("users.createModal.role")}
                 onChange={(e) => setRole(e.target.value as Role)}
                 disabled={loading}
                 data-testid={DATA_TEST_ID.CREATE_USER_MODAL_ROLE}
               >
-                {isSuperAdmin && <MenuItem value={Role.SUPER_ADMIN}>{ROLE_LABELS[Role.SUPER_ADMIN]}</MenuItem>}
-                <MenuItem value={Role.ADMIN}>{ROLE_LABELS[Role.ADMIN]}</MenuItem>
-                <MenuItem value={Role.INSTITUTION_STAFF}>{ROLE_LABELS[Role.INSTITUTION_STAFF]}</MenuItem>
+                {isSuperAdmin && <MenuItem value={Role.SUPER_ADMIN}>{t("users.roles.superAdmin")}</MenuItem>}
+                <MenuItem value={Role.ADMIN}>{t("users.roles.admin")}</MenuItem>
+                <MenuItem value={Role.INSTITUTION_STAFF}>{t("users.roles.institutionStaff")}</MenuItem>
               </Select>
             </FormControl>
             {role === Role.INSTITUTION_STAFF && (
@@ -206,7 +196,7 @@ const CreateUserModal: React.FC = () => {
         {showingResendState ? (
           <>
             <Button onClick={handleClose} disabled={resending} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CLOSE}>
-              {t("common.close", "Close")}
+              {t("common.close")}
             </Button>
             <Button
               onClick={handleResend}
@@ -215,13 +205,13 @@ const CreateUserModal: React.FC = () => {
               disabled={resending}
               data-testid={DATA_TEST_ID.CREATE_USER_MODAL_RESEND}
             >
-              {resending ? <CircularProgress size={20} /> : t("users.createModal.resend", "Resend email")}
+              {resending ? <CircularProgress size={20} /> : t("users.createModal.resend")}
             </Button>
           </>
         ) : (
           <>
             <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CANCEL}>
-              {t("common.cancel", "Cancel")}
+              {t("common.cancel")}
             </Button>
             <Button
               variant="contained"
@@ -229,7 +219,7 @@ const CreateUserModal: React.FC = () => {
               disabled={loading || !isValid}
               data-testid={DATA_TEST_ID.CREATE_USER_MODAL_SUBMIT}
             >
-              {loading ? <CircularProgress size={20} /> : t("users.createModal.submit", "Create User")}
+              {loading ? <CircularProgress size={20} /> : t("users.createModal.submit")}
             </Button>
           </>
         )}

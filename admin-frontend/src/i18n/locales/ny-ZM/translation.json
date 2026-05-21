@@ -42,6 +42,19 @@
     },
     "modal": {
       "areYouSure": "Mukutsimikiza?"
+    },
+    "cancel": "Lekani",
+    "close": "Tsekani",
+    "dataTable": {
+      "sortAscending": "Sungulani kukwera",
+      "sortDescending": "Sungulani kutsika",
+      "sortAscText": "Sungulani A-Z",
+      "sortDescText": "Sungulani Z-A",
+      "noData": "Chilibe chidziwitso",
+      "prevPage": "Peji yapitayo",
+      "nextPage": "Peji yotsatira",
+      "pageAriaLabel": "Peji {{page}}",
+      "filterAriaLabel": "Sefa {{column}}"
     }
   },
   "auth": {
@@ -107,7 +120,13 @@
   },
   "header": {
     "logout": "Tulukani",
-    "user": "Wogwiritsa"
+    "user": "Wogwiritsa",
+    "profile": "Profaili",
+    "users": "Ogwiritsa Ntchito",
+    "role": {
+      "admin": "Woyang'anira",
+      "institutionStaff": "Ogwira Ntchito ku Sukulu"
+    }
   },
   "navbar": {
     "title": "{{appName}} Admin",
@@ -122,8 +141,11 @@
     "privacyPolicy": "mfundo zazinsinsi",
     "termsOfUse": "Mgwirizano pazakagwiritsidwe",
     "accessibility": "Kufikika",
-    "contact": "Contact",
-    "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya."
+    "contact": "Kontaktani",
+    "collaboration": "{{appName}} ndi chida chaulere cha malangizo a ntchito choperekedwa ndi Unduna wa Ukadaulo ndi Sayansi ku Zambia, chomangidwa mogwirizana ndi World Bank Group ndi Tabiya.",
+    "worldBankLogoAlt": "Chizindikiro cha Gulu la World Bank",
+    "ministryTechLogoAlt": "Chizindikiro cha Unduna wa Teknoloji",
+    "tabiyaLogoAlt": "Chizindikiro cha Tabiya"
   },
   "dashboard": {
     "sectionTitle": "Dashboard yoyang'anira - kuyang'anira ndi kusanthula kwamagulu osiyanasiyana",
@@ -134,8 +156,9 @@
     "tabs": {
       "institutions": "Mabungwe",
       "modules": "Ma modules",
-      "skillsAnalytics": "Skills Analytics",
-      "jobPostings": "Zolemba Ntchito"
+      "skillsAnalytics": "Kusanthula Maluso",
+      "jobPostings": "Zolemba Ntchito",
+      "ariaLabel": "Zikwatura za Dashibodi"
     },
     "dataTable": {
       "clearSorting": "Kusanja bwino"
@@ -198,7 +221,7 @@
         "hospitality": "Kuchereza alendo",
         "manufacturing": "Kupanga",
         "water": "Madzi",
-        "transport": "Transport",
+        "transport": "Mayendedwe",
         "others": "Zina"
       },
       "filters": {
@@ -233,7 +256,9 @@
       },
       "filters": {
         "allProvinces": "Zigawo Zonse",
-        "allSectors": "Magawo Onse"
+        "allSectors": "Magawo Onse",
+        "searchProvinces": "Sakani maboma...",
+        "searchSectors": "Sakani zigawo..."
       }
     },
     "jobPostings": {
@@ -282,7 +307,8 @@
         "candidatePoolValue": "{{count}} ophunzira (50%+ machesi)",
         "skillsExtracted": "Maluso Ochotsedwa ({{count}})",
         "viewOriginalPosting": "Onani Zolemba Zoyambirira"
-      }
+      },
+      "page": "Peji {{page}} mwa {{totalPages}}"
     },
     "institutionsTable": {
       "headers": {
@@ -291,7 +317,7 @@
         "active7Days": "Yogwira (7D)",
         "skillsDiscovery": "Pangani mbiri yanu",
         "careerReadiness": "Career Readiness",
-        "careerExplorer": "Career Explorer"
+        "careerExplorer": "Kufunafuna Ntchito"
       },
       "subHeaders": {
         "started": "Anayamba",
@@ -304,7 +330,10 @@
       "nextPage": "Tsamba lotsatira",
       "page": "Tsamba {{page}}"
     },
-    "comingSoon": "Palibe deta mpaka pano."
+    "comingSoon": "Palibe deta mpaka pano.",
+    "pagination": {
+      "range": "Peji {{start}}–{{end}} mwa {{total}}"
+    }
   },
   "instructorDashboard": {
     "sectionTitle": "Dashboard ya Mlangizi - kuyang'anira zochitika za ophunzira ndi kupita patsogolo",
@@ -318,7 +347,7 @@
       "ariaLabel": "Ma tabu a dashboard ya aphunzitsi",
       "students": "Ophunzira",
       "modules": "Malo Anu a Ntchito",
-      "skillsAnalytics": "Skills Analytics"
+      "skillsAnalytics": "Kusanthula Maluso"
     },
     "stats": {
       "totalStudentsRegistered": "Ophunzira Onse Olembetsa",
@@ -342,10 +371,10 @@
         "modulesCompleted": "Ma module Okonzekera Ntchito Atsirizidwa",
         "careerReady": "Kukonzekera Ntchito",
         "skillsInterestsExplored": "Pangani mbiri yanu",
-        "careerExplorer": "Career Explorer",
+        "careerExplorer": "Kufunafuna Ntchito",
         "prioritySectorsExplored": "Magawo Ofunika Kwambiri Afufuzidwa",
         "lastLogin": "Kulowa Komaliza",
-        "lastActiveModule": "Last Active Module"
+        "lastActiveModule": "Mojiyu Wogwira Pomaliza"
       },
       "filters": {
         "all": "Zonse",
@@ -367,7 +396,20 @@
     "title": "Admin Lowani",
     "email": "Imelo",
     "password": "Mawu achinsinsi",
-    "submit": "Lowani muakaunti"
+    "submit": "Lowani muakaunti",
+    "subtitle": "Lowani kuti mufikire Potiyo la Woyang'anira",
+    "logoAlt": "Logo",
+    "forgotPassword": "Mwagona mawu achinsinsi?",
+    "requestAccess": "Pemphani kufika",
+    "errors": {
+      "invalidCredentials": "Imelo kapena mawu achinsinsi ndi olakwika",
+      "userDisabled": "Akaunti iyi yachotsedwa",
+      "tooManyRequests": "Mayeso ochulukirapo olephera. Chonde yesaninso patapita nthawi",
+      "networkError": "Cholakwika cha intaneti. Chonde wonetserani ulumikizano wanu",
+      "invalidEmail": "Chonde lowetsani adiresi yabwino ya imelo",
+      "generic": "Kulowa kwalephereka. Chonde yesaninso",
+      "fillAllFields": "Chonde uzuzeni mafunda onse"
+    }
   },
   "notFound": {
     "message": "Tsamba silinapezeke",
@@ -400,7 +442,10 @@
       "name": "Dzina Lowonetsa",
       "role": "Udindo",
       "institutionId": "Nambala ya Bungwe",
-      "submit": "Pangani Wogwiritsa Ntchito"
+      "submit": "Pangani Wogwiritsa Ntchito",
+      "emailAlreadyExists": "Wogwiritsa ntchito ndi imelo iyi alipo kale",
+      "emailFailed": "Tapanga {{email}}, koma imelo yokengezetsa mawu achinsinsi yalephera kutumizidwa. Mungayeserenso tsopano kapena kutumiza pambuyo pake ku peji la Mawu Achinsinsi Owagona.",
+      "resend": "Tumizaninso Imelo"
     },
     "updateRoleModal": {
       "title": "Sinthani Udindo",
@@ -418,6 +463,114 @@
       "createFailed": "Zalephera kupanga wogwiritsa ntchito",
       "updateFailed": "Zalephera kusintha udindo",
       "deleteFailed": "Zalephera kuchotsa wogwiritsa ntchito"
+    },
+    "roles": {
+      "superAdmin": "Woyang'anira Wamkulu",
+      "admin": "Woyang'anira",
+      "institutionStaff": "Ogwira Ntchito ku Sukulu"
+    },
+    "tabs": {
+      "active": "Ogwiritsa Ntchito Ogwira",
+      "pending": "Zolemba Zomwe Zikudikira"
+    },
+    "institutionAutocomplete": {
+      "label": "Sukulu",
+      "loadError": "Zosukulu zikulephera kukwezeka"
+    }
+  },
+  "register": {
+    "title": "Pemphani Kufika",
+    "subtitle": "Lembelanini monga mphunzitsi kapena woyang'anira wa masukulu angapo. Woyang'anira wamkulu adzayang'anira pempholi lanu.",
+    "email": "Imelo",
+    "name": "Dzina lonse",
+    "role": "Udindo",
+    "submit": "Tumizirani Pempholi",
+    "success": "Zikomo — tapokera pempholi lanu. Mudzalandira imelo woyang'anira wamkulu akayanganiranso ndikuvomereza akaunti yanu.",
+    "backToLogin": "Bwererani ku Lowera",
+    "logoAlt": "Logo",
+    "roles": {
+      "admin": "Woyang'anira wa Masukulu Angapo",
+      "institutionStaff": "Mphunzitsi"
+    },
+    "errors": {
+      "alreadyExists": "Kulembetsa kogwira kuli kale kwa imelo iyi.",
+      "generic": "Zolembetsa zalalephereka. Chonde yesaninso."
+    }
+  },
+  "registrations": {
+    "table": {
+      "email": "Imelo",
+      "name": "Dzina",
+      "role": "Udindo Wopemphedwa",
+      "institution": "Sukulu",
+      "submittedAt": "Yatumizidwa",
+      "actions": "Zochita",
+      "empty": "Zolemba Zomwe Zikudikira Zilibe"
+    },
+    "actions": {
+      "approve": "Vomera",
+      "reject": "Kanani"
+    },
+    "roles": {
+      "admin": "Woyang'anira wa Masukulu Angapo",
+      "institutionStaff": "Mphunzitsi"
+    },
+    "loading": "Kukweza…",
+    "approve": {
+      "title": "Vomera Kulemba",
+      "error": "Zovomera zolembetsa zalalephereka",
+      "resend": "Tumizaninso Imelo",
+      "submit": "Vomera"
+    },
+    "reject": {
+      "title": "Kana Kulemba",
+      "error": "Zokanana zolembetsa zalalephereka",
+      "reasonLabel": "Chifukwa",
+      "submit": "Kanani"
+    }
+  },
+  "forgotPassword": {
+    "logoAlt": "Logo",
+    "title": "Kengeretsani Mawu Anu Achinsinsi",
+    "success": "Ngati akaunti ilipo kwa imelo iyo, tatumiza malangizo okengezetsa.",
+    "subtitle": "Lowetsani imelo yanu ndipo tidzatumiza ulalo wokengezetsa mawu anu achinsinsi.",
+    "email": "Imelo",
+    "submit": "Tumizani Ulalo Wokengezetsa",
+    "backToLogin": "Bwererani ku Lowera"
+  },
+  "profile": {
+    "title": "Profaili Yanga",
+    "section": {
+      "profileInfo": "Chidziwitso cha Profaili",
+      "changePassword": "Sinthani Mawu Achinsinsi"
+    },
+    "field": {
+      "name": "Dzina Lowonetsa",
+      "email": "Imelo",
+      "currentPassword": "Mawu Achinsinsi Akuno",
+      "newPassword": "Mawu Achinsinsi Atsopano",
+      "confirmPassword": "Tsimikizani Mawu Achinsinsi Atsopano"
+    },
+    "action": {
+      "save": "Sungani Zosintha",
+      "changePassword": "Sinthani Mawu Achinsinsi"
+    },
+    "success": {
+      "profileUpdated": "Profaili yagwirizanitsidwa bwino.",
+      "passwordChanged": "Mawu achinsinsi asintha bwino."
+    },
+    "error": {
+      "noUser": "Wogwiritsa ntchito sapezeka. Chonde lowani mwaliwiro.",
+      "nameEmailRequired": "Dzina ndi imelo ndi zofunikira.",
+      "emailAlreadyExists": "Wogwiritsa ntchito ndi imelo iyi alipo kale.",
+      "saveFailed": "Kugwirizanitsa profaili kwalephereka.",
+      "currentPasswordRequired": "Mawu achinsinsi akuno ndi ofunikira.",
+      "newPasswordRequired": "Mawu achinsinsi atsopano ndi ofunikira.",
+      "passwordMismatch": "Mawu achinsinsi atsopano sakugwirizana.",
+      "passwordTooShort": "Mawu achinsinsi ayenera kukhala ndi zilembo zisanu ndi chimodzi mwachochepa.",
+      "wrongPassword": "Mawu achinsinsi akuno ndi olakwika.",
+      "requiresRecentLogin": "Chonde tulukani ndikudzalowapo mwatsopano asanasinthe mawu anu achinsinsi.",
+      "passwordChangeFailed": "Kusintha mawu achinsinsi kwalephereka."
     }
   }
 }
