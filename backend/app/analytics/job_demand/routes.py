@@ -15,6 +15,7 @@ from app.analytics.job_demand.repository import (
     IJobDemandAnalyticsRepository,
     JobDemandAnalyticsRepository,
 )
+from app.analytics.job_demand.sector_mapping import validate_sector_map
 from app.analytics.job_demand.types import JobDemandStatsResponse
 from app.constants.errors import HTTPErrorResponse
 from app.server_dependencies.db_dependencies import CompassDBProvider
@@ -36,6 +37,9 @@ async def _get_job_demand_analytics_repository(
 
 def add_job_demand_analytics_routes(router: APIRouter, auth: Authentication) -> None:
     """Register job-demand analytics routes on the given router."""
+    # Fail fast at startup: a missing/malformed sector_category_map.json should
+    # break the deploy here, not surface as a 500 on the first user request.
+    validate_sector_map()
 
     @router.get(
         path="/job-demand-stats",

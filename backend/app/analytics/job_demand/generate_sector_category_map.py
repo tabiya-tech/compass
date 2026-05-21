@@ -88,6 +88,11 @@ async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--min-count", type=int, default=1,
                         help="Only classify category tokens seen on >= this many jobs.")
+    parser.add_argument("--min-coverage-pct", type=float, default=50.0,
+                        help="Refuse to write if job coverage falls below this percent "
+                             "(guards against a degraded LLM run silently shipping a "
+                             "near-empty map). Lower it deliberately if a low result is "
+                             "genuinely expected.")
     args = parser.parse_args()
 
     # Drop the "All Sectors" sentinel: a real sectors[] value but not a
@@ -107,8 +112,16 @@ async def main() -> None:
     mapping = await _classify(sectors, tokens, cfg)
     artifact = _build_artifact(sectors, token_counts, mapping, total_jobs,
                                cfg.language_model_name)
-    _OUT_PATH.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
     client.close()
+
+    coverage = artifact["_meta"]["coverage_pct"]
+    if coverage < args.min_coverage_pct:
+        raise SystemExit(
+            f"Refusing to write {_OUT_PATH.name}: job coverage {coverage}% is below "
+            f"--min-coverage-pct {args.min_coverage_pct}% — likely a degraded LLM run. "
+            "Re-run, or lower --min-coverage-pct if this low result is expected."
+        )
+    _OUT_PATH.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
     logger.info("Wrote %s — %.1f%% job coverage (%d/%d)", _OUT_PATH,
                 artifact["_meta"]["coverage_pct"], artifact["_meta"]["mapped_jobs"],
                 total_jobs)

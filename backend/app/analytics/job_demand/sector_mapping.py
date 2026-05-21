@@ -48,6 +48,12 @@ def _category_to_sector() -> dict:
     return cached
 
 
+def validate_sector_map() -> None:
+    """Eagerly load the generated map so a missing/malformed artifact fails at
+    app startup (route registration) rather than as a 500 on the first request."""
+    _category_to_sector()
+
+
 def job_category_match(sector: Optional[str]) -> Optional[dict]:
     """Return a ``$match`` value for ``job.category`` for the given institution
     sector, or ``None`` for no sector constraint.
@@ -68,6 +74,11 @@ def job_category_match(sector: Optional[str]) -> Optional[dict]:
     ]
     if not prefixes:
         return {"$in": []}
+    # Alternation order is irrelevant here: the trailing `(?:$|,)` boundary requires
+    # a leading token to be followed by end-of-string or a comma, so a shorter token
+    # (e.g. "IT") cannot swallow a longer compound category (e.g. "IT & Telecoms").
+    # Keys are leading tokens (split on the first comma), so prefix collisions among
+    # them are harmless — the boundary disambiguates regardless of sort order.
     alternation = "|".join(re.escape(p) for p in sorted(prefixes))
     # Leading category token only: "<prefix>" exactly or "<prefix>,<rest>".
     return {"$regex": rf"^\s*(?:{alternation})\s*(?:$|,)", "$options": "i"}
