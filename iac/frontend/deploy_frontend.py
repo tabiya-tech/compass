@@ -53,7 +53,7 @@ def deploy_frontend(*,
         get_resource_name(resource="frontend-artifacts", resource_type="bucket-content"),
         bucket_name=bucket.name,
         # do not cache these files
-        no_cache_paths=["index.html", "screening.html", "data/version.json", "data/env.js", "data/config/field.yaml"],
+        no_cache_paths=["index.html", "data/version.json", "data/env.js", "data/config/field.yaml"],
         target_dir="",  # On the target bucket, they will be saved at the root directory.
         source_dir_path=frontend_artifacts_dir,
         opts=pulumi.ResourceOptions(depends_on=bucket, provider=basic_config.provider))
