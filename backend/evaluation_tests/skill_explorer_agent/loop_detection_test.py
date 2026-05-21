@@ -180,7 +180,7 @@ test_cases: list[LoopDetectionTestCase] = [
             timeline=Timeline(start="2021", end="2023"),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         ),
-        country_of_user=Country.ZAMBIA,
+        country_of_user=Country.KENYA,
     ),
     LoopDetectionTestCase(
         name="severe_loop_completion_msg",
@@ -195,7 +195,7 @@ test_cases: list[LoopDetectionTestCase] = [
             timeline=Timeline(start="2021", end="2023"),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         ),
-        country_of_user=Country.ZAMBIA,
+        country_of_user=Country.KENYA,
     ),
     LoopDetectionTestCase(
         name="loop_on_question",
@@ -210,7 +210,7 @@ test_cases: list[LoopDetectionTestCase] = [
             timeline=Timeline(start="2021", end="2023"),
             work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT,
         ),
-        country_of_user=Country.ZAMBIA,
+        country_of_user=Country.KENYA,
     ),
     LoopDetectionTestCase(
         name="engaged_user_loop_on_question",
