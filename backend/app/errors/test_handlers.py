@@ -1,3 +1,4 @@
+import re
 import uuid
 from http import HTTPStatus
 from unittest.mock import patch
@@ -5,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from app.errors.handlers import register_exception_handlers
 from app.middleware.correlation_id_middleware import CorrelationIdMiddleware
@@ -34,6 +35,22 @@ def app():
 
     @_app.post("/validated")
     async def _validated(_: _Payload):
+        return {"ok": True}
+
+    class _CustomValidatedPayload(BaseModel):
+        # Mirrors the plain-personal-data name field: a custom validator that raises ValueError.
+        # Pydantic wraps the raw ValueError in the error `ctx`, which is not JSON-serializable.
+        name: str
+
+        @field_validator("name")
+        @classmethod
+        def _only_letters_spaces_dots(cls, value: str) -> str:
+            if not re.match(r"^[\w\s.]+$", value, re.UNICODE):
+                raise ValueError("must contain only letters, spaces, and dots")
+            return value
+
+    @_app.post("/validated-custom")
+    async def _validated_custom(_: _CustomValidatedPayload):
         return {"ok": True}
 
     return _app
@@ -134,5 +151,27 @@ class TestValidationExceptionHandler:
         assert actual_response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         actual_body = actual_response.json()
         assert isinstance(actual_body["detail"], list)
+        # AND the correlation id is attached
+        assert actual_body["correlation_id"] == given_correlation_id
+
+    def test_validation_error_raised_by_custom_validator_is_serialized_to_422(self, client):
+        # GIVEN a correlation id
+        given_correlation_id = str(uuid.uuid4())
+
+        # WHEN submitting a value that trips a custom validator which raises ValueError
+        # (pydantic puts the raw ValueError in the error ctx, which json.dumps cannot serialize)
+        actual_response = client.post(
+            "/validated-custom",
+            json={"name": "O'Brien"},
+            headers={"X-Correlation-ID": given_correlation_id},
+        )
+
+        # THEN the status is 422 (not a 500 from a non-serializable error payload)
+        assert actual_response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        actual_body = actual_response.json()
+        # AND the detail is the JSON-serializable pydantic error list
+        assert isinstance(actual_body["detail"], list)
+        # AND the validator's message is preserved for the client
+        assert any("letters, spaces, and dots" in error["msg"] for error in actual_body["detail"])
         # AND the correlation id is attached
         assert actual_body["correlation_id"] == given_correlation_id

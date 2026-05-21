@@ -4,6 +4,7 @@ from http import HTTPStatus
 
 import sentry_sdk
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -56,7 +57,9 @@ async def _validation_exception_handler(_: Request, exc: RequestValidationError)
     # while still attaching the correlation id for support lookups.
     correlation_id = correlation_id_ctx_var.get()
     body = {
-        "detail": exc.errors(),
+        # jsonable_encoder makes the error list JSON-safe: custom validators raise ValueError,
+        # which pydantic puts as a raw exception object in `ctx`, and json.dumps cannot serialize it.
+        "detail": jsonable_encoder(exc.errors()),
         "correlation_id": correlation_id if correlation_id != ":none:" else None,
     }
     return JSONResponse(
