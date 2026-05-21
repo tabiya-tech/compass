@@ -20,7 +20,7 @@ const getAdoptionTrendsUrl = () => {
 const ANALYTICS_ADOPTION_TRENDS_URL = getAdoptionTrendsUrl();
 const ANALYTICS_SKILLS_DISCOVERY_URL = getBackendUrl() + "/analytics/skills-discovery-stats";
 const ANALYTICS_CAREER_READINESS_URL = getBackendUrl() + "/analytics/career-readiness-stats";
-const ANALYTICS_SKILL_GAP_URL = getBackendUrl() + "/analytics/skill-gap-stats?limit=5";
+const ANALYTICS_JOB_DEMAND_URL = getBackendUrl() + "/analytics/job-demand-stats?limit=5";
 const ANALYTICS_SKILLS_SUPPLY_URL = getBackendUrl() + "/analytics/skills-supply-stats?limit=5";
 
 const STORY_JOB_POSTINGS: JobPostingRow[] = [
@@ -157,26 +157,15 @@ const meta: Meta<typeof Dashboard> = {
         },
       },
       {
-        url: ANALYTICS_SKILL_GAP_URL,
+        url: ANALYTICS_JOB_DEMAND_URL,
         method: "GET",
         status: 200,
         response: {
-          total_students_with_skill_gaps: 180,
-          top_skill_gaps: [
-            {
-              skill_id: "1",
-              skill_label: "Problem Solving",
-              students_with_gap_count: 110,
-              avg_job_unlock_count: 3,
-              avg_proximity_score: 0.6,
-            },
-            {
-              skill_id: "2",
-              skill_label: "Communication",
-              students_with_gap_count: 95,
-              avg_job_unlock_count: 2,
-              avg_proximity_score: 0.55,
-            },
+          total_jobs: 200,
+          jobs_with_linked_skills: 180,
+          top_skills_in_demand: [
+            { skill_label: "Problem Solving", jobs_count: 110 },
+            { skill_label: "Communication", jobs_count: 95 },
           ],
         },
       },

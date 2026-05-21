@@ -11,7 +11,6 @@ import type {
   StudentApiItem,
   PaginatedResponse,
   AdoptionTrendsResponse,
-  SkillGapStatsResponse,
   CareerReadinessStatsResponse,
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
@@ -28,7 +27,6 @@ export type {
   StudentApiItem,
   PaginatedResponse,
   AdoptionTrendsResponse,
-  SkillGapStatsResponse,
   CareerReadinessStatsResponse,
   CareerExplorerStatsResponse,
   SkillsDiscoveryStatsResponse,
@@ -145,36 +143,6 @@ export default class AnalyticsService {
     });
     try {
       return (await response.json()) as PaginatedResponse<StudentApiItem>;
-    } catch (e) {
-      throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
-        error: e,
-      });
-    }
-  }
-
-  async getSkillGapStats(
-    limit = 10,
-    institution?: string,
-    location?: string,
-    sector?: string
-  ): Promise<SkillGapStatsResponse> {
-    const params = new URLSearchParams({ limit: String(limit) });
-    if (institution) params.set("institution", institution);
-    if (location) params.set("location", location);
-    if (sector) params.set("sector", sector);
-    const url = `${this.baseUrl}/analytics/skill-gap-stats?${params}`;
-    const errorFactory = getRestAPIErrorFactory(SERVICE_NAME, "getSkillGapStats", "GET", url);
-    const response = await customFetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      expectedStatusCode: StatusCodes.OK,
-      serviceName: SERVICE_NAME,
-      serviceFunction: "getSkillGapStats",
-      failureMessage: "Failed to fetch skill gap stats",
-      expectedContentType: "application/json",
-    });
-    try {
-      return (await response.json()) as SkillGapStatsResponse;
     } catch (e) {
       throw errorFactory(response.status, ErrorConstants.ErrorCodes.INVALID_RESPONSE_BODY, "Invalid JSON", {
         error: e,

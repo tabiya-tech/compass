@@ -61,19 +61,6 @@ export interface AdoptionTrendsResponse {
   };
 }
 
-export interface SkillGapEntry {
-  skill_id: string;
-  skill_label: string;
-  students_with_gap_count: number;
-  avg_job_unlock_count: number;
-  avg_proximity_score: number;
-}
-
-export interface SkillGapStatsResponse {
-  total_students_with_skill_gaps: number;
-  top_skill_gaps: SkillGapEntry[];
-}
-
 export interface CareerReadinessModuleBreakdown {
   module_id: string;
   module_title: string;
