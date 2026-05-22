@@ -1,0 +1,1311 @@
+{
+  "common": {
+    "buttons": {
+      "login": "Entrar",
+      "loginLink": "Entrar no Njila",
+      "logout": "Sair",
+      "submit": "Submeter",
+      "register": "Criar Conta",
+      "registerLink": "Criar Conta",
+      "startNewConversation": "Iniciar nova conversa",
+      "settings": "Definições",
+      "cancel": "Cancelar",
+      "confirm": "Sim, tenho a certeza",
+      "backToLogin": "Voltar ao Início de Sessão",
+      "save": "Guardar",
+      "goBack": "Voltar",
+      "restore": "Restaurar",
+      "revert": "Reverter",
+      "continue": "Continuar",
+      "noThankYou": "Não, obrigado",
+      "iWantToStay": "Quero ficar",
+      "yes": "Sim",
+      "no": "Não",
+      "skip": "Saltar",
+      "yesExit": "Sim, sair",
+      "rebuildProfile": "Reconstruir Perfil"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Palavra-passe",
+      "confirmEmail": "Confirmar Email",
+      "confirmPassword": "Confirmar Palavra-passe"
+    },
+    "validation": {
+      "validEmailRequired": "Por favor, insira um endereço de email válido",
+      "emailsDoNotMatch": "Os emails não coincidem",
+      "passwordsDoNotMatch": "As palavras-passe não coincidem",
+      "emailRequired": "Por favor, insira o seu email",
+      "passwordRequired": "Por favor, insira a sua palavra-passe",
+      "passwordMinLength": "A palavra-passe deve ter pelo menos 8 caracteres.",
+      "passwordNeedLowercase": "A palavra-passe deve incluir pelo menos uma letra minúscula.",
+      "passwordNeedUppercase": "A palavra-passe deve incluir pelo menos uma letra maiúscula.",
+      "passwordNeedNumber": "A palavra-passe deve incluir pelo menos um número.",
+      "passwordNeedSpecialChar": "A palavra-passe deve incluir pelo menos um carácter especial como: !@#$%*& etc."
+    },
+    "chat": {
+      "errors": {
+        "messageLimit": "O limite de mensagem é de {{max}} caracteres.",
+        "invalidSpecialCharacters": "Caracteres especiais inválidos: {{chars}}"
+      }
+    },
+    "time": {
+      "onDate": "em {{date}}",
+      "yesterday": "ontem",
+      "daySingular": "dia",
+      "dayPlural": "dias",
+      "hourSingular": "hora",
+      "hourPlural": "horas",
+      "minuteSingular": "minuto",
+      "minutePlural": "minutos",
+      "ago": "há {{time}}",
+      "justNow": "agora mesmo"
+    },
+    "upload": {
+      "errors": {
+        "maxFileSize": "O ficheiro selecionado é demasiado grande. O tamanho máximo é de 3 MB.",
+        "tooDense": "O seu CV tem mais texto do que o que podemos processar. Por favor, encurte-o ou carregue um ficheiro com menos páginas e tente novamente.",
+        "emptyParse": "Não conseguimos detetar experiências no seu CV. Por favor, verifique o ficheiro e tente novamente.",
+        "generic": "Falha ao analisar o seu CV. Por favor, tente novamente ou use um ficheiro diferente.",
+        "rateLimit": "Demasiados carregamentos ao mesmo tempo. Por favor, aguarde um minuto e tente novamente.",
+        "maxUploadsReached": "Atingiu o número máximo de carregamentos de CV para esta conversa. Não são permitidos mais carregamentos.",
+        "duplicate": "Este CV já foi carregado. Selecione-o dos seus CVs carregados anteriormente.",
+        "unsupportedFileType": "Tipo de ficheiro não suportado. Permitidos: PDF, DOCX, TXT.",
+        "timeout": "O carregamento demorou demasiado tempo. Isto significa geralmente uma ligação lenta — por favor, verifique a sua rede e tente novamente.",
+        "unauthorized": "Não está autorizado. Por favor, inicie sessão novamente.",
+        "uploadNotFound": "Carregamento não encontrado. Pode ter falhado ao iniciar.",
+        "cvMarkdownTooLong": "O conteúdo do seu CV é demasiado longo. Por favor, encurte o seu CV e tente novamente."
+      }
+    },
+    "errors": {
+      "updateState": "Falha ao atualizar o estado do ranking de competências. Por favor, tente novamente mais tarde.",
+      "generic": "Algo correu mal. Por favor, tente novamente.",
+      "api": {
+        "requestTooLong": "Os dados enviados para o serviço parecem ser demasiado grandes. Por favor, tente novamente com uma carga menor. Se o problema persistir, limpe a cache do seu navegador e atualize a página.",
+        "tooManyRequests": "Parece que está a fazer demasiados pedidos. Por favor, abrande e tente novamente mais tarde.",
+        "unexpectedError": "Algo correu mal do nosso lado. Por favor, tente novamente num momento, e se continuar a acontecer copie a referência abaixo e partilhe-a com o suporte.",
+        "serverConnectionError": "Não é possível ligar ao serviço. Por favor, verifique a sua ligação à internet ou tente novamente mais tarde.",
+        "resourceNotFound": "O recurso solicitado não foi encontrado. Por favor, limpe a cache do seu navegador e atualize a página.",
+        "authenticationFailure": "Parece que não tem sessão iniciada. Por favor, entre para continuar.",
+        "permissionDenied": "Parece que não tem as permissões necessárias. Por favor, saia e entre novamente.",
+        "unableToProcessResponse": "Encontrámos um problema ao processar os dados. Limpe a cache do navegador e atualize ou tente novamente mais tarde.",
+        "serviceUnavailable": "O serviço está atualmente indisponível. Por favor, tente novamente mais tarde.",
+        "dataValidationError": "Parece haver um problema com o seu pedido. Se estiver a submeter dados, por favor certifique-se de que são válidos e tente novamente. Se o problema persistir, limpe a cache do seu navegador e atualize a página.",
+        "unableToProcessRequest": "Desculpe. Algo correu mal ao processar o seu pedido."
+      }
+    },
+    "status": {
+      "calculating": "A calcular",
+      "cancelling": "A cancelar",
+      "saving": "A guardar"
+    },
+    "backdrop": {
+      "loggingYouOut": "A terminar a sua sessão..."
+    },
+    "modal": {
+      "areYouSure": "Tem a certeza?",
+      "areYouSureYouWantToExit": "Tem a certeza de que quer sair?"
+    }
+  },
+  "chat": {
+    "chatMessageField": {
+      "addActionAriaLabel": "adicionar",
+      "moreActionsTooltip": "mais ações",
+      "sendMessageTooltip": "enviar mensagem",
+      "placeholders": {
+        "chatFinished": "A conversa foi concluída. Não pode enviar mais mensagens.",
+        "aiTyping": "A IA está a escrever..., aguarde que termine.",
+        "offline": "Está offline. Por favor, ligue-se à internet para enviar uma mensagem.",
+        "default": "Escreva a sua mensagem...",
+        "uploading": "A carregar CV...",
+        "bws": "Use os botões acima para escolher o seu mais e menos preferido."
+      },
+      "uploadCvIntro": "Pode carregar o seu CV assim que começarmos a explorar as suas experiências",
+      "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máx {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres máx",
+      "uploadCvOtherPhase": "O carregamento de CV só está disponível durante a recolha de experiências",
+      "uploadCvLabel": "Carregar CV",
+      "viewUploadedLabel": "CVs carregados anteriormente",
+      "sendFailed": "Não foi possível enviar a sua mensagem. Por favor, tente novamente."
+    },
+    "chatMessage": {
+      "typingChatMessage": {
+        "typing": "A escrever",
+        "thinking": "Por favor aguarde, estou a pensar",
+        "thinkingPreferenceElicitation": "A pensar na sua resposta…"
+      },
+      "bwsTaskMessage": {
+        "whichWouldYouPrefer": "Qual preferia?",
+        "most": "Mais:",
+        "least": "Menos:",
+        "submit": "Submeter",
+        "submitted": "Submetido"
+      },
+      "conversationConclusionFooter": {
+        "youCanNow": "Pode agora",
+        "viewAndDownloadCv": "Ver e Descarregar o seu Relatório de Competências",
+        "here": "aqui.",
+        "createAccountIntro": "Se quiser explorar as suas competências e experiências no futuro, pode",
+        "createAccount": "Criar uma Conta",
+        "verificationReminder": "Um email de verificação foi enviado para o seu endereço de email. Por favor, verifique a sua conta antes de iniciar sessão novamente.",
+        "feedbackWelcome": "Gostaríamos de receber mais",
+        "feedbackLinkText": "Feedback",
+        "feedbackFromYouSuffix": "de si. Demora apenas 5 minutos e ajuda-nos a melhorar!",
+        "feedbackInProgressPrefix": "Por favor",
+        "feedbackInProgressLinkText": "Complete o seu Feedback",
+        "feedbackInProgressSuffix": "para nos ajudar a melhorar a sua experiência!"
+      },
+      "sent": "enviado ",
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Escolha um:"
+        }
+      }
+    },
+    "chat": {
+      "notifications": {
+        "experiencesFetchFailed": "Falha ao recuperar experiências",
+        "logoutSuccess": "Sessão terminada com sucesso",
+        "startConversationFailed": "Falha ao iniciar nova conversa",
+        "startConversationSuccess": "Nova conversa iniciada"
+      },
+      "backdrop": {
+        "loggingOut": "A terminar a sua sessão, aguarde um momento..."
+      },
+      "startNewConversationDialog": {
+        "title": "Iniciar Nova Conversa?",
+        "content": "Assim que iniciar uma nova conversa, todas as mensagens da conversa atual serão perdidas para sempre.",
+        "confirmation": "Tem a certeza de que quer iniciar uma nova conversa?"
+      },
+      "bwsTransitionMessage": "Agora gostaria de compreender o que mais valoriza num emprego. Vou mostrar-lhe alguns conjuntos de actividades de trabalho — para cada um, escolha a que **mais** prefere e a que **menos** prefere.",
+      "refreshConfirmationDialog": {
+        "title": "Tem a certeza de que gostaria de atualizar?",
+        "content": "{{appName}} está a escrever e atualizar a página pode causar problemas. Pode perder o progresso da sua conversa atual.",
+        "question": "Gostaria de esperar que {{appName}} termine, ou atualizar de qualquer forma?",
+        "waitButton": "Esperar por {{appName}}",
+        "refreshButton": "Atualizar"
+      }
+    },
+    "chatProgressbar": {
+      "labels": {
+        "workTypes": "tipos de trabalho",
+        "experiences": "experiências",
+        "questions": "perguntas",
+        "tasks": "tarefas"
+      },
+      "phases": {
+        "initializing": "A inicializar...",
+        "intro": "Introdução",
+        "collecting": "A recolher",
+        "exploring": "A explorar",
+        "discoveringPreferences": "A descobrir preferências",
+        "rankingOccupations": "A classificar profissões",
+        "recommendations": "A discutir recomendações",
+        "finished": "Conversa terminada",
+        "unknown": "Fase desconhecida"
+      }
+    },
+    "util": {
+      "feedbackThankYou": "Obrigado por disponibilizar o seu tempo para partilhar o seu valioso feedback.",
+      "ratingThankYou": "Obrigado por avaliar o {{appName}}.",
+      "errorSomethingWentWrong": "Lamento, algo parece ter corrido mal do meu lado... Pode, por favor, atualizar a página e tentar novamente?",
+      "errorPleaseRepeat": "Lamento, algo parece ter corrido mal do meu lado... Pode, por favor, repetir isso?",
+      "messages": {
+        "experiencesIntro": "Estas são as minhas experiências:"
+      }
+    },
+    "reaction": {
+      "components": {
+        "dislikeReasonPopover": {
+          "title": "Por favor, diga-nos qual é o problema?",
+          "closeButton": "fechar feedback",
+          "reasons": {
+            "inappropriateTone": "Tom Inapropriado",
+            "offensiveLanguage": "Linguagem Ofensiva",
+            "biased": "Parcial/Enviesado",
+            "incorrectInformation": "Informação Incorreta",
+            "irrelevant": "Irrelevante",
+            "confusing": "Confuso"
+          }
+        },
+        "reactionButtons": {
+          "likeLabel": "gosto",
+          "dislikeLabel": "não gosto",
+          "errors": {
+            "submitLike": "A sua reação não foi enviada. Toque novamente para tentar de novo.",
+            "removeLike": "Não conseguimos remover a sua reação. Toque novamente para tentar de novo.",
+            "submitDislike": "A sua reação não foi enviada. Toque novamente para tentar de novo.",
+            "removeDislike": "Não conseguimos remover a sua reação. Toque novamente para tentar de novo."
+          }
+        }
+      }
+    },
+    "cvUploadPolling": {
+      "uploadingCv": "A carregar CV",
+      "cancelled": "Carregamento de CV cancelado",
+      "uploadedSuccessfully": "CV carregado com sucesso",
+      "converting": "A converter CV",
+      "processing": "A processar CV",
+      "extractingExperiences": "A extrair experiências",
+      "savingCv": "A guardar CV",
+      "failed": "Falha no carregamento do CV",
+      "failedToStart": "Não conseguimos iniciar o seu carregamento. Por favor, tente novamente.",
+      "networkErrorStatus": "Perdemos a ligação enquanto verificávamos o seu carregamento. O carregamento ainda pode ser bem-sucedido — continuaremos a tentar.",
+      "failedToCancel": "Não conseguimos cancelar o carregamento. Pode continuar em segundo plano.",
+      "uploadingFileNamed": "A carregar {{filename}}...",
+      "thinkingMessage": "A processar o seu CV, isto pode demorar um pouco..."
+    },
+    "chatHeader": {
+      "viewExperiences": "Relatório das minhas competências",
+      "feedbackMessage": "Gostaríamos de ouvir o seu feedback sobre a sua experiência até agora!",
+      "giveFeedback": "Dar Feedback",
+      "feedbackMessagePlaceholder": "Gostaríamos de ouvir a sua opinião! Por favor, partilhe qualquer feedback ou sugestões que tenha para melhorar o {{appName}}.",
+      "sendFeedback": "Enviar Feedback",
+      "feedbackSuccessMessage": "Obrigado pelo seu feedback!",
+      "giveGeneralFeedback": "Dar feedback geral",
+      "userInfo": "Informação do utilizador",
+      "viewMyProfile": "Perfil",
+      "userIconAlt": "Ícone de Utilizador",
+      "beforeYouGo": "Antes de ir",
+      "logoutConfirmationMessage": "Tem a certeza de que quer sair?",
+      "anonymousAccountWarning": "Está atualmente a usar uma conta anónima. Se sair, perderá o acesso ao seu histórico de conversas e experiências.",
+      "logoutWarningAnonymous": "Se sair, perderá o acesso ao seu histórico de conversas e experiências.",
+      "createAccountToSaveProgress": "Crie uma conta para guardar o seu progresso",
+      "continueYourJourneyLater": "e continue a sua jornada mais tarde.",
+      "formTitle": "Dar feedback geral",
+      "nameLabel": "Nome",
+      "namePlaceholder": "O Seu Nome",
+      "emailLabel": "Email",
+      "descriptionLabel": "Descrição",
+      "emailPlaceholder": "o.seu.email@exemplo.org",
+      "addScreenshot": "Adicionar uma captura de ecrã",
+      "requiredLabel": "(obrigatório)",
+      "cancelButton": "Cancelar"
+    }
+  },
+  "auth": {
+    "pages": {
+      "login": {
+        "welcomeTitle": "Bem-vindo ao {{appName}}!",
+        "welcomeBack": "Bem-vindo de volta!",
+        "loginToYourAccountToContinue": "Inicie sessão na sua conta para continuar",
+        "loginUsing": "Entrar através de",
+        "loggingYouIn": "A iniciar a sua sessão...",
+        "loggingInAria": "A iniciar sessão",
+        "signInDescription": "Se já tem uma conta Njila, insira o seu <0>email</0> e <1>palavra-passe</1> para lhe aceder, ou escolha <2>Google</2> para entrar.",
+        "dontHaveAnAccount": "Ainda não tem conta? Registe-se gratuitamente.",
+        "needHelp": "Ajuda",
+        "fillInEmailAndPassword": "Por favor, preencha os campos de email e palavra-passe",
+        "orLoginToYourAccountToContinue": "Ou inicie sessão na sua conta para continuar",
+        "or": "ou",
+        "invitationCodeValid": "Código de convite é válido",
+        "continueAsGuest": "Continuar como Convidado",
+        "appHero": {
+          "discoverLine": "Descubra as suas",
+          "skillsLine": "competências e pontos fortes",
+          "subheadline": "O seu caminho guiado das competências para o seu primeiro emprego — construído em torno do que sabe, do que fez e para onde quer ir.",
+          "signInTitle": "Iniciar Sessão",
+          "cta": "Iniciar Sessão",
+          "whatIsTitleBefore": "O que é o ",
+          "whatIsTitleBrand": "{{appName}}",
+          "feature1Title": "Descubra os seus pontos fortes",
+          "feature1Body": "Descubra que competências já possui — da sua formação, do seu trabalho e da sua vida.",
+          "feature2Title": "Construa um CV que seja notado",
+          "feature2Body": "Crie um CV profissional adaptado ao que os empregadores na Zâmbia procuram.",
+          "feature3Title": "Encontre o seu caminho",
+          "feature3Body": "Explore carreiras com grande procura, compreenda de que qualificações necessita e encontre ofertas de emprego reais."
+        },
+        "components": {
+          "loginWithInviteCodeForm": {
+            "loginCode": "Código de início de sessão"
+          }
+        }
+      },
+      "register": {
+        "signUpTitle": "Criar uma conta",
+        "signUpDescription": "Para criar uma conta Njila, insira o seu <0>endereço de email</0> e crie uma <1>palavra-passe</1>. Também pode criar uma conta com a sua conta <2>Google</2>.",
+        "emailPlaceholder": "O seu endereço de email",
+        "passwordPlaceholder": "Crie uma palavra-passe",
+        "confirmPasswordPlaceholder": "Repita a palavra-passe",
+        "welcomeTitle": "Bem-vindo ao {{appName}}!",
+        "welcomeBack": "Bem-vindo de volta!",
+        "subtitle": "Necessitamos de algumas informações para começar",
+        "registerWithGoogle": "Continuar com o Google",
+        "alreadyHaveAccount": "Já tem uma conta?",
+        "registeringYou": "A criar a sua conta...",
+        "enterRegistrationCode": "Insira o seu código de registo",
+        "registrationCode": "Código de registo",
+        "andEitherContinueWith": "e continue através de",
+        "components": {
+          "registerWithEmailForm": {
+            "registeringAria": "A criar conta"
+          }
+        }
+      },
+      "landing": {
+        "continueAsGuest": "Continuar como Convidado",
+        "subtitleBold": "Descubra o seu pleno potencial",
+        "subtitleBody": "Descubra e articule as suas competências através de conversas naturais guiadas por IA. Construa o seu perfil de competências e descarregue um CV para impulsionar a sua procura de emprego. Crie uma conta gratuita para guardar o seu progresso e revisitar o seu histórico de conversas.",
+        "invitationCodeValid": "O código de convite é válido",
+        "welcome": "Bem-vindo!",
+        "welcomeTitle": "Bem-vindo ao {{appName}}!",
+        "or": "ou",
+        "loggingYouIn": "A iniciar a sua sessão..."
+      },
+      "verifyEmail": {
+        "registrationThankYou": "Obrigado por criar uma conta no {{appName}}.",
+        "verificationEmailSentMessage": "Um email de verificação foi enviado para o seu endereço de email. Para continuar, por favor verifique primeiro o seu endereço de email.",
+        "verificationEmailSentBadge": "Email de verificação enviado"
+      },
+      "authHandler": {
+        "processing": "Aguarde um momento, estamos a processar o seu pedido...",
+        "savingPassword": "A guardar a sua nova palavra-passe...",
+        "savePassword": "Guardar palavra-passe",
+        "passwordRequirementsNotMet": "Por favor, certifique-se de que a sua palavra-passe cumpre todos os requisitos.",
+        "verifyEmailTitle": "A verificar o seu email",
+        "verifyEmailSuccess": "Email verificado!",
+        "verifyEmailSuccessRedirect": "O seu email foi verificado. Será redirecionado para iniciar sessão em breve.",
+        "resetPasswordTitle": "Repor a sua palavra-passe",
+        "resetPasswordSubtitle": "Insira uma nova palavra-passe para {{email}}.",
+        "newPasswordPlaceholder": "Nova palavra-passe",
+        "passwordResetSuccess": "A sua palavra-passe foi atualizada.",
+        "passwordResetSuccessFull": "A sua palavra-passe foi atualizada com sucesso. Pode agora iniciar sessão com a sua nova palavra-passe.",
+        "recoverEmailTitle": "A restaurar o seu email",
+        "recoverEmailSuccess": "o seu endereço de email foi restaurado.",
+        "recoverEmailSuccessWithEmail": "O seu endereço de email foi restaurado para {{email}}. Também enviámos uma hiperligação para reposição de palavra-passe para esse endereço por precaução.",
+        "errors": {
+          "title": "Algo correu mal",
+          "invalidLink": "Esta hiperligação não contém informações obrigatórias. Pode estar malformada ou incompleta.",
+          "linkInvalidOrExpired": "Esta hiperligação é inválida ou expirou. Por favor, peça uma nova.",
+          "unknownMode": "Não conseguimos reconhecer a ação solicitada por esta hiperligação."
+        }
+      }
+    },
+    "components": {
+      "anonymousAccountConversionDialog": {
+        "registerAccount": "Criar Conta",
+        "registrationInfo": "Por favor, crie uma conta com um email para manter o acesso a esta conversa. Sem uma conta, não poderá iniciar sessão novamente ou voltar a esta conversa.",
+        "emailWarning": "Por favor, certifique-se de que utiliza o email correto, pois não poderá ser alterado mais tarde e ser-lhe-á pedido para o verificar.",
+        "closeRegistrationForm": "Fechar formulário de criação de conta",
+        "invalidEmail": "Por favor, insira um endereço de email válido",
+        "emailsMismatch": "Por favor, certifique-se de que ambos os endereços de email coincidem",
+        "passwordRequirementsNotMet": "Por favor, certifique-se de que a sua palavra-passe cumpre todos os requisitos",
+        "registrationSuccess": "Conta criada com sucesso!",
+        "verificationSentWithEmail": "Sessão iniciada atualmente com o email: {{email}}. Um email de verificação foi enviado para o seu endereço de email. Por favor, verifique a sua conta antes de iniciar sessão novamente.",
+        "registrationFailed": "Falha ao criar conta"
+      },
+      "passwordReset": {
+        "forgotPassword": "Esqueceu-se da palavra-passe?",
+        "pleaseEnterEmail": "Por favor, insira o seu endereço de email",
+        "passwordResetEmailSent": "Email de reposição de palavra-passe enviado!",
+        "failedToSendResetEmail": "Não conseguimos enviar o email de reposição de palavra-passe neste momento. Por favor, tente novamente.",
+        "passwordResetLinkSent": "Uma hiperligação para reposição de palavra-passe foi enviada para o seu endereço de email.",
+        "resetPassword": "Repor Palavra-passe",
+        "closePasswordResetForm": "Fechar formulário de reposição de palavra-passe"
+      },
+      "registrationCodeFormModal": {
+        "closeRegistrationCodeForm": "Fechar formulário de código de registo",
+        "noRegistrationCodePrompt": "Não tem um código de registo?",
+        "reachOut": "Contacte-nos"
+      },
+      "requestInvitationCodeFormModal": {
+        "requestAccessTitle": "Solicitar acesso ao {{appName}}",
+        "requestAccessSubtitle": "Por favor, diga-nos como planeia usar o {{appName}}. Analisaremos cuidadosamente o seu pedido e entraremos em contacto em breve.",
+        "closeRequestInvitationForm": "Fechar formulário de pedido de código de convite",
+        "name": "Nome",
+        "message": "Mensagem",
+        "messagePlaceholder": "Por favor, partilhe como planeia usar o {{appName}}",
+        "invitationRequestSubmitSuccess": "O seu pedido de acesso ao {{appName}} foi submetido com sucesso. Entraremos em contacto em breve.",
+        "invitationRequestSubmitError": "Algo correu mal ao tentar enviar o seu pedido"
+      },
+      "requestInvitationCode": {
+        "requestLoginCode": "Não tem um código de início de sessão?"
+      },
+      "resendVerificationEmail": {
+        "emailNotVerified": "O seu email não está verificado. Por favor, verifique a sua caixa de entrada para o email de verificação.",
+        "resendVerificationEmail": "Reenviar email de verificação",
+        "resendVerificationEmailSuccess": "Email de verificação enviado com sucesso",
+        "resendVerificationEmailFailedWithMessage": "Falha ao enviar email de verificação: {{message}}"
+      },
+      "socialAuth": {
+        "orContinueWith": "Ou",
+        "loginWithGoogle": "Continuar com o Google",
+        "googleLoginIsNotAvailableWhenOffline": "O início de sessão com o Google não está disponível quando offline.",
+        "accountNotRegistered": "Esta conta não está registada. Por favor, contacte o fornecedor desta hiperligação."
+      }
+    },
+    "loggingYouOutNotice": "Estamos a terminar a sua sessão...",
+    "errors": {
+      "loginFailedGeneric": "Não conseguimos iniciar a sua sessão neste momento. Por favor, tente novamente.",
+      "registerFailedGeneric": "Não conseguimos criar a sua conta neste momento. Por favor, tente novamente.",
+      "preferencesFetchFailedWithMessage": "Ocorreu um erro ao tentar obter as suas preferências: {{message}}",
+      "firebase": {
+        "emailAlreadyInUse": "Já existe uma conta com este email. Se criou uma conta com o Google, use o botão 'Entrar com o Google' para iniciar sessão.",
+        "emailNotVerified": "O email que está a utilizar está registado, mas ainda não o verificou. Por favor, verifique o seu email para continuar.",
+        "invalidCredential": "O email ou palavra-passe fornecidos são inválidos.",
+        "invalidEmail": "O endereço de email não é válido.",
+        "operationNotAllowed": "As contas de email/palavra-passe não estão ativadas.",
+        "weakPassword": "A palavra-passe é demasiado fraca.",
+        "userDisabled": "A conta de utilizador foi desativada.",
+        "userNotFound": "Nenhum utilizador foi encontrado para as credenciais fornecidas.",
+        "wrongPassword": "A palavra-passe é inválida.",
+        "tooManyRequests": "Bloqueámos todos os pedidos deste dispositivo devido a atividade invulgar. Tente novamente mais tarde.",
+        "internalError": "Ocorreu um erro interno.",
+        "tooManyUsers": "Existem demasiados utilizadores neste projeto Firebase.",
+        "invalidRegistrationCode": "O código de registo que inseriu é inválido. Por favor, verifique o código e tente novamente.",
+        "invalidInvitationCode": "O código de convite que inseriu é inválido. Por favor, verifique o código e tente novamente.",
+        "invalidInvitationType": "O código que utilizou é para criar uma conta, não para iniciar sessão. Por favor, vá para a página Criar Conta.",
+        "invalidRegistrationType": "O código que utilizou é para iniciar sessão, não para criar uma conta. Por favor, vá para a página Iniciar Sessão.",
+        "popupClosedByUser": "A janela pop-up de início de sessão do Google foi fechada antes de completar o processo.",
+        "invalidLoginMethod": "Esta operação não é permitida com o método de início de sessão atual.",
+        "emailAlreadyVerified": "O endereço de email já está verificado."
+      }
+    },
+    "verificationEmailSentShort": "Email de verificação enviado!"
+  },
+  "cv": {
+    "cvTypingChatMessage": {
+      "uploading": "Por favor aguarde enquanto carrego e analiso o seu CV",
+      "uploadedReady": "O conteúdo do seu CV está no campo de texto. Reveja-o e envie quando estiver pronto."
+    },
+    "uploadedCVsMenu": {
+      "backTitle": "Voltar ao menu principal",
+      "titleWithCount": "CVs carregados anteriormente ({{count}})",
+      "helpCollect": "Toque num CV para carregar o seu conteúdo no campo de texto. Reveja e envie quando estiver pronto.",
+      "helpDisabled": "A seleção de CV só está disponível durante a fase de recolha de experiências.",
+      "empty": "Nenhum CV carregado encontrado."
+    },
+    "cancellableTypingChatMessage": {
+      "typing": "A escrever",
+      "thinking": "Por favor aguarde, isto pode demorar um pouco",
+      "cancel": "Cancelar"
+    }
+  },
+  "experiences": {
+    "experiencesDrawer": {
+      "components": {
+        "experienceEditForm": {
+          "components": {
+            "summaryEditField": {
+              "summaryPlaceholder": "Resumo da experiência",
+              "restoreFailed": "Não conseguimos restaurar esse resumo. O seu resumo anterior ainda está guardado — por favor, tente novamente.",
+              "restored": "Resumo restaurado."
+            }
+          },
+          "updateSuccess": "Experiência atualizada com sucesso!",
+          "updateFailed": "As suas alterações não foram guardadas. Por favor, tente novamente daqui a pouco.",
+          "skillsAddedSuccess": "Competências adicionadas com sucesso!",
+          "editTitle": "Editar Experiência",
+          "infoLabel": "Informação da experiência",
+          "infoHelp": "Toque num campo para atualizar o tipo de trabalho, o título, as datas, a empresa, a localização ou o resumo da sua experiência.",
+          "field": {
+            "experienceTitlePlaceholder": "Título da experiência",
+            "experienceTitleRequired": "* O título da experiência é obrigatório",
+            "startDatePlaceholder": "Data de início",
+            "endDatePlaceholder": "Data de fim",
+            "companyPlaceholder": "Empresa",
+            "locationPlaceholder": "Localização"
+          },
+          "topSkillsHelpEdit": "Toque numa competência para ver mais detalhes. Use o menu suspenso para alterar o rótulo da competência e o ícone de eliminação para a remover. Toque no botão Adicionar Competência para adicionar mais.",
+          "addSkillButton": "Adicionar competência",
+          "updatingBackdrop": "A atualizar experiência...",
+          "maxCharsAllowed": "Máximo de {{count}} caracteres permitidos."
+        },
+        "experiencesDrawerHeader": {
+          "closeTitle": "Fechar experiências"
+        },
+        "experiencesDrawerContent": {
+          "menu": {
+            "edit": "Editar",
+            "delete": "Eliminar",
+            "revert": "Reverter"
+          },
+          "actionsUnavailableUntilExplored": "Estas ações ficarão disponíveis assim que tiver discutido a experiência em detalhe com o {{appName}}.",
+          "moreOptionsTitle": "Mais opções",
+          "topSkillsLabel": "Principais Competências",
+          "topSkillsHelp": "Toque numa competência para ver mais detalhes.",
+          "noSkillsYet": "Nenhuma competência descoberta ainda",
+          "untitled": "Sem título!"
+        },
+        "skillPopover": {
+          "alsoKnownAs": "Também conhecido como:"
+        },
+        "restoreExperiencesDrawer": {
+          "title": "Restaurar Experiências",
+          "fetchFailed": "Não conseguimos carregar as suas experiências eliminadas agora. Elas ainda estão seguras — por favor, tente novamente.",
+          "empty": "Nenhuma experiência eliminada encontrada."
+        },
+        "downloadReportButton": {
+          "downloadCv": "Descarregar Relatório de Competências",
+          "downloading": "A descarregar",
+          "helpTipBlockedMessage": "Não pode descarregar o relatório até terminar de explorar pelo menos uma experiência."
+        },
+        "shareReportButton": {
+          "shareReport": "Partilhar Relatório",
+          "preparingPdf": "A preparar o seu pdf",
+          "shareTitle": "Relatório de Experiência",
+          "shareText": "Veja o meu Relatório de Experiência",
+          "shareFailed": "Não conseguimos partilhar o seu relatório. Pode ainda assim descarregá-lo e partilhar o ficheiro diretamente.",
+          "shareCanceled": "Partilha cancelada a pedido do utilizador",
+          "share": "Partilhar"
+        }
+      },
+      "deleteSuccess": "Experiência eliminada com sucesso!",
+      "deleteFailed": "Falha ao eliminar experiência.",
+      "userHasNoSessions": "O utilizador não tem sessões",
+      "noActiveSession": "Nenhuma sessão ativa encontrada",
+      "restoreSuccess": "Experiência restaurada com sucesso!",
+      "restoreFailed": "Falha ao restaurar experiência.",
+      "personalInfoTooltip": "Esta informação vem do seu perfil e está incluída no seu CV. Para a alterar ou remover, edite o ficheiro descarregado.",
+      "andSkillsTitle": "Experiências e Competências",
+      "personalInformationTitle": "Informação Pessoal",
+      "personalInfo": {
+        "nameLabel": "Nome:",
+        "emailLabel": "Email:",
+        "locationLabel": "Localização:",
+        "educationLabel": "Educação:"
+      },
+      "uncategorizedTooltip": "Com base na conversa, estas experiências não puderam ser categorizadas automaticamente.",
+      "restoreDeletedLink": "Restaurar experiências eliminadas",
+      "unsavedChanges": {
+        "title": "Alterações não guardadas",
+        "content": "Tem alterações não guardadas. Tem a certeza de que quer fechar sem guardar?",
+        "closeButton": "Fechar",
+        "keepEditingButton": "Continuar a Editar"
+      },
+      "delete": {
+        "title": "Eliminar Experiência",
+        "content": "Tem a certeza de que quer eliminar esta experiência? Esta ação não pode ser desfeita.",
+        "confirmButton": "Eliminar"
+      },
+      "revert": {
+        "title": "Reverter Experiência",
+        "content": "Tem a certeza de que quer reverter esta experiência para a sua versão não editada? Isto irá substituir quaisquer alterações que tenha feito.",
+        "confirmButton": "Reverter"
+      },
+      "deletingBackdrop": "A eliminar experiência...",
+      "restoringBackdrop": "A restaurar experiência...",
+      "emptyStateMessage": "Ainda não descobrimos nenhuma experiência. Vamos continuar a conversar.",
+      "util": {
+        "workTypeDescription": {
+          "selfEmployment": "Trabalha por conta própria, gere o seu próprio negócio, ou aceita trabalhos como freelancer ou sob contrato",
+          "formalSectorWagedEmployment": "Tem um emprego remunerado e trabalha para um empregador, empresa ou organização",
+          "formalSectorUnpaidTraineeWork": "Está numa função de formação ou estágio para adquirir competências ou experiência",
+          "unseenUnpaid": "Faz trabalho não remunerado, como prestação de cuidados, tarefas domésticas ou voluntariado comunitário",
+          "uncategorized": "O {{appName}} não conseguiu categorizar este tipo de trabalho"
+        },
+        "errors": {
+          "experienceTitleMaxLength": "Máximo de {{max}} caracteres permitidos.",
+          "companyMaxLength": "Máximo de {{max}} caracteres permitidos.",
+          "locationMaxLength": "Máximo de {{max}} caracteres permitidos.",
+          "summaryMaxLength": "Máximo de {{max}} caracteres permitidos.",
+          "timelineMaxLength": "Máximo de {{max}} caracteres permitidos."
+        }
+      },
+      "reportTitle": "Seu Relatório de Competências Njila",
+      "educationLabel": "EDUCAÇÃO",
+      "experiencesAndSkillsLabel": "EXPERIÊNCIAS E COMPETÊNCIAS"
+    },
+    "report": {
+      "skillsReportTitle": "Relatório de Competências",
+      "skillsDescriptionTitle": "Descrição de Competências",
+      "experiencesTitle": "EXPERIÊNCIAS",
+      "selfEmploymentTitle": "Trabalho por conta própria",
+      "salaryWorkTitle": "Trabalho Assalariado",
+      "unpaidWorkTitle": "Trabalho Não Remunerado",
+      "traineeWorkTitle": "Trabalho de Estagiário",
+      "uncategorizedTitle": "Não Categorizado",
+      "topSkillsTitle": "Principais Competências: ",
+      "skillsDescriptionText": "Abaixo, encontrará uma lista das competências descobertas durante a sua conversa com o {{appName}}, juntamente com as suas descrições.",
+      "disclaimer": {
+        "part1": "Aviso legal: ",
+        "part2": "As competências listadas baseiam-se numa conversa com o candidato, não são verificadas ou validadas pela Tabiya e podem ser imprecisas. ",
+        "part3": "A informação deve ser verificada antes de ser utilizada para procura de emprego, entrevistas de emprego ou para a criação de um CV. Para rever esta informação, fale novamente com o {{appName}} ou crie um CV completo baseado neste relatório."
+      },
+      "bodyText": "Este relatório resume a informação fundamental recolhida durante uma conversa com o {{appName}} em {{date}}. O {{appName}} é um chatbot de IA que ajuda quem procura emprego a explorar as suas competências e experiências. Este relatório apresenta a experiência de trabalho do candidato e as competências identificadas em cada experiência. Esta informação pode ser usada para guiar a procura de emprego e destacar as competências ao candidatar-se a empregos, especialmente durante entrevistas com potenciais empregadores. Pode ser um bom ponto de partida para a criação de um CV completo.",
+      "format": {
+        "pdf": "PDF",
+        "docx": "DOCX"
+      }
+    }
+  },
+  "features": {
+    "skillsRanking": {
+      "components": {
+        "skillsRankingPrompt": {
+          "mainMessage": "Quase a terminar! Responda a mais algumas perguntas de investigação e enviar-lhe-emos <0>{{compensationAmount}}</0> de tempo de antena assim que tiver concluído todas as tarefas."
+        },
+        "skillsRankingBriefing": {
+          "introWorkBased": "Se estiver interessado, posso calcular que percentagem de oportunidades no <0>{{jobPlatformUrl}}</0> correspondem às suas competências e como se compara com outros candidatos — só precisa de me mostrar quão valiosa é esta informação para si.",
+          "introTimeBased": "Se estiver interessado, posso calcular que percentagem de oportunidades no <0>{{jobPlatformUrl}}</0> correspondem às suas competências e como se compara com outros candidatos. Isto pode demorar algum tempo — se não estiver interessado em esperar mais, pode clicar em <0>cancelar</0> a qualquer momento na próxima mensagem, enquanto eu calculo. Quando estiver pronto, por favor clique em <1>continuar</1>.",
+          "puzzleInstructions": "Verá letras inclinadas em alguns ecrãs. Coloque cada letra na vertical usando os botões de rotação. Pode cancelar a qualquer momento. Em 5% dos casos, <0>mais letras corrigidas = maior probabilidade de receber a informação.</0> No resto do tempo, depende de mim.",
+          "failedToContinue": "Falha ao continuar. Por favor, tente novamente mais tarde."
+        },
+        "skillsRankingProofOfValue": {
+          "waitingMessage": "Por favor aguarde enquanto faço os cálculos, ou clique em cancelar a qualquer momento se não quiser esperar mais pela informação.",
+          "puzzleAutoCompleteMessage": "A completar automaticamente os puzzles restantes..."
+        },
+        "skillsRankingCompletionAdvice": {
+          "adviceMessage": "Alguns conselhos: Estes números são para si. Como podem estes números mudar a forma como procura funções esta semana? Pare e considere onde o seu tempo e energia parecem agora ser melhor gastos na sua estratégia para encontrar um emprego."
+        },
+        "skillsRankingRetypedRank": {
+          "question_1": "Como última pergunta, vamos recordar o que lhe disse acima apenas em relação ao seu próprio ajuste às oportunidades:",
+          "question_2": "verifique novamente o que eu disse há três mensagens, para que percentagem de oportunidades",
+          "question_3": " em",
+          "question_4": " possui as competências fundamentais?",
+          "sliderAria": "Controlo de percentil de classificação reintroduzido"
+        },
+        "skillsRankingPerceivedRank": {
+          "questionWithDisclosure": "Agora, pense nestes 100 utilizadores do <0>{{jobPlatformUrl}}</0>, que são maioritariamente candidatos a emprego da África do Sul com idades entre os 18-34 anos com o ensino secundário de uma escola de bairro (township) ou rural. <0>Exatamente quantos desses 100</0> acredita que se ajustariam a <0>menos oportunidades</0> no <0>{{jobPlatformUrl}}</0> <0>do que você</0>?",
+          "questionWithoutDisclosure": "Antes de terminarmos realmente a nossa conversa, tenho apenas uma última pergunta relacionada com o que foi dito — se pensar em 100 pessoas que procuram emprego na África do Sul, com idades entre 18-34 anos e com o ensino secundário de uma escola de bairro ou rural. Quantos destes 100 candidatos acredita que se ajustariam a <0>menos posições</0> no <1>{{jobPlatformUrl}}</1> do que você?",
+          "sliderAria": "Controlo de percentil de classificação percebido"
+        },
+        "skillsRankingDisclosure": {
+          "skillsRankingMarketDisclosure": {
+            "message_1": "Possui as competências fundamentais para ",
+            "message_2": " das oportunidades anunciadas em ",
+            "message_3": ". É uma gama sólida de opções!"
+          },
+          "skillsRankingJobSeekerDisclosure": {
+            "pendingMessage": "Obrigado! Estamos a verificar as últimas oportunidades no {{jobPlatformUrl}} para que os números sejam precisos. Partilharemos os seus resultados em breve ou pode pedi-los quando lhe ligarmos para o inquérito por telefone.",
+            "comparisonPart1_prefix": "Além disso, ",
+            "comparisonPart1_main": "Comparado com outros utilizadores do \n            {{jobPlatformUrl}}\n             , está no grupo [\n            {{groupIndex}}\n            ] de \n            {{groupTotal}}\n            .",
+            "comparisonPart2_prefix": "Imagine alinhar 100 \n          {{jobPlatformUrl}}\n           utilizadores, do que se ajusta a menos empregos para o que se ajusta a mais. Dividimos a fila em cinco blocos de 20 pessoas. O bloco 1 (os 20 superiores) ajusta-se a mais empregos; o bloco 5 (os 20 inferiores) ajusta-se a menos. Você está no bloco ",
+            "comparisonPart2_group": "[\n            {{groupIndex}}\n            ]",
+            "comparisonPart2_middle": ", que é o ",
+            "comparisonPart2_label": "[\n            {{comparisonLabel}}\n            ]",
+            "comparisonPart2_suffix": " bloco.",
+            "updateError": "Falha ao atualizar o estado do ranking de competências. Por favor, tente novamente mais tarde."
+          }
+        },
+        "rotateToSolve": {
+          "instructions1": "Rode cada letra até que esteja na vertical. Selecione uma letra clicando nela e, em seguida, rode-a no sentido dos ponteiros do relógio com",
+          "instructions2": " ou no sentido contrário com",
+          "allCompleteMessage": "Todos os puzzles concluídos! Bem feito!",
+          "puzzleCompleteMessage": "Puzzle concluído! Por favor, resolva outro ou cancele se não estiver assim tão interessado na informação.",
+          "rotateLeftAria": "Rodar carácter no sentido contrário aos ponteiros do relógio",
+          "rotateRightAria": "Rodar carácter no sentido dos ponteiros do relógio"
+        }
+      }
+    }
+  },
+  "consent": {
+    "components": {
+      "consentPage": {
+        "beforeWeBeginTitle": "Antes de começarmos...",
+        "introPart1": "Criámos esta ferramenta de IA para si com cuidado para o ajudar a si e a outros jovens como você a explorarem as suas competências e a descobrirem novas oportunidades.",
+        "introHighlightResponsibly": "Por favor, use a IA de forma responsável!",
+        "introPart2": "A tecnologia de IA é nova e está longe de ser perfeita. Não compreende o contexto como os humanos.",
+        "introPart3": "Verifique sempre os detalhes importantes e evite partilhar informações pessoais sobre si e outros com a IA durante a conversa.",
+        "introPart4": "Ajude-nos a manter todas as interações de IA seguras e positivas! 😊",
+        "termsAndConditions": "Termos e Condições",
+        "privacyPolicy": "Política de Privacidade",
+        "checkboxTermsAndConditions": "Li e aceito os <0>{{terms_and_conditions}}</0> do {{appName}}.",
+        "checkboxPrivacyPolicy": "Li e aceito a <0>{{privacy_policy}}</0> do {{appName}}.",
+        "areYouReady": "Está pronto para começar?",
+        "acceptButton": "Com certeza, estou pronto",
+        "withSupportFrom": "Com o apoio de",
+        "modalApology": "Lamentamos que tenha optado por não concordar com os {{terms_and_conditions}} e a {{privacy_policy}}.",
+        "modalCannotProceed": "Não poderá prosseguir e terá a sua",
+        "modalLoggedOutHighlight": "sessão terminada.",
+        "modalYesExit": "Sim, sair",
+        "snackbarAgreementAccepted": "Acordo Aceitado",
+        "snackbarUserNotFound": "Utilizador não encontrado",
+        "snackbarLoggedOutSuccess": "Sessão terminada com sucesso.",
+        "snackbarLoggedOutFailure": "Falha ao terminar a sessão.",
+        "snackbarFailedUpdatePreferences": "Falha ao atualizar as preferências do utilizador"
+      }
+    }
+  },
+  "sensitiveData": {
+    "components": {
+      "sensitiveDataForm": {
+        "title": "Forneça as suas informações",
+        "subtitle": "Usamos os seus dados para personalizar a sua experiência e poderemos contactá-lo sobre o {{appName}}.",
+        "unskippableSubtitle": "Por favor, forneça as seguintes informações para continuar.",
+        "skippableSubtitle": "Pode saltar este passo.",
+        "helpTipText": "A sua informação é encriptada utilizando encriptação de ponta a ponta topo de gama e armazenada de forma segura.",
+        "failedToLoadConfig": "Falha ao carregar a configuração do formulário",
+        "failedToLoadProgrammes": "Não conseguimos carregar os programas para esta instituição neste momento. Por favor, tente selecioná-la novamente.",
+        "fieldRequired": "Este campo é obrigatório.",
+        "invalidForm": "Por favor, corrija os campos destacados antes de submeter.",
+        "savedSuccess": "Dados pessoais guardados com sucesso e de forma segura.",
+        "errorDefault": "Não foi possível guardar os dados pessoais. Por favor, tente novamente e se o problema persistir, limpe a cache do seu navegador e atualize a página.",
+        "errorEncryptedDataTooLarge": "Os dados pessoais parecem ser demasiado grandes para serem guardados. Por favor, tente novamente introduzindo valores menores nos campos. Se o problema persistir, limpe a cache do seu navegador e atualize a página.",
+        "collectionSkipped": "Recolha de dados pessoais ignorada.",
+        "rejectParagraph1": "Lamentamos que tenha optado por não fornecer os seus dados. Fornecer esta informação ajuda o {{appName}} a proporcionar-lhe uma experiência mais personalizada. Não poderá prosseguir e a sua sessão será terminada.",
+        "skipParagraph1": "Lamentamos que prefira não fornecer os seus dados. Fornecer esta informação ajuda o {{appName}} a proporcionar-lhe uma experiência mais personalizada. Note que, se saltar este passo,",
+        "skipParagraph1Highlighted": " não poderá fornecer esta informação mais tarde.",
+        "startConversation": "Iniciar conversa",
+        "areYouSureYouWantToSkip": "Tem a certeza de que quer saltar?",
+        "yesSkip": "Sim, saltar",
+        "shareData": "Partilhar dados",
+        "skipping": "A saltar...",
+        "refreshPage": "Atualizar Página",
+        "loadingForm": "A carregar o formulário...",
+        "schoolYearOptions": {
+          "year1": "Ano 1",
+          "year2": "Ano 2",
+          "year3": "Ano 3",
+          "year4": "Ano 4"
+        },
+        "fields": {
+          "firstName": "Primeiro Nome",
+          "lastName": "Apelido",
+          "institution": "Instituição",
+          "institutionSearchPlaceholder": "Comece a escrever para pesquisar...",
+          "programme": "Curso",
+          "programmeSelectPlaceholder": "Seleccionar curso",
+          "programmeSelectFirstPlaceholder": "Seleccione primeiro uma instituição",
+          "schoolYear": "Ano Escolar",
+          "typeAtLeastXChars": "Digite pelo menos 2 caracteres para pesquisar",
+          "searching": "A pesquisar...",
+          "noInstitutionsFound": "Nenhuma instituição encontrada",
+          "selectInstitutionFirst": "Seleccione primeiro uma instituição",
+          "loadingProgrammes": "A carregar cursos...",
+          "noProgrammesAvailable": "Nenhum curso disponível"
+        }
+      },
+      "enumField": {
+        "pleaseSelectX": "Por favor, selecione um(a) {{x}}",
+        "clearSelection": "Limpar seleção",
+        "searchPlaceholder": "Pesquisar…",
+        "searchAriaLabel": "Opções de pesquisa"
+      },
+      "multipleSelectField": {
+        "searchPlaceholder": "Pesquisar…",
+        "searchAriaLabel": "Opções de pesquisa",
+        "selectAtLeastOne": "Por favor, seleccione pelo menos um {{field}}"
+      }
+    }
+  },
+  "feedback": {
+    "overallFeedback": {
+      "feedbackForm": {
+        "components": {
+          "customerSatisfactionRating": {
+            "questionText": "Finalmente, gostaríamos de ouvir a sua opinião sobre a sua experiência até agora! Quão satisfeito está com o {{appName}}?",
+            "ratingLabelLow": "Insatisfeito",
+            "ratingLabelHigh": "Satisfeito",
+            "submitSuccess": "Feedback de classificação submetido com sucesso!",
+            "submitError": "O seu feedback não foi enviado. Por favor, tente novamente daqui a pouco."
+          },
+          "feedbackFormContent": {
+            "previous": "Anterior",
+            "next": "Seguinte"
+          }
+        },
+        "submitSuccess": "Feedback submetido com sucesso!",
+        "submitError": "O seu feedback não foi enviado. Por favor, tente novamente daqui a pouco. Se isto continuar a acontecer, avise o suporte utilizando a referência mostrada quando ocorrem falhas.",
+        "helpUsImprove": "Ajude-nos a melhorar!",
+        "closeForm": "fechar formulário de feedback",
+        "submittingFeedback": "A submeter feedback..."
+      }
+    },
+    "bugReport": {
+      "reportBug": "Reportar um Erro"
+    },
+    "feedbackModal": {
+      "title": "Reportar um erro ou enviar feedback",
+      "subtitle": "Diga-nos o que aconteceu ou o que ajudaria. Lemos todos os comentários.",
+      "type": {
+        "bug": "Erro",
+        "feedback": "Feedback",
+        "idea": "Ideia"
+      },
+      "priority": {
+        "low": "Baixa",
+        "medium": "Média",
+        "high": "Alta"
+      },
+      "messagePlaceholder": "Descreva o que aconteceu, o que esperava, ou qualquer feedback...",
+      "addScreenshot": "Adicionar captura de ecrã",
+      "removeScreenshot": "Remover captura de ecrã",
+      "screenshotAlt": "Captura de ecrã anexada",
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "successMessage": "Obrigado pelo seu feedback!",
+      "errorMessage": "Não conseguimos enviar o seu feedback. Por favor, tente novamente."
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "ilustração de erro",
+      "defaultMessage": "Algo correu mal com o {{appName}}. Tente recarregar a página e, se continuar a acontecer, copie a referência abaixo e partilhe-a com o suporte.",
+      "notFound": "Erro 404 - Página Não Encontrada",
+      "refreshButton": "Atualizar página"
+    },
+    "restAPIError": {
+      "storyChooseMessageLabel": "Escolha uma mensagem de erro para exibir numa notificação:",
+      "storySelectPlaceholder": "Selecione uma mensagem de erro"
+    },
+    "supportReference": {
+      "copyButton": "Copiar para o suporte",
+      "copied": "Copiado",
+      "copyFailed": "Não foi possível copiar para a área de transferência",
+      "heading": "Se isto continuar a acontecer, copie os detalhes abaixo e partilhe-os com o suporte:",
+      "expand": "Mostrar mensagem completa",
+      "collapse": "Mostrar menos",
+      "close": "Fechar"
+    }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "Está offline",
+      "backOnline": "Está novamente online"
+    },
+    "compassLogoAlt": "Logótipo do {{appName}}"
+  },
+  "info": {
+    "infoDrawer": {
+      "frontendTitle": "Frontend",
+      "backendTitle": "Backend",
+      "applicationInformation": "Informação da Aplicação",
+      "closeApplicationInformation": "Fechar informação da aplicação",
+      "versionInfo": {
+        "date": "Data",
+        "version": "Versão",
+        "buildNumber": "Número de Compilação",
+        "gitSha": "GIT SHA"
+      }
+    }
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "fechar janela de confirmação"
+    },
+    "passwordInput": {
+      "togglePasswordVisibility": "alternar visibilidade da palavra-passe"
+    },
+    "helpTip": {
+      "tooltip": "ajuda"
+    }
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Seletor de Idioma"
+    }
+  },
+  "_deprecated": {
+    "bias_experience_accuracy": "Precisão de Bias e Experiência",
+    "inaccurate": "Impreciso",
+    "very_accurate": "Muito preciso",
+    "skill_accuracy": "Precisão de Competências",
+    "final_feedback": "Feedback final",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Improvável",
+    "likely": "Provável"
+  },
+  "steps": {
+    "biasAndExperience": "Precisão de Bias e Experiência",
+    "skillAccuracy": "Precisão de Competências",
+    "finalFeedback": "Feedback final"
+  },
+  "labels": {
+    "inaccurate": "Impreciso",
+    "veryAccurate": "Muito preciso",
+    "difficult": "Difícil",
+    "easy": "Fácil",
+    "unlikely": "Improvável",
+    "likely": "Provável"
+  },
+  "buttons": {
+    "submit": "Submeter",
+    "next": "Seguinte",
+    "previous": "Anterior"
+  },
+  "careerReadiness": {
+    "backToModules": "Voltar a todos os módulos",
+    "emptyList": "Nenhum módulo disponível no momento.",
+    "introduction": "Trabalhe em cada módulo ao seu próprio ritmo. Cada um é uma conversa guiada por IA centrada numa área de competência específica. Retome onde parou ou inicie um novo módulo.",
+    "pageTitle": "Preparação para a Carreira",
+    "pageDescription": "Desenvolva as competências que os empregadores procuram além da sua formação técnica",
+    "subNavTitle": "Prepare-se para o emprego — Módulo {{number}}",
+    "listError": "Não foi possível carregar os módulos. Por favor, tente novamente.",
+    "statusDone": "Concluído",
+    "statusInProgress": "Em Progresso",
+    "statusNotStarted": "Não iniciado",
+    "statusUnlocked": "Não iniciado",
+    "moduleNotFound": "Módulo não encontrado.",
+    "moduleComplete": "Módulo concluído! Bem feito.",
+    "progressTitle": "Conclusão da Preparação para a Carreira",
+    "progressDescription": "Módulos de preparação para a carreira que concluiu",
+    "progressCompleted": "concluído",
+    "progressRemaining": "restante",
+    "quizRetry": "Repetir Quiz",
+    "quizQuestionOf": "Pergunta {{current}} de {{total}}",
+    "quizNext": "Seguinte",
+    "quizPrevious": "Anterior",
+    "quizPassedNotification": "Passou no módulo!",
+    "quizFailedNotification": "Não passou. Pode repetir o quiz.",
+    "quizPassedInline": "Passou no módulo!",
+    "quizFailedInline": "Falhou. Pode repetir o quiz.",
+    "quizCorrectAnswersSummary": "Respostas corretas: {{answers}}",
+    "quizPassedAgentMessage": "A sua pontuação foi de {{score}}/{{total}}. Parabéns, passou! Pode agora continuar a fazer-me qualquer pergunta de seguimento sobre este tema.",
+    "quizShowAnswers": "Mostrar respostas",
+    "quizHideAnswers": "Ocultar respostas",
+    "quizWrongAnswersTitle": "Rever respostas incorretas",
+    "quizCorrectAnswer": "Resposta correta",
+    "quizYourAnswer": "A sua resposta",
+    "chatLockedUntilQuizPassed": "Pode continuar a conversar depois de passar no quiz.",
+    "modulesTitle": "Módulos",
+    "modulesCompletedOfTotal": "{{completed}} de {{total}} módulos",
+    "upNext": "A seguir",
+    "takes30Min": "Demora ~30 min",
+    "approx30Min": "~30 min",
+    "continue": "Continuar",
+    "chat": "Iniciar",
+    "heroTitle": "Prepare-se para o Emprego",
+    "heroDescription": "Seis módulos para o preparar para o mercado de trabalho — identidade profissional, escrita de CV, cartas de apresentação, entrevistas, preparação para o local de trabalho e empreendedorismo. Trabalhe neles ao seu próprio ritmo.",
+    "illustration": "Ilustração",
+    "moduleTitles": {
+      "professionalIdentity": "Compreender a sua identidade profissional",
+      "cvDevelopment": "Como escrever um CV?",
+      "coverLetterMotivation": "Elaboração de cartas de apresentação e declarações de motivação",
+      "interviewPreparation": "Preparação para entrevistas de emprego",
+      "workplaceReadiness": "Preparação para iniciar um novo emprego: prontidão para o local de trabalho",
+      "entrepreneurship": "Empreendedorismo e Desenvolvimento de Empresas"
+    }
+  },
+  "home": {
+    "dashboard": "O Seu Centro de Carreira",
+    "backToDashboard": "Voltar ao painel principal",
+    "welcomeBack": "Bem-vindo de volta, {{name}}",
+    "subtitle": "O {{appName}} é a ponte entre o que aprendeu e para onde se dirige. Converse com a IA para destacar as suas competências, preparar-se para entrevistas e explorar rotas de carreira reais na Zâmbia.",
+    "profileStrength": "A força atual do seu perfil é de {{progress}}%.",
+    "profileStrengthHint": "É um bom começo — experimente Minhas Competências e Interesses para destacar mais sobre o que sabe e de que gosta.",
+    "seeProfile": "Ver perfil →",
+    "whatToDo": "O que gostaria de fazer hoje?",
+    "whatToDoSubtitle": "Cada módulo é uma conversa guiada por IA ou um recurso para o ajudar na sua jornada de carreira.",
+    "hero": {
+      "headline1": "Vamos descobrir",
+      "headline2": "As suas competências e pontos fortes",
+      "body": "O seu caminho guiado das competências para o seu primeiro emprego. Comece por descobrir o que traz consigo — depois explore carreiras, desenvolva a preparação para a carreira e encontre oportunidades reais na Zâmbia.",
+      "illustrationAlt": "Pessoa num sinal de sinalização num caminho, explorando direções de carreira"
+    },
+    "cta": {
+      "buildProfileTitle": "Construa o Seu Perfil",
+      "buildProfileDesc": "Comece por descobrir o que traz consigo, construa um relatório de competências abrangente e diga-nos em que tipo de trabalho está interessado",
+      "buildProfileCta": "Iniciar Conversa de Perfil",
+      "explorePathsTitle": "Explorador de Carreiras",
+      "explorePathsDesc": "Explore os setores e carreiras em que está interessado - salários, percursos de qualificação, programas de formação, principais empregadores.",
+      "explorePathsCta": "Explorar Percursos de Carreira",
+      "jobMatchesTitle": "Correspondências de Emprego",
+      "jobMatchesDesc": "Ofertas reais em toda a Zâmbia, correspondentes ao que pode fazer agora.",
+      "jobMatchesCta": "Explorar os seus empregos"
+    },
+    "jobReadySection": {
+      "title": "Prepare-se para o Emprego",
+      "description": "Precisa de ajuda na procura de emprego? Trabalhe nestes módulos e ganhe confiança para o seu CV, entrevistas e tudo o resto.",
+      "seeFullCourse": "Ver lista completa de cursos →",
+      "startLearning": "COMEÇAR A APRENDER",
+      "continueLearning": "CONTINUAR A APRENDER",
+      "chat": "Iniciar",
+      "startChat": "Começar a aprender",
+      "continueProfileChat": "Continuar a aprender",
+      "completedLearning": "CONCLUÍDO",
+      "viewModule": "Ver módulo",
+      "locked": "Bloqueado",
+      "empty": "Ainda não estão disponíveis módulos de curso.",
+      "loadError": "Não foi possível carregar o progresso do seu curso. Tente novamente mais tarde.",
+      "loading": "A carregar módulos do curso",
+      "durationHint": "Demora cerca de 30 a 40 min"
+    },
+    "myExperience": {
+      "sectionTitle": "A minha experiência",
+      "cardTitle": "Ver Relatório das minhas Competências",
+      "cardSubtitle": "Descarregue e partilhe o seu CV personalizado."
+    },
+    "profile": {
+      "title": "O Meu Perfil",
+      "subtitle": "Ver e gerir as informações do seu perfil",
+      "myProfile": "O Meu Perfil",
+      "myAccount": "A Minha Conta",
+      "security": "Segurança",
+      "preferences": "Preferências",
+      "profileSection": "Perfil",
+      "skillsInterestsProgressTitle": "Construa o Seu Perfil",
+      "skillsInterestsProgressDescription": "Quanto progrediu na sua conversa de descoberta de competências",
+      "moduleCompleted": "concluído",
+      "moduleRemaining": "restante",
+      "moduleProgress": "Progresso do Módulo",
+      "skillsDiscovered": "Construa o Seu Perfil",
+      "jobReadiness": "Preparação para o Emprego",
+      "name": "Nome",
+      "email": "Email",
+      "language": "Idioma",
+      "termsAccepted": "Termos e Condições Aceites",
+      "location": "Localização",
+      "school": "Escola",
+      "program": "Programa",
+      "year": "Ano",
+      "notProvided": "Não fornecido",
+      "notAvailable": "Não disponível",
+      "viewMyCv": "Ver o Relatório das minhas Competências",
+      "viewMyCvSubtitle": "Descarregue e partilhe o seu Relatório de Competências personalizado",
+      "share": "Partilhar",
+      "shareProfileUnavailable": "A partilha não está disponível neste dispositivo.",
+      "linkCopied": "Ligação do perfil copiada para a área de transferência",
+      "noSkillsYet": "Nenhuma competência descoberta ainda. Inicie uma conversa para descobrir as suas competências!",
+      "workSkills": "Competências de Trabalho e Outras",
+      "educationSkills": "Competências de Educação",
+      "noEducationSkillsYet": "Nenhuma competência de educação descoberta ainda.",
+      "careerExplorer": "Explorador de Carreiras",
+      "noSectorsYet": "Nenhum setor explorado ainda. Inicie o Explorador de Carreiras para explorar setores!",
+      "sectorsExplored": "Explorou {{count}} setor(es)",
+      "profileStrength": "Força do Perfil",
+      "careerPathways": "Percursos de Carreira",
+      "browseAllPathways": "Explorar todos →",
+      "skillsShowLess": "Mostrar menos",
+      "skillsShowAll": "Mostrar todos os {{count}} →",
+      "pathways": {
+        "mining": {
+          "title": "Mineração",
+          "description": "Extração subterrânea, segurança, operação de equipamentos"
+        },
+        "energy": {
+          "title": "Energia",
+          "description": "Geração de energia, solar, manutenção da rede"
+        },
+        "agriculture": {
+          "title": "Agricultura",
+          "description": "Agricultura, processamento de alimentos, agroindústria"
+        },
+        "hospitality": {
+          "title": "Hospitalidade e Turismo",
+          "description": "Turismo, hotéis, catering, serviço ao cliente"
+        },
+        "water": {
+          "title": "Água e Saneamento",
+          "description": "Gestão de água, saneamento, infraestruturas"
+        },
+        "health": {
+          "title": "Ciências da Saúde",
+          "description": "Saúde aliada, diagnóstico, farmácia, fisioterapia"
+        }
+      },
+      "profileStrengthProgressAriaLabel": "Progresso da força do perfil",
+      "educationSkillsProgressAriaLabel": "Progresso das competências de educação",
+      "workSkillsProgressAriaLabel": "Progresso das competências de trabalho"
+    },
+    "modules": {
+      "skillsDiscovery": "Construa o Seu Perfil",
+      "skillsDiscoverySubtitle": "Converse com o {{appName}} para descobrir as suas competências do trabalho e da vida.",
+      "jobReadiness": "Preparação para a Carreira",
+      "careerExplorer": "Explorador de Carreiras",
+      "knowledgeHub": "Centro de Conhecimento",
+      "jobMatching": "Correspondência de Empregos",
+      "skillsDiscoveryDesc": "Converse com o {{appName}} para descobrir as suas competências e interesses — dos seus estudos, trabalho e vida quotidiana.",
+      "jobReadinessDesc": "Desenvolva a preparação para o emprego através de módulos guiados por IA — desde a compreensão da sua identidade profissional e escrita de CV até entrevistas, preparação para o local de trabalho e empreendedorismo.",
+      "careerExplorerDesc": "Explore percursos de carreira em Energia, Mineração, Agricultura e muito mais — com dados salariais e rotas de qualificação.",
+      "knowledgeHubDesc": "Explore perfis setoriais, referências salariais e percursos de qualificação TEVET, tudo num só lugar.",
+      "jobMatchingDesc": "Veja como as suas competências correspondem a ofertas de emprego reais e explore perspetivas do mercado de trabalho na Zâmbia.",
+      "continue": "Continuar",
+      "completed": "Concluído",
+      "soon": "Em breve",
+      "comingSoon": "Brevemente"
+    },
+    "footer": {
+      "privacyPolicy": "Política de Privacidade",
+      "termsOfUse": "Termos de Utilização",
+      "accessibility": "Acessibilidade",
+      "contact": "Contacto",
+      "collaboration": "O {{appName}} é uma ferramenta gratuita de orientação de carreira oferecida pelo Ministério da Tecnologia e Ciência da Zâmbia, construída em parceria com o Grupo Banco Mundial e a Tabiya.",
+      "worldBankLogoAlt": "Logótipo do Grupo Banco Mundial",
+      "ministryTechLogoAlt": "Logótipo do Ministério da Tecnologia",
+      "tabiyaLogoAlt": "Logótipo da Tabiya"
+    },
+    "sidebar": {
+      "showLess": "Mostrar Menos",
+      "seeAll": "Ver Tudo {{count}} →",
+      "skillsDiscovery": {
+        "title": "Competências Identificadas",
+        "emptyState": "As competências aparecerão aqui assim que completar a conversa \"Construir o Seu Perfil\"",
+        "fromWorkAndLife": "Do trabalho e da vida",
+        "fromTEVET": "Do programa TEVET"
+      },
+      "careerExplorer": {
+        "title": "Sectores Explorados",
+        "emptyState": "Os sectores aparecerão aqui à medida que explora carreiras com o Njila."
+      },
+      "careerReadiness": {
+        "title": "Temas"
+      },
+      "home": {
+        "skillsFromWork": "Competências do Trabalho",
+        "skillsFromTEVET": "Competências do Programa TEVET",
+        "myExperience": "Minha Experiência",
+        "workSkillsEmpty": "As competências aparecerão aqui assim que completar a conversa \"Construir o Seu Perfil\"",
+        "programmeSkillsEmpty": "As competências do programa aparecerão à medida que completar os módulos."
+      }
+    },
+    "moduleHandoff": {
+      "message": "Bom trabalho! Pronto para continuar?",
+      "continueWith": "Continuar com {{moduleLabel}}"
+    }
+  },
+  "careerExplorer": {
+    "title": "Explorador de Carreiras",
+    "subtitle": "Veja que carreiras correspondem às suas competências — salários, qualificações, principais empregadores.",
+    "placeholder": "Pergunte sobre um setor...",
+    "send": "Enviar"
+  },
+  "knowledgeHub": {
+    "backToDashboard": "Voltar ao painel principal",
+    "backToKnowledgeHub": "Voltar aos Percursos",
+    "documentNotFound": "Documento não encontrado",
+    "heroTitlePrefix": "Percursos de Carreira",
+    "heroTitleQuestion": "Onde é que a Zâmbia está a contratar?",
+    "introduction": "Saber no que é bom é apenas metade do caminho. Estes são os percursos de carreira com maior procura na Zâmbia neste momento — explore-os para ver onde as suas competências encontram oportunidades reais.",
+    "discoverSectorCta": "Descubra o setor de {{sector}} →",
+    "sectors": {
+      "energy": {
+        "title": "Energia",
+        "description": "O sector da energia na Zâmbia está a passar por uma transformação maciça, mudando para fontes de energia renováveis como a solar e eólica para complementar a sua forte base hidroeléctrica."
+      },
+      "mining": {
+        "title": "Mineração",
+        "description": "O sector mineiro continua a ser a espinha dorsal económica da Zâmbia, impulsionando as receitas de exportação e o avanço tecnológico."
+      },
+      "hospitality": {
+        "title": "Hospitalidade e Turismo",
+        "description": "O rico património natural da Zâmbia e os crescentes pólos de negócios tornam a hotelaria um sector vibrante."
+      },
+      "agriculture": {
+        "title": "Agricultura",
+        "description": "A agricultura é o maior empregador na Zâmbia, mas está a mudar da agricultura de subsistência para o agronegócio comercial e produção impulsionada pela tecnologia."
+      },
+      "water": {
+        "title": "Água e Saneamento",
+        "description": "Tratamento de água, redes de abastecimento, infra-estruturas de saneamento e operações de gestão de resíduos."
+      },
+      "health": {
+        "title": "Ciências da Saúde",
+        "description": "As ciências de saúde aliadas apoiam os cuidados clínicos através de diagnóstico, reabilitação, dispensa, trabalho laboratorial e saúde ambiental."
+      }
+    },
+    "noDocumentsAvailable": "Ainda não existem documentos disponíveis.",
+    "careerPathwaysTitle": "Percursos de Carreira",
+    "prioritySector": "Setor Prioritário",
+    "avgMonthlyEarnings": "Média de ganhos mensais (setor formal)",
+    "criticalOccupations": "Profissões críticas identificadas",
+    "tevetProgrammes": "Programas TEVET oferecidos",
+    "keyEmployers": "Principais empregadores a ter em conta",
+    "tevetAccreditedProgrammes": "Programas acreditados TEVET relevantes para o setor de {{sector}}",
+    "accreditedProgrammesCount": "{{count}} programas acreditados em {{institutions}} instituições. {{suffix}}",
+    "loadingProgrammes": "A carregar dados do programa...",
+    "shortCoursesNote": "+ {{count}} cursos de curta duração oferecidos por empregadores do setor e prestadores de formação especializada.",
+    "criticalSkillsLabel": "Especializações de competências críticas relacionadas com {{sector}} identificadas",
+    "filterAll": "Todos ({{count}})",
+    "filterZqf": "ZQF {{level}} ({{count}})",
+    "tableOccupation": "Profissão em procura",
+    "tableZqf": "ZQF",
+    "tableDuration": "Duração",
+    "tableTevet": "TEVET",
+    "tableCountAll": "A mostrar todas as {{count}} profissões. Onde não está listado nenhum programa, a formação é normalmente fornecida no local de trabalho pelos empregadores ou o currículo está atualmente em desenvolvimento.",
+    "tableCountFiltered": "A mostrar {{count}} profissões no nível ZQF {{level}}. Onde não está listado nenhum programa, a formação é normalmente fornecida no local de trabalho pelos empregadores ou o currículo está atualmente em desenvolvimento.",
+    "newProgrammesDev": "Novos programas em desenvolvimento",
+    "newProgrammesDevDesc": "Áreas curriculares prioritárias identificadas através do Programa de Desenvolvimento de Competências para o Aumento da Empregabilidade (SDEP) da OIT/TEVETA e consultas setoriais.",
+    "devOccupationsLabel": "Profissões sem programas TEVET dedicados",
+    "keepInMind": "Coisas a ter em conta",
+    "navWhereJobs": "Onde estão os empregos",
+    "navProgrammes": "Programas",
+    "navCriticalSkills": "Competências críticas",
+    "navInDevelopment": "Em desenvolvimento",
+    "navKeepInMind": "A ter em conta",
+    "pageSectionsAriaLabel": "Secções da página",
+    "programmeCount": "{{count}} cursos",
+    "zqf": {
+      "skillsAward": {
+        "label": "Certificado de Competências",
+        "duration": "Curso de curta duração"
+      },
+      "level3": {
+        "label": "Certificado Nível 3",
+        "duration": "1 ano"
+      },
+      "craftCertificate": {
+        "label": "Certificado de Especialidade",
+        "duration": "2 anos"
+      },
+      "advancedCertificate": {
+        "label": "Certificado Avançado",
+        "duration": "2.5 anos"
+      },
+      "diploma": {
+        "label": "Diploma",
+        "duration": "3 anos"
+      }
+    }
+  },
+  "jobMatching": {
+    "pageTitle": "Correspondência de Empregos",
+    "pageDescription": "Explore ofertas de emprego reais e veja como as suas competências correspondem a oportunidades em toda a Zâmbia.",
+    "matched": {
+      "programmeBanner": "Obtenha correspondências mais personalizadas ao completar a conversa de Construção do Seu Perfil.",
+      "emptyNoSkills": "Os empregos correspondentes ainda não estão disponíveis. Complete a secção \"Construa o Seu Perfil\" para desbloquear recomendações personalizadas.",
+      "emptyProgrammeNoMatches": "Ainda não existem correspondências. Complete a conversa de Construção do Seu Perfil para encontrar empregos que se ajustem às suas competências.",
+      "emptySiNoMatches": "Não temos correspondências para si agora — volte mais tarde."
+    },
+    "tabs": {
+      "browse": "Procurar Empregos",
+      "matched": "Correspondências para Si"
+    },
+    "table": {
+      "sortAscending": "Ordenar ascendentemente",
+      "sortDescending": "Ordenar descendentemente",
+      "filterSearchPlaceholder": "Pesquisar…",
+      "filterSearchAriaLabel": "Opções de filtro de pesquisa",
+      "sortClear": "Limpar ordenação",
+      "browseAriaLabel": "Tabela de procura de empregos",
+      "matchedAriaLabel": "Tabela de empregos correspondentes",
+      "noJobsFound": "Nenhum emprego encontrado.",
+      "noData": "Sem dados",
+      "prevPage": "Página anterior",
+      "nextPage": "Próxima página",
+      "searchPlaceholder": "Pesquisar títulos de emprego ou empresas...",
+      "searchAriaLabel": "Pesquisar empregos",
+      "pageAriaLabel": "Página {{page}}",
+      "pageRange": "Página {{start}}–{{end}} of {{total}}"
+    },
+    "columns": {
+      "jobTitle": "Título do Emprego",
+      "company": "Empresa",
+      "category": "Categoria",
+      "type": "Tipo",
+      "location": "Localização",
+      "posted": "Publicado",
+      "match": "Correspondência",
+      "filterAll": "Todos"
+    },
+    "jobDetail": {
+      "closeButton": "Fechar",
+      "applyNow": "Candidatar-se Agora",
+      "category": "Categoria:",
+      "matchScore": "Pontuação de Correspondência:",
+      "extractedSkills": "Competências Extraídas ({{count}})",
+      "posted": "Publicado em {{date}}"
+    }
+  },
+  "nav": {
+    "search": "Procurar...",
+    "dashboard": "Painel Principal",
+    "pathways": "Percursos",
+    "needHelp": "Ajuda",
+    "faq": "FAQ",
+    "faqAriaLabel": "Ajuda e FAQ"
+  },
+  "faq": {
+    "lede": "Respostas a perguntas comuns sobre o Njila — como funciona, como criar uma conta e como resolver problemas comuns.",
+    "searchPlaceholder": "Procurar perguntas...",
+    "searchAriaLabel": "Procurar FAQ",
+    "clearSearch": "Limpar pesquisa",
+    "tocLabel": "Nesta página",
+    "noResults": "Nenhuma pergunta corresponde a essa pesquisa.",
+    "tutorialEyebrow": "Tutorial de 4 min",
+    "tutorialHeading": "Veja como funciona o Njila",
+    "tutorialIframeTitle": "Vídeo tutorial do Njila",
+    "tutorialUnavailableOffline": "Está offline. Ligue-se à internet para ver este vídeo.",
+    "scrollProgressLabel": "Progresso da leitura"
+  }
+}

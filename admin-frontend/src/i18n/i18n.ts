@@ -14,6 +14,7 @@ import esEs from "./locales/es-ES/translation.json";
 import esAr from "./locales/es-AR/translation.json";
 import swKe from "./locales/sw-KE/translation.json";
 import nyZm from "./locales/ny-ZM/translation.json";
+import ptMz from "./locales/pt-MZ/translation.json";
 
 // --- i18n initialization ---
 const resources = {
@@ -32,6 +33,7 @@ const resources = {
   ...constructLocaleResources(Locale.ES_ES, esEs),
   ...constructLocaleResources(Locale.SW_KE, swKe),
   ...constructLocaleResources(Locale.NY_ZM, nyZm),
+  ...constructLocaleResources(Locale.PT_MZ, ptMz),
 };
 
 // Validate DEFAULT_LOCALE before using it

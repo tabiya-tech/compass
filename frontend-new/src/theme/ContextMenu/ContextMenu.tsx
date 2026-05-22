@@ -113,6 +113,7 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
               py: { xs: theme.fixedSpacing(theme.tabiyaSpacing.xs), sm: theme.fixedSpacing(theme.tabiyaSpacing.sm) },
               px: theme.fixedSpacing(theme.tabiyaSpacing.md),
               gap: theme.fixedSpacing(theme.tabiyaSpacing.md),
+              whiteSpace: "normal",
               "&:hover": { backgroundColor: theme.palette.action.hover },
               "& .MuiListItemIcon-root": { minWidth: "unset" },
             }}

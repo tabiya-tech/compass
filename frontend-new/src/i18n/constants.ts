@@ -10,6 +10,7 @@ export enum Locale {
   ES_AR = "es-AR",
   SW_KE = "sw-KE",
   NY_ZM = "ny-ZM",
+  PT_MZ = "pt-MZ",
 }
 
 export const LocalesLabels = {
@@ -19,6 +20,7 @@ export const LocalesLabels = {
   [Locale.ES_AR]: "Español (Argentina)",
   [Locale.SW_KE]: "Kiswahili (Kenya)",
   [Locale.NY_ZM]: "Nyanja (Zambia)",
+  [Locale.PT_MZ]: "Portuguese (Mozambique)",
 } as const;
 
 export const SupportedLocales: Locale[] = [
@@ -28,5 +30,6 @@ export const SupportedLocales: Locale[] = [
   Locale.ES_AR,
   Locale.SW_KE,
   Locale.NY_ZM,
+  Locale.PT_MZ,
 ];
 export const FALL_BACK_LOCALE = Locale.EN_GB;

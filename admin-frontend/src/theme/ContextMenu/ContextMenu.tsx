@@ -101,6 +101,9 @@ function ContextMenu(props: Readonly<ContextMenuProps>) {
             data-testid={DATA_TEST_ID.MENU_ITEM}
             disabled={item.disabled}
             key={item.id}
+            sx={{
+              whiteSpace: "normal",
+            }}
           >
             {item.icon && (
               <ListItemIcon data-testid={DATA_TEST_ID.MENU_ITEM_ICON}>

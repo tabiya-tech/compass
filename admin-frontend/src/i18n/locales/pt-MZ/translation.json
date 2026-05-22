@@ -1,0 +1,567 @@
+{
+  "common": {
+    "buttons": {
+      "login": "Entrar",
+      "logout": "Terminar sessão",
+      "submit": "Submeter",
+      "cancel": "Cancelar",
+      "confirm": "Sim, tenho a certeza",
+      "save": "Guardar",
+      "goBack": "Voltar",
+      "continue": "Continuar",
+      "yes": "Sim",
+      "no": "Não"
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Senha"
+    },
+    "validation": {
+      "validEmailRequired": "Por favor, introduza um endereço de e-mail válido",
+      "passwordMinLength": "A senha deve ter pelo menos 8 caracteres."
+    },
+    "errors": {
+      "generic": "Algo correu mal. Por favor, tente novamente.",
+      "api": {
+        "unexpectedError": "Ocorreu um erro inesperado. Por favor, tente mais tarde.",
+        "serverConnectionError": "Não foi possível ligar ao serviço. Por favor, verifique a sua ligação à Internet ou tente mais tarde.",
+        "authenticationFailure": "Parece que não iniciou sessão. Por favor, inicie sessão para continuar.",
+        "permissionDenied": "Parece que não tem as permissões necessárias. Por favor, termine a sessão e volte a entrar.",
+        "resourceNotFound": "O recurso solicitado não foi encontrado.",
+        "tooManyRequests": "Demasiados pedidos. Por favor, tente novamente mais tarde.",
+        "requestTooLong": "O pedido foi demasiado longo. Por favor, tente novamente com um volume de dados menor.",
+        "unableToProcessResponse": "Não foi possível processar a resposta. Por favor, atualize a página.",
+        "serviceUnavailable": "O serviço está temporariamente indisponível. Por favor, tente novamente mais tarde.",
+        "dataValidationError": "Ocorreu um problema com os dados. Por favor, verifique e tente novamente.",
+        "unableToProcessRequest": "Não foi possível processar o pedido. Por favor, tente novamente."
+      }
+    },
+    "status": {
+      "loading": "A carregar...",
+      "saving": "A guardar..."
+    },
+    "modal": {
+      "areYouSure": "Tem a certeza?"
+    },
+    "dataTable": {
+      "sortAscending": "Ordenar de forma ascendente",
+      "sortDescending": "Ordenar de forma descendente",
+      "sortAscText": "Ordenar de A-Z",
+      "sortDescText": "Ordenar de Z-A",
+      "noData": "Sem dados",
+      "prevPage": "Página anterior",
+      "nextPage": "Próxima página",
+      "pageAriaLabel": "Página {{page}}",
+      "filterAriaLabel": "Filtrar por {{column}}"
+    },
+    "cancel": "Cancelar",
+    "close": "Fechar"
+  },
+  "auth": {
+    "pages": {
+      "login": {
+        "welcomeTitle": "Bem-vindo ao Painel de Administração do {{appName}}!",
+        "welcomeBack": "Bem-vindo de volta!",
+        "loginToYourAccountToContinue": "Inicie sessão na sua conta para continuar",
+        "loggingYouIn": "A iniciar a sua sessão..."
+      }
+    },
+    "errors": {
+      "loginFailedWithMessage": "Falha ao iniciar sessão: {{message}}",
+      "firebase": {
+        "invalidCredential": "O e-mail/senha fornecido é inválido.",
+        "invalidEmail": "O endereço de e-mail não é válido.",
+        "userDisabled": "A conta de utilizador foi desativada.",
+        "userNotFound": "Nenhum utilizador foi encontrado com as credenciais fornecidas.",
+        "wrongPassword": "A senha é inválida.",
+        "tooManyRequests": "Bloqueámos todos os pedidos deste dispositivo devido a atividade invulgar. Tente mais tarde.",
+        "internalError": "Ocorreu um erro interno."
+      }
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Painel de Administração",
+      "welcome": "Bem-vindo ao Portal de Administração"
+    },
+    "navigation": {
+      "dashboard": "Painel de Controlo"
+    }
+  },
+  "error": {
+    "errorPage": {
+      "illustrationAlt": "ilustração de erro",
+      "defaultMessage": "Algo correu mal. Tente recarregar a página...",
+      "notFound": "Erro 404 - Página Não Encontrada"
+    }
+  },
+  "app": {
+    "isOnlineProvider": {
+      "offline": "Está offline",
+      "backOnline": "Está novamente online"
+    },
+    "logoAlt": "Logótipo do {{appName}}"
+  },
+  "theme": {
+    "confirmModalDialog": {
+      "closeConfirmModal": "fechar janela de confirmação"
+    },
+    "passwordInput": {
+      "togglePasswordVisibility": "alternar visibilidade da senha"
+    },
+    "helpTip": {
+      "tooltip": "ajuda"
+    }
+  },
+  "i18n": {
+    "languageContextMenu": {
+      "selector": "Seletor de Idioma"
+    }
+  },
+  "header": {
+    "logout": "Terminar sessão",
+    "user": "Utilizador",
+    "role": {
+      "admin": "Administrador",
+      "institutionStaff": "Pessoal da Instituição"
+    },
+    "profile": "Perfil",
+    "users": "Utilizadores"
+  },
+  "footer": {
+    "privacyPolicy": "Política de Privacidade",
+    "termsOfUse": "Termos de Utilização",
+    "accessibility": "Acessibilidade",
+    "contact": "Contacto",
+    "collaboration": "O {{appName}} é uma ferramenta gratuita de orientação profissional disponibilizada pelo Ministério da Tecnologia e Ciência da Zâmbia, desenvolvida em parceria com o Grupo Banco Mundial e a Tabiya.",
+    "worldBankLogoAlt": "Logótipo do Grupo Banco Mundial",
+    "ministryTechLogoAlt": "Logótipo do Ministério da Tecnologia",
+    "tabiyaLogoAlt": "Logótipo da Tabiya"
+  },
+  "dashboard": {
+    "sectionTitle": "Painel do Administrador — monitorização e análise interinstitucional",
+    "header": {
+      "welcome": "Bem-vindo, {{name}}",
+      "school": "TEVETA — Autoridade de Educação Técnica, Formação Vocacional e Empreendedorismo"
+    },
+    "tabs": {
+      "institutions": "Instituições",
+      "modules": "Módulos",
+      "skillsAnalytics": "Análise de Competências",
+      "jobPostings": "Ofertas de Emprego",
+      "ariaLabel": "Separadores do painel"
+    },
+    "dataTable": {
+      "clearSorting": "Limpar ordenação"
+    },
+    "dailyAdoptionTrend": {
+      "title": "Tendência de Adoção Diária",
+      "titleTooltip": "Novos registos e utilizadores ativos diários nos últimos 7 dias. Ajuda a acompanhar se a adoção está a crescer dia a dia.",
+      "noData": "Nenhum dado disponível",
+      "newRegistrations": "Novos Registos",
+      "dailyActiveUsers": "Utilizadores Ativos Diários"
+    },
+    "stats": {
+      "institutionsActive": "Instituições Ativas",
+      "institutionsActiveSubtitle": "de {{total}} instituições piloto",
+      "institutionsActiveSubtitleNoTotal": "de instituições piloto",
+      "institutionsActiveTooltip": "Instituições piloto que têm pelo menos um estudante registado no {{appName}}.",
+      "totalStudentsRegistered": "Total de Estudantes Registados",
+      "totalStudentsRegisteredTooltip": "Todos os estudantes que criaram uma conta no {{appName}} até à data, em todas as instituições.",
+      "activeStudents7Days": "Estudantes Ativos (Últimos 7 dias)",
+      "activeStudents7DaysSubtitle": "{{pct}}% dos registados",
+      "activeStudents7DaysSubtitleNoPct": "dos registados",
+      "activeStudents7DaysTooltip": "Estudantes que iniciaram sessão ou interagiram com o {{appName}} nos últimos 7 dias."
+    },
+    "modules": {
+      "titles": {
+        "skillsDiscovery": "Construir o Seu Perfil",
+        "skillsDiscoveryTooltip": "Construir o Seu Perfil: os estudantes partilham experiências passadas e o {{appName}} extrai um perfil das suas competências.",
+        "careerReadiness": "Preparar-se para o Trabalho",
+        "careerReadinessTooltip": "Módulo de Preparação para o Trabalho: os estudantes trabalham no CV, carta de apresentação, preparação para entrevistas e outros submódulos de preparação para o emprego.",
+        "careerExplorer": "Explorador de Carreiras",
+        "careerExplorerTooltip": "Módulo Explorador de Carreiras: os estudantes navegam por profissões correspondentes às suas competências e interesses."
+      },
+      "registeredStudents": "{{count}} estudantes registados",
+      "started": "Iniciado",
+      "completed": "Concluído",
+      "completedAll5": "Concluiu todos os módulos",
+      "returned2Plus": "Regressou 2 ou mais vezes",
+      "prioritySectors": "Utilizadores que exploraram setor(es) prioritário(s)",
+      "avgSubModulesCompleted": "Média de submódulos concluídos",
+      "engagementFunnel": "Funil de engajamento",
+      "subModuleBreakdown": "Desdobramento por submódulo",
+      "topSectorsExplored": "Principais setores explorados",
+      "startedLegend": "Iniciado",
+      "completedLegend": "Concluído",
+      "sharingExperiences": "Partilhar Experiências",
+      "identifyingSkills": "Identificar Competências",
+      "collectingPreferences": "Recolher Preferências",
+      "professionalIdentity": "Compreender a sua identidade profissional",
+      "cvDevelopment": "Como escrever um CV?",
+      "coverLetterMotivation": "Elaborar cartas de apresentação e declarações de motivação",
+      "interviewPreparation": "Preparar-se para entrevistas de emprego",
+      "workplaceReadiness": "Preparar-se para começar um novo emprego: prontidão para o local de trabalho",
+      "entrepreneurship": "Empreendedorismo e Desenvolvimento de Empresas",
+      "sectors": {
+        "ict": "TIC",
+        "mining": "Mineração",
+        "energy": "Energia",
+        "construction": "Construção",
+        "agriculture": "Agricultura",
+        "hospitality": "Hotelaria e Turismo",
+        "manufacturing": "Manufatura",
+        "water": "Água",
+        "transport": "Transporte",
+        "others": "Outros"
+      },
+      "filters": {
+        "allLocations": "Todas as Localizações",
+        "allProvinces": "Todas as Províncias",
+        "allInstitutions": "Todas as Instituições",
+        "allQualifications": "Todas as Qualificações",
+        "allYears": "Todos os Anos"
+      }
+    },
+    "skillsAnalytics": {
+      "supplyVsDemandTitle": "Oferta de Competências vs Procura do Mercado de Trabalho",
+      "supplyVsDemandTitleTooltip": "Principais competências que os estudantes já possuem (oferta) versus as competências que as entidades empregadoras mais solicitam nas ofertas de emprego (procura).",
+      "topSkillsAmongStudents": "Principais Competências Entre Estudantes",
+      "topSkillsInDemand": "Principais Competências em Procura (Ofertas de Emprego)",
+      "topSkillsInDemandCaption": "Com base em {{withSkills}} de {{total}} ofertas · {{pct}}% não tinha competências associadas à taxonomia",
+      "topSkillsInDemandCaptionTooltip": "Apenas as competências associadas à taxonomia de competências são classificadas. As restantes ofertas não tinham nenhuma competência associada — nenhuma foi detetada, ou as frases detetadas não puderam ser associadas à taxonomia — pelo que estão excluídas desta classificação. As contagens refletem a Província e o Setor selecionados; o Setor é estimado a partir das categorias das ofertas de emprego.",
+      "gapBySectorTitle": "Lacuna de Competências por Setor",
+      "gapBySectorTitleTooltip": "Diferença entre as competências que os estudantes possuem e as competências solicitadas pelas entidades empregadoras, dividida por setor.",
+      "avgGapLabel": "Lacuna média entre a oferta de competências dos estudantes e a procura do mercado de trabalho",
+      "gapPp": "{{gap}}pp",
+      "legend": {
+        "supply": "Oferta",
+        "demand": "Procura",
+        "supplyStudents": "Oferta (estudantes)",
+        "demandEmployers": "Procura (empregadores)"
+      },
+      "aria": {
+        "supplyBar": "Oferta para {{skill}}: {{value}}%",
+        "demandBar": "Procura para {{skill}}: {{value}}%",
+        "gapBar": "Lacuna de competências para {{sector}}: oferta {{supply}}%, procura {{demand}}%"
+      },
+      "filters": {
+        "allProvinces": "Todas as Províncias",
+        "allSectors": "Todos os Setores",
+        "searchProvinces": "Pesquisar províncias...",
+        "searchSectors": "Pesquisar setores..."
+      }
+    },
+    "pagination": {
+      "range": "Página {{start}}–{{end}} de {{total}}"
+    },
+    "jobPostings": {
+      "stats": {
+        "jobsSourced": "Empregos Obtidos",
+        "jobsSourcedTooltip": "Total de ofertas de emprego recolhidas a partir das plataformas de emprego suportadas.",
+        "sectorsCovered": "Setores Cobertos",
+        "sectorsCoveredTooltip": "Número de setores distintos representados nas ofertas de emprego recolhidas.",
+        "sectorsCoveredSubtitle": "Categorias de emprego em todas as ofertas",
+        "sourcePlatforms": "Plataformas de Origem",
+        "sourcePlatformsTooltip": "Número de plataformas de emprego distintas que alimentam a base de dados.",
+        "lastUpdatedOn": "Última atualização em {{date}}"
+      },
+      "searchPlaceholder": "Pesquisar títulos de emprego...",
+      "skillsSearchPlaceholder": "Pesquisar competências extraídas...",
+      "jobsCount": "{{count}} de {{total}} empregos",
+      "page": "Página {{page}} de {{totalPages}}",
+      "moreSkills": "+{{count}} mais",
+      "filters": {
+        "allSectors": "Todos os Setores",
+        "allLocations": "Todas as Localizações",
+        "allPlatforms": "Todas as Plataformas",
+        "allZqfLevels": "Todos os Níveis ZQF"
+      },
+      "table": {
+        "jobTitle": "Título do Emprego",
+        "sector": "Setor",
+        "location": "Localização",
+        "zqf": "ZQF",
+        "platform": "Plataforma",
+        "skillsExtracted": "Competências Extraídas",
+        "candidatePool": "Grupo de Candidatos",
+        "candidatePoolSubheader": "Correspondência de 50%+ de competências",
+        "link": "Ligação"
+      },
+      "aria": {
+        "search": "Pesquisar títulos de emprego",
+        "openJob": "Abrir oferta de emprego para {{title}}",
+        "table": "Tabela de ofertas de emprego",
+        "moreSkills": "Mostrar mais {{count}} competências",
+        "detailsDialog": "Janela de detalhes da oferta de emprego",
+        "closeDetailsDialog": "Fechar detalhes da oferta de emprego"
+      },
+      "modal": {
+        "platform": "Plataforma",
+        "candidatePool": "Grupo de Candidatos",
+        "candidatePoolValue": "{{count}} estudantes (50%+ de correspondência)",
+        "skillsExtracted": "Competências Extraídas ({{count}})",
+        "viewOriginalPosting": "Ver Oferta Original"
+      }
+    },
+    "institutionsTable": {
+      "headers": {
+        "institution": "Instituição",
+        "students": "Estudantes",
+        "active7Days": "Ativo (7D)",
+        "skillsDiscovery": "Construa o Seu Perfil",
+        "careerReadiness": "Prepare-se para o Emprego",
+        "careerExplorer": "Explorador de Carreiras"
+      },
+      "subHeaders": {
+        "started": "Iniciado",
+        "completed": "Concluído",
+        "ofReg": "% de reg.",
+        "ofStarted": "% de iniciados"
+      },
+      "empty": "Nenhuma instituição encontrada.",
+      "prevPage": "Página anterior",
+      "nextPage": "Próxima página",
+      "page": "Página {{page}} de {{totalPages}}"
+    },
+    "comingSoon": "Sem dados até agora."
+  },
+  "instructorDashboard": {
+    "sectionTitle": "Painel do instrutor — monitorizar o envolvimento e progresso dos estudantes",
+    "header": {
+      "welcome": "Bem-vindo, {{name}}",
+      "institutionFallback": "A Sua Instituição",
+      "defaultName": "Instrutor",
+      "school": "Evelyn Hone College of Applied Art and Commerce"
+    },
+    "tabs": {
+      "ariaLabel": "Separadores do painel do instrutor",
+      "students": "Estudantes",
+      "modules": "Módulos",
+      "skillsAnalytics": "Análise de Competências"
+    },
+    "stats": {
+      "totalStudentsRegistered": "Total de Estudantes Registados",
+      "totalStudentsRegisteredTooltip": "Estudantes da sua instituição que criaram uma conta {{appName}}.",
+      "activeStudents7Days": "Estudantes Ativos (Últimos 7 dias)",
+      "activeStudents7DaysSubtitle": "{{pct}}% de registados",
+      "activeStudents7DaysTooltip": "Estudantes da sua instituição que iniciaram sessão ou interagiram com o {{appName}} nos últimos 7 dias.",
+      "avgProfileStrength": "Força Média do Perfil",
+      "avgProfileStrengthSubtitle": "Aumentou de 52% na semana passada"
+    },
+    "studentsTable": {
+      "ariaLabel": "Tabela de estudantes do instrutor",
+      "empty": "Nenhum estudante corresponde aos filtros atuais.",
+      "headers": {
+        "studentName": "Nome do Estudante",
+        "programme": "Programa",
+        "qualificationType": "Tipo de Qualificação",
+        "year": "Ano",
+        "gender": "Género",
+        "profileStrength": "Força do Perfil",
+        "modulesCompleted": "Módulos de Preparação para a Carreira Concluídos",
+        "careerReady": "Preparação para a Carreira Concluída",
+        "skillsInterestsExplored": "Construa o Seu Perfil",
+        "careerExplorer": "Explorador de Carreiras",
+        "prioritySectorsExplored": "Setores Prioritários Explorados",
+        "lastLogin": "Último Acesso",
+        "lastActiveModule": "Último Módulo Ativo"
+      },
+      "filters": {
+        "all": "Todos",
+        "searchPlaceholder": "Pesquisar estudante por nome",
+        "searchAriaLabel": "Pesquisar por nome do estudante",
+        "today": "Hoje",
+        "thisWeek": "Esta semana",
+        "older": "Antigo"
+      },
+      "statusLabels": {
+        "not_started": "Não Iniciado",
+        "in_progress": "Em Progresso",
+        "completed": "Concluído",
+        "started": "Iniciado"
+      }
+    }
+  },
+  "login": {
+    "title": "Acesso do Administrador",
+    "email": "E-mail",
+    "password": "Senha",
+    "submit": "Entrar",
+    "subtitle": "Inicie sessão para aceder ao portal de administração",
+    "logoAlt": "Logótipo",
+    "forgotPassword": "Esqueceu-se da senha?",
+    "requestAccess": "Solicitar acesso",
+    "errors": {
+      "invalidCredentials": "E-mail ou senha inválidos",
+      "userDisabled": "Esta conta foi desativada",
+      "tooManyRequests": "Demasiadas tentativas falhadas. Por favor, tente mais tarde",
+      "networkError": "Erro de rede. Por favor, verifique a sua ligação",
+      "invalidEmail": "Por favor, introduza um endereço de e-mail válido",
+      "generic": "Falha ao iniciar sessão. Por favor, tente novamente",
+      "fillAllFields": "Por favor, preencha todos os campos"
+    }
+  },
+  "notFound": {
+    "message": "Página não encontrada",
+    "description": "A página que procura pode ter sido removida ou está temporariamente indisponível.",
+    "goHome": "Ir para o Painel de Controlo"
+  },
+  "users": {
+    "title": "Utilizadores",
+    "addUser": "Adicionar Utilizador",
+    "table": {
+      "email": "E-mail",
+      "name": "Nome de Exibição",
+      "role": "Função",
+      "institutionId": "ID da Instituição",
+      "status": "Estado",
+      "actions": "Ações",
+      "empty": "Nenhum utilizador encontrado"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    },
+    "actions": {
+      "editRole": "Editar Função",
+      "delete": "Eliminar Utilizador"
+    },
+    "createModal": {
+      "title": "Adicionar Novo Utilizador",
+      "email": "E-mail",
+      "name": "Nome de Exibição",
+      "role": "Função",
+      "institutionId": "ID da Instituição",
+      "submit": "Criar Utilizador",
+      "emailAlreadyExists": "Já existe um utilizador com este e-mail",
+      "emailFailed": "Criado {{email}}, mas o e-mail de reposição de senha falhou ao enviar. Pode tentar novamente agora ou enviá-lo mais tarde a partir da página Esqueceu-se da Senha.",
+      "resend": "Reenviar e-mail"
+    },
+    "updateRoleModal": {
+      "title": "Atualizar Função",
+      "role": "Função",
+      "institutionId": "ID da Instituição",
+      "submit": "Atualizar Função"
+    },
+    "deleteModal": {
+      "title": "Eliminar Utilizador",
+      "message": "Tem a certeza de que deseja eliminar {{email}}? Esta ação não pode ser desfeita.",
+      "confirm": "Eliminar"
+    },
+    "error": {
+      "loadFailed": "Falha ao carregar utilizadores",
+      "createFailed": "Falha ao criar utilizador",
+      "updateFailed": "Falha ao atualizar função",
+      "deleteFailed": "Falha ao eliminar utilizador"
+    },
+    "roles": {
+      "superAdmin": "Super Administrador",
+      "admin": "Administrador",
+      "institutionStaff": "Pessoal da Instituição"
+    },
+    "tabs": {
+      "active": "Utilizadores Ativos",
+      "pending": "Inscrições Pendentes"
+    },
+    "institutionAutocomplete": {
+      "label": "Instituição",
+      "loadError": "Falha ao carregar instituições"
+    }
+  },
+  "register": {
+    "title": "Solicitar Acesso",
+    "subtitle": "Registe-se como instrutor ou administrador interinstitucional. Um super administrador analisará o seu pedido.",
+    "email": "E-mail",
+    "name": "Nome completo",
+    "role": "Função",
+    "submit": "Submeter pedido",
+    "success": "Obrigado — recebemos o seu pedido. Receberá um e-mail assim que um super administrador analisar e aprovar a sua conta.",
+    "backToLogin": "Voltar ao início de sessão",
+    "logoAlt": "Logótipo",
+    "roles": {
+      "admin": "Administrador interinstitucional",
+      "institutionStaff": "Instrutor"
+    },
+    "errors": {
+      "alreadyExists": "Já existe um registo ativo para este e-mail.",
+      "generic": "Falha ao submeter o registo. Por favor, tente novamente."
+    }
+  },
+  "registrations": {
+    "table": {
+      "email": "E-mail",
+      "name": "Nome",
+      "role": "Função solicitada",
+      "institution": "Instituição",
+      "submittedAt": "Submetido em",
+      "actions": "Ações",
+      "empty": "Nenhuma inscrição pendente"
+    },
+    "actions": {
+      "approve": "Aprovar",
+      "reject": "Rejeitar"
+    },
+    "roles": {
+      "admin": "Administrador interinstitucional",
+      "institutionStaff": "Instrutor"
+    },
+    "loading": "A carregar…",
+    "approve": {
+      "title": "Aprovar Inscrição",
+      "error": "Falha ao aprovar o registo",
+      "resend": "Reenviar e-mail",
+      "submit": "Aprovar"
+    },
+    "reject": {
+      "title": "Rejeitar Inscrição",
+      "error": "Falha ao rejeitar o registo",
+      "reasonLabel": "Motivo",
+      "submit": "Rejeitar"
+    }
+  },
+  "forgotPassword": {
+    "logoAlt": "Logótipo",
+    "title": "Reponha a sua senha",
+    "success": "Se existir uma conta para esse e-mail, enviámos instruções de reposição.",
+    "subtitle": "Introduza o seu e-mail e enviaremos uma hiperligação para repor a sua senha.",
+    "email": "E-mail",
+    "submit": "Enviar hiperligação de reposição",
+    "backToLogin": "Voltar ao início de sessão"
+  },
+  "profile": {
+    "title": "O Meu Perfil",
+    "section": {
+      "profileInfo": "Informações do Perfil",
+      "changePassword": "Alterar Senha"
+    },
+    "field": {
+      "name": "Nome de Exibição",
+      "email": "E-mail",
+      "currentPassword": "Senha Atual",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha"
+    },
+    "action": {
+      "save": "Guardar Alterações",
+      "changePassword": "Alterar Senha"
+    },
+    "success": {
+      "profileUpdated": "Perfil atualizado com sucesso.",
+      "passwordChanged": "Senha alterada com sucesso."
+    },
+    "error": {
+      "noUser": "Utilizador não encontrado. Por favor, inicie sessão novamente.",
+      "nameEmailRequired": "Nome e e-mail são obrigatórios.",
+      "emailAlreadyExists": "Já existe um utilizador com este e-mail.",
+      "saveFailed": "Falha ao atualizar o perfil.",
+      "currentPasswordRequired": "A senha atual é obrigatória.",
+      "newPasswordRequired": "A nova senha é obrigatória.",
+      "passwordMismatch": "As novas senhas não coincidem.",
+      "passwordTooShort": "A senha deve ter pelo menos 6 caracteres.",
+      "wrongPassword": "A senha atual está incorreta.",
+      "requiresRecentLogin": "Por favor, termine a sessão e volte a entrar antes de alterar a sua senha.",
+      "passwordChangeFailed": "Falha ao alterar a senha."
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "interaction_ease": {
+    "question_text": "Quão fácil ou difícil foi interagir com o {{appName}} e compreender as suas respostas?",
+    "description": "Esta pergunta é usada para medir o Índice de Esforço do Cliente (CES). A resposta é numa escala de 1 (Muito difícil) a 5 (Muito fácil).",
+    "comment_placeholder": "Por favor, explique a sua classificação e partilhe quaisquer sugestões para melhorar a facilidade de interação com o {{appName}}."
+  },
+  "clarity_of_skills": {
+    "question_text": "O {{appName}} ajudou-o a obter uma compreensão mais clara das suas competências? Se não, porquê?",
+    "description": "Esta pergunta visa medir a Utilidade Percebida (PU). O utilizador pode responder VERDADEIRO (indicando que o {{appName}} ajudou) ou FALSO (indicando que o {{appName}} não ajudou), com um campo de texto opcional para comentários adicionais.",
+    "comment_placeholder": "Por favor, partilhe por que razão o {{appName}} não o ajudou a obter uma compreensão mais clara das suas competências."
+  },
+  "satisfaction_with_compass": {
+    "question_text": "Quão satisfeito está com o {{appName}}?",
+    "description": "Esta pergunta é usada para medir o Índice de Satisfação do Cliente (CSAT). A resposta é numa escala de 1 (Muito insatisfeito) a 5 (Muito satisfeito).",
+    "comment_placeholder": null
+  },
+  "work_experience_accuracy": {
+    "question_text": "Houve algum aspeto da sua informação de experiência profissional identificada pelo {{appName}} que estivesse incorreto?",
+    "options": {
+      "experience_title": "Título da experiência incorreto",
+      "experience_dates": "Datas de início/fim incorretas",
+      "experience_location": "Localização incorreta",
+      "duplicate_experience": "Experiências duplicadas",
+      "missing_experience": "Experiências em falta",
+      "other": "Outro"
+    },
+    "description": "Esta pergunta serve para identificar imprecisões específicas na informação da experiência profissional. A resposta é um conjunto de chaves de opção selecionadas, com comentários adicionais opcionais.",
+    "comment_placeholder": "Por favor, forneça mais detalhes sobre as imprecisões na sua informação de experiência profissional identificadas pelo {{appName}}."
+  },
+  "incorrect_skills": {
+    "question_text": "Existem competências que o {{appName}} identificou incorretamente para si?",
+    "description": "Esta pergunta visa identificar competências identificadas incorretamente. O utilizador pode responder VERDADEIRO (indicando competências incorretas) ou FALSO (indicando que não há competências incorretas). Em caso de VERDADEIRO, o utilizador pode fornecer comentários adicionais.",
+    "comment_placeholder": "Por favor, liste quaisquer competências que o {{appName}} identificou incorretamente para si."
+  },
+  "missing_skills": {
+    "question_text": "Existem competências que possui que o {{appName}} não identificou?",
+    "description": "Esta pergunta visa identificar competências em falta. As respostas devem ser VERDADEIRO (indicando competências em falta) ou FALSO (indicando que não há competências em falta). Em caso de VERDADEIRO, o utilizador pode fornecer comentários adicionais.",
+    "comment_placeholder": "Por favor, liste quaisquer competências que possui e que o {{appName}} não identificou."
+  },
+  "perceived_bias": {
+    "question_text": "Sentiu que o {{appName}} o tratou de forma injusta ao fazer suposições sobre a sua origem, idioma ou outras características pessoais? Se sim, por favor descreva a sua experiência.",
+    "description": "Esta pergunta visa identificar o preconceito percebido. As respostas devem ser VERDADEIRO (indicando preconceito) ou FALSO (indicando ausência de preconceito), com um campo de texto opcional para comentários adicionais.",
+    "comment_placeholder": "Por favor, partilhe mais detalhes sobre a sua experiência. Inclua exemplos específicos de quando sentiu que o {{appName}} o tratou de forma injusta ou fez suposições sobre a sua origem, idioma ou outras características pessoais."
+  },
+  "recommendation": {
+    "question_text": "Qual é a probabilidade de recomendar o {{appName}} a outros candidatos a emprego?",
+    "description": "Esta pergunta é usada para medir o Net Promoter Score (NPS). A resposta é numa escala de 1 (Nada provável) a 5 (Extremamente provável).",
+    "comment_placeholder": null
+  },
+  "additional_feedback": {
+    "question_text": "Por favor, partilhe qualquer feedback adicional ou sugestões que tenha para melhorar o {{appName}}.",
+    "description": "Usado para recolher qualquer feedback adicional ou sugestões do utilizador para melhorar o {{appName}}. A resposta é fornecida em formato de texto.",
+    "comment_placeholder": "Gostaríamos de saber a sua opinião! Por favor, partilhe qualquer feedback adicional ou sugestões que tenha para melhorar o {{appName}}."
+  }
+}
