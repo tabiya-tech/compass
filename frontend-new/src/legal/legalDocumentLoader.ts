@@ -1,9 +1,6 @@
 import { parseYamlFrontmatter } from "src/knowledgeHub/parseYamlFrontmatter";
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import privacyPolicyMd from "!!raw-loader!./documents/privacy-policy.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import termsOfUseMd from "!!raw-loader!./documents/terms-of-use.md";
 
 export type LegalDocumentVariant = "privacy" | "terms";

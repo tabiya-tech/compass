@@ -1,13 +1,33 @@
 import { parseYamlFrontmatter } from "src/knowledgeHub/parseYamlFrontmatter";
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import faqMd from "!!raw-loader!./documents/faq.md";
+import faqEnGbMd from "!!raw-loader!./documents/faq.en-GB.md";
+import faqEnUsMd from "!!raw-loader!./documents/faq.en-US.md";
+import faqEsEsMd from "!!raw-loader!./documents/faq.es-ES.md";
+import faqEsArMd from "!!raw-loader!./documents/faq.es-AR.md";
+import faqNyZmMd from "!!raw-loader!./documents/faq.ny-ZM.md";
+import faqSwKeMd from "!!raw-loader!./documents/faq.sw-KE.md";
+import faqPtMzMd from "!!raw-loader!./documents/faq.pt-MZ.md";
+
+/** Section number for the troubleshooting checklist in all FAQ locale documents. */
+export const CHECKLIST_SECTION_NUMBER = 10;
+
+const FAQ_BY_LOCALE: Record<string, string> = {
+  "en-GB": faqEnGbMd,
+  "en-US": faqEnUsMd,
+  "es-ES": faqEsEsMd,
+  "es-AR": faqEsArMd,
+  "ny-ZM": faqNyZmMd,
+  "sw-KE": faqSwKeMd,
+  "pt-MZ": faqPtMzMd,
+};
 
 export interface FaqQuestion {
   id: string;
   question: string;
   answerMarkdown: string;
 }
+
+export type FaqSectionKind = "qa" | "static" | "checklist";
 
 export interface FaqSection {
   id: string;
@@ -16,6 +36,7 @@ export interface FaqSection {
   items: FaqQuestion[];
   staticMarkdown?: string;
   isStatic: boolean;
+  kind: FaqSectionKind;
 }
 
 export interface FaqDocument {
@@ -31,7 +52,7 @@ const slugify = (raw: string): string =>
     .replace(/\s+/g, "-")
     .slice(0, 80) || "section";
 
-const parseSections = (markdown: string): FaqSection[] => {
+export const parseSections = (markdown: string): FaqSection[] => {
   const sectionBlocks = markdown
     .split(/\n(?=## )/)
     .map((s) => s.trim())
@@ -55,6 +76,7 @@ const parseSections = (markdown: string): FaqSection[] => {
     const id = slugify(title);
 
     if (itemBlocks.length === 0) {
+      const kind: FaqSectionKind = number === CHECKLIST_SECTION_NUMBER ? "checklist" : "static";
       return {
         id,
         number,
@@ -62,6 +84,7 @@ const parseSections = (markdown: string): FaqSection[] => {
         items: [],
         staticMarkdown: body,
         isStatic: true,
+        kind,
       };
     }
 
@@ -83,12 +106,14 @@ const parseSections = (markdown: string): FaqSection[] => {
       title,
       items,
       isStatic: false,
+      kind: "qa",
     };
   });
 };
 
-export const getFaqDocument = (): FaqDocument => {
-  const { data, content } = parseYamlFrontmatter(faqMd);
+export const getFaqDocument = (locale?: string): FaqDocument => {
+  const markdown = (locale && FAQ_BY_LOCALE[locale]) ?? faqEnGbMd;
+  const { data, content } = parseYamlFrontmatter(markdown);
   return {
     title: data.title,
     sections: parseSections(content.trim()),

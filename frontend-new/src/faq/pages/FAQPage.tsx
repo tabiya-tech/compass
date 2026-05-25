@@ -32,19 +32,19 @@ export const DATA_TEST_ID = {
 
 const containsQuery = (haystack: string, needle: string): boolean => haystack.toLowerCase().includes(needle);
 
-const isChecklistSection = (section: FaqSection): boolean => section.isStatic && /checklist/i.test(section.title);
+const isChecklistSection = (section: FaqSection): boolean => section.kind === "checklist";
 
 const FAQ_TUTORIAL_VIDEO_FALLBACK_URL =
   "https://player.vimeo.com/video/1193881841?h=8ee6f6190d&title=0&byline=0&portrait=0";
 
 const FAQPage: React.FC = () => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
 
-  const { title, sections } = useMemo(() => getFaqDocument(), []);
+  const { title, sections } = useMemo(() => getFaqDocument(i18n.language), [i18n.language]);
 
   const [searchInput, setSearchInput] = useState("");
   const normalizedQuery = searchInput.trim().toLowerCase();

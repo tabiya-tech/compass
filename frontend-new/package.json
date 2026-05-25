@@ -119,7 +119,19 @@
     "parser": "@typescript-eslint/parser",
     "rules": {
       "import/first": "off"
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/knowledgeHub/documentLoader.ts",
+          "src/faq/faqDocumentLoader.ts",
+          "src/legal/legalDocumentLoader.ts"
+        ],
+        "rules": {
+          "import/no-webpack-loader-syntax": "off"
+        }
+      }
+    ]
   },
   "jest": {
     "resetMocks": false,

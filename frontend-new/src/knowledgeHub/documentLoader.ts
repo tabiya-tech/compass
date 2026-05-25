@@ -1,23 +1,11 @@
 import { Document, DocumentMetadata } from "./types";
 import { parseYamlFrontmatter } from "./parseYamlFrontmatter";
 
-// Import markdown files directly with raw-loader
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import miningPathwayMd from "!!raw-loader!./documents/mining.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import energyPathwayMd from "!!raw-loader!./documents/energy.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import hospitalityPathwayMd from "!!raw-loader!./documents/hospitality.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import agriculturePathwayMd from "!!raw-loader!./documents/agriculture.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import waterPathwayMd from "!!raw-loader!./documents/water.md";
-
-// eslint-disable-next-line import/no-webpack-loader-syntax
 import healthPathwayMd from "!!raw-loader!./documents/health.md";
 
 // Document registry - add new documents here
