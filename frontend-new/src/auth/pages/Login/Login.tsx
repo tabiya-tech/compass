@@ -507,7 +507,7 @@ const Login: React.FC = () => {
               backgroundColor: theme.palette.common.cream,
               color: theme.palette.brandAction.main,
               alignSelf: "center",
-              width: { xs: "90%", sm: "75%" },
+              width: { xs: "90%", sm: "80%" },
               maxWidth: 420,
               fontSize: theme.typography.subtitle1.fontSize,
               alignItems: "center",

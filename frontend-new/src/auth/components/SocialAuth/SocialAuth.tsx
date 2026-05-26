@@ -195,7 +195,7 @@ const SocialAuth: React.FC<Readonly<SocialAuthProps>> = ({
         </Typography>
       </Divider>
       <Box width="100%" display="flex" justifyContent="center">
-        <Box data-test_id={DATA_TEST_ID.FIREBASE_AUTH} width={{ xs: "90%", sm: "75%" }} maxWidth={420}>
+        <Box data-test_id={DATA_TEST_ID.FIREBASE_AUTH} width={{ xs: "90%", sm: "80%" }} maxWidth={420}>
           <Button
             variant="text"
             size={"medium"}

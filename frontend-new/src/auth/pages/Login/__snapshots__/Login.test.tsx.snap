@@ -36,7 +36,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 26.4px;"
@@ -107,7 +107,7 @@ exports[`Testing Login component Render tests should hide login code related ele
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 26.4px;"
@@ -202,7 +202,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 26.4px;"
@@ -291,7 +291,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
         style="margin-top: 26.4px;"
@@ -387,7 +387,7 @@ exports[`Testing Login component should handle application login code 1`] = `
         data-testid="reset-password-email-container"
       />
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
         data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
         disabled=""
         style="margin-top: 26.4px;"
@@ -476,7 +476,7 @@ exports[`Testing Login component should remove registration link if registration
           data-testid="reset-password-email-container"
         />
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-tgcmq8-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedBrandAction MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorBrandAction MuiButton-disableElevation css-xok3jj-MuiButtonBase-root-MuiButton-root"
           data-testid="login-button-7ce9ba1f-bde0-48e2-88df-e4f697945cc4"
           disabled=""
           style="margin-top: 26.4px;"

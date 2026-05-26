@@ -116,6 +116,7 @@ const ResetPasswordEmailSender: React.FC<ResetPasswordEmailSenderProps> = ({ ini
           sx={{
             textDecoration: "Underline",
             fontWeight: 600,
+            whiteSpace: "normal",
             "&:hover": {
               color: theme.palette.common.white,
               opacity: 0.75,
