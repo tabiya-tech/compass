@@ -7,13 +7,11 @@ using the default fallback locale as the reference.
 """
 import argparse
 import logging
-import os
 import sys
 from pathlib import Path
 
 # Add the backend directory to the path so we can import app modules
-backend_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(backend_dir))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.i18n.i18n_manager import I18nManager
 
@@ -41,13 +39,7 @@ def main():
     )
     args = parser.parse_args()
 
-    # Determine locales directory
-    if args.locales_dir:
-        locales_dir = args.locales_dir
-    else:
-        locales_dir = os.path.join(backend_dir, "app", "i18n", "locales")
-
-    manager = I18nManager(locales_dir=locales_dir)
+    manager = I18nManager()
 
     if args.verify:
         if not manager.translations:

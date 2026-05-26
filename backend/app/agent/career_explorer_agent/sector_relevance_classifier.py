@@ -15,6 +15,7 @@ from app.agent.llm_caller import LLMCaller
 from app.app_config import get_application_config
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_manager import ConversationContext
+from app.i18n.translation_service import get_i18n_manager
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, ZERO_TEMPERATURE_GENERATION_CONFIG, JSON_GENERATION_CONFIG
 from common_libs.llm.schema_builder import with_response_schema
@@ -59,8 +60,14 @@ def _build_classifier_instructions(existing_sectors: list[str] | None = None) ->
         else ""
     )
 
+    try:
+        locale_label = get_i18n_manager().get_locale().label()
+    except LookupError:
+        locale_label = "English"
+
     return dedent(f"""\
         You classify user messages for routing purposes.
+        The user may write in {locale_label} — classify their intent regardless of the language used.
 
         Return PRIORITY_SECTOR if the user is clearly asking about {country_name}'s priority sectors: {sector_list_str} — or a direct sub-field of these (e.g. solar within Energy, irrigation within Agriculture).
 

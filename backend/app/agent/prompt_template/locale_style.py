@@ -27,10 +27,22 @@ def _get_locale_section():
         section += textwrap.dedent("""
         #Swahili Language Guidance
         - Use simple, everyday Kiswahili. Avoid overly formal or literary Swahili.
-        - When the user uses Swahili terms for jobs or skills, acknowledge them naturally and use 
+        - When the user uses Swahili terms for jobs or skills, acknowledge them naturally and use
           the Swahili term in your response alongside any clarification.
-        - If the user mixes English and Swahili (code-switching), respond in Kiswahili but you may 
+        - If the user mixes English and Swahili (code-switching), respond in Kiswahili but you may
           use commonly understood English loan words (e.g., "CV", "email", "computer").
+        - Keep the same warm, supportive tone as in English conversations.
+        """)
+
+    # Mozambican Portuguese-specific guidance
+    elif language == Locale.PT_MZ:
+        section += textwrap.dedent("""
+        #Mozambican Portuguese Language Guidance
+        - Use everyday Mozambican Portuguese. Avoid overly formal or European Portuguese expressions.
+        - Prefer vocabulary and phrasing natural to Mozambique (e.g. "trabalho" over "labor",
+          everyday greetings like "Olá" rather than "Bom dia, Vossa Excelência").
+        - If the user mixes English and Portuguese (common in urban Mozambique), respond fully in
+          Portuguese but you may use widely understood English terms (e.g., "CV", "email", "online").
         - Keep the same warm, supportive tone as in English conversations.
         """)
 

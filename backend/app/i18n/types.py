@@ -7,6 +7,7 @@ class Locale(Enum):
     ES_AR = "es-AR"
     ES_ES = "es-ES"
     SW_KE = "sw-KE"
+    PT_MZ = "pt-MZ"
 
     @staticmethod
     def from_locale_str(locale: str) -> "Locale":
@@ -24,9 +25,11 @@ class Locale(Enum):
                 return "Español (Argentina)"
             case Locale.SW_KE:
                 return "Kiswahili (Kenya)"
+            case Locale.PT_MZ:
+                return "Português (Moçambique)"
 
 
-SUPPORTED_LOCALES: list[Locale] = [Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES, Locale.SW_KE]
+SUPPORTED_LOCALES: list[Locale] = [Locale.EN_US, Locale.EN_GB, Locale.ES_AR, Locale.ES_ES, Locale.SW_KE, Locale.PT_MZ]
 
 
 def is_locale_supported(language: Locale) -> bool:

@@ -33,6 +33,7 @@ class ClassifierTestCase:
     user_input: str
     expected_relevance: SectorRelevance
     expected_sector_name: str | None
+    locale: Locale = Locale.EN_US
 
 
 CLASSIFIER_TEST_CASES = [
@@ -46,6 +47,15 @@ CLASSIFIER_TEST_CASES = [
     ClassifierTestCase("healthcare", "Careers in nursing or healthcare?", SectorRelevance.NON_PRIORITY_SECTOR, "Healthcare"),
     ClassifierTestCase("general_career", "How do I find a job?", SectorRelevance.NON_PRIORITY_SECTOR, None),
     ClassifierTestCase("multi_agriculture_mining", "I'm interested in agriculture and mining", SectorRelevance.PRIORITY_SECTOR, "Agriculture"),
+    # Portuguese (pt-MZ) cases — classifier must handle non-English input correctly
+    ClassifierTestCase("pt_mining", "Quero saber sobre mineração", SectorRelevance.PRIORITY_SECTOR, "Mining", Locale.PT_MZ),
+    ClassifierTestCase("pt_agriculture", "Fale-me sobre agricultura", SectorRelevance.PRIORITY_SECTOR, "Agriculture", Locale.PT_MZ),
+    ClassifierTestCase("pt_energy_solar", "Quais são as carreiras em energia solar?", SectorRelevance.PRIORITY_SECTOR, "Energy", Locale.PT_MZ),
+    ClassifierTestCase("pt_water", "Empregos no sector da água?", SectorRelevance.PRIORITY_SECTOR, "Water", Locale.PT_MZ),
+    ClassifierTestCase("pt_hospitality", "O que posso fazer no turismo?", SectorRelevance.PRIORITY_SECTOR, "Hospitality", Locale.PT_MZ),
+    ClassifierTestCase("pt_healthcare", "Como me torno enfermeiro?", SectorRelevance.NON_PRIORITY_SECTOR, "Healthcare", Locale.PT_MZ),
+    ClassifierTestCase("pt_it", "Quero trabalhar como programador", SectorRelevance.NON_PRIORITY_SECTOR, "Tech/ICT", Locale.PT_MZ),
+    ClassifierTestCase("pt_general", "Como encontro um emprego?", SectorRelevance.NON_PRIORITY_SECTOR, None, Locale.PT_MZ),
 ]
 
 
@@ -68,7 +78,7 @@ async def test_sector_relevance_classifier(
     test_case: ClassifierTestCase,
 ):
     # GIVEN the i18n locale is set
-    get_i18n_manager().set_locale(Locale.EN_US)
+    get_i18n_manager().set_locale(test_case.locale)
 
     # AND a conversation context with a welcome turn and the user's input
     given_context = FakeConversationContext()

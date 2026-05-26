@@ -30,6 +30,9 @@ class PriorityExplorerTestCase:
     name: str
     user_input: str
     expected_phrases: list[str]
+    locale: Locale = Locale.EN_US
+    # Portuguese responses contain the same facts but translated — check for these instead
+    expected_phrases_absent: list[str] | None = None
 
 
 PRIORITY_EXPLORER_TEST_CASES = [
@@ -63,6 +66,30 @@ PRIORITY_EXPLORER_TEST_CASES = [
         "What are the non-priority sectors?",
         ["Non-priority", "sectors", "not", "covered", "by", "the", "priority", "sectors"],
     ),
+    # Portuguese (pt-MZ) cases — verify RAG retrieval works and response is in Portuguese
+    PriorityExplorerTestCase(
+        "pt_mining",
+        "Quais são as funções na mineração?",
+        # Proper nouns / numbers pass through untranslated; Portuguese sector words confirm language
+        ["Copperbelt", "Barrick", "K7,500", "mineração", "mineiro", "equipamento", "técnico", "geólogo", "perfurador"],
+        locale=Locale.PT_MZ,
+        # Response must NOT be in English — if these appear it means the locale was ignored
+        expected_phrases_absent=["roles in mining", "Heavy Equipment Repair", "gemstone mines"],
+    ),
+    PriorityExplorerTestCase(
+        "pt_agriculture",
+        "Fale-me sobre agricultura",
+        ["agricultura", "Zambeef", "TEVET", "irrigação", "aquicultura", "comercial", "cultivo"],
+        locale=Locale.PT_MZ,
+        expected_phrases_absent=["Tell me about", "crop health", "irrigation"],
+    ),
+    PriorityExplorerTestCase(
+        "pt_energy",
+        "Quais são as carreiras em energia solar?",
+        ["energia", "solar", "renovável", "técnico", "electricista", "geração"],
+        locale=Locale.PT_MZ,
+        expected_phrases_absent=["solar technicians", "power generation"],
+    ),
 ]
 
 
@@ -84,7 +111,7 @@ async def test_priority_sector_explorer_rag_content(
     career_explorer_config_with_sectors,
     test_case: PriorityExplorerTestCase,
 ):
-    get_i18n_manager().set_locale(Locale.EN_US)
+    get_i18n_manager().set_locale(test_case.locale)
 
     context = FakeConversationContext()
     context.add_turn("", "Welcome! Which sector interests you?")
@@ -101,4 +128,12 @@ async def test_priority_sector_explorer_rag_content(
         f"Priority sector response should contain at least one of {test_case.expected_phrases} "
         f"but got: {message[:400]}..."
     )
+
+    if test_case.expected_phrases_absent:
+        for phrase in test_case.expected_phrases_absent:
+            assert phrase.lower() not in response_lower, (
+                f"Response should NOT contain '{phrase}' (locale={test_case.locale.value}) "
+                f"but it did: {message[:400]}..."
+            )
+
     logging.info("Priority explorer test %s: found expected content in response", test_case.name)

@@ -1,0 +1,82 @@
+{
+  "quickReply": {
+    "letsStart": "Vamos começar!",
+    "whatCanYouHelp": "Com o que pode me ajudar?",
+    "howLongDoesItTake": "Quanto tempo demora?",
+    "yes": "Sim",
+    "no": "Não",
+    "thatsAll": "É tudo",
+    "iWantToAddSomething": "Quero acrescentar algo",
+    "iHaveMoreQuestions": "Tenho mais perguntas"
+  },
+  "welcomeAgentFirstEncounter": "Bem-vindo! Estou aqui para ajudá-lo a descrever as suas competências e o que procura na sua carreira.\nVeja como vamos proceder:\n\n• Primeiro, vou pedir um breve resumo do seu trabalho, incluindo quaisquer actividades não remuneradas como voluntariado ou contribuições familiares.\n• À medida que conversamos, o seu CV vai tomando forma.\n• Depois de cobrir o básico, vamos aprofundar cada experiência para capturar os detalhes mais importantes.\n\nConcentre-se no que mais importa para si. A conversa demora em média 50 minutos (pode ser mais dependendo do número de experiências), por isso planeie em conformidade.\nSe necessário, pode usar os dados da sua conta para voltar mais tarde e continuar de onde ficou.\n\nSe tiver alguma dúvida, fique à vontade para perguntar.\n\nPronto para começar?",
+  "collectExperiences": {
+    "didNotUnderstand": "Desculpe, não entendi. Pode reformular, por favor?",
+    "moveToOtherExperiences": "Vamos passar para outras experiências profissionais.",
+    "finalMessage": "Obrigado por partilhar as suas experiências. Vamos passar para a próxima etapa.",
+    "noExperienceCollected": "Ainda não foram recolhidos dados de experiência",
+    "allFieldsFilled": "Todos os campos foram preenchidos.",
+    "allFieldsNotFilled": "Nem todos os campos foram preenchidos.",
+    "workType": {
+      "formalWagedDescription": "trabalhar para uma empresa ou negócio de outra pessoa por dinheiro",
+      "unpaidTraineeDescription": "trabalho não remunerado como estagiário numa empresa ou organização",
+      "selfEmploymentDescription": "gerir o meu próprio negócio, fazer trabalho independente ou por conta própria",
+      "unseenUnpaidDescription": "trabalho não remunerado como voluntariado comunitário, prestação de cuidados à própria família ou a outra família, ajuda numa casa",
+      "paidWorkPhaseDescription": "trabalho remunerado (trabalhar para uma empresa ou negócio de outra pessoa por dinheiro)",
+      "unpaidWorkPhaseDescription": "trabalho não remunerado (por ex. estágio não remunerado, voluntariado, prestação de cuidados ou ajuda numa casa)",
+      "noneDescription": "sem experiência profissional",
+      "notSupported": "O tipo de trabalho não é suportado"
+    },
+    "fields": {
+      "experienceTitle": "título da experiência",
+      "paidWork": "trabalho remunerado",
+      "workType": "tipo de trabalho",
+      "startDate": "data de início",
+      "endDate": "data de fim",
+      "company": "empresa/receptor do trabalho",
+      "location": "localização"
+    },
+    "askAboutType": "Já teve alguma experiência que inclua: {experience_type}",
+    "recapPrompt": "Vamos fazer um resumo e dar-me a oportunidade de corrigir eventuais erros."
+  },
+  "exploreExperiences": {
+    "noMoreExperiences": "Parece que não há mais experiências para discutir.",
+    "skippedExperienceMissingDetails": "Saltei a sua experiência \"{experience_title}\" porque não partilhou detalhes suficientes",
+    "finishedAll": "Terminei de explorar todas as suas experiências.",
+    "transitionToPreferences": "Excelente trabalho! Registei todas as suas competências e experiências.\n\nA seguir, vou ajudá-lo a descobrir o que mais valoriza num emprego. Isto permitirá recomendar as melhores oportunidades para si.",
+    "noSkillsIdentified": "Nenhuma competência identificada",
+    "linkAndRank": {
+      "summaryMessage": "Com base na informação fornecida sobre a sua experiência como '{experience_title}', aqui está um breve resumo:\n\n{summary}\n\nAs {top_count} principais competências demonstradas:{skills_summary}"
+    }
+  },
+  "agentDirector": {
+    "finalMessage": "A conversa terminou!",
+    "errorRetry": "Estou com algumas dificuldades neste momento, pode repetir o que disse?",
+    "allAgentsDone": "Conversa terminada, todos os agentes concluíram!",
+    "forcefullyEnded": "Conversa terminada forçosamente"
+  },
+  "careerExplorer": {
+    "welcomeMessage": "Bem-vindo ao Explorador de Carreiras! Com base nas prioridades de desenvolvimento de {country}, existem {sector_count} sectores-chave onde os formandos do TEVET estão muito procurados:\n\n{sectors_list}\n\nAlém destes sectores prioritários, também podemos discutir qualquer carreira que queira explorar. Qual sector lhe interessa mais?",
+    "errorRetry": "Estou com dificuldades neste momento. Pode tentar novamente?"
+  },
+  "experience": {
+    "until": "até {end_date}",
+    "noTitleProvidedYet": "Título ainda não fornecido",
+    "workType": {
+      "short": {
+        "formalSectorWagedEmployment": "Emprego Assalariado",
+        "formalSectorUnpaidTraineeWork": "Estagiário",
+        "selfEmployment": "Conta Própria",
+        "unseenUnpaid": "Voluntário/Não Remunerado"
+      }
+    }
+  },
+  "exploreSkills": {
+    "finalMessage": "Obrigado por partilhar estes detalhes! Tenho toda a informação de que preciso.",
+    "question": {
+      "paidWork": "O que acha importante ao trabalhar num emprego remunerado ou para um empregador?",
+      "unpaidTrainee": "O que acha importante ao trabalhar como estagiário não remunerado?",
+      "unseenUnpaid": "O que acha mais importante ao ajudar a comunidade ou ao cuidar de outros?"
+    }
+  }
+}

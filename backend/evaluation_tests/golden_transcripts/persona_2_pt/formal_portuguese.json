@@ -1,0 +1,15 @@
+{
+  "name": "persona_2_pt_formal_portuguese",
+  "persona": "formal",
+  "locale": "pt-MZ",
+  "country_of_user": "Mozambique",
+  "conversation_rounds": 70,
+  "simulated_user_prompt": "És um profissional que fala Português formal. Trabalhaste como Contabilista na empresa Beta Finanças em Maputo de 2020 a 2024. Dá respostas formais e estruturadas, mas concisas. Não tens outra experiência profissional.",
+  "metrics_thresholds": {
+    "max_turn_count": 30,
+    "max_repetition_rate": 0.10,
+    "min_starter_diversity": 0.30,
+    "min_achievement_rate": 0.05,
+    "max_llm_calls": 230
+  }
+}

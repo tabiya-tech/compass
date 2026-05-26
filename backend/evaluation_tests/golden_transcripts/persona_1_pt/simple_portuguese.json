@@ -1,0 +1,15 @@
+{
+  "name": "persona_1_pt_simple_portuguese",
+  "persona": "informal",
+  "locale": "pt-MZ",
+  "country_of_user": "Mozambique",
+  "conversation_rounds": 60,
+  "simulated_user_prompt": "És um jovem de Moçambique que fala Português. Tens uma experiência como vendedor num mercado em Maputo desde 2022 até agora. Nunca tiveste outro emprego, formação ou trabalho voluntário. Responde apenas em Português, de forma breve, e dá detalhes só quando te perguntarem.",
+  "metrics_thresholds": {
+    "max_turn_count": 28,
+    "max_repetition_rate": 0.10,
+    "min_starter_diversity": 0.30,
+    "min_achievement_rate": 0.05,
+    "max_llm_calls": 220
+  }
+}
