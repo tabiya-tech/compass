@@ -519,8 +519,26 @@ class CareerReadinessService(ICareerReadinessService):
         response_messages = all_messages + [agent_message]
 
         quiz_available = conversation.quiz_delivered and not conversation.quiz_passed
+        module_completed = False
+        conversation_mode = ConversationMode.INSTRUCTION
 
-        if (finished
+        if finished and module.quiz is None and not conversation.quiz_passed:
+            # Quiz-less module (e.g. entrepreneurship): all topics covered completes it.
+            completion_message = CareerReadinessMessage(
+                message_id=str(ObjectId()),
+                message="Great work! You've covered all the key topics for this module. "
+                        "You can now ask me any follow-up questions about this topic.",
+                sender=CareerReadinessMessageSender.AGENT,
+                sent_at=datetime.now(timezone.utc),
+            )
+            await self._repository.append_message(conversation.conversation_id, completion_message)
+            await self._repository.update_quiz_passed(conversation.conversation_id, True)
+            await self._repository.update_conversation_mode(
+                conversation.conversation_id, ConversationMode.SUPPORT)
+            response_messages.append(completion_message)
+            module_completed = True
+            conversation_mode = ConversationMode.SUPPORT
+        elif (finished
                 and module.quiz is not None and not conversation.quiz_delivered):
             marker_message = CareerReadinessMessage(
                 message_id=str(ObjectId()),
@@ -539,8 +557,9 @@ class CareerReadinessService(ICareerReadinessService):
             module_id=conversation.module_id,
             messages=_filter_silence(response_messages),
             covered_topics=_derive_covered_topic_names(merged_topic_status, conversation.covered_topics),
-            conversation_mode=ConversationMode.INSTRUCTION,
+            conversation_mode=conversation_mode,
             quiz_available=quiz_available,
+            module_completed=module_completed,
         )
 
     async def _handle_support_message(

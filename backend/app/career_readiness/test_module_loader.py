@@ -350,15 +350,22 @@ class TestModuleRegistry:
         for module in actual_modules:
             assert len(module.topics) > 0, f"Module {module.id} has no topics"
 
-    def test_all_real_modules_have_quiz(self):
+    def test_all_real_modules_have_quiz_except_entrepreneurship(self):
         # GIVEN the real modules directory
+        # AND that the entrepreneurship module's quiz is intentionally disabled for the pilot
         actual_registry = ModuleRegistry()
+        given_quizless_module_ids = {"entrepreneurship"}
 
         # WHEN all modules are retrieved
         actual_modules = actual_registry.get_all_modules()
 
-        # THEN each module has a quiz with 10 questions
+        # THEN every module except entrepreneurship has a quiz with 10 questions
         for module in actual_modules:
+            if module.id in given_quizless_module_ids:
+                assert module.quiz is None, (
+                    f"Module {module.id} is expected to be quiz-less but has a quiz"
+                )
+                continue
             assert module.quiz is not None, f"Module {module.id} has no quiz"
             assert len(module.quiz.questions) == 10, (
                 f"Module {module.id} has {len(module.quiz.questions)} questions, expected 10"

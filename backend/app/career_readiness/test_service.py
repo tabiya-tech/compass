@@ -894,6 +894,94 @@ class TestSendMessage:
         assert actual_result.quiz_available is False
 
     @pytest.mark.asyncio
+    async def test_quizless_module_completes_directly_when_all_topics_become_covered(self):
+        # GIVEN a quiz-less module (e.g. entrepreneurship) with one topic still uncovered
+        given_module = ModuleConfig(
+            id="entrepreneurship",
+            title="Entrepreneurship & Enterprise Development",
+            description="A quiz-less module.",
+            icon="entrepreneurship",
+            sort_order=6,
+            input_placeholder="Ask about starting a business...",
+            content="# Entrepreneurship\nStart a business.",
+            topics=["Topic A", "Topic B"],
+            quiz=None,
+        )
+        # AND the agent now marks the final remaining topic covered
+        given_agent = MockCareerReadinessAgent(
+            response_message="Great, we've covered everything!",
+            proposed_topic_status=_full_topic_status(
+                given_module.topics, covered=["Topic A", "Topic B"],
+            ),
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="entrepreneurship",
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent that covers the remaining topic
+        actual_result = await service.send_message(
+            "user_abc", "entrepreneurship", given_conversation.conversation_id, "I understand now",
+        )
+
+        # THEN the module is reported as completed
+        assert actual_result.module_completed is True
+        # AND no quiz is offered
+        assert actual_result.quiz_available is False
+        # AND the conversation transitions to SUPPORT mode for follow-up questions
+        assert actual_result.conversation_mode == ConversationMode.SUPPORT
+        # AND the closing message is a completion message, not a quiz prompt
+        assert "quiz" not in actual_result.messages[-1].message.lower()
+        # AND the conversation is persisted as passed in SUPPORT mode, without a quiz ever being delivered
+        actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
+        assert actual_conv is not None
+        assert actual_conv.quiz_passed is True
+        assert actual_conv.quiz_delivered is False
+        assert actual_conv.conversation_mode == ConversationMode.SUPPORT
+
+    @pytest.mark.asyncio
+    async def test_quizless_module_does_not_complete_while_a_topic_is_uncovered(self):
+        # GIVEN a quiz-less module where one topic remains uncovered after this turn
+        given_module = ModuleConfig(
+            id="entrepreneurship",
+            title="Entrepreneurship & Enterprise Development",
+            description="A quiz-less module.",
+            icon="entrepreneurship",
+            sort_order=6,
+            input_placeholder="Ask about starting a business...",
+            content="# Entrepreneurship\nStart a business.",
+            topics=["Topic A", "Topic B"],
+            quiz=None,
+        )
+        # AND the agent leaves the remaining topic uncovered after this turn
+        given_agent = MockCareerReadinessAgent(
+            response_message="Let me explain Topic B.",
+            proposed_topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        service, repo = _make_service(modules=[given_module], agent=given_agent)
+        given_conversation = _make_conversation(
+            user_id="user_abc", module_id="entrepreneurship",
+            topic_status=_full_topic_status(given_module.topics, covered=["Topic A"]),
+        )
+        await repo.create(given_conversation)
+
+        # WHEN a message is sent that does not cover the remaining topic
+        actual_result = await service.send_message(
+            "user_abc", "entrepreneurship", given_conversation.conversation_id, "hmm",
+        )
+
+        # THEN the module is NOT completed and stays in INSTRUCTION mode
+        assert actual_result.module_completed is False
+        assert actual_result.conversation_mode == ConversationMode.INSTRUCTION
+        actual_conv = await repo.find_by_conversation_id(given_conversation.conversation_id)
+        assert actual_conv is not None
+        assert actual_conv.quiz_passed is False
+        assert actual_conv.quiz_delivered is False
+        assert actual_conv.conversation_mode == ConversationMode.INSTRUCTION
+
+    @pytest.mark.asyncio
     async def test_agent_downgrade_attempt_is_rejected_and_state_retained(self):
         # GIVEN a conversation where Topic A is already covered on the server side
         given_module = _make_module_config(topics=["Topic A", "Topic B"])
