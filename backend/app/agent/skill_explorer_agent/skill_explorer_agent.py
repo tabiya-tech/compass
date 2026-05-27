@@ -170,7 +170,11 @@ class SkillsExplorerAgent(Agent):
             # If the user input is empty, set it to "(silence)"
             # This is to avoid the agent failing to respond to an empty input
             user_input.message = "(silence)"
-        else:
+        elif not _first_time_for_experience:
+            # The first-turn user message is a transition trigger from the previous agent,
+            # not a response to any question this agent asked. Skipping extraction and the
+            # answers_provided append keeps question_asked_until_now and answers_provided
+            # aligned by construction so each Q[i] pairs with the actual answer it elicited.
             # Extract the responsibilities from the last user's input
             responsibilities_extraction_tool = _ResponsibilitiesExtractionTool(self.logger)
             responsibilities_output, responsibilities_llm_stats = \
