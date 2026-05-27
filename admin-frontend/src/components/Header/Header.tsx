@@ -124,7 +124,7 @@ const Header: React.FC = () => {
           </NavLink>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: theme.spacing(theme.tabiyaSpacing.md) }}>
-          {isAdmin && (
+          {(isAdmin || isSuperAdmin) && (
             <NavLink
               to={usersHref}
               style={({ isActive }) => ({ fontWeight: isActive ? 600 : 400, textDecoration: "none", color: "inherit" })}
