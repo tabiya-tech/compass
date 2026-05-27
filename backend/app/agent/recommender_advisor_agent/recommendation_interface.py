@@ -9,6 +9,7 @@ Handles generating or loading recommendations from:
 Epic 3: Recommender Agent Implementation
 """
 
+from datetime import datetime
 from typing import Any, Optional
 import logging
 
@@ -312,6 +313,48 @@ def _to_matching_preference_vector(
     )
 
 
+def _parse_year(date_str: Optional[str]) -> Optional[int]:
+    """Extract the year from a date string of format YYYY, YYYY-MM, or DD-MM-YYYY."""
+    if not date_str or not date_str.strip():
+        return None
+    s = date_str.strip()
+    try:
+        if len(s) == 4:
+            return int(s)
+        if len(s) == 7 and s[4] == "-":
+            return int(s[:4])
+        if len(s) == 10 and s[2] == "-" and s[5] == "-":
+            return int(s[6:])
+    except (ValueError, IndexError):
+        pass
+    return None
+
+
+def _compute_education_fields(education_experiences: list) -> tuple[int, int, float]:
+    """Compute education summary fields from a list of CollectedData with source='education'.
+
+    Returns:
+        (any_post_secondary_educ, number_post_secondary_educ, total_duration_postsec)
+    """
+    from app.agent.collect_experiences_agent._types import CollectedData
+
+    current_year = datetime.now().year
+    non_empty = [e for e in education_experiences if not CollectedData.all_fields_empty(e)]
+
+    count = len(non_empty)
+    total_years = 0.0
+    for exp in non_empty:
+        start_year = _parse_year(exp.start_date)
+        end_year = _parse_year(exp.end_date) if exp.end_date else current_year
+        if end_year is None:
+            end_year = current_year
+        if start_year is not None:
+            duration = max(0.0, float(end_year - start_year))
+            total_years += duration
+
+    return (1 if count > 0 else 0, count, total_years)
+
+
 class RecommendationInterface:
     """
     Interface for generating/loading recommendations.
@@ -341,6 +384,7 @@ class RecommendationInterface:
         skills_vector: Optional[dict] = None,
         bws_scores: Optional[dict[str, float]] = None,
         top_10_bws: Optional[list[str]] = None,
+        education_experiences: Optional[list] = None,
     ) -> Node2VecRecommendations:
         """
         Generate recommendations for a user.
@@ -366,6 +410,7 @@ class RecommendationInterface:
                     f"Generating recommendations for {youth_id} via MatchingService "
                     f"(version={self._matching_service.algorithm_version})"
                 )
+                any_educ, num_educ, total_dur = _compute_education_fields(education_experiences or [])
                 result = await self._matching_service.generate_recommendations(
                     youth_id=youth_id,
                     city=city,
@@ -376,6 +421,9 @@ class RecommendationInterface:
                         bws_scores=bws_scores,
                         top_10_bws=top_10_bws,
                     ),
+                    any_post_secondary_educ=any_educ,
+                    number_post_secondary_educ=num_educ,
+                    total_duration_postsec=total_dur,
                 )
 
                 # Convert unified CompassMatchingResult to agent format

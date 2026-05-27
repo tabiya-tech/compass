@@ -86,6 +86,11 @@ class RecommenderAdvisorAgentState(BaseModel):
         default=None,
         description="Skills vector from Epic 4 (skill IDs + proficiency levels)"
     )
+
+    education_experiences: list = Field(
+        default_factory=list,
+        description="Education experiences (CollectedData with source='education') for matching service"
+    )
     
     preference_vector: Optional[PreferenceVector] = Field(
         default=None,

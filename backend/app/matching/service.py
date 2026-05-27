@@ -30,5 +30,8 @@ class MatchingService(ABC):
         province: Optional[str],
         skills_vector: SkillsVector,
         preference_vector: PreferenceVector,
+        any_post_secondary_educ: Optional[int] = None,
+        number_post_secondary_educ: Optional[int] = None,
+        total_duration_postsec: Optional[float] = None,
     ) -> CompassMatchingResult:
         """Fetch matches for one user and return them in unified Compass form."""

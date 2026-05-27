@@ -437,6 +437,12 @@ class ConversationService(IConversationService):
                         f"{len(pref_state.bws_scores)} items"
                     )
 
+            # Extract education experiences for matching service signals
+            rec_state.education_experiences = [
+                e for e in state.collect_experience_state.collected_data
+                if e.source == "education"
+            ]
+
             # Set youth_id (use session_id as fallback)
             if rec_state.youth_id is None:
                 rec_state.youth_id = f"youth_{state.session_id}"

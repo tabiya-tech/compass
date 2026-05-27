@@ -64,13 +64,19 @@ class MatchingServiceV2(MatchingService):
                                        city: Optional[str],
                                        province: Optional[str],
                                        skills_vector: SkillsVector,
-                                       preference_vector: PreferenceVector) -> CompassMatchingResult:
+                                       preference_vector: PreferenceVector,
+                                       any_post_secondary_educ: Optional[int] = None,
+                                       number_post_secondary_educ: Optional[int] = None,
+                                       total_duration_postsec: Optional[float] = None) -> CompassMatchingResult:
         request = MatchingRequest(
             user_id=youth_id,
             city=city or "",
             province=province or "",
             skills_vector=skills_vector,
             preference_vector=preference_vector,
+            any_post_secondary_educ=any_post_secondary_educ,
+            number_post_secondary_educ=number_post_secondary_educ,
+            total_duration_postsec=total_duration_postsec,
         )
 
         response = await self._client.process_request(_ResponseList, "/match_v2", request)

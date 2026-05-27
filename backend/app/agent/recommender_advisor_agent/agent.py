@@ -435,6 +435,7 @@ class RecommenderAdvisorAgent(Agent):
                 skills_vector=self._state.skills_vector,
                 bws_scores=self._state.bws_scores,
                 top_10_bws=self._state.top_10_bws,
+                education_experiences=self._state.education_experiences,
             )
             new_occs = [o for o in fresh.occupation_recommendations if o.uuid not in seen_uuids]
             new_jobs = [j for j in fresh.opportunity_recommendations if j.uuid not in seen_uuids]
@@ -463,6 +464,7 @@ class RecommenderAdvisorAgent(Agent):
                 preference_vector=self._state.preference_vector,
                 skills_vector=self._state.skills_vector,
                 bws_scores=self._state.bws_scores,
+                education_experiences=self._state.education_experiences,
                 top_10_bws=self._state.top_10_bws,
             )
             self.logger.info(
