@@ -170,6 +170,25 @@ describe("ProtectedRoute", () => {
       // GIVEN the user is authenticated AND is an admin
       mockGetUser(givenUser);
       jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(true);
+      jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(false);
+
+      // WHEN navigating to the users page
+      renderWithRouter(routerPaths.USERS, [
+        { path: routerPaths.USERS, element: <div>Users Page</div> },
+        { path: routerPaths.INSTRUCTOR, element: <div>Instructor Page</div> },
+        { path: routerPaths.ROOT, element: <div>Root Page</div> },
+      ]);
+
+      // THEN expect the users page to be displayed
+      expect(screen.getByText("Users Page")).toBeInTheDocument();
+    });
+
+    test("should allow super admin to access the users page", () => {
+      // GIVEN the user is authenticated AND is a super admin
+      mockGetUser(givenUser);
+      jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(true);
       jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(false);
 
       // WHEN navigating to the users page
@@ -187,6 +206,7 @@ describe("ProtectedRoute", () => {
       // GIVEN the user is authenticated AND is institution staff (not admin)
       mockGetUser(givenUser);
       jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(false);
       jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(true);
 
       // WHEN navigating to the users page
@@ -206,6 +226,7 @@ describe("ProtectedRoute", () => {
       // GIVEN the user is authenticated but has neither admin nor institution staff role
       mockGetUser(givenUser);
       jest.spyOn(UserStateService.getInstance(), "isAdmin").mockReturnValue(false);
+      jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(false);
       jest.spyOn(UserStateService.getInstance(), "isInstitutionStaff").mockReturnValue(false);
 
       // WHEN navigating to the users page

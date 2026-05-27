@@ -45,7 +45,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   // Restrict user-management ("permissioning") routes to admins.
-  if (targetPath === routerPaths.USERS && !userStateService.isAdmin()) {
+  if (targetPath === routerPaths.USERS && !userStateService.isAdmin() && !userStateService.isSuperAdmin()) {
     console.debug(`redirecting from ${targetPath} --> ${homePath} because user is not an admin`);
     return <Navigate to={homePath} replace />;
   }
