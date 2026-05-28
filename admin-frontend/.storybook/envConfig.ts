@@ -4,8 +4,8 @@ export const getEnvConfig = async (head: string | undefined = ""): Promise<strin
   console.debug("[Storybook EnvConfig] Starting environment configuration setup");
 
   const defaultConfig = {
-    FIREBASE_API_KEY: btoa("some-key"),
-    FIREBASE_AUTH_DOMAIN: btoa("some-domain"),
+    ADMIN_FRONTEND_FIREBASE_API_KEY: btoa("some-key"),
+    ADMIN_FRONTEND_FIREBASE_AUTH_DOMAIN: btoa("some-domain"),
     BACKEND_URL: btoa("http://foo.bar.com/api"),
     SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY: btoa("some-key"),
     SENSITIVE_PERSONAL_DATA_RSA_ENCRYPTION_KEY_ID: btoa("1"),
