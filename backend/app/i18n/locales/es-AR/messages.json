@@ -31,6 +31,7 @@
     "noMoreExperiences": "Parece que no hay experiencias para seguir conversando.",
     "skippedExperienceMissingDetails": "Omití tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
     "finishedAll": "Terminé de explorar todas tus experiencias.",
+    "transitionToPreferences": "¡Bien, ya exploramos todas tus experiencias! Ahora vamos a entender qué es lo que más valoras en un trabajo — tus preferencias. Te guío con unos breves escenarios.",
     "noSkillsIdentified": "No se identificaron habilidades",
     "linkAndRank": {
       "summaryMessage": "Según la información que brindaste sobre tu experiencia como '{experience_title}', acá va un resumen breve:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}"
@@ -61,5 +62,31 @@
       "selfEmployment": "¿Qué pensás que es importante cuando sos tu propio jefe?",
       "unseenUnpaid": "¿Qué pensás que es más importante al ayudar en la comunidad o cuidar a otras personas?"
     }
+  },
+  "preferenceElicitation": {
+    "experienceQuestionsIntro": "Ahora me gustaría entender qué es lo más importante para vos en un trabajo, cosas como el salario, el equilibrio entre la vida laboral y personal, la estabilidad laboral y el crecimiento profesional.",
+    "fallbackQuestionNoExperience": "Contame sobre una tarea de trabajo que hayas disfrutado mucho: ¿qué la hizo satisfactoria?",
+    "fallbackQuestionWithExperience": "Mencionaste que trabajaste como {experience_title}. ¿Qué fue lo que más disfrutaste de ese trabajo?",
+    "categoryLabels": {
+      "financial": "salario y remuneración",
+      "work_environment": "el ambiente de trabajo y el trayecto",
+      "job_security": "la estabilidad laboral",
+      "career_advancement": "el crecimiento profesional",
+      "work_life_balance": "el equilibrio entre la vida laboral y personal",
+      "task_preferences": "el tipo de trabajo del día a día",
+      "values_culture": "la cultura y los valores de la empresa",
+      "mixed": "una mezcla de compensaciones"
+    },
+    "vignetteTransitionCategoryChanged": "Ya vimos {previous_label}; ahora veamos {current_label}.",
+    "vignetteTransitionSameCategory": "Seguimos con {current_label}, pero desde otro ángulo.",
+    "vignetteChoosePrompt": "¿Cuál preferirías y por qué?",
+    "gateFallbackQuestion1": "¿Qué es más importante para vos: un salario alto con menos estabilidad, o un salario moderado con buena estabilidad laboral?",
+    "gateFallbackQuestion2": "¿Cómo te sentís trabajando en equipo frente a trabajar de forma independiente la mayor parte del tiempo?",
+    "gateFallbackQuestion3": "Si tuvieras que elegir, ¿preferirías un trabajo desafiante y de ritmo rápido, o uno estable y predecible?",
+    "wrapupMessage": "¡Genial! Aprendí mucho sobre tus preferencias.\n\nEsto es lo que entiendo sobre lo que te importa en un trabajo:\n\n{summary}\n\nGracias por compartir tus preferencias conmigo.",
+    "alreadyComplete": "Ya registré tus preferencias. ¡Pasemos a encontrar oportunidades para vos!",
+    "errorRetry": "Estoy teniendo algunos problemas en este momento. ¿Podés intentarlo de nuevo?",
+    "followUpFallback": "¿Podés contarme más sobre tu elección?",
+    "followUpFallbackNoVignette": "¿Podés contarme un poco más sobre por qué elegiste esa opción?"
   }
 }

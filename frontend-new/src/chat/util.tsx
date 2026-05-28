@@ -30,6 +30,11 @@ import CVTypingChatMessage, {
 import CancellableTypingChatMessage, {
   CancellableTypingChatMessageProps,
 } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
+import BWSTaskMessage, { BWS_TASK_MESSAGE_TYPE } from "src/chat/chatMessage/bwsTaskMessage/BWSTaskMessage";
+import { BWSTaskMessageProps, BWSTaskMetadata } from "src/chat/chatMessage/bwsTaskMessage/BWSTaskMessage.types";
+import QuickReplyButtons from "src/chat/chatMessage/suggestedActions/QuickReplyButtons";
+import { QuickReplyOption } from "src/chat/ChatService/ChatService.types";
+import { Box } from "@mui/material";
 import i18n from "src/i18n/i18n";
 
 const uniqueId = "cancellable-cv-typing-message-2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -238,6 +243,69 @@ export const parseConversationPhase = (newPhase: CurrentPhase, previousPhase?: C
   }
 
   return validPhase;
+};
+
+export const QUICK_REPLY_CHAT_MESSAGE_TYPE = "quick-reply-chat-message-bd7c6e4f-5a91-4f3b-9d2a-7e8c1b3a5d6e";
+
+export interface QuickReplyChatMessageProps extends CompassChatMessageProps {
+  options: QuickReplyOption[];
+  onSelect: (label: string) => void;
+}
+
+export const generateQuickReplyMessage = (
+  message_id: string,
+  message: string,
+  sent_at: string,
+  reaction: MessageReaction | null,
+  options: QuickReplyOption[],
+  onSelect: (label: string) => void
+): IChatMessage<QuickReplyChatMessageProps> => {
+  const payload: QuickReplyChatMessageProps = {
+    message_id,
+    message,
+    sent_at,
+    reaction,
+    options,
+    onSelect,
+  };
+  return {
+    type: QUICK_REPLY_CHAT_MESSAGE_TYPE,
+    message_id,
+    sender: ConversationMessageSender.COMPASS,
+    payload,
+    component: (props: QuickReplyChatMessageProps) => (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <CompassChatMessage
+          message_id={props.message_id}
+          message={props.message}
+          sent_at={props.sent_at}
+          reaction={props.reaction}
+        />
+        <QuickReplyButtons options={props.options} onSelect={props.onSelect} />
+      </Box>
+    ),
+  };
+};
+
+export const generateBWSTaskMessage = (
+  messageId: string,
+  metadata: BWSTaskMetadata,
+  onSubmit: (taskId: string, bestWaId: string, worstWaId: string) => void
+): IChatMessage<BWSTaskMessageProps> => {
+  const payload: BWSTaskMessageProps = {
+    taskId: metadata.task_id,
+    taskNumber: metadata.task_number,
+    totalTasks: metadata.total_tasks,
+    alternatives: metadata.alternatives,
+    onSubmit,
+  };
+  return {
+    type: BWS_TASK_MESSAGE_TYPE,
+    message_id: messageId,
+    sender: ConversationMessageSender.COMPASS,
+    payload,
+    component: (props: BWSTaskMessageProps) => <BWSTaskMessage {...props} />,
+  };
 };
 
 export const formatExperiencesToMessage = (experiences: string[] | null): string => {

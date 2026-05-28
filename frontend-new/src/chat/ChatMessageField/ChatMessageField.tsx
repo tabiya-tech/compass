@@ -31,6 +31,8 @@ export interface ChatMessageFieldProps {
   currentPhase?: ConversationPhase;
   prefillMessage?: string | null; // optional prefill content for the input field
   cvUploadError?: string | null; // CV upload error message from polling process
+  // When true, the user must respond via an interactive card (e.g. BWS task) and free-text input is disabled.
+  isAwaitingInteractiveResponse?: boolean;
 }
 
 const uniqueId = "2a76494f-351d-409d-ba58-e1b2cfaf2a53";
@@ -68,6 +70,7 @@ export const PLACEHOLDER_TEXTS = {
   OFFLINE: "chat.chatMessageField.placeholders.offline",
   DEFAULT: "chat.chatMessageField.placeholders.default",
   UPLOADING: "chat.chatMessageField.placeholders.uploading",
+  INTERACTIVE_AWAITING: "chat.chatMessageField.placeholders.awaitingInteractiveResponse",
 } as const;
 
 export const CHARACTER_LIMIT_ERROR_MESSAGES = {
@@ -429,6 +432,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
     if (props.isChatFinished) {
       return t(PLACEHOLDER_TEXTS.CHAT_FINISHED);
     }
+    if (props.isAwaitingInteractiveResponse) {
+      return t(PLACEHOLDER_TEXTS.INTERACTIVE_AWAITING);
+    }
     if (props.isUploadingCv) {
       return t(PLACEHOLDER_TEXTS.UPLOADING);
     }
@@ -439,7 +445,7 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       return t(PLACEHOLDER_TEXTS.OFFLINE);
     }
     return t(PLACEHOLDER_TEXTS.DEFAULT);
-  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, isOnline, t]);
+  }, [props.aiIsTyping, props.isChatFinished, props.isUploadingCv, props.isAwaitingInteractiveResponse, isOnline, t]);
 
   // Check if the send button should be disabled
   const sendIsDisabled = useCallback(() => {
@@ -447,16 +453,30 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       props.isChatFinished ||
       props.aiIsTyping ||
       props.isUploadingCv ||
+      props.isAwaitingInteractiveResponse ||
       !isOnline ||
       message.trim().length === 0 ||
       message.trim().length > CHAT_MESSAGE_MAX_LENGTH // Only disable the send button when over the limit
     );
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline, message]);
+  }, [
+    props.isChatFinished,
+    props.aiIsTyping,
+    props.isUploadingCv,
+    props.isAwaitingInteractiveResponse,
+    isOnline,
+    message,
+  ]);
 
   // Check if the input field should be disabled
   const inputIsDisabled = useCallback(() => {
-    return props.isChatFinished || props.aiIsTyping || props.isUploadingCv || !isOnline;
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, isOnline]);
+    return (
+      props.isChatFinished ||
+      props.aiIsTyping ||
+      props.isUploadingCv ||
+      props.isAwaitingInteractiveResponse ||
+      !isOnline
+    );
+  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, props.isAwaitingInteractiveResponse, isOnline]);
 
   const contextMenuItems: MenuItemConfig[] =
     menuView === "main"

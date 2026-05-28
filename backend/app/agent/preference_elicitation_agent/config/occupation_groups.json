@@ -1,0 +1,242 @@
+[
+  {
+    "code": "11",
+    "label": "LEGISLATORS, CHIEF EXECUTIVES AND SENIOR GOVERNMENT OFFICIALS",
+    "description": "Presidents, ministers, senior government administrators",
+    "major": "1"
+  },
+  {
+    "code": "12",
+    "label": "ADMINISTRATIVE AND COMMERCIAL MANAGERS",
+    "description": "Business managers, finance managers, HR managers",
+    "major": "1"
+  },
+  {
+    "code": "13",
+    "label": "Production and Specialized Services Managers",
+    "description": "Factory managers, construction managers, logistics managers",
+    "major": "1"
+  },
+  {
+    "code": "14",
+    "label": "Hospitality, Retail and Other Services Managers",
+    "description": "Hotel managers, restaurant managers, shop managers",
+    "major": "1"
+  },
+  {
+    "code": "21",
+    "label": "SCIENCE AND ENGINEERING PROFESSIONALS",
+    "description": "Engineers, scientists, researchers, architects",
+    "major": "2"
+  },
+  {
+    "code": "22",
+    "label": "HEALTH PROFESSIONALS",
+    "description": "Doctors, nurses, pharmacists, dentists",
+    "major": "2"
+  },
+  {
+    "code": "23",
+    "label": "TEACHING PROFESSIONALS",
+    "description": "Teachers, university lecturers, trainers",
+    "major": "2"
+  },
+  {
+    "code": "24",
+    "label": "BUSINESS AND ADMINISTRATION",
+    "description": "Accountants, financial analysts, business consultants",
+    "major": "2"
+  },
+  {
+    "code": "25",
+    "label": "INFORMATION AND COMMUNICATIONS",
+    "description": "Software developers, IT specialists, programmers",
+    "major": "2"
+  },
+  {
+    "code": "26",
+    "label": "LEGAL, SOCIAL AND CULTURAL",
+    "description": "Lawyers, social workers, artists, journalists",
+    "major": "2"
+  },
+  {
+    "code": "31",
+    "label": "SCIENCE AND ENGINEERING ASSOCIATE",
+    "description": "Technicians, lab assistants, engineering assistants",
+    "major": "3"
+  },
+  {
+    "code": "32",
+    "label": "HEALTH ASSOCIATE PROFESSIONALS",
+    "description": "Medical assistants, paramedics, nursing assistants",
+    "major": "3"
+  },
+  {
+    "code": "33",
+    "label": "BUSINESS AND ADMINISTRATION ASSOCIATE",
+    "description": "Accounting assistants, administrative officers, office supervisors",
+    "major": "3"
+  },
+  {
+    "code": "34",
+    "label": "LEGAL, SOCIAL, CULTURAL AND RELATED",
+    "description": "Legal assistants, youth workers, sports coaches",
+    "major": "3"
+  },
+  {
+    "code": "35",
+    "label": "INFORMATION AND COMMUNICATIONS",
+    "description": "IT support technicians, web designers, network technicians",
+    "major": "3"
+  },
+  {
+    "code": "41",
+    "label": "GENERAL AND KEYBOARD CLERKS",
+    "description": "Data entry clerks, typists, office clerks",
+    "major": "4"
+  },
+  {
+    "code": "42",
+    "label": "CUSTOMER SERVICE CLERKS",
+    "description": "Receptionists, call center agents, customer service staff",
+    "major": "4"
+  },
+  {
+    "code": "43",
+    "label": "NUMERICAL AND MATERIAL RECORDING",
+    "description": "Bookkeepers, stock clerks, inventory clerks",
+    "major": "4"
+  },
+  {
+    "code": "44",
+    "label": "OTHER CLERICAL SUPPORT WORKERS",
+    "description": "Filing clerks, mail carriers, library assistants",
+    "major": "4"
+  },
+  {
+    "code": "51",
+    "label": "PERSONAL SERVICES WORKERS",
+    "description": "Hairdressers, beauticians, cooks, waiters",
+    "major": "5"
+  },
+  {
+    "code": "52",
+    "label": "SALES WORKERS",
+    "description": "Shop assistants, sales representatives, cashiers",
+    "major": "5"
+  },
+  {
+    "code": "53",
+    "label": "PERSONAL CARE WORKERS",
+    "description": "Childcare workers, elderly care workers, home health aides",
+    "major": "5"
+  },
+  {
+    "code": "54",
+    "label": "PROTECTIVE SERVICES WORKERS",
+    "description": "Police officers, security guards, firefighters",
+    "major": "5"
+  },
+  {
+    "code": "61",
+    "label": "Market-Oriented Skilled Agricultural Workers",
+    "description": "Commercial farmers, crop growers, livestock keepers",
+    "major": "6"
+  },
+  {
+    "code": "62",
+    "label": "MARKET -ORIENTED SKILLED FORESTY, Fishery and Hunting Workers",
+    "description": "Forestry workers, fishermen, fish farmers",
+    "major": "6"
+  },
+  {
+    "code": "63",
+    "label": "SUBSISTENCE FARMERS, FISHERS, HUNTERS",
+    "description": "Subsistence farmers, small-scale fishers",
+    "major": "6"
+  },
+  {
+    "code": "71",
+    "label": "BUILDING AND RELATED TRADE WORKERS",
+    "description": "Carpenters, masons, plumbers, electricians",
+    "major": "7"
+  },
+  {
+    "code": "72",
+    "label": "METAL, MACHINERY AND RELATED TRADES",
+    "description": "Welders, mechanics, machine tool operators",
+    "major": "7"
+  },
+  {
+    "code": "73",
+    "label": "HANDICRAFT AND PRINTING WORKERS",
+    "description": "Tailors, jewelers, printers, craft workers",
+    "major": "7"
+  },
+  {
+    "code": "74",
+    "label": "Electrical And Electronic Trade Workers",
+    "description": "Electricians, electronics technicians, installers",
+    "major": "7"
+  },
+  {
+    "code": "75",
+    "label": "FOOD PROCESSING, WOODWORKING, GARMENT",
+    "description": "Bakers, butchers, furniture makers, garment workers",
+    "major": "7"
+  },
+  {
+    "code": "81",
+    "label": "Stationary Plant And Machine Operators",
+    "description": "Factory machine operators, processing plant workers",
+    "major": "8"
+  },
+  {
+    "code": "82",
+    "label": "ASSEMBLERS",
+    "description": "Product assemblers, manufacturing workers",
+    "major": "8"
+  },
+  {
+    "code": "83",
+    "label": "DRIVERS AND MOBILE PLANT OPERATORS",
+    "description": "Truck drivers, bus drivers, delivery drivers",
+    "major": "8"
+  },
+  {
+    "code": "91",
+    "label": "CLEANERS AND HELPERS",
+    "description": "Cleaners, janitors, domestic workers",
+    "major": "9"
+  },
+  {
+    "code": "92",
+    "label": "AGRICULTURAL, FORESTRY, FISHERY AND",
+    "description": "Farm laborers, agricultural assistants",
+    "major": "9"
+  },
+  {
+    "code": "93",
+    "label": "LABOURERS IN MINING, CONSTRUCTION,",
+    "description": "Construction laborers, mining workers, helpers",
+    "major": "9"
+  },
+  {
+    "code": "94",
+    "label": "FOOD PREPARATION ASSISTANTS",
+    "description": "Kitchen helpers, food prep workers",
+    "major": "9"
+  },
+  {
+    "code": "95",
+    "label": "STREET AND RELATED SALES AND SERVICE",
+    "description": "Street vendors, market sellers, service workers",
+    "major": "9"
+  },
+  {
+    "code": "96",
+    "label": "REFUSE WORKERS AND OTHER ELEMENTARY",
+    "description": "Garbage collectors, waste workers, general laborers",
+    "major": "9"
+  }
+]

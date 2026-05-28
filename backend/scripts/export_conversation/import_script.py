@@ -80,6 +80,9 @@ def _update_state_session_id(state: ApplicationState, new_session_id: int) -> Ap
     if hasattr(state, 'skills_explorer_agent_state') and state.skills_explorer_agent_state:
         state.skills_explorer_agent_state.session_id = new_session_id
 
+    if hasattr(state, 'preference_elicitation_agent_state') and state.preference_elicitation_agent_state:
+        state.preference_elicitation_agent_state.session_id = new_session_id
+
     return state
 
 

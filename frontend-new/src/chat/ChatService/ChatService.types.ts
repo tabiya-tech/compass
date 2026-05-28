@@ -1,6 +1,7 @@
 // Enum for the sender
 import { ReactionKind } from "src/chat/reaction/reaction.types";
 import { CurrentPhase } from "src/chat/chatProgressbar/types";
+import { BWSTaskMetadata } from "src/chat/chatMessage/bwsTaskMessage/BWSTaskMessage.types";
 
 export enum ConversationMessageSender {
   USER = "USER",
@@ -11,6 +12,12 @@ export interface MessageReaction {
   kind: ReactionKind | null;
 }
 
+export type ConversationMessageType = "TEXT" | "BWS_TASK";
+
+export interface QuickReplyOption {
+  label: string;
+}
+
 // Type for individual conversation messages
 export interface ConversationMessage {
   message_id: string;
@@ -18,6 +25,9 @@ export interface ConversationMessage {
   sent_at: string; // ISO formatted datetime string
   sender: ConversationMessageSender; // Either 'USER' or 'COMPASS'
   reaction: MessageReaction | null;
+  message_type?: ConversationMessageType;
+  metadata?: BWSTaskMetadata;
+  quick_reply_options?: QuickReplyOption[] | null;
 }
 
 export interface ConversationResponse {
