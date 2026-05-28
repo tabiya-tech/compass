@@ -1,0 +1,170 @@
+2026-02-27 17:37:38,733 - __main__ - INFO - ================================================================================
+2026-02-27 17:37:38,733 - __main__ - INFO - OFFLINE VIGNETTE OPTIMIZATION PIPELINE
+2026-02-27 17:37:38,734 - __main__ - INFO - ================================================================================
+2026-02-27 17:37:38,734 - __main__ - INFO - Configuration: app/agent/preference_elicitation_agent/offline_optimization/preference_parameters.json
+2026-02-27 17:37:38,734 - __main__ - INFO - Output directory: offline_output
+2026-02-27 17:37:38,734 - __main__ - INFO - Static vignettes: 7 (5 beginning)
+2026-02-27 17:37:38,734 - __main__ - INFO - Adaptive library: 40
+2026-02-27 17:37:38,734 - __main__ - INFO - Diversity weight: 0.3
+2026-02-27 17:37:38,734 - __main__ - INFO - Sample size: 100,000 pairs per round
+2026-02-27 17:37:38,734 - __main__ - INFO - 
+2026-02-27 17:37:38,734 - __main__ - INFO - STEP 1: Generating all possible job profiles...
+2026-02-27 17:37:38,734 - __main__ - INFO - --------------------------------------------------------------------------------
+2026-02-27 17:37:38,734 - ProfileGenerator - INFO - Generating candidate profiles...
+2026-02-27 17:37:38,738 - ProfileGenerator - INFO - Generated 5120 candidate profiles from 5120 total combinations
+2026-02-27 17:37:38,738 - __main__ - INFO - Generated 5120 candidate profiles
+2026-02-27 17:37:38,738 - __main__ - INFO - 
+2026-02-27 17:37:38,738 - __main__ - INFO - Initialized VignetteConverter for format conversion
+2026-02-27 17:37:38,738 - __main__ - INFO - 
+2026-02-27 17:37:38,780 - __main__ - INFO - Saved all profiles to: offline_output/all_profiles.json
+2026-02-27 17:37:38,780 - __main__ - INFO - 
+2026-02-27 17:37:38,780 - __main__ - INFO - STEP 2: Preparing profiles for vignette generation...
+2026-02-27 17:37:38,780 - __main__ - INFO - --------------------------------------------------------------------------------
+2026-02-27 17:37:38,780 - __main__ - INFO - Using all 5120 profiles for vignette generation
+2026-02-27 17:37:38,780 - __main__ - INFO - (Pairwise dominance will be checked during vignette selection)
+2026-02-27 17:37:38,780 - __main__ - INFO - 
+2026-02-27 17:37:38,822 - __main__ - INFO - Saved candidate profiles to: offline_output/candidate_profiles.json
+2026-02-27 17:37:38,822 - __main__ - INFO - 
+2026-02-27 17:37:38,822 - __main__ - INFO - STEP 3: Optimizing static vignettes using D-efficiency...
+2026-02-27 17:37:38,822 - __main__ - INFO - --------------------------------------------------------------------------------
+2026-02-27 17:37:38,822 - DEfficiencyOptimizer - INFO - Selecting 7 static vignettes from 5120 profiles...
+2026-02-27 17:37:38,822 - DEfficiencyOptimizer - INFO - Total possible vignette pairs: 13,104,640
+2026-02-27 17:37:38,822 - DEfficiencyOptimizer - INFO - Sampling 100,000 pairs per round for efficiency
+2026-02-27 17:37:38,822 - DEfficiencyOptimizer - INFO - Selecting vignette 1/7...
+2026-02-27 17:37:38,948 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:40,727 - DEfficiencyOptimizer - INFO -   Round 1: Selected vignette with det increase = 1.04e+02
+2026-02-27 17:37:40,727 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 2.32e+02
+2026-02-27 17:37:40,728 - DEfficiencyOptimizer - INFO - Selecting vignette 2/7...
+2026-02-27 17:37:40,861 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:42,627 - DEfficiencyOptimizer - INFO -   Round 2: Selected vignette with det increase = 1.86e+02
+2026-02-27 17:37:42,627 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 4.18e+02
+2026-02-27 17:37:42,627 - DEfficiencyOptimizer - INFO - Selecting vignette 3/7...
+2026-02-27 17:37:42,769 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:44,545 - DEfficiencyOptimizer - INFO -   Round 3: Selected vignette with det increase = 3.38e+02
+2026-02-27 17:37:44,545 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 7.56e+02
+2026-02-27 17:37:44,545 - DEfficiencyOptimizer - INFO - Selecting vignette 4/7...
+2026-02-27 17:37:44,681 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:46,473 - DEfficiencyOptimizer - INFO -   Round 4: Selected vignette with det increase = 5.48e+02
+2026-02-27 17:37:46,473 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 1.30e+03
+2026-02-27 17:37:46,473 - DEfficiencyOptimizer - INFO - Selecting vignette 5/7...
+2026-02-27 17:37:46,625 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:48,410 - DEfficiencyOptimizer - INFO -   Round 5: Selected vignette with det increase = 9.01e+02
+2026-02-27 17:37:48,410 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 2.21e+03
+2026-02-27 17:37:48,410 - DEfficiencyOptimizer - INFO - Selecting vignette 6/7...
+2026-02-27 17:37:48,549 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:50,355 - DEfficiencyOptimizer - INFO -   Round 6: Selected vignette with det increase = 1.30e+03
+2026-02-27 17:37:50,355 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 3.51e+03
+2026-02-27 17:37:50,355 - DEfficiencyOptimizer - INFO - Selecting vignette 7/7...
+2026-02-27 17:37:50,497 - DEfficiencyOptimizer - INFO -   Sampled 100,000 random pairs
+2026-02-27 17:37:52,301 - DEfficiencyOptimizer - INFO -   Round 7: Selected vignette with det increase = 2.16e+03
+2026-02-27 17:37:52,301 - DEfficiencyOptimizer - INFO -   Current FIM determinant: 5.67e+03
+2026-02-27 17:37:52,301 - DEfficiencyOptimizer - INFO - Selected 5 beginning vignettes, 2 end vignettes
+2026-02-27 17:37:52,301 - DEfficiencyOptimizer - INFO - Final FIM determinant: 5.67e+03
+2026-02-27 17:37:52,314 - __main__ - INFO - Selected 5 beginning vignettes
+2026-02-27 17:37:52,314 - __main__ - INFO - Selected 2 end vignettes
+2026-02-27 17:37:52,314 - __main__ - INFO - 
+2026-02-27 17:37:52,319 - __main__ - INFO - Optimization statistics:
+2026-02-27 17:37:52,319 - __main__ - INFO -   num_vignettes: 7
+2026-02-27 17:37:52,319 - __main__ - INFO -   fim_determinant: 5671.916666666673
+2026-02-27 17:37:52,319 - __main__ - INFO -   d_efficiency: 3.4375349325930027
+2026-02-27 17:37:52,319 - __main__ - INFO -   eigenvalues: [array of length 7]
+2026-02-27 17:37:52,319 - __main__ - INFO -   condition_number: 2.28229194210721
+2026-02-27 17:37:52,319 - __main__ - INFO -   min_eigenvalue: 2.020155762870983
+2026-02-27 17:37:52,319 - __main__ - INFO -   max_eigenvalue: 4.610585219401888
+2026-02-27 17:37:52,319 - __main__ - INFO - 
+2026-02-27 17:37:52,319 - VignetteConverter - INFO - Converted 5 vignettes to online format (prefix: static_begin)
+2026-02-27 17:37:52,320 - __main__ - INFO - Saved beginning vignettes to: offline_output/static_vignettes_beginning.json
+2026-02-27 17:37:52,321 - VignetteConverter - INFO - Converted 2 vignettes to online format (prefix: static_end)
+2026-02-27 17:37:52,321 - __main__ - INFO - Saved end vignettes to: offline_output/static_vignettes_end.json
+2026-02-27 17:37:52,321 - __main__ - INFO - 
+2026-02-27 17:37:52,321 - __main__ - INFO - STEP 4: Building adaptive library...
+2026-02-27 17:37:52,321 - __main__ - INFO - --------------------------------------------------------------------------------
+2026-02-27 17:37:52,321 - AdaptiveLibraryBuilder - INFO - Building adaptive library with 40 vignettes...
+2026-02-27 17:37:52,321 - AdaptiveLibraryBuilder - INFO - Total possible vignette pairs: 13,104,640
+2026-02-27 17:37:52,321 - AdaptiveLibraryBuilder - INFO - Selecting vignette 1/40...
+2026-02-27 17:37:52,412 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:52,710 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:53,042 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:53,401 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:53,772 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:54,152 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:54,558 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:54,980 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:55,416 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:55,869 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:56,245 - AdaptiveLibraryBuilder - INFO - Selecting vignette 11/40...
+2026-02-27 17:37:56,337 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:56,815 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:57,313 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:57,830 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:58,372 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:58,909 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:37:59,475 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:00,043 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:00,632 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:01,242 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:01,771 - AdaptiveLibraryBuilder - INFO - Selecting vignette 21/40...
+2026-02-27 17:38:01,858 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:02,485 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:03,136 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:03,809 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:04,489 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:05,188 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:05,895 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:06,623 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:07,364 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:08,118 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:08,794 - AdaptiveLibraryBuilder - INFO - Selecting vignette 31/40...
+2026-02-27 17:38:08,890 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:09,669 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:10,478 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:11,305 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:12,158 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:13,019 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:13,885 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:14,794 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:15,697 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:16,618 - AdaptiveLibraryBuilder - INFO -   Sampled 10,000 unique candidates
+2026-02-27 17:38:17,451 - AdaptiveLibraryBuilder - INFO - Built adaptive library with 40 vignettes
+2026-02-27 17:38:17,452 - __main__ - INFO - Built adaptive library with 40 vignettes
+2026-02-27 17:38:17,452 - __main__ - INFO - 
+2026-02-27 17:38:17,456 - __main__ - INFO - Library statistics:
+2026-02-27 17:38:17,456 - __main__ - INFO -   num_vignettes: 40
+2026-02-27 17:38:17,456 - __main__ - INFO -   avg_pairwise_distance: 0.6981414425012814
+2026-02-27 17:38:17,456 - __main__ - INFO -   min_pairwise_distance: 0.34321925711295787
+2026-02-27 17:38:17,456 - __main__ - INFO -   max_pairwise_distance: 1.0
+2026-02-27 17:38:17,456 - __main__ - INFO -   std_pairwise_distance: 0.18377874227935836
+2026-02-27 17:38:17,456 - __main__ - INFO -   attribute_coverage:
+2026-02-27 17:38:17,456 - __main__ - INFO -     wage: {25000: 16, 15000: 14, 20000: 21, 30000: 19, 35000: 10}
+2026-02-27 17:38:17,456 - __main__ - INFO -     physical_demand: {0: 43, 1: 37}
+2026-02-27 17:38:17,456 - __main__ - INFO -     flexibility: {0: 43, 1: 37}
+2026-02-27 17:38:17,456 - __main__ - INFO -     commute_time: {60: 21, 15: 18, 30: 19, 45: 22}
+2026-02-27 17:38:17,456 - __main__ - INFO -     job_security: {1: 49, 0: 31}
+2026-02-27 17:38:17,456 - __main__ - INFO -     remote_work: {1: 44, 0: 36}
+2026-02-27 17:38:17,456 - __main__ - INFO -     career_growth: {0: 43, 1: 37}
+2026-02-27 17:38:17,456 - __main__ - INFO -     task_variety: {1: 42, 0: 38}
+2026-02-27 17:38:17,456 - __main__ - INFO -     social_interaction: {1: 41, 0: 39}
+2026-02-27 17:38:17,456 - __main__ - INFO -     company_values: {0: 41, 1: 39}
+2026-02-27 17:38:17,456 - __main__ - INFO - 
+2026-02-27 17:38:17,457 - VignetteConverter - INFO - Converted 40 vignettes to online format (prefix: adaptive)
+2026-02-27 17:38:17,459 - __main__ - INFO - Saved adaptive library to: offline_output/adaptive_library.json
+2026-02-27 17:38:17,459 - __main__ - INFO - 
+2026-02-27 17:38:17,459 - __main__ - INFO - ================================================================================
+2026-02-27 17:38:17,459 - __main__ - INFO - OPTIMIZATION COMPLETE
+2026-02-27 17:38:17,459 - __main__ - INFO - ================================================================================
+2026-02-27 17:38:17,459 - __main__ - INFO - Total candidate profiles: 5120
+2026-02-27 17:38:17,459 - __main__ - INFO - Non-dominated profiles: 5120
+2026-02-27 17:38:17,459 - __main__ - INFO - Static vignettes: 7 (5 beginning, 2 end)
+2026-02-27 17:38:17,459 - __main__ - INFO - Adaptive library: 40
+2026-02-27 17:38:17,459 - __main__ - INFO - D-efficiency: 3.4375
+2026-02-27 17:38:17,459 - __main__ - INFO - FIM determinant: 5.67e+03
+2026-02-27 17:38:17,459 - __main__ - INFO - 
+2026-02-27 17:38:17,459 - __main__ - INFO - Output directory: offline_output
+2026-02-27 17:38:17,459 - __main__ - INFO - Files created:
+2026-02-27 17:38:17,459 - __main__ - INFO -   - all_profiles.json
+2026-02-27 17:38:17,459 - __main__ - INFO -   - candidate_profiles.json
+2026-02-27 17:38:17,459 - __main__ - INFO -   - static_vignettes_beginning.json
+2026-02-27 17:38:17,459 - __main__ - INFO -   - static_vignettes_end.json
+2026-02-27 17:38:17,459 - __main__ - INFO -   - adaptive_library.json
+2026-02-27 17:38:17,459 - __main__ - INFO -   - optimization.log
+2026-02-27 17:38:17,459 - __main__ - INFO - ================================================================================

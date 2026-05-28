@@ -1,0 +1,232 @@
+{
+  "attributes": [
+    {
+      "name": "wage",
+      "label": "Monthly wage",
+      "group": "Financial",
+      "type": "ordered",
+      "coding": "linear",
+      "levels": [
+        { "id": "w_15k", "label": "KES 15,000", "value": 15000 },
+        { "id": "w_20k", "label": "KES 20,000", "value": 20000 },
+        { "id": "w_25k", "label": "KES 25,000", "value": 25000 },
+        { "id": "w_30k", "label": "KES 30,000", "value": 30000 },
+        { "id": "w_35k", "label": "KES 35,000", "value": 35000 }
+      ]
+    },
+    {
+      "name": "physical_demand",
+      "label": "Physical demands",
+      "group": "Work Environment",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "pd_low",
+      "levels": [
+        { "id": "pd_low", "label": "Low physical demand" },
+        { "id": "pd_high", "label": "High physical demand" }
+      ]
+    },
+    {
+      "name": "flexibility",
+      "label": "Work schedule",
+      "group": "Work-Life Balance",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "flex_fixed",
+      "levels": [
+        { "id": "flex_fixed", "label": "Fixed 8am-5pm shifts" },
+        { "id": "flex_flexible", "label": "Flexible hours" }
+      ]
+    },
+    {
+      "name": "commute_time",
+      "label": "Commute time",
+      "group": "Work Environment",
+      "type": "ordered",
+      "coding": "linear",
+      "levels": [
+        { "id": "commute_15", "label": "15 minutes", "value": 15 },
+        { "id": "commute_30", "label": "30 minutes", "value": 30 },
+        { "id": "commute_45", "label": "45 minutes", "value": 45 },
+        { "id": "commute_60", "label": "60 minutes", "value": 60 }
+      ]
+    },
+    {
+      "name": "job_security",
+      "label": "Job security",
+      "group": "Job Security",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "security_low",
+      "levels": [
+        { "id": "security_low", "label": "Contract-based (unstable)" },
+        { "id": "security_high", "label": "Permanent (stable)" }
+      ]
+    },
+    {
+      "name": "remote_work",
+      "label": "Work arrangement",
+      "group": "Work Environment",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "remote_no",
+      "levels": [
+        { "id": "remote_no", "label": "Office-based" },
+        { "id": "remote_yes", "label": "Remote work possible" }
+      ]
+    },
+    {
+      "name": "career_growth",
+      "label": "Career advancement",
+      "group": "Career Growth",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "growth_low",
+      "levels": [
+        { "id": "growth_low", "label": "Limited growth opportunities" },
+        { "id": "growth_high", "label": "High growth potential" }
+      ]
+    },
+    {
+      "name": "task_variety",
+      "label": "Task variety",
+      "group": "Task Preference",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "task_routine",
+      "levels": [
+        { "id": "task_routine", "label": "Routine, predictable tasks" },
+        { "id": "task_varied", "label": "Varied, changing tasks" }
+      ]
+    },
+    {
+      "name": "social_interaction",
+      "label": "Social interaction",
+      "group": "Task Preference",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "social_low",
+      "levels": [
+        { "id": "social_low", "label": "Independent work, minimal interaction" },
+        { "id": "social_high", "label": "Team-based, high collaboration" }
+      ]
+    },
+    {
+      "name": "company_values",
+      "label": "Company values alignment",
+      "group": "Values & Culture",
+      "type": "categorical",
+      "coding": "dummy",
+      "base_level_id": "values_neutral",
+      "levels": [
+        { "id": "values_neutral", "label": "Standard business practices" },
+        { "id": "values_mission", "label": "Mission-driven, social impact focus" }
+      ]
+    }
+  ],
+  "model": {
+    "utility_spec": "mnl",
+    "parameters": [
+      {
+        "name": "beta_wage",
+        "attribute": "wage",
+        "coding": "linear",
+        "prior": { "distribution": "normal", "mean": 0.5, "sd": 0.5 },
+        "comment": "Maps to financial_importance dimension"
+      },
+      {
+        "name": "beta_phys_high",
+        "attribute": "physical_demand",
+        "level_id": "pd_high",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": -0.3, "sd": 0.5 },
+        "comment": "Maps to work_environment_importance dimension (combined with remote_work, commute)"
+      },
+      {
+        "name": "beta_growth_high",
+        "attribute": "career_growth",
+        "level_id": "growth_high",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.4, "sd": 0.5 },
+        "comment": "Maps to career_growth_importance dimension"
+      },
+      {
+        "name": "beta_flex_flexible",
+        "attribute": "flexibility",
+        "level_id": "flex_flexible",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.3, "sd": 0.5 },
+        "comment": "Maps to work_life_balance_importance dimension (combined with commute)"
+      },
+      {
+        "name": "beta_security_high",
+        "attribute": "job_security",
+        "level_id": "security_high",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.5, "sd": 0.5 },
+        "comment": "Maps to job_security_importance dimension"
+      },
+      {
+        "name": "beta_task_varied",
+        "attribute": "task_variety",
+        "level_id": "task_varied",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.2, "sd": 0.5 },
+        "comment": "Maps to task_preference_importance dimension (combined with social_interaction)"
+      },
+      {
+        "name": "beta_social_high",
+        "attribute": "social_interaction",
+        "level_id": "social_high",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.0, "sd": 0.5 },
+        "comment": "Maps to task_preference_importance dimension (social component)"
+      },
+      {
+        "name": "beta_remote_yes",
+        "attribute": "remote_work",
+        "level_id": "remote_yes",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.6, "sd": 0.5 },
+        "comment": "Maps to work_environment_importance dimension (remote work preference)"
+      },
+      {
+        "name": "beta_commute",
+        "attribute": "commute_time",
+        "coding": "linear",
+        "prior": { "distribution": "normal", "mean": -0.2, "sd": 0.5 },
+        "comment": "Maps to both work_environment and work_life_balance dimensions"
+      },
+      {
+        "name": "beta_values_mission",
+        "attribute": "company_values",
+        "level_id": "values_mission",
+        "coding": "dummy",
+        "prior": { "distribution": "normal", "mean": 0.3, "sd": 0.5 },
+        "comment": "Maps to values_culture_importance dimension"
+      }
+    ]
+  },
+  "attribute_directions": {
+    "wage": "positive",
+    "physical_demand": "negative",
+    "flexibility": "positive",
+    "commute_time": "negative",
+    "job_security": "positive",
+    "remote_work": "positive",
+    "career_growth": "positive",
+    "task_variety": "positive",
+    "social_interaction": "neutral",
+    "company_values": "positive"
+  },
+  "preference_dimension_mapping": {
+    "comment": "How vignette attributes map to the 7 preference dimensions in PosteriorDistribution",
+    "financial_importance": ["wage"],
+    "work_environment_importance": ["physical_demand", "remote_work", "commute_time"],
+    "career_growth_importance": ["career_growth"],
+    "work_life_balance_importance": ["flexibility", "commute_time"],
+    "job_security_importance": ["job_security"],
+    "task_preference_importance": ["task_variety", "social_interaction"],
+    "values_culture_importance": ["company_values"]
+  }
+}

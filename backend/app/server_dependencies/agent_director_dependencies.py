@@ -29,5 +29,7 @@ def get_agent_director(conversation_manager: ConversationMemoryManager = Depends
     return LLMAgentDirector(
         conversation_manager=conversation_manager,
         search_services=search_services,
-        experience_pipeline_config=experience_pipeline_config
+        experience_pipeline_config=experience_pipeline_config,
+        enable_preference_elicitation=application_config.enable_preference_elicitation,
+        default_country_of_user=application_config.default_country_of_user,
     )

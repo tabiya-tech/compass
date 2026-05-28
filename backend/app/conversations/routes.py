@@ -10,7 +10,7 @@ from fastapi import FastAPI, APIRouter, Request, Response, Depends, HTTPExceptio
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
-from app.app_config import get_application_config
+from app.app_config import ApplicationConfig, get_application_config
 from app.application_state import ApplicationStateManager
 from app.constants.errors import HTTPErrorResponse
 from app.context_vars import session_id_ctx_var, user_id_ctx_var, client_id_ctx_var
@@ -24,6 +24,8 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
+from app.job_preferences.get_job_preferences_service import get_job_preferences_service
+from app.job_preferences.service import IJobPreferencesService
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
@@ -45,13 +47,18 @@ async def get_conversation_service(agent_director: LLMAgentDirector = Depends(ge
                                    db: AsyncIOMotorDatabase = Depends(
                                        CompassDBProvider.get_application_db),
                                    metrics_service: IMetricsService = Depends(
-                                       get_metrics_service)) -> IConversationService:
+                                       get_metrics_service),
+                                   application_config: ApplicationConfig = Depends(get_application_config),
+                                   job_preferences_service: IJobPreferencesService = Depends(
+                                       get_job_preferences_service)) -> IConversationService:
     return ConversationService(agent_director=agent_director,
                                application_state_metrics_recorder=ApplicationStateMetricsRecorder(
                                    application_state_manager=application_state_manager,
                                    metrics_service=metrics_service),
                                conversation_memory_manager=conversation_memory_manager,
-                               reaction_repository=ReactionRepository(db))
+                               reaction_repository=ReactionRepository(db),
+                               enable_preference_elicitation=application_config.enable_preference_elicitation,
+                               job_preferences_service=job_preferences_service)
 
 
 logger = logging.getLogger(__name__)

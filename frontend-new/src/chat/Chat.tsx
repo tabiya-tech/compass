@@ -5,15 +5,19 @@ import ChatList from "src/chat/chatList/ChatList";
 import { IChatMessage } from "src/chat/Chat.types";
 import {
   CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE,
+  generateBWSTaskMessage,
   generateCancellableCVTypingMessage,
   generateCompassMessage,
   generateConversationConclusionMessage,
   generatePleaseRepeatMessage,
+  generateQuickReplyMessage,
   generateSomethingWentWrongMessage,
   generateTypingMessage,
   generateUserMessage,
   parseConversationPhase,
 } from "./util";
+import { BWS_TASK_MESSAGE_TYPE } from "src/chat/chatMessage/bwsTaskMessage/BWSTaskMessage";
+import { getPreferenceElicitationEnabled } from "src/envService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, useTheme } from "@mui/material";
 import ChatHeader from "./ChatHeader/ChatHeader";
@@ -140,6 +144,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
   const initializingRef = useRef(false);
   const [initialized, setInitialized] = useState<boolean>(false);
+
+  // Preference elicitation feature flag — gates BWS card rendering and input-disable behaviour.
+  const isPreferenceElicitationEnabled = useMemo(() => getPreferenceElicitationEnabled() === "true", []);
+
+  // Stable ref for handleBWSSubmit — avoids a circular dep between sendMessage and handleBWSSubmit.
+  const handleBWSSubmitRef = useRef<((taskId: string, bestWaId: string, worstWaId: string) => Promise<void>) | null>(
+    null
+  );
 
   // Experiences that have been processed
   const exploredExperiencesCount = useMemo(
@@ -564,9 +576,9 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
   // Goes to the chat service to send a message
   const sendMessage = useCallback(
-    async (userMessage: string, sessionId: number) => {
+    async (userMessage: string, sessionId: number, suppressOptimisticUserMessage: boolean = false) => {
       setAiIsTyping(true);
-      if (userMessage) {
+      if (userMessage && !suppressOptimisticUserMessage) {
         // optimistically add the user's message for a more responsive feel
         const message = generateUserMessage(userMessage, new Date().toISOString());
         addMessageToChat(message);
@@ -590,16 +602,47 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
 
         response.messages.forEach((messageItem, idx) => {
           const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
-          if (!isConclusionMessage) {
+          if (isConclusionMessage) return;
+          if (isPreferenceElicitationEnabled && messageItem.message_type === "BWS_TASK" && messageItem.metadata) {
             addMessageToChat(
-              generateCompassMessage(
+              generateBWSTaskMessage(
+                messageItem.message_id,
+                messageItem.metadata,
+                (taskId, bestWaId, worstWaId) =>
+                  handleBWSSubmitRef.current?.(taskId, bestWaId, worstWaId) ?? Promise.resolve()
+              )
+            );
+            return;
+          }
+          if (
+            isPreferenceElicitationEnabled &&
+            messageItem.quick_reply_options &&
+            messageItem.quick_reply_options.length > 0
+          ) {
+            addMessageToChat(
+              generateQuickReplyMessage(
                 messageItem.message_id,
                 messageItem.message,
                 messageItem.sent_at,
-                messageItem.reaction
+                messageItem.reaction,
+                messageItem.quick_reply_options,
+                (label) => {
+                  if (activeSessionId !== null) {
+                    void sendMessage(label, activeSessionId);
+                  }
+                }
               )
             );
+            return;
           }
+          addMessageToChat(
+            generateCompassMessage(
+              messageItem.message_id,
+              messageItem.message,
+              messageItem.sent_at,
+              messageItem.reaction
+            )
+          );
         });
         // Handle the conclusion message and skills ranking flow for new messages
         if (response.conversation_completed && response.messages.length) {
@@ -641,7 +684,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking]
+    [
+      addMessageToChat,
+      exploredExperiences,
+      fetchExperiences,
+      activeSessionId,
+      showSkillsRanking,
+      isPreferenceElicitationEnabled,
+    ]
   );
 
   const initializeChat = useCallback(
@@ -681,9 +731,46 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
           const isConclusionMessage = history.conversation_completed;
           const mappedMessages = history.messages
             .filter((_, idx) => !(isConclusionMessage && idx === history.messages.length - 1))
+            // Drop user messages that are encoded BWS responses — they're a wire-level concern,
+            // not something the user typed and should see in their chat history.
+            .filter((message: ConversationMessage) => {
+              if (message.sender !== ConversationMessageSender.USER) return true;
+              try {
+                const parsed = JSON.parse(message.message);
+                return parsed?.type !== "bws_response";
+              } catch {
+                return true;
+              }
+            })
             .map((message: ConversationMessage) => {
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
+              }
+              if (isPreferenceElicitationEnabled && message.message_type === "BWS_TASK" && message.metadata) {
+                return generateBWSTaskMessage(
+                  message.message_id,
+                  message.metadata,
+                  (taskId, bestWaId, worstWaId) =>
+                    handleBWSSubmitRef.current?.(taskId, bestWaId, worstWaId) ?? Promise.resolve()
+                );
+              }
+              if (
+                isPreferenceElicitationEnabled &&
+                message.quick_reply_options &&
+                message.quick_reply_options.length > 0
+              ) {
+                return generateQuickReplyMessage(
+                  message.message_id,
+                  message.message,
+                  message.sent_at,
+                  message.reaction,
+                  message.quick_reply_options,
+                  (label) => {
+                    if (sessionId !== null) {
+                      void sendMessage(label, sessionId);
+                    }
+                  }
+                );
               }
               return generateCompassMessage(message.message_id, message.message, message.sent_at, message.reaction);
             });
@@ -744,7 +831,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, setAiIsTyping, showSkillsRanking, sendMessage]
+    [addMessageToChat, setAiIsTyping, showSkillsRanking, sendMessage, isPreferenceElicitationEnabled]
   );
 
   // Resets the text field for the next message
@@ -921,6 +1008,31 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
     };
   }, [aiIsTyping]);
 
+  // Handles BWS card submission — encodes the selection as a JSON message and sends it
+  // through the normal message channel without optimistically rendering the JSON to the user.
+  const handleBWSSubmit = useCallback(
+    async (taskId: string, bestWaId: string, worstWaId: string) => {
+      const payload = JSON.stringify({
+        type: "bws_response",
+        task_id: taskId,
+        best: bestWaId,
+        worst: worstWaId,
+      });
+      if (activeSessionId === null) return;
+      await sendMessage(payload, activeSessionId, true);
+    },
+    [sendMessage, activeSessionId]
+  );
+  handleBWSSubmitRef.current = handleBWSSubmit;
+
+  // Disable the text input while the latest message is a BWS task card —
+  // free-text replies are rejected by the agent and would just loop.
+  const isAwaitingBWSResponse = useMemo(() => {
+    if (!isPreferenceElicitationEnabled) return false;
+    if (messages.length === 0) return false;
+    return messages[messages.length - 1].type === BWS_TASK_MESSAGE_TYPE;
+  }, [messages, isPreferenceElicitationEnabled]);
+
   const handleConfirmRefresh = () => {
     allowRefreshRef.current = true;
     setShowRefreshConfirmDialog(false);
@@ -997,6 +1109,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 currentPhase={currentPhase.phase}
                 prefillMessage={prefillMessage}
                 cvUploadError={cvUploadError}
+                isAwaitingInteractiveResponse={isAwaitingBWSResponse}
               />
             </Box>
           </Box>

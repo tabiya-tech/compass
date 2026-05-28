@@ -15,8 +15,17 @@ class AgentType(Enum):
     COLLECT_EXPERIENCES_AGENT = "CollectExperiencesAgent"
     INFER_OCCUPATIONS_AGENT = "InferOccupationsAgent"
     EXPLORE_SKILLS_AGENT = "ExploreSkillsAgent"
+    PREFERENCE_ELICITATION_AGENT = "PreferenceElicitationAgent"
     FAREWELL_AGENT = "FarewellAgent"
     QNA_AGENT = "QnaAgent"
+
+
+class LLMQuickReplyOption(BaseModel):
+    """Quick-reply option for the LLM to suggest in its response."""
+    label: str = Field(description="Short button text displayed to the user and sent as their reply when clicked (max ~40 chars)")
+
+    class Config:
+        extra = "forbid"
 
 
 class AgentInput(BaseModel):
@@ -100,6 +109,9 @@ class AgentOutput(BaseModel):
 
     sent_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     """The sent_at of the message"""
+
+    metadata: Optional[dict] = None
+    """Optional metadata for structured UI rendering (e.g., BWS tasks, vignette options, interactive components)"""
 
     class Config:
         extra = "forbid"

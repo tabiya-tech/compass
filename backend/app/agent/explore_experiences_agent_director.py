@@ -190,8 +190,15 @@ class ExploreExperiencesAgentDirector(Agent):
             current_experience = state.experiences_state.get(state.current_experience_uuid, None)
 
         if not current_experience:
+            # When preference elicitation is enabled, transition into it with a
+            # bridge message instead of the "no more experiences" wrap-up text.
+            transition_key = (
+                "exploreExperiences.transitionToPreferences"
+                if self._enable_preference_elicitation
+                else "exploreExperiences.noMoreExperiences"
+            )
             message = AgentOutput(
-                message_for_user=t("messages", "exploreExperiences.noMoreExperiences"),
+                message_for_user=t("messages", transition_key),
                 finished=True,
                 agent_type=self._agent_type,
                 agent_response_time_in_sec=0,
@@ -284,9 +291,15 @@ class ExploreExperiencesAgentDirector(Agent):
             # then we are done
             _next_experience = _pick_next_experience_to_process(state.experiences_state)
             if not _next_experience:
-                # No more experiences to process, we are done
+                # No more experiences to process — either say goodbye to the explore phase
+                # or hand off to preference elicitation depending on the feature flag.
+                transition_key = (
+                    "exploreExperiences.transitionToPreferences"
+                    if self._enable_preference_elicitation
+                    else "exploreExperiences.finishedAll"
+                )
                 return AgentOutput(
-                    message_for_user=t("messages", "exploreExperiences.finishedAll"),
+                    message_for_user=t("messages", transition_key),
                     finished=True,
                     agent_type=self._agent_type,
                     agent_response_time_in_sec=0,
@@ -360,7 +373,8 @@ class ExploreExperiencesAgentDirector(Agent):
     def __init__(self, *,
                  conversation_manager: ConversationMemoryManager,
                  search_services: SearchServices,
-                 experience_pipeline_config: ExperiencePipelineConfig
+                 experience_pipeline_config: ExperiencePipelineConfig,
+                 enable_preference_elicitation: bool = False,
                  ):
         super().__init__(agent_type=AgentType.EXPLORE_EXPERIENCES_AGENT,
                          is_responsible_for_conversation_history=True)
@@ -370,6 +384,7 @@ class ExploreExperiencesAgentDirector(Agent):
         self._collect_experiences_agent = CollectExperiencesAgent()
         self._exploring_skills_agent = SkillsExplorerAgent()
         self._experience_pipeline_config = experience_pipeline_config
+        self._enable_preference_elicitation = enable_preference_elicitation
 
     def get_collect_experiences_agent(self) -> CollectExperiencesAgent:
         return self._collect_experiences_agent

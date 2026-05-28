@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QuickReplyButtons render tests should render a chip for each quick reply option 1`] = `
+<div
+  class="MuiBox-root css-f4no7g"
+  data-testid="quick-reply-container-quick-reply-buttons-3f7a8b2c"
+>
+  <div
+    class="MuiBox-root css-0"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary css-1og92e1-MuiButtonBase-root-MuiButton-root"
+      data-testid="quick-reply-button-quick-reply-buttons-3f7a8b2c"
+      tabindex="0"
+      type="button"
+    >
+      Yes
+    </button>
+  </div>
+  <div
+    class="MuiBox-root css-0"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary css-1og92e1-MuiButtonBase-root-MuiButton-root"
+      data-testid="quick-reply-button-quick-reply-buttons-3f7a8b2c"
+      tabindex="0"
+      type="button"
+    >
+      No
+    </button>
+  </div>
+  <div
+    class="MuiBox-root css-0"
+  >
+    <button
+      class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary css-1og92e1-MuiButtonBase-root-MuiButton-root"
+      data-testid="quick-reply-button-quick-reply-buttons-3f7a8b2c"
+      tabindex="0"
+      type="button"
+    >
+      Maybe
+    </button>
+  </div>
+</div>
+`;

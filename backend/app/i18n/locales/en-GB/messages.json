@@ -31,6 +31,7 @@
     "noMoreExperiences": "It looks like, there are no experiences to discuss further.",
     "skippedExperienceMissingDetails": "I have skipped your experience \"{experience_title}\" because you did not share enough details",
     "finishedAll": "I have finished exploring all your experiences.",
+    "transitionToPreferences": "Great, that's all your experiences explored! Now let's take a moment to understand what matters to you in a job — your preferences. I'll walk you through a few short scenarios.",
     "noSkillsIdentified": "No skills identified",
     "linkAndRank": {
       "summaryMessage": "Based on the information provided about your experience as '{experience_title}', here’s a brief overview:\n\n{summary}\n\nTop {top_count} skills demonstrated:{skills_summary}"
@@ -61,5 +62,31 @@
       "selfEmployment": "What do you think is important when you are your own boss?",
       "unseenUnpaid": "What do you think is most important when helping out in the community or caring for others?"
     }
+  },
+  "preferenceElicitation": {
+    "experienceQuestionsIntro": "Now I'd like to understand what matters most to you in a job - things like salary, work-life balance, job security, and career growth.",
+    "fallbackQuestionNoExperience": "Tell me about a work task you really enjoyed - what made it satisfying?",
+    "fallbackQuestionWithExperience": "You mentioned working as {experience_title}. What did you enjoy most about that work?",
+    "categoryLabels": {
+      "financial": "salary and compensation",
+      "work_environment": "work environment and commute",
+      "job_security": "job stability",
+      "career_advancement": "career growth",
+      "work_life_balance": "work-life balance",
+      "task_preferences": "the type of day-to-day work",
+      "values_culture": "company culture and values",
+      "mixed": "a mix of trade-offs"
+    },
+    "vignetteTransitionCategoryChanged": "We've covered {previous_label} — now let's look at {current_label}.",
+    "vignetteTransitionSameCategory": "Still on {current_label}, but here's a different angle.",
+    "vignetteChoosePrompt": "Which would you prefer, and why?",
+    "gateFallbackQuestion1": "What's more important to you — high pay with less stability, or moderate pay with strong job security?",
+    "gateFallbackQuestion2": "How do you feel about working in a team versus working independently most of the time?",
+    "gateFallbackQuestion3": "If you had to choose, would you prefer a job that's challenging and fast-paced, or one that's steady and predictable?",
+    "wrapupMessage": "Great! I've learned a lot about your preferences.\n\nHere's what I understand about what matters to you in a job:\n\n{summary}\n\nThank you for sharing your preferences with me.",
+    "alreadyComplete": "I've already recorded your preferences. Let's move on to finding opportunities for you!",
+    "errorRetry": "I'm having some trouble right now. Could you please try again?",
+    "followUpFallback": "Could you tell me more about your choice?",
+    "followUpFallbackNoVignette": "Could you tell me a bit more about why you chose that option?"
   }
 }

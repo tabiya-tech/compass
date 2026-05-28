@@ -77,6 +77,14 @@ class ApplicationConfig(BaseModel):
     cv_max_uploads_per_user: Optional[int] = Field(default=DEFAULT_MAX_UPLOADS_PER_USER, gt=0)
     cv_rate_limit_per_minute: Optional[int] = Field(default=DEFAULT_RATE_LIMIT_PER_MINUTE, gt=0)
 
+    enable_preference_elicitation: bool = False
+    """
+    A flag to enable or disable the preference elicitation phase of the conversation.
+    When disabled, the conversation flows directly from explore experiences to farewell.
+    When enabled, a preference elicitation agent runs vignette and BWS interactions
+    between explore experiences and farewell, and `/job-preferences` routes are registered.
+    """
+
     language_config: LanguageConfig
     """
     The language configuration for the backend, including default locale and available locales with date formats.
