@@ -37,21 +37,6 @@ jest.mock("firebase/compat/app", () => {
   return mockAuth;
 });
 
-jest.mock("firebaseui", () => {
-  return {
-    auth: {
-      AuthUI: {
-        start: jest.fn(),
-        getInstance: jest.fn().mockReturnValue({
-          start: jest.fn(),
-          reset: jest.fn(),
-        }),
-        reset: jest.fn(),
-      },
-    },
-  };
-});
-
 // mock authBroadcastChannel
 const mockBroadcast = jest.fn();
 jest.mock("src/auth/services/authBroadcastChannel/authBroadcastChannel.ts", () => {
