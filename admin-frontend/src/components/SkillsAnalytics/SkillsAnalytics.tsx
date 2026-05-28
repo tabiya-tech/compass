@@ -51,6 +51,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
       onChange={(e: SelectChangeEvent) => onChange(e.target.value)}
       onClose={() => setSearch("")}
       displayEmpty
+      inputProps={{ "aria-label": "filter options" }}
       sx={{
         backgroundColor: theme.palette.background.paper,
         minWidth: 250,

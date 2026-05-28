@@ -69,6 +69,9 @@ const preview: Preview = {
       // but this does not work well because it reports false positives and false negatives.
       // The same selector is used in the `a11y` parameter in the `test-runner.js` file.
       element: '#storybook-root:not([aria-hidden="true"]), body > div[role="presentation"]',
+      // Prevents addon-a11y from auto-running axe, which would conflict with
+      // the explicit axe-playwright calls in test-runner.js. Tests still run.
+      manual: true,
     },
   },
   globalTypes: {

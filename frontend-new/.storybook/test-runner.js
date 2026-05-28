@@ -2,10 +2,10 @@ const { getStoryContext } = require("@storybook/test-runner");
 const { injectAxe, checkA11y, configureAxe } = require("axe-playwright");
 
 module.exports = {
-  async preRender(page) {
+  async preVisit(page) {
     await injectAxe(page);
   },
-  async postRender(page, context) {
+  async postVisit(page, context) {
     // Get entire context of a story, including parameters, args, argTypes, etc.
     const storyContext = await getStoryContext(page, context);
 
