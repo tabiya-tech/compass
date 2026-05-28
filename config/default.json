@@ -35,6 +35,9 @@
   "cv": {
     "enabled": true
   },
+  "preferenceElicitation": {
+    "enabled": false
+  },
   "skillsReport": {
     "logos": [
       {

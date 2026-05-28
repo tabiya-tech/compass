@@ -110,7 +110,8 @@
         "aiTyping": "La IA está escribiendo..., espera a que termine.",
         "offline": "Estás desconectado. Conéctate a Internet para enviar un mensaje.",
         "default": "Escribe tu mensaje...",
-        "uploading": "Subiendo CV..."
+        "uploading": "Subiendo CV...",
+        "awaitingInteractiveResponse": "Por favor, utiliza los botones de arriba para responder."
       },
       "uploadCvIntro": "Puedes subir tu CV tan pronto como empecemos a explorar tus experiencias",
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Máximo {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} caracteres como límite",
@@ -122,6 +123,18 @@
       "typingChatMessage": {
         "typing": "Escribiendo",
         "thinking": "La IA está pensando, por favor espera"
+      },
+      "bwsTaskMessage": {
+        "whichWouldYouPrefer": "¿Cuál prefieres más y cuál menos?",
+        "most": "Mejor",
+        "least": "Peor",
+        "submit": "Enviar",
+        "submitted": "Enviado"
+      },
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Elige una opción:"
+        }
       },
       "conversationConclusionFooter": {
         "youCanNow": "Ahora puedes",
@@ -172,6 +185,7 @@
         "intro": "Introducción",
         "collecting": "Recopilando",
         "exploring": "Explorando",
+        "discoveringPreferences": "Descubriendo tus preferencias",
         "finished": "Conversación finalizada",
         "unknown": "Fase desconocida"
       }

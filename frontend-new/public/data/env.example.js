@@ -85,6 +85,9 @@ window.tabiyaConfig = {
   // CV Upload feature flag (optional, defaults to false if not set)
   GLOBAL_ENABLE_CV_UPLOAD: btoa("true"),
 
+  // Preference Elicitation feature flag (optional, defaults to false if not set)
+  GLOBAL_ENABLE_PREFERENCE_ELICITATION: btoa("false"),
+
   // Optional features settings.
   // ################################################################
   // #       Optional Features settings

@@ -1,9 +1,19 @@
 from datetime import datetime, timezone
+from typing import Literal, Optional
 
 from pydantic import BaseModel, field_serializer, field_validator, Field
 from enum import Enum
 
 from app.conversations.reactions.types import ReactionKind, Reaction
+
+
+class QuickReplyOption(BaseModel):
+    """A quick-reply button option displayed below a chat message."""
+    label: str
+    """The text displayed on the button and sent as user input when clicked"""
+
+    class Config:
+        extra = "forbid"
 
 
 class MessageReaction(BaseModel):
@@ -56,6 +66,15 @@ class ConversationMessage(BaseModel):
     reaction: MessageReaction | None = None
     """Optional reaction to the message"""
 
+    message_type: Literal["TEXT", "BWS_TASK"] = "TEXT"
+    """Type of message — TEXT for normal chat, BWS_TASK for the interactive Best-Worst Scaling card"""
+
+    metadata: Optional[dict] = None
+    """Structured payload for interactive message types (e.g. BWS task alternatives)"""
+
+    quick_reply_options: list[QuickReplyOption] | None = None
+    """Optional quick-reply button options shown below this message"""
+
     @field_serializer('sent_at')
     def serialize_sent_at(self, value: datetime) -> str:
         return value.astimezone(timezone.utc).isoformat()
@@ -86,6 +105,7 @@ class CurrentConversationPhaseResponse(Enum):
     INTRO = "INTRO"
     COLLECT_EXPERIENCES = "COLLECT_EXPERIENCES"
     DIVE_IN = "DIVE_IN"
+    PREFERENCE_ELICITATION = "PREFERENCE_ELICITATION"
     ENDED = "ENDED"
 
     # An unknown phase, used for error handling and fallbacks.

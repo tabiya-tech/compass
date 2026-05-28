@@ -7,6 +7,7 @@ from typing import Optional, AsyncGenerator
 from app.agent.agent_director.abstract_agent_director import AgentDirectorState
 from app.agent.collect_experiences_agent import CollectExperiencesAgentState
 from app.agent.explore_experiences_agent_director import ExploreExperiencesAgentDirectorState
+from app.agent.preference_elicitation_agent.state import PreferenceElicitationAgentState
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.agent.welcome_agent import WelcomeAgentState
 from app.application_state import ApplicationState, ApplicationStateStore
@@ -50,6 +51,13 @@ class JSONApplicationStateStore(ApplicationStateStore):
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 state_dict = json.load(f)
+                # preference_elicitation_agent_state is lazy-initialized for sessions that
+                # predate the feature — fall back to a default if it's missing from the file.
+                pref_state_doc = state_dict.get('preference_elicitation_agent_state')
+                if pref_state_doc is None:
+                    preference_elicitation_agent_state = PreferenceElicitationAgentState(session_id=session_id)
+                else:
+                    preference_elicitation_agent_state = PreferenceElicitationAgentState.from_document(pref_state_doc)
                 return ApplicationState(
                     session_id=session_id,
                     agent_director_state=AgentDirectorState.from_document(state_dict['agent_director_state']),
@@ -61,7 +69,8 @@ class JSONApplicationStateStore(ApplicationStateStore):
                     collect_experience_state=CollectExperiencesAgentState.from_document(
                         state_dict['collect_experience_state']),
                     skills_explorer_agent_state=SkillsExplorerAgentState.from_document(
-                        state_dict['skills_explorer_agent_state'])
+                        state_dict['skills_explorer_agent_state']),
+                    preference_elicitation_agent_state=preference_elicitation_agent_state,
                 )
         except (json.JSONDecodeError, FileNotFoundError) as e:
             self._logger.error(f"Error reading state file for session {session_id}: {e}")

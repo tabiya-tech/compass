@@ -1,0 +1,258 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-27T17:37:52.319733",
+    "type": "static_beginning",
+    "count": 5,
+    "optimization_stats": {
+      "num_vignettes": 7,
+      "fim_determinant": 5671.916666666673,
+      "d_efficiency": 3.4375349325930027,
+      "eigenvalues": [
+        2.020155762870983,
+        2.485914239651003,
+        4.610585219401888,
+        3.79490348513728,
+        4.0344289472598325,
+        4.000000000000001,
+        4.0
+      ],
+      "condition_number": 2.28229194210721,
+      "min_eigenvalue": 2.020155762870983,
+      "max_eigenvalue": 4.610585219401888
+    },
+    "format": "online_vignette_schema",
+    "note": "Vignettes converted to online format with inferred categories"
+  },
+  "vignettes": [
+    {
+      "vignette_id": "static_begin_001",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: Low physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Contract-based (unstable) | Work arrangement: Remote work possible | Career advancement: High growth potential | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 0,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 0,
+            "remote_work": 1,
+            "career_growth": 1,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 0
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 35,000/month",
+          "description": "Monthly wage: KES 35,000 | Physical demands: High physical demand | Work schedule: Fixed 8am-5pm shifts | Commute time: 45 minutes | Job security: Permanent (stable) | Work arrangement: Office-based | Career advancement: Limited growth opportunities | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 35000,
+            "physical_demand": 1,
+            "flexibility": 0,
+            "commute_time": 45,
+            "job_security": 1,
+            "remote_work": 0,
+            "career_growth": 0,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 1
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    },
+    {
+      "vignette_id": "static_begin_002",
+      "category": "work_life_balance",
+      "scenario_text": "Consider these two job opportunities with different work-life balance:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 15,000/month",
+          "description": "Monthly wage: KES 15,000 | Physical demands: High physical demand | Work schedule: Fixed 8am-5pm shifts | Commute time: 60 minutes | Job security: Permanent (stable) | Work arrangement: Office-based | Career advancement: High growth potential | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 15000,
+            "physical_demand": 1,
+            "flexibility": 0,
+            "commute_time": 60,
+            "job_security": 1,
+            "remote_work": 0,
+            "career_growth": 1,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 1
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: High physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Contract-based (unstable) | Work arrangement: Remote work possible | Career advancement: Limited growth opportunities | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 1,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 0,
+            "remote_work": 1,
+            "career_growth": 0,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 0
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_life_balance"
+      ],
+      "difficulty_level": "medium"
+    },
+    {
+      "vignette_id": "static_begin_003",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 15,000/month",
+          "description": "Monthly wage: KES 15,000 | Physical demands: Low physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Permanent (stable) | Work arrangement: Remote work possible | Career advancement: Limited growth opportunities | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 15000,
+            "physical_demand": 0,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 1,
+            "remote_work": 1,
+            "career_growth": 0,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 0
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: High physical demand | Work schedule: Fixed 8am-5pm shifts | Commute time: 60 minutes | Job security: Contract-based (unstable) | Work arrangement: Office-based | Career advancement: High growth potential | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 1,
+            "flexibility": 0,
+            "commute_time": 60,
+            "job_security": 0,
+            "remote_work": 0,
+            "career_growth": 1,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 1
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    },
+    {
+      "vignette_id": "static_begin_004",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 20,000/month",
+          "description": "Monthly wage: KES 20,000 | Physical demands: Low physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Contract-based (unstable) | Work arrangement: Remote work possible | Career advancement: High growth potential | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 20000,
+            "physical_demand": 0,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 0,
+            "remote_work": 1,
+            "career_growth": 1,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 1
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 30,000/month",
+          "description": "Monthly wage: KES 30,000 | Physical demands: High physical demand | Work schedule: Fixed 8am-5pm shifts | Commute time: 60 minutes | Job security: Permanent (stable) | Work arrangement: Remote work possible | Career advancement: Limited growth opportunities | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 30000,
+            "physical_demand": 1,
+            "flexibility": 0,
+            "commute_time": 60,
+            "job_security": 1,
+            "remote_work": 1,
+            "career_growth": 0,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 0
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    },
+    {
+      "vignette_id": "static_begin_005",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: High physical demand | Work schedule: Flexible hours | Commute time: 30 minutes | Job security: Contract-based (unstable) | Work arrangement: Office-based | Career advancement: Limited growth opportunities | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 1,
+            "flexibility": 1,
+            "commute_time": 30,
+            "job_security": 0,
+            "remote_work": 0,
+            "career_growth": 0,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 1
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 35,000/month",
+          "description": "Monthly wage: KES 35,000 | Physical demands: Low physical demand | Work schedule: Fixed 8am-5pm shifts | Commute time: 15 minutes | Job security: Permanent (stable) | Work arrangement: Remote work possible | Career advancement: High growth potential | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 35000,
+            "physical_demand": 0,
+            "flexibility": 0,
+            "commute_time": 15,
+            "job_security": 1,
+            "remote_work": 1,
+            "career_growth": 1,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 0
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    }
+  ]
+}

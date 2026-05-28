@@ -1,0 +1,56 @@
+{
+  "tasks": [
+    {
+      "task_id": 0,
+      "theme": "Leadership & People Management",
+      "items": ["4.A.4.b.4", "4.A.4.c.2", "4.A.4.b.5", "4.A.4.b.3", "4.A.2.b.5"]
+    },
+    {
+      "task_id": 1,
+      "theme": "Communication & Relationships",
+      "items": ["4.A.4.a.2", "4.A.4.a.1", "4.A.4.a.3", "4.A.4.a.4", "4.A.4.a.6"]
+    },
+    {
+      "task_id": 2,
+      "theme": "Analysis & Problem Solving",
+      "items": ["4.A.2.b.1", "4.A.2.a.4", "4.A.1.a.1", "4.A.2.a.1", "4.A.2.a.2"]
+    },
+    {
+      "task_id": 3,
+      "theme": "Creative & Strategic Thinking",
+      "items": ["4.A.2.b.4", "4.A.2.b.2", "4.A.2.b.3", "4.A.2.b.6", "4.A.1.a.2"]
+    },
+    {
+      "task_id": 4,
+      "theme": "Selling, Advising & Helping",
+      "items": ["4.A.4.a.6", "4.A.4.b.6", "4.A.4.a.7", "4.A.4.a.5", "4.A.4.a.8"]
+    },
+    {
+      "task_id": 5,
+      "theme": "Physical & Operational Work",
+      "items": ["4.A.3.a.3", "4.A.3.a.1", "4.A.3.a.4", "4.A.3.a.2", "4.A.3.b.4"]
+    },
+    {
+      "task_id": 6,
+      "theme": "Administration & Records",
+      "items": ["4.A.3.b.6", "4.A.4.c.1", "4.A.4.c.3", "4.A.1.b.2", "4.A.2.a.3"]
+    },
+    {
+      "task_id": 7,
+      "theme": "Mixed / Cross-cutting",
+      "items": ["4.A.3.b.1", "4.A.1.b.3", "4.A.1.b.1", "4.A.1.a.2", "4.A.2.b.3"]
+    }
+  ],
+  "metadata": {
+    "n_tasks": 8,
+    "alts_per_task": 5,
+    "total_unique_items": 37,
+    "total_slots": 40,
+    "repeated_items": ["4.A.4.a.6", "4.A.2.b.3", "4.A.1.a.2"],
+    "coverage_stats": {
+      "min": 1,
+      "max": 2,
+      "avg": 1.08
+    }
+  }
+}
