@@ -78,5 +78,13 @@ class RejectRegistrationRequest(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class ApproveRegistrationResponse(BaseModel):
+    """Response for approving a registration — includes the registration record and the new user's UID."""
+    registration: AdminRegistration
+    uid: str
+
+    model_config = {"extra": "forbid"}
+
+
 class DuplicateActiveRegistrationError(Exception):
     """Raised when an active (pending or approved) registration already exists for the email."""

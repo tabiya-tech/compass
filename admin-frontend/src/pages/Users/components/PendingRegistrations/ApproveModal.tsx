@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -8,10 +9,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Tooltip,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useTranslation } from "react-i18next";
 import { AdminRegistration } from "src/pages/Register/registrationsService";
-import { EmailSendError } from "./usePendingRegistrations";
 
 const uniqueId = "approve-registration-modal-1a3c5e7f-2b4d-6e8a-9c0e-1d2f3a4b5c6d";
 
@@ -19,28 +24,29 @@ export const DATA_TEST_ID = {
   DIALOG: `${uniqueId}-dialog`,
   CANCEL: `${uniqueId}-cancel`,
   CONFIRM: `${uniqueId}-confirm`,
-  EMAIL_FAILED_ALERT: `${uniqueId}-email-failed-alert`,
-  RESEND: `${uniqueId}-resend`,
+  RESET_LINK: `${uniqueId}-reset-link`,
+  COPY_LINK: `${uniqueId}-copy-link`,
   CLOSE: `${uniqueId}-close`,
 };
 
 export interface ApproveModalProps {
   registration: AdminRegistration | null;
   onClose: () => void;
-  onConfirm: (id: string) => Promise<void>;
-  onResendEmail: (email: string) => Promise<void>;
+  /** Returns the password reset link for the newly created user. */
+  onConfirm: (id: string) => Promise<string>;
 }
 
-const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onConfirm, onResendEmail }) => {
+const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onConfirm }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [emailFailedFor, setEmailFailedFor] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
+  const [resetLink, setResetLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleClose = () => {
     setError(null);
-    setEmailFailedFor(null);
+    setResetLink(null);
+    setCopied(false);
     onClose();
   };
 
@@ -48,37 +54,24 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
     if (!registration) return;
     setLoading(true);
     setError(null);
-    setEmailFailedFor(null);
     try {
-      await onConfirm(registration.id);
-      handleClose();
+      const link = await onConfirm(registration.id);
+      setResetLink(link);
     } catch (e) {
-      if (e instanceof EmailSendError) {
-        // Approval succeeded server-side; only the email send failed.
-        // Keep the dialog open with a Resend prompt.
-        setEmailFailedFor(e.email);
-      } else {
-        setError(e instanceof Error ? e.message : t("registrations.approve.error"));
-      }
+      setError(e instanceof Error ? e.message : t("registrations.approve.error"));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResend = async () => {
-    if (!emailFailedFor) return;
-    setResending(true);
-    try {
-      await onResendEmail(emailFailedFor);
-      handleClose();
-    } catch {
-      // Stay open; the alert remains visible so the user can retry.
-    } finally {
-      setResending(false);
-    }
+  const handleCopy = async () => {
+    if (!resetLink) return;
+    await navigator.clipboard.writeText(resetLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const showingResendState = emailFailedFor !== null;
+  const showingLinkState = resetLink !== null;
 
   return (
     <Dialog open={!!registration} onClose={handleClose} maxWidth="sm" fullWidth data-testid={DATA_TEST_ID.DIALOG}>
@@ -89,40 +82,46 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ registration, onClose, onCo
             {error}
           </Alert>
         )}
-        {showingResendState ? (
-          <Alert severity="warning" sx={{ mb: 2 }} data-testid={DATA_TEST_ID.EMAIL_FAILED_ALERT}>
-            {t(
-              "registrations.approve.emailFailed",
-              "Approved {{email}}, but the password-reset email failed to send. You can retry now or send it later from the Forgot Password page.",
-              { email: emailFailedFor }
-            )}
-          </Alert>
+        {showingLinkState ? (
+          <>
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {t("registrations.approve.approved", { email: registration?.email ?? "" })}
+            </Alert>
+            <TextField
+              label={t("registrations.approve.resetLinkLabel")}
+              value={resetLink}
+              fullWidth
+              multiline
+              maxRows={4}
+              InputProps={{
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip title={copied ? t("common.copied") : t("common.copy")}>
+                      <IconButton onClick={handleCopy} edge="end" data-testid={DATA_TEST_ID.COPY_LINK}>
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+              data-testid={DATA_TEST_ID.RESET_LINK}
+            />
+            <Box sx={{ mt: 1 }}>
+              <Alert severity="info">{t("registrations.approve.resetLinkInfo")}</Alert>
+            </Box>
+          </>
         ) : (
           <DialogContentText>
-            {t(
-              "registrations.approve.confirm",
-              "This will create a Firebase account for {{email}} and email them a password-reset link. Continue?",
-              { email: registration?.email ?? "" }
-            )}
+            {t("registrations.approve.confirm", { email: registration?.email ?? "" })}
           </DialogContentText>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        {showingResendState ? (
-          <>
-            <Button onClick={handleClose} disabled={resending} data-testid={DATA_TEST_ID.CLOSE}>
-              {t("common.close")}
-            </Button>
-            <Button
-              onClick={handleResend}
-              variant="contained"
-              color="warning"
-              disabled={resending}
-              data-testid={DATA_TEST_ID.RESEND}
-            >
-              {resending ? <CircularProgress size={20} /> : t("registrations.approve.resend")}
-            </Button>
-          </>
+        {showingLinkState ? (
+          <Button onClick={handleClose} data-testid={DATA_TEST_ID.CLOSE}>
+            {t("common.close")}
+          </Button>
         ) : (
           <>
             <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CANCEL}>

@@ -4,6 +4,7 @@ Provides endpoints to list and manage users.
 """
 
 import logging
+import os
 from typing import Optional
 
 from fastapi import APIRouter, Query, HTTPException, status, Depends
@@ -18,6 +19,7 @@ from app.admin.users._types import (
     DeleteUserResponse,
     UpdateProfileRequest,
     UpdateProfileResponse,
+    PasswordResetLinkResponse,
 )
 from app.admin.users.service import UsersService, get_users_service
 from app.app_config import get_application_config
@@ -210,6 +212,51 @@ def get_admin_users_routes(auth: Authentication) -> APIRouter:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to update user role",
+            ) from e
+
+    @router.post(
+        "/{user_id}/password-reset-link",
+        response_model=PasswordResetLinkResponse,
+        summary="Generate a password reset link",
+        description="Generate a Firebase password reset link for the given user to share via any channel. Super admin only.",
+        dependencies=[Depends(require_super_admin)],
+    )
+    async def get_password_reset_link(
+            user_id: str,
+            users_service: UsersService = Depends(get_users_service),
+    ) -> PasswordResetLinkResponse:
+        """
+        Generate a password reset link for a user.
+
+        Returns a one-time password reset URL that the super admin can share
+        with the user via any channel (email, Slack, etc.).
+
+        - **user_id**: The user ID to generate the reset link for
+        """
+        try:
+            config = get_application_config()
+            tenant_id = config.admin_firebase_tenant_id
+            # Use ADMIN_FRONTEND_URL env var (injected by IAC from the environment stack).
+            # For generate_password_reset_link, ActionCodeSettings.url is the action handler —
+            # the link itself points to this URL with oobCode params appended.
+            admin_frontend_url = os.getenv("ADMIN_FRONTEND_URL", "").rstrip("/")
+            continue_url = f"{admin_frontend_url}/#/auth-handler" if admin_frontend_url else None
+            return await users_service.get_password_reset_link(
+                tenant_id=tenant_id,
+                user_id=user_id,
+                continue_url=continue_url,
+            )
+        except ValueError as e:
+            logger.error("Invalid request: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(e),
+            ) from e
+        except Exception as e:
+            logger.error("Failed to generate password reset link: %s", e)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate password reset link",
             ) from e
 
     @router.patch(

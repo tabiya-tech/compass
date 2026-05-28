@@ -30,6 +30,7 @@ def main():
     domain_name = getstackref(env_reference, "domain_name")
     auth_domain = getstackref(env_reference, "auth_domain")
     frontend_domain = getstackref(env_reference, "frontend_domain")
+    admin_frontend_domain = getstackref(env_reference, "admin_frontend_domain")
 
     # Get stack reference for dns
     dns_stack_ref = pulumi.StackReference(f"tabiya-tech/compass-dns/{stack_name}")
@@ -58,6 +59,7 @@ def main():
         domain_name=domain_name,
         auth_domain=auth_domain,
         frontend_domain=frontend_domain,
+        admin_frontend_domain=admin_frontend_domain,
         extra_authorized_domains=extra_authorized_domains,
         gcp_oauth_client_id=gcp_oauth_client_id,
         gcp_oauth_client_secret=gcp_oauth_client_secret,

@@ -118,3 +118,10 @@ class UpdateProfileResponse(BaseModel):
     email: Optional[str] = None
 
     model_config = {"extra": "forbid"}
+
+
+class PasswordResetLinkResponse(BaseModel):
+    """Response model for password reset link generation."""
+    reset_link: str
+
+    model_config = {"extra": "forbid"}

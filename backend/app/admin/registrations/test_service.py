@@ -43,7 +43,11 @@ def _service_with_mocks(
     repository.create_or_replace_pending = AsyncMock(return_value=initial_registration)
 
     users_service = MagicMock()
-    users_service.create_user = AsyncMock(side_effect=create_user_side_effect)
+    create_user_return = MagicMock(uid="new-firebase-uid")
+    users_service.create_user = AsyncMock(
+        return_value=create_user_return,
+        side_effect=create_user_side_effect,
+    )
 
     return AdminRegistrationsService(repository, users_service), repository, users_service
 
@@ -70,7 +74,8 @@ class TestApprove:
         assert call_kwargs["request"].institution_id == "inst-1"
         # AND the row is marked approved
         repository.mark_decided.assert_awaited_once()
-        assert actual.status == RegistrationStatus.APPROVED
+        assert actual.registration.status == RegistrationStatus.APPROVED
+        assert actual.uid == "new-firebase-uid"
 
     @pytest.mark.asyncio
     async def test_does_not_mark_decided_when_firebase_email_already_exists(self, mocker):

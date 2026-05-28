@@ -43,8 +43,11 @@ const REDIRECT_DELAY_MS = 3000;
 const getQueryParams = (search: string): URLSearchParams => {
   // With a hash router Firebase usually appends params after the hash, so location.search has them.
   // If the install was done with a non-hash URL (or a redirect stripped them), fall back to window.location.search.
+  // If that's also empty, parse params from the hash fragment (e.g. /#/auth-handler?mode=...&oobCode=...).
   if (search) return new URLSearchParams(search);
-  return new URLSearchParams(window.location.search);
+  if (window.location.search) return new URLSearchParams(window.location.search);
+  const hashQuery = window.location.hash.includes("?") ? window.location.hash.split("?")[1] : "";
+  return new URLSearchParams(hashQuery);
 };
 
 const AuthHandler: React.FC = () => {

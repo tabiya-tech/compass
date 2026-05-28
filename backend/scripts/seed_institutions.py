@@ -18,7 +18,11 @@ import os
 import re
 import sys
 
+from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
+
+# Load .env from the backend directory (parent of scripts/)
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

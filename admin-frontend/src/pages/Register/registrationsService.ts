@@ -47,6 +47,11 @@ export interface ListRegistrationsResponse {
   pending_count: number;
 }
 
+export interface ApproveRegistrationResponse {
+  registration: AdminRegistration;
+  uid: string;
+}
+
 export const registrationsService = {
   async submit(request: CreateRegistrationRequest): Promise<CreateRegistrationResponse> {
     const base = getBackendUrl();
@@ -76,13 +81,13 @@ export const registrationsService = {
     return handleResponse<ListRegistrationsResponse>(response);
   },
 
-  async approve(id: string): Promise<AdminRegistration> {
+  async approve(id: string): Promise<ApproveRegistrationResponse> {
     const base = getBackendUrl();
     const response = await fetch(`${base}/admin-registrations/${encodeURIComponent(id)}/approve`, {
       method: "POST",
       headers: getAuthHeaders(),
     });
-    return handleResponse<AdminRegistration>(response);
+    return handleResponse<ApproveRegistrationResponse>(response);
   },
 
   async reject(id: string, reason: string): Promise<AdminRegistration> {

@@ -10,6 +10,7 @@ from app.admin.registrations import rate_limit as rate_limit_module
 from app.admin.registrations.routes import _get_registrations_service, add_admin_registrations_routes
 from app.admin.registrations.types import (
     AdminRegistration,
+    ApproveRegistrationResponse,
     DuplicateActiveRegistrationError,
     RegistrationRoleRequest,
     RegistrationStatus,
@@ -263,15 +264,19 @@ class TestSuperAdminGate:
         # GIVEN a caller authenticated as super_admin and a service that approves
         client, mocked_service = _make_app(role="super_admin")
         approved = _sample_pending_registration().model_copy(update={"status": RegistrationStatus.APPROVED})
-        mocked_service.approve = AsyncMock(return_value=approved)
+        mocked_service.approve = AsyncMock(return_value=ApproveRegistrationResponse(
+            registration=approved,
+            uid="new-user-uid",
+        ))
 
         # WHEN they POST /approve
         actual_response = client.post("/admin-registrations/65a1b2c3d4e5f6a7b8c9d0e1/approve")
 
         # THEN 200 is returned
         assert actual_response.status_code == HTTPStatus.OK
-        # AND the registration status flips to approved
-        assert actual_response.json()["status"] == "approved"
+        # AND the body includes the registration and uid
+        assert actual_response.json()["registration"]["status"] == "approved"
+        assert actual_response.json()["uid"] == "new-user-uid"
 
 
 class TestReject:

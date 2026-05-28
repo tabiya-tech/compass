@@ -50,6 +50,7 @@ class Arguments(BaseModel):
     institution_id: str | None
     tenant_id: str
     project_id: str
+    continue_url: str | None
     dry_run: bool
 
 
@@ -96,7 +97,7 @@ def create_firebase_user(name: str, email: str, password: str, tenant_id: str, d
     return user.uid
 
 
-def send_password_reset_email(email: str, tenant_id: str | None, dry_run: bool) -> None:
+def send_password_reset_email(email: str, tenant_id: str | None, continue_url: str | None, dry_run: bool) -> None:
     """Generate a password reset link for the user."""
     if dry_run:
         logger.info("[DRY RUN] Would generate password reset link for: %s", email)
@@ -106,8 +107,10 @@ def send_password_reset_email(email: str, tenant_id: str | None, dry_run: bool) 
 
     logger.info("Generating password reset link for: %s", email)
 
+    action_code_settings = auth.ActionCodeSettings(url=continue_url) if continue_url else None
+
     auth_client = get_auth_client(tenant_id)
-    link = auth_client.generate_password_reset_link(email)
+    link = auth_client.generate_password_reset_link(email, action_code_settings=action_code_settings)
 
     logger.info("Password reset link generated successfully")
     logger.info("Send this link to the user: %s", link)
@@ -157,7 +160,7 @@ def create_admin_user(args: Arguments) -> None:
     set_custom_claims(user_id, args.role, args.institution_id, args.tenant_id, args.dry_run)
 
     # Send password reset email
-    send_password_reset_email(args.email, args.tenant_id, args.dry_run)
+    send_password_reset_email(args.email, args.tenant_id, args.continue_url, args.dry_run)
 
     if args.dry_run:
         logger.info("=" * 50)
@@ -218,6 +221,13 @@ def parse_args() -> Arguments:
     )
 
     parser.add_argument(
+        "--continue-url",
+        required=False,
+        type=str,
+        help="URL to redirect to after password reset (e.g. https://admin.njila.ai)"
+    )
+
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Preview changes without actually creating the user"
@@ -244,6 +254,7 @@ def parse_args() -> Arguments:
         institution_id=parsed.institution_id if role == Role.INSTITUTION_STAFF else None,
         tenant_id=parsed.tenant_id,
         project_id=parsed.project_id,
+        continue_url=parsed.continue_url,
         dry_run=parsed.dry_run
     )
 

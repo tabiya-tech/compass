@@ -39,7 +39,7 @@ interface PendingTabContentProps {
 
 const PendingTabContent: React.FC<PendingTabContentProps> = ({ pending }) => {
   const { t } = useTranslation();
-  const { registrations, loading, error, approve, reject, resendResetEmail } = pending;
+  const { registrations, loading, error, approve, reject } = pending;
   const [approveTarget, setApproveTarget] = useState<AdminRegistration | null>(null);
   const [rejectTarget, setRejectTarget] = useState<AdminRegistration | null>(null);
 
@@ -55,12 +55,7 @@ const PendingTabContent: React.FC<PendingTabContentProps> = ({ pending }) => {
       ) : (
         <RegistrationsTable registrations={registrations} onApprove={setApproveTarget} onReject={setRejectTarget} />
       )}
-      <ApproveModal
-        registration={approveTarget}
-        onClose={() => setApproveTarget(null)}
-        onConfirm={approve}
-        onResendEmail={resendResetEmail}
-      />
+      <ApproveModal registration={approveTarget} onClose={() => setApproveTarget(null)} onConfirm={approve} />
       <RejectModal registration={rejectTarget} onClose={() => setRejectTarget(null)} onConfirm={reject} />
     </>
   );

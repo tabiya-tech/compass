@@ -158,23 +158,28 @@ def _setup_identity_platform(
         environment_type: pulumi.Output[str],
         auth_domain: pulumi.Output[str],
         frontend_domain: pulumi.Output[str],
+        admin_frontend_domain: pulumi.Output[str],
         extra_authorized_domains: list[str],
         app_name: str,
         dependencies: list[pulumi.Resource]) -> IdentityPlatform:
     # for the development environment allow localhost
     def _get_authorized_domains(args) -> list[str]:
         _frontend_domain = args[0]
-        _environment_type = args[1]
-        _authorized_domains = [_frontend_domain]
+        _admin_frontend_domain = args[1]
+        _environment_type = args[2]
+        _authorized_domains = [_frontend_domain, _admin_frontend_domain]
         if _environment_type == EnvironmentTypes.DEV.value:
             # add more domains here depending on how the application is accessed.
             _authorized_domains.append("localhost")
         _authorized_domains.extend(extra_authorized_domains)
         return _authorized_domains
 
-    authorized_domains = pulumi.Output.all(frontend_domain, environment_type).apply(_get_authorized_domains)
+    authorized_domains = pulumi.Output.all(frontend_domain, admin_frontend_domain, environment_type).apply(_get_authorized_domains)
     firebase_custom_domain = "njila.ai" if app_name == NJILA_AI_APP_NAME else frontend_domain
-    callback_uri =  "https://njila.ai/#/auth-handler" if app_name == NJILA_AI_APP_NAME else frontend_domain.apply(lambda v: f"https://{v}/#/auth-handler")
+    # The callback_uri is the action handler URL embedded in Firebase-sent emails (password reset,
+    # email verification). It must point to the admin frontend so the oobCode is consumed by the
+    # admin Firebase auth instance (which has the correct tenantId).
+    callback_uri = admin_frontend_domain.apply(lambda v: f"https://{v}/#/auth-handler")
     idp_config = IdentityPlatform(
         get_resource_name(resource="identity-platform", resource_type="default-config"),
         notification_config=NotificationConfigArgs(
@@ -243,6 +248,7 @@ def deploy_auth(*,
                 domain_name: pulumi.Output[str],
                 auth_domain: pulumi.Output[str],
                 frontend_domain: pulumi.Output[str],
+                admin_frontend_domain: pulumi.Output[str],
                 extra_authorized_domains: list[str],
                 gcp_oauth_client_id: str,
                 gcp_oauth_client_secret: str,
@@ -280,6 +286,7 @@ def deploy_auth(*,
         environment_type=environment_type,
         auth_domain=auth_domain,
         frontend_domain=frontend_domain,
+        admin_frontend_domain=admin_frontend_domain,
         extra_authorized_domains=extra_authorized_domains,
         app_name=app_name,
         dependencies=record_sets

@@ -2,7 +2,7 @@
 import "src/_test_utilities/consoleMock";
 
 import React from "react";
-import { screen, waitFor, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import CreateUserModal, { DATA_TEST_ID } from "./CreateUserModal";
@@ -27,19 +27,10 @@ jest.mock("../usersService", () => {
     usersService: {
       ...actual.usersService,
       createUser: jest.fn(),
+      getPasswordResetLink: jest.fn(),
     },
   };
 });
-
-const mockResetPassword = jest.fn();
-jest.mock("src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService", () => ({
-  __esModule: true,
-  default: {
-    getInstance: () => ({
-      resetPassword: (email: string) => mockResetPassword(email),
-    }),
-  },
-}));
 
 const buildOpenContext = (): UsersContextValue => ({
   users: [],
@@ -84,10 +75,11 @@ describe("CreateUserModal role select", () => {
     expect(within(listbox).getByText("Institution Staff")).toBeInTheDocument();
   });
 
-  test("calls Firebase resetPassword with the new user's email after the user is created", async () => {
-    // GIVEN super_admin caller, valid form input, createUser succeeds, and Firebase send succeeds
+  test("shows the password reset link after the user is created", async () => {
+    // GIVEN super_admin caller, valid form input, createUser and getPasswordResetLink succeed
     jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(true);
     const givenEmail = "newadmin@org.edu";
+    const givenLink = "https://auth.example.com/reset?oobCode=abc123";
     (usersService.createUser as jest.Mock).mockResolvedValue({
       uid: "uid-9",
       email: givenEmail,
@@ -95,7 +87,7 @@ describe("CreateUserModal role select", () => {
       role: "admin",
       institution_id: null,
     });
-    mockResetPassword.mockResolvedValue(undefined);
+    (usersService.getPasswordResetLink as jest.Mock).mockResolvedValue({ reset_link: givenLink });
     const user = userEvent.setup();
 
     // WHEN the modal is filled out and submitted (default role is Admin → no institution required)
@@ -104,38 +96,9 @@ describe("CreateUserModal role select", () => {
     await user.type(screen.getByLabelText(/display name/i), "New Admin");
     await user.click(screen.getByTestId(DATA_TEST_ID.CREATE_USER_MODAL_SUBMIT));
 
-    // THEN Firebase resetPassword is called with the email returned by the backend
-    await waitFor(() => expect(mockResetPassword).toHaveBeenCalledWith(givenEmail));
-  });
-
-  test("shows the Resend warning when email send fails after the user is created", async () => {
-    // GIVEN super_admin caller, valid form input, createUser succeeds, but Firebase send fails
-    jest.spyOn(UserStateService.getInstance(), "isSuperAdmin").mockReturnValue(true);
-    const givenEmail = "stuck@org.edu";
-    (usersService.createUser as jest.Mock).mockResolvedValue({
-      uid: "uid-10",
-      email: givenEmail,
-      display_name: "Stuck Admin",
-      role: "admin",
-      institution_id: null,
-    });
-    mockResetPassword.mockRejectedValueOnce(new Error("network down"));
-    const user = userEvent.setup();
-
-    // WHEN the modal is filled out and submitted
-    renderModal();
-    await user.type(screen.getByLabelText(/email/i), givenEmail);
-    await user.type(screen.getByLabelText(/display name/i), "Stuck Admin");
-    await user.click(screen.getByTestId(DATA_TEST_ID.CREATE_USER_MODAL_SUBMIT));
-
-    // THEN the email-failed warning alert is shown along with a Resend button
-    expect(await screen.findByTestId(DATA_TEST_ID.CREATE_USER_MODAL_EMAIL_FAILED_ALERT)).toBeInTheDocument();
-    expect(screen.getByTestId(DATA_TEST_ID.CREATE_USER_MODAL_RESEND)).toBeInTheDocument();
-
-    // AND clicking Resend retries the Firebase send with the same email
-    mockResetPassword.mockResolvedValueOnce(undefined);
-    await user.click(screen.getByTestId(DATA_TEST_ID.CREATE_USER_MODAL_RESEND));
-    await waitFor(() => expect(mockResetPassword).toHaveBeenLastCalledWith(givenEmail));
+    // THEN the reset link is displayed for the super admin to copy
+    expect(await screen.findByDisplayValue(givenLink)).toBeInTheDocument();
+    expect(screen.getByTestId(DATA_TEST_ID.CREATE_USER_MODAL_COPY_LINK)).toBeInTheDocument();
   });
 
   test("hides the Super Admin option when caller is not super_admin", async () => {

@@ -55,7 +55,9 @@
       "areYouSure": "Are you sure?"
     },
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied!"
   },
   "auth": {
     "pages": {
@@ -435,8 +437,9 @@
       "institutionId": "Institution ID",
       "submit": "Create User",
       "emailAlreadyExists": "A user with this email already exists",
-      "emailFailed": "Created {{email}}, but the password-reset email failed to send. You can retry now or send it later from the Forgot Password page.",
-      "resend": "Resend email"
+      "userCreated": "Account created for {{email}}. Share the link below with them to set their password.",
+      "resetLinkLabel": "Password setup link",
+      "resetLinkInfo": "This link is single-use. Send it to the user via email, Slack, or any secure channel."
     },
     "updateRoleModal": {
       "title": "Update Role",
@@ -509,8 +512,11 @@
     "loading": "Loading…",
     "approve": {
       "title": "Approve Sign-up",
+      "confirm": "This will create a Firebase account for {{email}}. Continue?",
+      "approved": "Account created for {{email}}. Share the link below with them to set their password.",
+      "resetLinkLabel": "Password setup link",
+      "resetLinkInfo": "This link is single-use. Send it to the user via email, Slack, or any secure channel.",
       "error": "Failed to approve registration",
-      "resend": "Resend email",
       "submit": "Approve"
     },
     "reject": {
@@ -528,6 +534,34 @@
     "email": "Email",
     "submit": "Send reset link",
     "backToLogin": "Back to login"
+  },
+  "authHandler": {
+    "logoAlt": "Logo",
+    "backToLogin": "Back to login",
+    "resetPassword": {
+      "title": "Set your password",
+      "subtitle": "Setting password for {{email}}",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "passwordMismatch": "Passwords do not match",
+      "submit": "Save password",
+      "success": "Your password has been set. You can now log in."
+    },
+    "verifyEmail": {
+      "title": "Verify email",
+      "success": "Your email has been verified."
+    },
+    "recoverEmail": {
+      "title": "Recover email",
+      "success": "Your email address has been restored.",
+      "successWithEmail": "Your email address has been restored to {{email}}."
+    },
+    "errors": {
+      "title": "Something went wrong",
+      "invalidLink": "This link is invalid, has expired, or has already been used.",
+      "unknownMode": "Unrecognised action.",
+      "resetFailed": "Failed to set password. The link may have expired — request a new one."
+    }
   },
   "profile": {
     "title": "My Profile",

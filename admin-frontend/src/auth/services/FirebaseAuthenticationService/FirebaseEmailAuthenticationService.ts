@@ -118,11 +118,8 @@ class FirebaseEmailAuthenticationService extends AuthenticationService {
   async resetPassword(email: string): Promise<void> {
     const firebaseErrorFactory = getFirebaseErrorFactory("FirebaseEmailAuthService", "resetPassword");
     try {
-      // No actionCodeSettings: passing a continueUrl forces Firebase's hosted
-      // reset page to load /__/firebase/init.json from the auth domain, which
-      // breaks on dev (auth subdomain Hosting site doesn't serve it; the apex
-      // redirect lacks CORS). After the reset, Firebase's default page links
-      // back to the app — close enough.
+      // No actionCodeSettings: the project-wide callback_uri (set in IAC) already points to
+      // the admin frontend's auth-handler page, so Firebase-sent reset emails land correctly.
       await firebaseAuth.sendPasswordResetEmail(email);
     } catch (error) {
       throw castToFirebaseError(error, firebaseErrorFactory);

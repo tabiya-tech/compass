@@ -18,6 +18,7 @@ from app.admin.users._types import (
     DeleteUserResponse,
     UpdateProfileRequest,
     UpdateProfileResponse,
+    PasswordResetLinkResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -259,6 +260,34 @@ class UsersService:
             name=firebase_user.display_name,
             email=firebase_user.email,
         )
+
+
+    async def get_password_reset_link(
+            self,
+            tenant_id: str,
+            user_id: str,
+            continue_url: Optional[str] = None,
+    ) -> PasswordResetLinkResponse:
+        """
+        Generate a password reset link for the given user.
+
+        :param tenant_id: The Firebase tenant ID.
+        :param user_id: The user ID whose reset link to generate.
+        :param continue_url: The admin frontend URL to embed so the link lands on the
+            correct auth-handler page (tenant-aware). Should be the admin frontend's
+            auth-handler URL (e.g. https://admin.njila.ai/#/auth-handler).
+        :return: PasswordResetLinkResponse containing the reset link.
+        """
+        logger.info("Generating password reset link for user: %s, tenant: %s", user_id, tenant_id)
+        firebase_user = self._firebase.get_user(tenant_id=tenant_id, user_id=user_id)
+        if not firebase_user or not firebase_user.email:
+            raise ValueError(f"User {user_id} not found or has no email")
+        link = self._firebase.generate_password_reset_link(
+            tenant_id=tenant_id,
+            email=firebase_user.email,
+            continue_url=continue_url,
+        )
+        return PasswordResetLinkResponse(reset_link=link)
 
 
 def get_users_service(

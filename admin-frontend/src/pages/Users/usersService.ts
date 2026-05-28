@@ -65,6 +65,10 @@ export interface UpdateProfileResponse {
   email: string | null;
 }
 
+export interface PasswordResetLinkResponse {
+  reset_link: string;
+}
+
 export class HttpError extends Error {
   constructor(
     public readonly status: number,
@@ -155,5 +159,14 @@ export const usersService = {
       body: JSON.stringify(request),
     });
     return handleResponse<UpdateProfileResponse>(response);
+  },
+
+  async getPasswordResetLink(userId: string): Promise<PasswordResetLinkResponse> {
+    const base = getBackendUrl();
+    const response = await fetch(`${base}/admin/users/${encodeURIComponent(userId)}/password-reset-link`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
+    return handleResponse<PasswordResetLinkResponse>(response);
   },
 };

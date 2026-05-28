@@ -14,6 +14,7 @@ from app.admin.registrations.repository import AdminRegistrationRepository
 from app.admin.registrations.service import AdminRegistrationsService
 from app.admin.registrations.types import (
     AdminRegistration,
+    ApproveRegistrationResponse,
     CreateRegistrationRequest,
     CreateRegistrationResponse,
     DuplicateActiveRegistrationError,
@@ -122,7 +123,7 @@ def add_admin_registrations_routes(app: FastAPI, auth: Authentication) -> None:
 
     @router.post(
         "/{registration_id}/approve",
-        response_model=AdminRegistration,
+        response_model=ApproveRegistrationResponse,
         responses={
             400: {"model": HTTPErrorResponse},
             403: {"model": HTTPErrorResponse},
@@ -137,7 +138,7 @@ def add_admin_registrations_routes(app: FastAPI, auth: Authentication) -> None:
         access_role: AccessRole = Depends(require_super_admin),
         user_info=Depends(auth.get_user_info()),
         service: AdminRegistrationsService = Depends(_get_registrations_service),
-    ) -> AdminRegistration:
+    ) -> ApproveRegistrationResponse:
         try:
             return await service.approve(registration_id, super_admin_uid=user_info.user_id)
         except EmailAlreadyExistsError as e:

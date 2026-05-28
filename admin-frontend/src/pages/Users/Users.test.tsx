@@ -20,6 +20,7 @@ jest.mock("./usersService", () => {
       deleteUser: jest.fn(),
       updateRole: jest.fn(),
       updateProfile: jest.fn(),
+      getPasswordResetLink: jest.fn(),
     },
   };
 });
@@ -34,15 +35,6 @@ jest.mock("src/pages/Register/registrationsService", () => ({
   },
   RegistrationStatus: { PENDING: "pending", APPROVED: "approved", REJECTED: "rejected" },
   RegistrationRoleRequest: { ADMIN: "admin", INSTITUTION_STAFF: "institution_staff" },
-}));
-
-jest.mock("src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService", () => ({
-  __esModule: true,
-  default: {
-    getInstance: () => ({
-      resetPassword: jest.fn().mockResolvedValue(undefined),
-    }),
-  },
 }));
 
 jest.mock("src/components/Header/Header", () => () => <div data-testid="mock-header" />);

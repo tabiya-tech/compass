@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -8,17 +9,20 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useTranslation } from "react-i18next";
 import { usersService, Role, CreateUserRequest, HttpError } from "../usersService";
 import { useUsersContext } from "../UsersContext";
 import InstitutionAutocomplete, { useInstitutionOptions } from "./InstitutionAutocomplete";
 import UserStateService from "src/userState/UserStateService";
-import FirebaseEmailAuthenticationService from "src/auth/services/FirebaseAuthenticationService/FirebaseEmailAuthenticationService";
 
 const uniqueId = "create-user-modal-3a5c7e9f-1b2d-4f6a-8c0e-2d4f6a8b0c1e";
 
@@ -30,8 +34,8 @@ export const DATA_TEST_ID = {
   CREATE_USER_MODAL_INSTITUTION_ID: `${uniqueId}-institution-id`,
   CREATE_USER_MODAL_CANCEL: `${uniqueId}-cancel`,
   CREATE_USER_MODAL_SUBMIT: `${uniqueId}-submit`,
-  CREATE_USER_MODAL_EMAIL_FAILED_ALERT: `${uniqueId}-email-failed-alert`,
-  CREATE_USER_MODAL_RESEND: `${uniqueId}-resend`,
+  CREATE_USER_MODAL_RESET_LINK: `${uniqueId}-reset-link`,
+  CREATE_USER_MODAL_COPY_LINK: `${uniqueId}-copy-link`,
   CREATE_USER_MODAL_CLOSE: `${uniqueId}-close`,
 };
 
@@ -51,8 +55,8 @@ const CreateUserModal: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [emailFailedFor, setEmailFailedFor] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
+  const [resetLink, setResetLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const isSuperAdmin = UserStateService.getInstance().isSuperAdmin();
 
   const handleClose = () => {
@@ -62,14 +66,15 @@ const CreateUserModal: React.FC = () => {
     setInstitutionId("");
     setError(null);
     setEmailError(null);
-    setEmailFailedFor(null);
+    setResetLink(null);
+    setCopied(false);
     setCreateModalOpen(false);
   };
 
   const handleSubmit = async () => {
     setError(null);
     setEmailError(null);
-    setEmailFailedFor(null);
+    setResetLink(null);
     const request: CreateUserRequest = {
       email,
       name,
@@ -80,14 +85,8 @@ const CreateUserModal: React.FC = () => {
     try {
       const created = await usersService.createUser(request);
       fetchUsers();
-      // Backend committed the user; trigger Firebase's hosted email template.
-      // If the send fails, keep the dialog open with a Resend prompt.
-      try {
-        await FirebaseEmailAuthenticationService.getInstance().resetPassword(created.email);
-        handleClose();
-      } catch {
-        setEmailFailedFor(created.email);
-      }
+      const { reset_link } = await usersService.getPasswordResetLink(created.uid);
+      setResetLink(reset_link);
     } catch (err: unknown) {
       if (err instanceof HttpError && err.status === 409) {
         setEmailError(t("users.error.emailAlreadyExists"));
@@ -99,23 +98,17 @@ const CreateUserModal: React.FC = () => {
     }
   };
 
-  const handleResend = async () => {
-    if (!emailFailedFor) return;
-    setResending(true);
-    try {
-      await FirebaseEmailAuthenticationService.getInstance().resetPassword(emailFailedFor);
-      handleClose();
-    } catch {
-      // Stay open; the alert remains visible so the user can retry.
-    } finally {
-      setResending(false);
-    }
+  const handleCopy = async () => {
+    if (!resetLink) return;
+    await navigator.clipboard.writeText(resetLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const isValid =
     email.trim() !== "" && name.trim() !== "" && (role !== Role.INSTITUTION_STAFF || institutionId.trim() !== "");
 
-  const showingResendState = emailFailedFor !== null;
+  const showingLinkState = resetLink !== null;
 
   return (
     <Dialog
@@ -132,10 +125,39 @@ const CreateUserModal: React.FC = () => {
             {error}
           </Alert>
         )}
-        {showingResendState ? (
-          <Alert severity="warning" sx={{ mb: 2 }} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_EMAIL_FAILED_ALERT}>
-            {t("users.createModal.emailFailed", { email: emailFailedFor })}
-          </Alert>
+        {showingLinkState ? (
+          <>
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {t("users.createModal.userCreated", { email })}
+            </Alert>
+            <TextField
+              label={t("users.createModal.resetLinkLabel")}
+              value={resetLink}
+              fullWidth
+              multiline
+              maxRows={4}
+              InputProps={{
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Tooltip title={copied ? t("common.copied") : t("common.copy")}>
+                      <IconButton
+                        onClick={handleCopy}
+                        edge="end"
+                        data-testid={DATA_TEST_ID.CREATE_USER_MODAL_COPY_LINK}
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              }}
+              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_RESET_LINK}
+            />
+            <Box sx={{ mt: 1 }}>
+              <Alert severity="info">{t("users.createModal.resetLinkInfo")}</Alert>
+            </Box>
+          </>
         ) : (
           <>
             <TextField
@@ -193,21 +215,10 @@ const CreateUserModal: React.FC = () => {
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        {showingResendState ? (
-          <>
-            <Button onClick={handleClose} disabled={resending} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CLOSE}>
-              {t("common.close")}
-            </Button>
-            <Button
-              onClick={handleResend}
-              variant="contained"
-              color="warning"
-              disabled={resending}
-              data-testid={DATA_TEST_ID.CREATE_USER_MODAL_RESEND}
-            >
-              {resending ? <CircularProgress size={20} /> : t("users.createModal.resend")}
-            </Button>
-          </>
+        {showingLinkState ? (
+          <Button onClick={handleClose} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CLOSE}>
+            {t("common.close")}
+          </Button>
         ) : (
           <>
             <Button onClick={handleClose} disabled={loading} data-testid={DATA_TEST_ID.CREATE_USER_MODAL_CANCEL}>

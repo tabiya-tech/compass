@@ -3,6 +3,7 @@ from typing import Optional
 from app.admin.registrations.repository import AdminRegistrationRepository
 from app.admin.registrations.types import (
     AdminRegistration,
+    ApproveRegistrationResponse,
     CreateRegistrationRequest,
     RegistrationRoleRequest,
     RegistrationStatus,
@@ -24,7 +25,7 @@ class AdminRegistrationsService:
     async def submit(self, request: CreateRegistrationRequest) -> AdminRegistration:
         return await self._repository.create_or_replace_pending(request)
 
-    async def approve(self, registration_id: str, super_admin_uid: str) -> AdminRegistration:
+    async def approve(self, registration_id: str, super_admin_uid: str) -> ApproveRegistrationResponse:
         registration = await self._repository.get_by_id(registration_id)
         if not registration:
             raise ValueError("Registration not found")
@@ -45,7 +46,7 @@ class AdminRegistrationsService:
         )
 
         # Surface Firebase failures (e.g., EmailAlreadyExistsError) without marking as decided.
-        await self._users_service.create_user(tenant_id=tenant_id, request=create_request)
+        created_user = await self._users_service.create_user(tenant_id=tenant_id, request=create_request)
 
         decided = await self._repository.mark_decided(
             registration_id,
@@ -55,7 +56,7 @@ class AdminRegistrationsService:
         )
         if not decided:
             raise ValueError("Failed to mark registration as approved")
-        return decided
+        return ApproveRegistrationResponse(registration=decided, uid=created_user.uid)
 
     async def reject(
         self, registration_id: str, super_admin_uid: str, reason: str
