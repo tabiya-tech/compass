@@ -231,7 +231,7 @@ class MatchingServiceV1(MatchingService):
             preference_vector=preference_vector,
         )
 
-        response = await self._client.process_request(_ResponseList, "/match", request)
+        response = await self._client.process_request(_ResponseList, "/match_v4", request)
         if not response.root:
             return CompassMatchingResult(user_id=youth_id, algorithm_version="v1")
 
