@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import { useSnackbar } from "src/theme/SnackbarProvider/SnackbarProvider";
 import { Box, Modal, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import PrimaryButton from "src/theme/PrimaryButton/PrimaryButton";
@@ -45,6 +46,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
   const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
   const { enqueueSnackbar } = useSnackbar();
+  const appName = getProductName();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -61,7 +63,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
         message,
       });
 
-      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess"), {
+      enqueueSnackbar(t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess", { appName }), {
         variant: "success",
       });
     } catch (e) {
@@ -89,7 +91,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
       >
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Typography variant="h4" gutterBottom data-testid={DATA_TEST_ID.MODAL_TITLE}>
-            {t("auth.components.requestInvitationCodeFormModal.requestAccessTitle")}
+            {t("auth.components.requestInvitationCodeFormModal.requestAccessTitle", { appName })}
           </Typography>
           <PrimaryIconButton
             title={t("auth.components.requestInvitationCodeFormModal.closeRequestInvitationForm")}
@@ -103,7 +105,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           </PrimaryIconButton>
         </Box>
         <Typography variant="body2" data-testid={DATA_TEST_ID.MODAL_SUBTITLE}>
-          {t("auth.components.requestInvitationCodeFormModal.requestAccessSubtitle")}
+          {t("auth.components.requestInvitationCodeFormModal.requestAccessSubtitle", { appName })}
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
@@ -133,7 +135,7 @@ const RequestInvitationCodeFormModal: React.FC<RequestInvitationFormModalProps> 
           <TextField
             fullWidth
             label={t("auth.components.requestInvitationCodeFormModal.message")}
-            placeholder={t("auth.components.requestInvitationCodeFormModal.messagePlaceholder")}
+            placeholder={t("auth.components.requestInvitationCodeFormModal.messagePlaceholder", { appName })}
             variant="outlined"
             margin="normal"
             required

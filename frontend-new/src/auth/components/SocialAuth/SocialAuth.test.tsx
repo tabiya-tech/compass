@@ -55,6 +55,7 @@ describe("SocialAuth tests", () => {
     (console.error as jest.Mock).mockClear();
     (console.warn as jest.Mock).mockClear();
     jest.clearAllMocks();
+    jest.spyOn(EnvServiceModule, "getProductName").mockReturnValue("mockProduct");
   });
 
   afterEach(() => {

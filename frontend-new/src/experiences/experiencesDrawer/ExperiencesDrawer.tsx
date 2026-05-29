@@ -25,6 +25,7 @@ import RestoreExperiencesDrawer from "src/experiences/experiencesDrawer/componen
 import { ExperienceError } from "src/error/commonErrors";
 import RestoreIcon from "src/theme/Icons/RestoreIcon";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import { getSkillsReportOutputConfig } from "../report/config/getConfig";
 import ShareReportButton from "src/experiences/experiencesDrawer/components/shareReportButton/ShareReportButton";
 import { useUserProfileContext } from "src/profile/UserProfileContext";
@@ -75,6 +76,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
+  const appName = getProductName();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const { profileData, refreshProfileData } = useUserProfileContext();
@@ -333,7 +335,7 @@ const ExperiencesDrawer: React.FC<ExperiencesDrawerProps> = ({
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.xl)}>
             <ExperiencesDrawerHeader
               notifyOnClose={handleClose}
-              title={t("experiences.experiencesDrawer.reportTitle")}
+              title={t("experiences.experiencesDrawer.reportTitle", { appName })}
               lastUpdated={conversationConductedAt}
             />
             <Box

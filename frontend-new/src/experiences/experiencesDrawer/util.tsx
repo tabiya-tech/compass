@@ -16,6 +16,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import QuizIcon from "@mui/icons-material/Quiz";
 import WorkIcon from "@mui/icons-material/Work";
 import i18n from "src/i18n/i18n";
+import { getProductName } from "src/envService";
 
 /**
  * Centralized error messages with i18n support
@@ -54,7 +55,9 @@ export const WORK_TYPE_DESCRIPTIONS = {
     return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.unseenUnpaid");
   },
   get UNCATEGORIZED() {
-    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.uncategorized");
+    return i18n.t("experiences.experiencesDrawer.util.workTypeDescription.uncategorized", {
+      appName: getProductName(),
+    });
   },
 } as const;
 

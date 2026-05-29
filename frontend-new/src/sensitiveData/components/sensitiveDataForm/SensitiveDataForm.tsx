@@ -44,7 +44,7 @@ import { PersistentStorageService } from "src/app/PersistentStorageService/Persi
 import { extractPersonalInfo } from "./config/utils";
 import SensitiveDataFormSkeleton from "src/sensitiveData/components/sensitiveDataForm/SensitiveDataFormSkeleton";
 import InstitutionService, { InstitutionSummary, Programme } from "src/institutions/services/InstitutionService";
-import { getDarkLogoUrl } from "src/envService";
+import { getDarkLogoUrl, getProductName } from "src/envService";
 
 const uniqueId = "ab02918f-d559-47ba-9662-ea6b3a3606d1";
 
@@ -151,6 +151,7 @@ const SCHOOL_YEAR_LABEL_KEYS: Record<(typeof SCHOOL_YEAR_VALUES)[number], Transl
 const SensitiveDataForm: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const appName = getProductName();
   const navigate = useNavigate();
   const logoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
   const { enqueueSnackbar } = useSnackbar();
@@ -471,7 +472,7 @@ const SensitiveDataForm: React.FC = () => {
               {t("sensitiveData.components.sensitiveDataForm.title")}
             </Typography>
             <Typography variant="body2">
-              {t("sensitiveData.components.sensitiveDataForm.subtitle")}
+              {t("sensitiveData.components.sensitiveDataForm.subtitle", { appName })}
               {isPIIRequired
                 ? " " + t("sensitiveData.components.sensitiveDataForm.unskippableSubtitle")
                 : " " + t("sensitiveData.components.sensitiveDataForm.skippableSubtitle")}
@@ -757,7 +758,7 @@ const SensitiveDataForm: React.FC = () => {
               id: "1",
               text: (
                 <>
-                  {t("sensitiveData.components.sensitiveDataForm.rejectParagraph1")}{" "}
+                  {t("sensitiveData.components.sensitiveDataForm.rejectParagraph1", { appName })}{" "}
                   <HighlightedSpan>{t("common.backdrop.loggingYouOut")}</HighlightedSpan>
                 </>
               ),
@@ -779,7 +780,7 @@ const SensitiveDataForm: React.FC = () => {
               id: "1",
               text: (
                 <>
-                  {t("sensitiveData.components.sensitiveDataForm.skipParagraph1")}{" "}
+                  {t("sensitiveData.components.sensitiveDataForm.skipParagraph1", { appName })}{" "}
                   <HighlightedSpan>
                     {t("sensitiveData.components.sensitiveDataForm.skipParagraph1Highlighted")}
                   </HighlightedSpan>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import { routerPaths } from "src/app/routerPaths";
 import CareerReadinessChat from "src/careerReadiness/components/CareerReadinessAgentMessage/CareerReadinessChat/CareerReadinessChat";
 import CareerReadinessService from "src/careerReadiness/services/CareerReadinessService";
@@ -25,6 +26,7 @@ const CareerReadinessModule: React.FC = () => {
   const navigate = useNavigate();
   const { moduleId } = useParams<{ moduleId: string }>();
   const { t } = useTranslation();
+  const appName = getProductName();
   const { enqueueSnackbar } = useSnackbar();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moduleCompleted, setModuleCompleted] = useState(false);
@@ -116,7 +118,7 @@ const CareerReadinessModule: React.FC = () => {
         errorMessage={
           modulesConnectionError || conversationConnectionError
             ? t("common.errors.api.serverConnectionError")
-            : t("error.errorPage.defaultMessage")
+            : t("error.errorPage.defaultMessage", { appName })
         }
         showRefreshButton
       />

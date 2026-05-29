@@ -2,7 +2,7 @@
   "common": {
     "buttons": {
       "login": "Iniciar sesión",
-      "loginLink": "Iniciar sesión en Njila",
+      "loginLink": "Iniciar sesión en {{appName}}",
       "logout": "Cerrar sesión",
       "submit": "Enviar",
       "register": "Crear cuenta",
@@ -291,7 +291,7 @@
         "loginUsing": "Inicia sesión usando",
         "loggingYouIn": "Iniciando sesión...",
         "loggingInAria": "Iniciando sesión",
-        "signInDescription": "Si ya tenés una cuenta de Njila, ingresá tu <0>correo electrónico</0> y tu <1>contraseña</1> para acceder, o elegí <2>Google</2> para iniciar sesión.",
+        "signInDescription": "Si ya tenés una cuenta de {{appName}}, ingresá tu <0>correo electrónico</0> y tu <1>contraseña</1> para acceder, o elegí <2>Google</2> para iniciar sesión.",
         "dontHaveAnAccount": "¿Todavía no tenés cuenta? Registrate gratis.",
         "needHelp": "Ayuda",
         "fillInEmailAndPassword": "Por favor, rellene los campos de correo electrónico y contraseña",
@@ -322,7 +322,7 @@
       },
       "register": {
         "signUpTitle": "Crear una cuenta",
-        "signUpDescription": "Para crear una cuenta de Njila, ingresá tu <0>dirección de correo</0> y creá una <1>contraseña</1>. También podés crear una cuenta con tu cuenta de <2>Google</2>.",
+        "signUpDescription": "Para crear una cuenta de {{appName}}, ingresá tu <0>dirección de correo</0> y creá una <1>contraseña</1>. También podés crear una cuenta con tu cuenta de <2>Google</2>.",
         "emailPlaceholder": "Tu correo electrónico",
         "passwordPlaceholder": "Creá una contraseña",
         "confirmPasswordPlaceholder": "Repetí la contraseña",
@@ -489,6 +489,12 @@
               "summaryPlaceholder": "Resumen de la experiencia",
               "restoreFailed": "No pudimos restaurar ese resumen. Tu resumen anterior sigue guardado — probá de nuevo.",
               "restored": "Resumen restaurado."
+            },
+            "addSkillsDrawer": {
+              "title": "Seleccionar habilidades",
+              "helpTip": "Tocá una habilidad para ver más detalles. Podés seleccionar las habilidades que querés agregar a tu experiencia.",
+              "subtitle": "Estas son habilidades adicionales de alto nivel identificadas por {{appName}} en función de tu experiencia.",
+              "okButton": "OK"
             }
           },
           "updateSuccess": "¡Experiencia actualizada con éxito!",
@@ -601,7 +607,7 @@
           "timelineMaxLength": "Máximo {{max}} de caracteres permitido."
         }
       },
-      "reportTitle": "Tu Informe de Habilidades de Njila",
+      "reportTitle": "Tu Informe de Habilidades de {{appName}}",
       "educationLabel": "EDUCACIÓN",
       "experiencesAndSkillsLabel": "EXPERIENCIAS Y HABILIDADES"
     },
@@ -1220,7 +1226,7 @@
       },
       "careerExplorer": {
         "title": "Sectores Explorados",
-        "emptyState": "Los sectores aparecerán aquí cuando explorés carreras con Njila."
+        "emptyState": "Los sectores aparecerán aquí cuando explorés carreras con {{appName}}."
       },
       "careerReadiness": {
         "title": "Temas"
@@ -1296,15 +1302,15 @@
     "faqAriaLabel": "Ayuda y preguntas frecuentes"
   },
   "faq": {
-    "lede": "Respuestas a preguntas comunes sobre Njila: cómo funciona, cómo crear una cuenta y cómo resolver problemas habituales.",
+    "lede": "Respuestas a preguntas comunes sobre {{appName}}: cómo funciona, cómo crear una cuenta y cómo resolver problemas habituales.",
     "searchPlaceholder": "Buscar preguntas…",
     "searchAriaLabel": "Buscar en preguntas frecuentes",
     "clearSearch": "Borrar búsqueda",
     "tocLabel": "En esta página",
     "noResults": "Ninguna pregunta coincide con esa búsqueda.",
     "tutorialEyebrow": "Tutorial de 4 minutos",
-    "tutorialHeading": "Mirá cómo funciona Njila",
-    "tutorialIframeTitle": "Video tutorial de Njila",
+    "tutorialHeading": "Mirá cómo funciona {{appName}}",
+    "tutorialIframeTitle": "Video tutorial de {{appName}}",
     "tutorialUnavailableOffline": "Estás sin conexión. Conectate a internet para ver este video.",
     "scrollProgressLabel": "Progreso de lectura"
   }

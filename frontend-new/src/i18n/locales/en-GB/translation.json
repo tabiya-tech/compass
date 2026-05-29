@@ -2,7 +2,7 @@
   "common": {
     "buttons": {
       "login": "Sign In",
-      "loginLink": "Sign In to Njila",
+      "loginLink": "Sign In to {{appName}}",
       "logout": "Logout",
       "submit": "Submit",
       "register": "Create Account",
@@ -291,7 +291,7 @@
         "loginUsing": "Sign in using",
         "loggingYouIn": "Signing you in...",
         "loggingInAria": "Signing in",
-        "signInDescription": "If you already have a Njila account, enter your <0>email</0> and <1>password</1> to access it, or choose <2>Google</2> to sign in.",
+        "signInDescription": "If you already have a {{appName}} account, enter your <0>email</0> and <1>password</1> to access it, or choose <2>Google</2> to sign in.",
         "dontHaveAnAccount": "No account yet? Register for free.",
         "needHelp": "Help",
         "fillInEmailAndPassword": "Please fill in the email and password fields",
@@ -322,7 +322,7 @@
       },
       "register": {
         "signUpTitle": "Create an account",
-        "signUpDescription": "To create a Njila account, enter your <0>email address</0> and create a <1>password</1>. You can also create an account with your <2>Google</2> account.",
+        "signUpDescription": "To create a {{appName}} account, enter your <0>email address</0> and create a <1>password</1>. You can also create an account with your <2>Google</2> account.",
         "emailPlaceholder": "Your email address",
         "passwordPlaceholder": "Create a password",
         "confirmPasswordPlaceholder": "Repeat the password",
@@ -489,6 +489,12 @@
               "summaryPlaceholder": "Summary of experience",
               "restoreFailed": "We couldn't restore that summary. Your previous summary is still saved — please try again.",
               "restored": "Summary restored."
+            },
+            "addSkillsDrawer": {
+              "title": "Select Skills",
+              "helpTip": "Tap a skill to view more details. You can select the skills you want to add to your experience.",
+              "subtitle": "These are additional top skills identified by {{appName}} based on your experience.",
+              "okButton": "OK"
             }
           },
           "updateSuccess": "Experience updated successfully!",
@@ -601,7 +607,7 @@
           "timelineMaxLength": "Maximum {{max}} characters allowed."
         }
       },
-      "reportTitle": "Your Njila Skills Report",
+      "reportTitle": "Your {{appName}} Skills Report",
       "educationLabel": "EDUCATION",
       "experiencesAndSkillsLabel": "EXPERIENCES AND SKILLS"
     },
@@ -1126,7 +1132,7 @@
       },
       "careerExplorer": {
         "title": "Sectors Explored",
-        "emptyState": "Sectors will appear here as you explore careers with Njila."
+        "emptyState": "Sectors will appear here as you explore careers with {{appName}}."
       },
       "careerReadiness": {
         "title": "Topics"
@@ -1296,15 +1302,15 @@
     "faqAriaLabel": "Help and FAQ"
   },
   "faq": {
-    "lede": "Answers to common questions about Njila — how it works, how to create an account, and how to resolve common problems.",
+    "lede": "Answers to common questions about {{appName}} — how it works, how to create an account, and how to resolve common problems.",
     "searchPlaceholder": "Search questions…",
     "searchAriaLabel": "Search FAQ",
     "clearSearch": "Clear search",
     "tocLabel": "On this page",
     "noResults": "No questions match that search.",
     "tutorialEyebrow": "4 min tutorial",
-    "tutorialHeading": "See how Njila works",
-    "tutorialIframeTitle": "Njila tutorial video",
+    "tutorialHeading": "See how {{appName}} works",
+    "tutorialIframeTitle": "{{appName}} tutorial video",
     "tutorialUnavailableOffline": "You're offline. Connect to the internet to watch this video.",
     "scrollProgressLabel": "Reading progress"
   }

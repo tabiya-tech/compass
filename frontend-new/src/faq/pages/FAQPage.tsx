@@ -14,7 +14,7 @@ import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
 import { routerPaths } from "src/app/routerPaths";
 import BackLink from "src/navigation/BackLink/BackLink";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
-import { getFaqTutorialVideoUrl } from "src/envService";
+import { getFaqTutorialVideoUrl, getProductName } from "src/envService";
 
 const uniqueId = "f6b1d3a8-9c47-4e5f-a2d1-7b9e8c4f2a13";
 
@@ -40,6 +40,7 @@ const FAQ_TUTORIAL_VIDEO_FALLBACK_URL =
 const FAQPage: React.FC = () => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
+  const appName = getProductName();
   const navigate = useNavigate();
   const isOnline = useContext(IsOnlineContext);
   const user = authenticationStateService.getInstance().getUser();
@@ -197,7 +198,7 @@ const FAQPage: React.FC = () => {
                 maxWidth: "640px",
               }}
             >
-              {t("faq.lede")}
+              {t("faq.lede", { appName })}
             </Typography>
             <Box sx={{ maxWidth: 480, marginTop: theme.fixedSpacing(theme.tabiyaSpacing.xl) }}>
               <TextField
@@ -278,7 +279,7 @@ const FAQPage: React.FC = () => {
                 marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md),
               }}
             >
-              {t("faq.tutorialHeading")}
+              {t("faq.tutorialHeading", { appName })}
             </Typography>
             <Box
               sx={{
@@ -297,7 +298,7 @@ const FAQPage: React.FC = () => {
                 component="iframe"
                 ref={iframeRef}
                 src={getFaqTutorialVideoUrl() || FAQ_TUTORIAL_VIDEO_FALLBACK_URL}
-                title={t("faq.tutorialIframeTitle")}
+                title={t("faq.tutorialIframeTitle", { appName })}
                 allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"

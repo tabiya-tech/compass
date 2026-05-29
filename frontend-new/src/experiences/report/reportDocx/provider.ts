@@ -2,13 +2,14 @@ import SkillReportDocx from "src/experiences/report/reportDocx/SkillReportDocx";
 import { IReportFormatProvider, ReportProps } from "src/experiences/report/types";
 import { saveAs } from "src/experiences/saveAs";
 import { SkillsReportOutputConfig } from "src/experiences/report/config/types";
+import { getProductName } from "src/envService";
 
 export class DocxReportDownloadProvider implements IReportFormatProvider {
   constructor(private config: SkillsReportOutputConfig) {}
 
   async download(props: ReportProps) {
     try {
-      const fileName = "njila-cv.docx";
+      const fileName = `${getProductName().toLowerCase()}-cv.docx`;
       const blob = await SkillReportDocx({
         name: props.name,
         email: props.email,

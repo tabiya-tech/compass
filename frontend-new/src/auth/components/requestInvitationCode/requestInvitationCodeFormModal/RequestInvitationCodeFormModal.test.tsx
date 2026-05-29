@@ -1,5 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import * as SentryInvitationCodeRequestService from "src/auth/components/requestInvitationCode/requestInvitationCodeService/SentryInvitationCodeRequest.service";
 import { render, screen } from "src/_test_utilities/test-utils";
@@ -111,7 +112,9 @@ describe("RequestInvitationCodeFormModal", () => {
     });
     // AND the notification should be displayed
     expect(useSnackbar().enqueueSnackbar).toHaveBeenCalledWith(
-      i18n.t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess"),
+      i18n.t("auth.components.requestInvitationCodeFormModal.invitationRequestSubmitSuccess", {
+        appName: "mockProduct",
+      }),
       { variant: "success" }
     );
   });

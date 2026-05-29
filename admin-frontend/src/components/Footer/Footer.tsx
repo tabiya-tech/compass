@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const { t } = useTranslation();
-  const appName = getProductName() || "";
+  const appName = getProductName();
   const privacyHref = getLegalDocumentAbsoluteUrl(LEGAL_DOCUMENT_ROUTE_PATHS.PRIVACY_POLICY);
   const termsHref = getLegalDocumentAbsoluteUrl(LEGAL_DOCUMENT_ROUTE_PATHS.TERMS_OF_USE);
 

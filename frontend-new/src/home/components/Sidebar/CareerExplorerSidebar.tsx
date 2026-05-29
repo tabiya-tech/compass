@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import Sidebar from "src/theme/Sidebar/Sidebar";
 import SidebarService from "src/home/components/Sidebar/SidebarService";
 import type { SectorData, SectorItem } from "src/home/components/Sidebar/SidebarService";
@@ -93,6 +94,7 @@ interface CareerExplorerSidebarProps {
 const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshToken = 0 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const appName = getProductName();
   const [data, setData] = useState<SectorData | null>(null);
   const cancelledRef = useRef(false);
 
@@ -124,7 +126,7 @@ const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshTo
             color: theme.palette.text.secondary,
           }}
         >
-          {t("home.sidebar.careerExplorer.emptyState")}
+          {t("home.sidebar.careerExplorer.emptyState", { appName })}
         </Box>
       ) : (
         <Box>

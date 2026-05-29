@@ -1,6 +1,7 @@
 // standard sentry mock
 import "src/_test_utilities/sentryMock";
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 import React from "react";
 import { render, screen, fireEvent } from "src/_test_utilities/test-utils";
 import VerifyEmail, { DATA_TEST_ID } from "./VerifyEmail";

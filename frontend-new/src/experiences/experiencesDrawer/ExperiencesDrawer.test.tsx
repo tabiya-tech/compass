@@ -1,6 +1,7 @@
 import i18n from "src/i18n/i18n";
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import ExperiencesDrawer, { DATA_TEST_ID } from "src/experiences/experiencesDrawer/ExperiencesDrawer";
 import userEvent from "@testing-library/user-event";

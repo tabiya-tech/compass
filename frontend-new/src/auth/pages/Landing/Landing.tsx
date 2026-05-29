@@ -40,7 +40,7 @@ const Landing: React.FC = () => {
     setPageLoading(isLoading, t("auth.pages.landing.loggingYouIn"));
   }, [isLoading, setPageLoading, t]);
 
-  const appName = getProductName() || "Njila";
+  const appName = getProductName();
 
   const applicationLoginCode = useMemo(() => getApplicationLoginCode(), []);
   const loginCodeDisabled = useMemo(() => getLoginCodeDisabled().toLowerCase() === "true", []);

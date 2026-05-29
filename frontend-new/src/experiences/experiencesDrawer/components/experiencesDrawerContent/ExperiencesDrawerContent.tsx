@@ -16,6 +16,7 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopover/SkillPopover";
 import { deduplicateSkills } from "src/utils/skillsUtils";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 
 const uniqueId = "34a59a9e-e7f6-4a10-8b72-0fd401c727de";
 
@@ -59,6 +60,7 @@ export const capitalizeFirstLetter = (string: string): string => {
 const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdit, onDelete, onRestoreToOriginal }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const appName = getProductName();
   const isOnline = useContext(IsOnlineContext);
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
   const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null);
@@ -94,7 +96,9 @@ const ExperiencesDrawerContent: React.FC<ExperienceProps> = ({ experience, onEdi
 
   const getContextMenuHeaderMessage = () => {
     if (!isExplored) {
-      return t("experiences.experiencesDrawer.components.experiencesDrawerContent.actionsUnavailableUntilExplored");
+      return t("experiences.experiencesDrawer.components.experiencesDrawerContent.actionsUnavailableUntilExplored", {
+        appName,
+      });
     }
     return undefined;
   };

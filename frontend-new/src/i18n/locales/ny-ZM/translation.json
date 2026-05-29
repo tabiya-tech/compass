@@ -2,7 +2,7 @@
   "common": {
     "buttons": {
       "login": "Lowani",
-      "loginLink": "Lowani ku Njila",
+      "loginLink": "Lowani ku {{appName}}",
       "logout": "Tsekani",
       "submit": "Tumizani",
       "register": "Pangani akaunti",
@@ -291,7 +291,7 @@
         "loginUsing": "Lowani pogwiritsa ntchito",
         "loggingYouIn": "Mukulowa...",
         "loggingInAria": "Kulowa",
-        "signInDescription": "Ngati muli ndi akaunti ya Njila kale, lowetsani <0>imelo</0> lanu ndi <1>mawu achinsinsi</1> kuti mulowe, kapena sankhani <2>Google</2> kuti mulowe.",
+        "signInDescription": "Ngati muli ndi akaunti ya {{appName}} kale, lowetsani <0>imelo</0> lanu ndi <1>mawu achinsinsi</1> kuti mulowe, kapena sankhani <2>Google</2> kuti mulowe.",
         "dontHaveAnAccount": "Mulibe akaunti? Pangani kwaulere.",
         "needHelp": "Thandizo",
         "fillInEmailAndPassword": "Chonde lembani imelo ndi mawu achinsinsi",
@@ -302,7 +302,7 @@
         "appHero": {
           "discoverLine": "Senzani zanu",
           "skillsLine": "nzeru ndi mphamvu zanu",
-          "subheadline": "Njila yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
+          "subheadline": "{{appName}} yanu yomwe ikutsogoleredwa kuchokera ku nzeru mpaka ku ntchito yoyamba — yomangidwa pa zimene mumazidziwa, zimene mwachita, ndi komwe mukufuna kupita.",
           "signInTitle": "Lowani",
           "cta": "Lowani",
           "whatIsTitleBefore": "Ndi chani ",
@@ -322,7 +322,7 @@
       },
       "register": {
         "signUpTitle": "Pangani akaunti",
-        "signUpDescription": "Kuti mupange akaunti ya Njila, lowetsani <0>imelo yanu</0> ndipo mupange <1>mawu achinsinsi</1>. Mutha kupanganso akaunti pogwiritsa akaunti yanu ya <2>Google</2>.",
+        "signUpDescription": "Kuti mupange akaunti ya {{appName}}, lowetsani <0>imelo yanu</0> ndipo mupange <1>mawu achinsinsi</1>. Mutha kupanganso akaunti pogwiritsa akaunti yanu ya <2>Google</2>.",
         "emailPlaceholder": "Imelo yanu",
         "passwordPlaceholder": "Pangani mawu achinsinsi",
         "confirmPasswordPlaceholder": "Bwerezani mawu achinsinsi",
@@ -489,6 +489,12 @@
               "summaryPlaceholder": "Fupikizo la chitukuko",
               "restoreFailed": "Sitinathe kubwezera chidulecho. Chidule chanu chakale chilipo — chonde yesaninso.",
               "restored": "Fupikizo labwezeretsedwa."
+            },
+            "addSkillsDrawer": {
+              "title": "Sankhani Nzeru",
+              "helpTip": "Dinani nzeru kuti muone zambiri. Mutha kusankha nzeru zomwe mukufuna kuonjezera ku chitukuko chanu.",
+              "subtitle": "Izi ndi nzeru zazikuluzikulu zowonjezera zomwe {{appName}} idazipeza mwa chitukuko chanu.",
+              "okButton": "Chabwino"
             }
           },
           "updateSuccess": "Chitukuko chasinthidwa bwino!",
@@ -601,7 +607,7 @@
           "timelineMaxLength": "Zilembo {{max}} pamwamba zololedwa."
         }
       },
-      "reportTitle": "Malipoti Anu a Luso la Njila",
+      "reportTitle": "Malipoti Anu a Luso la {{appName}}",
       "educationLabel": "MAPHUNZIRO",
       "experiencesAndSkillsLabel": "CHIDZIWITSO NDI LUSO"
     },
@@ -986,7 +992,7 @@
     "hero": {
       "headline1": "Tiyeni tipeze",
       "headline2": "Maluso & mphamvu zanu",
-      "body": "Njila yanu yowongolera kuchokera ku luso kupita kuntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa - kenako fufuzani ntchito, konzekerani ntchito, ndikupeza mwayi weniweni ku Zambia.",
+      "body": "{{appName}} yanu yowongolera kuchokera ku luso kupita kuntchito yanu yoyamba. Yambani pozindikira zomwe mumabweretsa - kenako fufuzani ntchito, konzekerani ntchito, ndikupeza mwayi weniweni ku Zambia.",
       "illustrationAlt": "Munthu ali pachikwangwani panjila, kuyang'ana njila zantchito"
     },
     "cta": {
@@ -1132,7 +1138,7 @@
       },
       "careerExplorer": {
         "title": "Zigawo Zofufuzidwa",
-        "emptyState": "Zigawo zidzaonekera apa mukafufuza ntchito ndi Njila."
+        "emptyState": "Zigawo zidzaonekera apa mukafufuza ntchito ndi {{appName}}."
       },
       "careerReadiness": {
         "title": "Zitenga"
@@ -1152,7 +1158,7 @@
   },
   "knowledgeHub": {
     "backToDashboard": "Bwererani ku Dashibodi",
-    "backToKnowledgeHub": "Bwererani ku Njila",
+    "backToKnowledgeHub": "Bwererani ku {{appName}}",
     "documentNotFound": "Chikalata sichinapezeke",
     "heroTitlePrefix": "Njila za Ntchito",
     "heroTitleQuestion": "Kodi ku Zambia akulemba ntchito kuti?",
@@ -1296,15 +1302,15 @@
     "faqAriaLabel": "Thandizo ndi Mafunso"
   },
   "faq": {
-    "lede": "Mayankho ku mafunso wamba okhudza Njila — momwe imagwirira ntchito, momwe mungapange akaunti, ndi momwe mungathetsere mavuto wamba.",
+    "lede": "Mayankho ku mafunso wamba okhudza {{appName}} — momwe imagwirira ntchito, momwe mungapange akaunti, ndi momwe mungathetsere mavuto wamba.",
     "searchPlaceholder": "Sakani mafunso…",
     "searchAriaLabel": "Sakani mu Mafunso",
     "clearSearch": "Chotsani kufufuza",
     "tocLabel": "Patsamba lino",
     "noResults": "Palibe mafunso amene akugwirizana ndi kufufuza kumeneko.",
     "tutorialEyebrow": "Nthawi 4 yakufundira",
-    "tutorialHeading": "Onani momwe Njila imagwirira ntchito",
-    "tutorialIframeTitle": "Vidiyo yophunzitsira za Njila",
+    "tutorialHeading": "Onani momwe {{appName}} imagwirira ntchito",
+    "tutorialIframeTitle": "Vidiyo yophunzitsira za {{appName}}",
     "tutorialUnavailableOffline": "Simuli pa intaneti. Lumikizani pa intaneti kuti muone video iyi.",
     "scrollProgressLabel": "Kupita patsogolo powerenga"
   }

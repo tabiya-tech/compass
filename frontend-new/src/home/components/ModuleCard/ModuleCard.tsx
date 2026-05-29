@@ -42,7 +42,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, badgeStatus = null }) =
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const appName = getProductName() || "";
+  const appName = getProductName();
 
   const handleClick = () => {
     if (module.disabled) {

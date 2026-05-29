@@ -126,7 +126,7 @@ exports[`ReportDrawerContent should render ExperiencesDrawerContent correctly 1`
     <div
       data-testid="b7499b01-8082-4209-8667-c7d559a70caf-menu-header-message"
     >
-      These actions will become available once you have discussed the experience in detail with {{appName}}.
+      These actions will become available once you have discussed the experience in detail with mockProduct.
     </div>
     <div
       data-disabled="true"

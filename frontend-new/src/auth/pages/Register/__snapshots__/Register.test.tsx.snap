@@ -19,7 +19,7 @@ exports[`Testing Register component it should show register form successfully 1`
       <div
         class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
       >
-        To create a Njila account, enter your 
+        To create a {{appName}} account, enter your 
         <strong>
           email address
         </strong>
@@ -125,7 +125,7 @@ exports[`Testing Register component should handle application registration code 
       <div
         class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
       >
-        To create a Njila account, enter your 
+        To create a {{appName}} account, enter your 
         <strong>
           email address
         </strong>

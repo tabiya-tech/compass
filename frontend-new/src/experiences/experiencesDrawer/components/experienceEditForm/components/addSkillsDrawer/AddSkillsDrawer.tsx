@@ -12,6 +12,7 @@ import SkillPopover from "src/experiences/experiencesDrawer/components/skillPopo
 import HelpTip from "src/theme/HelpTip/HelpTip";
 import { deduplicateSkills } from "src/utils/skillsUtils";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 
 const uniqueId = "82681361-b582-4dc3-8129-63f3f0f66eee";
 
@@ -105,14 +106,16 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
           <Box display="flex" flexDirection="column" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
             <Box display="flex" alignItems="center" gap={theme.fixedSpacing(theme.tabiyaSpacing.sm)}>
               <Typography variant="h5" data-testid={DATA_TEST_ID.SKILL_DRAWER_TITLE}>
-                Select Skills
+                {t("experiences.experiencesDrawer.components.experienceEditForm.components.addSkillsDrawer.title")}
               </Typography>
               <HelpTip icon={<InfoIcon />} data-testid={DATA_TEST_ID.SKILL_DRAWER_HELP_TIP}>
-                Tap a skill to view more details. You can select the skills you want to add to your experience.
+                {t("experiences.experiencesDrawer.components.experienceEditForm.components.addSkillsDrawer.helpTip")}
               </HelpTip>
             </Box>
             <Typography variant="body2" fontWeight="bold" data-testid={DATA_TEST_ID.SKILL_DRAWER_SUBTITLE}>
-              These are additional top skills identified by Njila based on your experience.
+              {t("experiences.experiencesDrawer.components.experienceEditForm.components.addSkillsDrawer.subtitle", {
+                appName: getProductName(),
+              })}
             </Typography>
           </Box>
           <Box display="flex" flexWrap="wrap" whiteSpace="normal" gap={theme.fixedSpacing(theme.tabiyaSpacing.md)}>
@@ -180,7 +183,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               disabled={selectedSkillIds.length === 0}
               data-testid={DATA_TEST_ID.SKILL_DRAWER_OK_BUTTON}
             >
-              OK
+              {t("experiences.experiencesDrawer.components.experienceEditForm.components.addSkillsDrawer.okButton")}
             </PrimaryButton>
           </Box>
         </Box>

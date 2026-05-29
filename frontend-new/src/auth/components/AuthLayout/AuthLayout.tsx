@@ -98,7 +98,7 @@ const AuthLayout: React.FC = () => {
   );
 
   const logoSrc = getDarkLogoUrl() || getLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
-  const appName = getProductName() || "Njila";
+  const appName = getProductName();
 
   const whiteBandContent = (
     <Box
@@ -160,7 +160,7 @@ const AuthLayout: React.FC = () => {
             whiteSpace: "normal",
           }}
         >
-          {t("auth.pages.login.appHero.subheadline")}
+          {t("auth.pages.login.appHero.subheadline", { appName })}
         </Typography>
       </Box>
 
@@ -249,7 +249,7 @@ const AuthLayout: React.FC = () => {
               color={showRegisterLink ? "brandAction" : "primary"}
               sx={{ alignSelf: "center" }}
             >
-              {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink")}
+              {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink", { appName })}
             </SecondaryButton>
           </Box>
         )}

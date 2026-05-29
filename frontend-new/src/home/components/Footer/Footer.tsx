@@ -33,7 +33,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ sx }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const appName = getProductName() || "";
+  const appName = getProductName();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
 
   const privacyHref = `${globalThis.location.origin}/#${routerPaths.PRIVACY_POLICY}`;

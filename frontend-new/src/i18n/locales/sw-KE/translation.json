@@ -2,7 +2,7 @@
   "common": {
     "buttons": {
       "login": "Ingia",
-      "loginLink": "Ingia kwenye Njila",
+      "loginLink": "Ingia kwenye {{appName}}",
       "logout": "Toka",
       "submit": "Wasilisha",
       "register": "Unda akaunti",
@@ -291,7 +291,7 @@
         "loginUsing": "Ingia ukitumia",
         "loggingYouIn": "Tunaingiza...",
         "loggingInAria": "Kuingia",
-        "signInDescription": "Ikiwa tayari una akaunti ya Njila, weka <0>barua pepe</0> yako na <1>nenosiri</1> ili kuingia, au chagua <2>Google</2> ili kuingia.",
+        "signInDescription": "Ikiwa tayari una akaunti ya {{appName}}, weka <0>barua pepe</0> yako na <1>nenosiri</1> ili kuingia, au chagua <2>Google</2> ili kuingia.",
         "dontHaveAnAccount": "Bado huna akaunti? Unda akaunti bure.",
         "needHelp": "Msaada",
         "fillInEmailAndPassword": "Tafadhali jaza barua pepe na nenosiri",
@@ -322,7 +322,7 @@
       },
       "register": {
         "signUpTitle": "Fungua akaunti",
-        "signUpDescription": "Ili kuunda akaunti ya Njila, weka <0>anwani yako ya barua pepe</0> na unda <1>nenosiri</1>. Unaweza pia kuunda akaunti ukitumia akaunti yako ya <2>Google</2>.",
+        "signUpDescription": "Ili kuunda akaunti ya {{appName}}, weka <0>anwani yako ya barua pepe</0> na unda <1>nenosiri</1>. Unaweza pia kuunda akaunti ukitumia akaunti yako ya <2>Google</2>.",
         "emailPlaceholder": "Barua pepe yako",
         "passwordPlaceholder": "Tengeneza nenosiri",
         "confirmPasswordPlaceholder": "Rudia nenosiri",
@@ -471,6 +471,12 @@
               "summaryPlaceholder": "Muhtasari wa uzoefu",
               "restoreFailed": "Hatukuweza kurejesha muhtasari huo. Muhtasari wako wa awali bado umehifadhiwa — tafadhali jaribu tena.",
               "restored": "Muhtasari umejeshwa."
+            },
+            "addSkillsDrawer": {
+              "title": "Chagua Ujuzi",
+              "helpTip": "Bonyeza ujuzi ili kuona maelezo zaidi. Unaweza kuchagua ujuzi unaotaka kuongeza kwenye uzoefu wako.",
+              "subtitle": "Hizi ni ujuzi wa juu wa ziada uliotambuliwa na {{appName}} kulingana na uzoefu wako.",
+              "okButton": "Sawa"
             }
           },
           "updateSuccess": "Uzoefu umesasishwa kwa mafanikio!",
@@ -583,7 +589,7 @@
           "timelineMaxLength": "Upeo wa herufi {{max}} unaruhusiwa."
         }
       },
-      "reportTitle": "Ripoti Yako ya Ujuzi wa Njila",
+      "reportTitle": "Ripoti Yako ya Ujuzi wa {{appName}}",
       "educationLabel": "ELIMU",
       "experiencesAndSkillsLabel": "UZOEFU NA UJUZI"
     },
@@ -1132,7 +1138,7 @@
       },
       "careerExplorer": {
         "title": "Sekta Zilizochunguzwa",
-        "emptyState": "Sekta zitaonekana hapa unapochunguza kazi na Njila."
+        "emptyState": "Sekta zitaonekana hapa unapochunguza kazi na {{appName}}."
       },
       "careerReadiness": {
         "title": "Mada"
@@ -1296,15 +1302,15 @@
     "faqAriaLabel": "Msaada na Maswali"
   },
   "faq": {
-    "lede": "Majibu ya maswali ya kawaida kuhusu Njila — jinsi inavyofanya kazi, jinsi ya kuunda akaunti, na jinsi ya kutatua matatizo ya kawaida.",
+    "lede": "Majibu ya maswali ya kawaida kuhusu {{appName}} — jinsi inavyofanya kazi, jinsi ya kuunda akaunti, na jinsi ya kutatua matatizo ya kawaida.",
     "searchPlaceholder": "Tafuta maswali…",
     "searchAriaLabel": "Tafuta katika Maswali",
     "clearSearch": "Futa utafutaji",
     "tocLabel": "Kwenye ukurasa huu",
     "noResults": "Hakuna maswali yanayolingana na utafutaji huo.",
     "tutorialEyebrow": "Mafunzo ya dakika 4",
-    "tutorialHeading": "Ona jinsi Njila inavyofanya kazi",
-    "tutorialIframeTitle": "Video ya mafunzo ya Njila",
+    "tutorialHeading": "Ona jinsi {{appName}} inavyofanya kazi",
+    "tutorialIframeTitle": "Video ya mafunzo ya {{appName}}",
     "tutorialUnavailableOffline": "Hauko mtandaoni. Unganisha kwenye mtandao ili kutazama video hii.",
     "scrollProgressLabel": "Maendeleo ya kusoma"
   }

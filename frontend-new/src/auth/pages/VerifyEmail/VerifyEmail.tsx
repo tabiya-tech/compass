@@ -8,7 +8,7 @@ import { routerPaths } from "src/app/routerPaths";
 import { useNavigate } from "react-router-dom";
 import MetricsService from "src/metrics/metricsService";
 import { EventType } from "src/metrics/types";
-import { getDarkLogoUrl } from "src/envService";
+import { getDarkLogoUrl, getProductName } from "src/envService";
 
 const uniqueId = "f1228c6a-e447-4946-b810-0c7ddc8ca833";
 
@@ -25,6 +25,7 @@ export const DATA_TEST_ID = {
 const VerifyEmail: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const appName = getProductName();
   const navigate = useNavigate();
   const logoSrc = getDarkLogoUrl() || `${process.env.PUBLIC_URL}/njila-logo-dark.svg`;
 
@@ -96,7 +97,7 @@ const VerifyEmail: React.FC = () => {
         </Box>
         <Box>
           <Typography variant="h1" color="primary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
-            {t("auth.pages.verifyEmail.registrationThankYou")}
+            {t("auth.pages.verifyEmail.registrationThankYou", { appName })}
           </Typography>
           <Typography variant="body2" data-testid={DATA_TEST_ID.VERIFICATION_BODY}>
             {t("auth.pages.verifyEmail.verificationEmailSentMessage")}

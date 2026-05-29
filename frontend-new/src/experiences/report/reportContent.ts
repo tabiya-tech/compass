@@ -1,4 +1,5 @@
 import i18n from "src/i18n/i18n";
+import { getProductName } from "src/envService";
 
 export const ReportContent = {
   // Use i18n keys and resolve at call/render time
@@ -30,7 +31,7 @@ export const ReportContent = {
     return i18n.t("experiences.report.topSkillsTitle");
   },
   get SKILLS_DESCRIPTION_TEXT() {
-    return i18n.t("experiences.report.skillsDescriptionText");
+    return i18n.t("experiences.report.skillsDescriptionText", { appName: getProductName() });
   },
   get DISCLAIMER_TEXT_PART1() {
     return i18n.t("experiences.report.disclaimer.part1");
@@ -39,9 +40,10 @@ export const ReportContent = {
     return i18n.t("experiences.report.disclaimer.part2");
   },
   get DISCLAIMER_TEXT_PART3() {
-    return i18n.t("experiences.report.disclaimer.part3");
+    return i18n.t("experiences.report.disclaimer.part3", { appName: getProductName() });
   },
-  REPORT_BODY_TEXT: (currentDate: string) => i18n.t("experiences.report.bodyText", { date: currentDate }),
+  REPORT_BODY_TEXT: (currentDate: string) =>
+    i18n.t("experiences.report.bodyText", { date: currentDate, appName: getProductName() }),
   IMAGE_URLS: {
     NJILA_LOGO: `${process.env.PUBLIC_URL}/njila-logo-dark.svg`,
     OXFORD_LOGO: `${process.env.PUBLIC_URL}/oxford-logo.png`,

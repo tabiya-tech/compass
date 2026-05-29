@@ -27,7 +27,7 @@ import { ChatError, MetricsError } from "src/error/commonErrors";
 import authenticationStateService from "src/auth/services/AuthenticationState.service";
 import { ensureSessionForUser } from "./ensureSession";
 import { issueNewSession } from "./issueNewSession";
-import { getNewSessionEnabled } from "src/envService";
+import { getNewSessionEnabled, getProductName } from "src/envService";
 import { useRebuildProfile } from "./RebuildProfileContext";
 import { ChatProvider } from "src/chat/ChatContext";
 import { lazyWithPreload } from "src/utils/preloadableComponent/PreloadableComponent";
@@ -124,6 +124,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [newConversationDialog, setNewConversationDialog] = React.useState<boolean>(false);
   const [exploredExperiencesNotification, setExploredExperiencesNotification] = useState<boolean>(false);
   const newSessionEnabled = getNewSessionEnabled();
+  const appName = getProductName();
   const allowRefreshRef = useRef<boolean>(false);
   const networkInfoSentRef = useRef<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(
@@ -1218,16 +1219,16 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
             title={t("chat.chat.refreshConfirmationDialog.title")}
             content={
               <>
-                {t("chat.chat.refreshConfirmationDialog.content")}
+                {t("chat.chat.refreshConfirmationDialog.content", { appName })}
                 <br />
                 <br />
-                {t("chat.chat.refreshConfirmationDialog.question")}
+                {t("chat.chat.refreshConfirmationDialog.question", { appName })}
               </>
             }
             onCancel={handleCancelRefresh}
             onConfirm={handleConfirmRefresh}
             onDismiss={handleCancelRefresh}
-            cancelButtonText={t("chat.chat.refreshConfirmationDialog.waitButton")}
+            cancelButtonText={t("chat.chat.refreshConfirmationDialog.waitButton", { appName })}
             confirmButtonText={t("chat.chat.refreshConfirmationDialog.refreshButton")}
           />
         )}

@@ -15,7 +15,7 @@ export const DATA_TEST_ID = {
 const HomeHero: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const appName = getProductName() || "";
+  const appName = getProductName();
 
   return (
     <Box

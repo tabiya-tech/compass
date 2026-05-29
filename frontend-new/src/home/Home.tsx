@@ -3,6 +3,7 @@ import React from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import { isConnectionError } from "src/error/restAPIError/isConnectionError";
 import Footer from "src/home/components/Footer/Footer";
 import HomeHero from "src/home/components/HomeHero/HomeHero";
@@ -22,6 +23,7 @@ export const DATA_TEST_ID = {
 const Home: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const appName = getProductName();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const { profileData, isLoadingModules, errors } = useUserProfileContext();
 
@@ -30,7 +32,7 @@ const Home: React.FC = () => {
   const careerReadinessModules = profileData?.modules ?? [];
   const moduleErrorMessage = modulesConnectionError
     ? t("common.errors.api.serverConnectionError")
-    : t("error.errorPage.defaultMessage");
+    : t("error.errorPage.defaultMessage", { appName });
 
   return (
     <Box

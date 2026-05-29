@@ -1,5 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import ExperiencesDrawerContent, {
   DATA_TEST_ID,

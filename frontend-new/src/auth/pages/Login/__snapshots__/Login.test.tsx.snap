@@ -20,7 +20,7 @@ exports[`Testing Login component Render tests should hide login code related ele
         <div
           class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
         >
-          If you already have a Njila account, enter your 
+          If you already have a {{appName}} account, enter your 
           <strong>
             email
           </strong>
@@ -91,7 +91,7 @@ exports[`Testing Login component Render tests should hide login code related ele
         <div
           class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
         >
-          If you already have a Njila account, enter your 
+          If you already have a {{appName}} account, enter your 
           <strong>
             email
           </strong>
@@ -162,7 +162,7 @@ exports[`Testing Login component Render tests should show continue as guest if l
         <div
           class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
         >
-          If you already have a Njila account, enter your 
+          If you already have a {{appName}} account, enter your 
           <strong>
             email
           </strong>
@@ -256,7 +256,7 @@ exports[`Testing Login component it should show login form successfully 1`] = `
       <div
         class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
       >
-        If you already have a Njila account, enter your 
+        If you already have a {{appName}} account, enter your 
         <strong>
           email
         </strong>
@@ -347,7 +347,7 @@ exports[`Testing Login component should handle application login code 1`] = `
       <div
         class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
       >
-        If you already have a Njila account, enter your 
+        If you already have a {{appName}} account, enter your 
         <strong>
           email
         </strong>
@@ -441,7 +441,7 @@ exports[`Testing Login component should remove registration link if registration
         <div
           class="MuiTypography-root MuiTypography-body2 css-ec8wkj-MuiTypography-root"
         >
-          If you already have a Njila account, enter your 
+          If you already have a {{appName}} account, enter your 
           <strong>
             email
           </strong>

@@ -1,5 +1,6 @@
 // mute the console
 import "src/_test_utilities/consoleMock";
+import "src/_test_utilities/envServiceMock";
 
 import ExperienceCategory from "src/experiences/experiencesDrawer/components/experienceCategory/ExperienceCategory";
 import { render, screen } from "src/_test_utilities/test-utils";

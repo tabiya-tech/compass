@@ -33,6 +33,7 @@ import CancellableTypingChatMessage, {
   CancellableTypingChatMessageProps,
 } from "src/chat/chatMessage/cancellableTypingChatMessage/CancellableTypingChatMessage";
 import i18n from "src/i18n/i18n";
+import { getProductName } from "src/envService";
 
 const uniqueId = "cancellable-cv-typing-message-2a76494f-351d-409d-ba58-e1b2cfaf2a53";
 export const CANCELLABLE_CV_TYPING_CHAT_MESSAGE_TYPE = `cancellable-cv-typing-message-${uniqueId}`;
@@ -46,7 +47,7 @@ export const FIXED_MESSAGES_TEXT = {
     return i18n.t("chat.util.feedbackThankYou");
   },
   get THANK_YOU_FOR_RATING() {
-    return i18n.t("chat.util.ratingThankYou");
+    return i18n.t("chat.util.ratingThankYou", { appName: getProductName() });
   },
   get SOMETHING_WENT_WRONG() {
     return i18n.t("chat.util.errorSomethingWentWrong");

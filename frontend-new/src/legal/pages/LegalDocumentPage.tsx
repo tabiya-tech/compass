@@ -24,7 +24,7 @@ const applyAppNamePlaceholders = (text: string, appName: string): string => text
 
 const LegalDocumentPage: React.FC<LegalDocumentPageProps> = ({ variant }) => {
   const theme = useTheme();
-  const appName = getProductName() || "Njila";
+  const appName = getProductName();
 
   const { title, markdown } = useMemo(() => getLegalDocument(variant), [variant]);
   const markdownWithAppName = useMemo(() => applyAppNamePlaceholders(markdown, appName), [markdown, appName]);

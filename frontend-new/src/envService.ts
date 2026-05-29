@@ -215,7 +215,7 @@ export const getProductName = () => {
   const envAppName = getEnv(EnvVariables.GLOBAL_PRODUCT_NAME);
   if (!envAppName) {
     console.warn("Product name not set, keeping the default");
-    return "Compass";
+    return "Njila";
   }
 
   return envAppName;

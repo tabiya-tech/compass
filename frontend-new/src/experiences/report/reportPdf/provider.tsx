@@ -4,6 +4,7 @@ import { IReportFormatProvider, ReportProps } from "src/experiences/report/types
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "src/experiences/saveAs";
 import { SkillsReportOutputConfig } from "src/experiences/report/config/types";
+import { getProductName } from "src/envService";
 
 export const PDF_REPORT_FILENAME = "Experience-Report.pdf";
 export const PDF_MIME_TYPE = "application/pdf";
@@ -35,7 +36,7 @@ export class PDFReportDownloadProvider implements IReportFormatProvider {
 
   async download(props: ReportProps) {
     try {
-      const fileName = "njila-cv.pdf";
+      const fileName = `${getProductName().toLowerCase()}-cv.pdf`;
       const blob = await this.generateBlob(props);
       saveAs(blob, fileName);
     } catch (error) {

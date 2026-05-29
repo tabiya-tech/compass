@@ -22,7 +22,7 @@ exports[`Sensitive Data Form Rendering static fields should render First Name, L
         <p
           class="MuiTypography-root MuiTypography-body2 css-1sldguw-MuiTypography-root"
         >
-          We use your data to personalize your experience and may contact you about {{appName}}.
+          We use your data to personalize your experience and may contact you about mockProduct.
            You can skip this step.
         </p>
       </div>

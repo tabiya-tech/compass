@@ -2,7 +2,7 @@
   "common": {
     "buttons": {
       "login": "Entrar",
-      "loginLink": "Entrar no Njila",
+      "loginLink": "Entrar no {{appName}}",
       "logout": "Sair",
       "submit": "Submeter",
       "register": "Criar Conta",
@@ -291,7 +291,7 @@
         "loginUsing": "Entrar através de",
         "loggingYouIn": "A iniciar a sua sessão...",
         "loggingInAria": "A iniciar sessão",
-        "signInDescription": "Se já tem uma conta Njila, insira o seu <0>email</0> e <1>palavra-passe</1> para lhe aceder, ou escolha <2>Google</2> para entrar.",
+        "signInDescription": "Se já tem uma conta {{appName}}, insira o seu <0>email</0> e <1>palavra-passe</1> para lhe aceder, ou escolha <2>Google</2> para entrar.",
         "dontHaveAnAccount": "Ainda não tem conta? Registe-se gratuitamente.",
         "needHelp": "Ajuda",
         "fillInEmailAndPassword": "Por favor, preencha os campos de email e palavra-passe",
@@ -322,7 +322,7 @@
       },
       "register": {
         "signUpTitle": "Criar uma conta",
-        "signUpDescription": "Para criar uma conta Njila, insira o seu <0>endereço de email</0> e crie uma <1>palavra-passe</1>. Também pode criar uma conta com a sua conta <2>Google</2>.",
+        "signUpDescription": "Para criar uma conta {{appName}}, insira o seu <0>endereço de email</0> e crie uma <1>palavra-passe</1>. Também pode criar uma conta com a sua conta <2>Google</2>.",
         "emailPlaceholder": "O seu endereço de email",
         "passwordPlaceholder": "Crie uma palavra-passe",
         "confirmPasswordPlaceholder": "Repita a palavra-passe",
@@ -489,6 +489,12 @@
               "summaryPlaceholder": "Resumo da experiência",
               "restoreFailed": "Não conseguimos restaurar esse resumo. O seu resumo anterior ainda está guardado — por favor, tente novamente.",
               "restored": "Resumo restaurado."
+            },
+            "addSkillsDrawer": {
+              "title": "Selecionar Competências",
+              "helpTip": "Toque numa competência para ver mais detalhes. Pode selecionar as competências que pretende adicionar à sua experiência.",
+              "subtitle": "Estas são competências adicionais de topo identificadas pelo {{appName}} com base na sua experiência.",
+              "okButton": "OK"
             }
           },
           "updateSuccess": "Experiência atualizada com sucesso!",
@@ -601,7 +607,7 @@
           "timelineMaxLength": "Máximo de {{max}} caracteres permitidos."
         }
       },
-      "reportTitle": "Seu Relatório de Competências Njila",
+      "reportTitle": "Seu Relatório de Competências {{appName}}",
       "educationLabel": "EDUCAÇÃO",
       "experiencesAndSkillsLabel": "EXPERIÊNCIAS E COMPETÊNCIAS"
     },
@@ -1126,7 +1132,7 @@
       },
       "careerExplorer": {
         "title": "Sectores Explorados",
-        "emptyState": "Os sectores aparecerão aqui à medida que explora carreiras com o Njila."
+        "emptyState": "Os sectores aparecerão aqui à medida que explora carreiras com o {{appName}}."
       },
       "careerReadiness": {
         "title": "Temas"
@@ -1296,15 +1302,15 @@
     "faqAriaLabel": "Ajuda e FAQ"
   },
   "faq": {
-    "lede": "Respostas a perguntas comuns sobre o Njila — como funciona, como criar uma conta e como resolver problemas comuns.",
+    "lede": "Respostas a perguntas comuns sobre o {{appName}} — como funciona, como criar uma conta e como resolver problemas comuns.",
     "searchPlaceholder": "Procurar perguntas...",
     "searchAriaLabel": "Procurar FAQ",
     "clearSearch": "Limpar pesquisa",
     "tocLabel": "Nesta página",
     "noResults": "Nenhuma pergunta corresponde a essa pesquisa.",
     "tutorialEyebrow": "Tutorial de 4 min",
-    "tutorialHeading": "Veja como funciona o Njila",
-    "tutorialIframeTitle": "Vídeo tutorial do Njila",
+    "tutorialHeading": "Veja como funciona o {{appName}}",
+    "tutorialIframeTitle": "Vídeo tutorial do {{appName}}",
     "tutorialUnavailableOffline": "Está offline. Ligue-se à internet para ver este vídeo.",
     "scrollProgressLabel": "Progresso da leitura"
   }

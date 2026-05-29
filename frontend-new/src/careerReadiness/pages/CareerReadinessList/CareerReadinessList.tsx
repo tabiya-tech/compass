@@ -1,6 +1,7 @@
 import React, { startTransition, useContext } from "react";
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { getProductName } from "src/envService";
 import type { Theme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { routerPaths } from "src/app/routerPaths";
@@ -28,6 +29,7 @@ export const DATA_TEST_ID = {
 const CareerReadinessList: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const appName = getProductName();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const isOnline = useContext(IsOnlineContext);
@@ -40,7 +42,7 @@ const CareerReadinessList: React.FC = () => {
   const modulesConnectionError = isConnectionError(errors?.modules);
   const modulesErrorMessage = modulesConnectionError
     ? t("common.errors.api.serverConnectionError")
-    : t("error.errorPage.defaultMessage");
+    : t("error.errorPage.defaultMessage", { appName });
 
   const upNextModule =
     modules.find((m) => m.status === "IN_PROGRESS") ??
