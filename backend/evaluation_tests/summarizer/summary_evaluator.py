@@ -17,7 +17,7 @@ class SummaryCriteriaEvaluator(BaseEvaluator):
         super().__init__(criteria)
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
-        self.llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
+        self.llm = GeminiGenerativeLLM(config=LLMConfig())
 
     async def evaluate(self, actual: SummaryEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_summary_prompt(conversation=actual.generate_conversation(),

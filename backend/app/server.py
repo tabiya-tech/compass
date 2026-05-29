@@ -19,7 +19,7 @@ from app.vector_search.occupation_search_routes import add_occupation_search_rou
 from app.vector_search.skill_search_routes import add_skill_search_routes
 from app.vector_search.validate_taxonomy_model import validate_taxonomy_model
 from app.version.version_routes import add_version_routes
-from app.i18n.language_config import get_language_config
+from app.i18n.language_config import load_language_config_from_env
 
 from contextlib import asynccontextmanager
 
@@ -74,7 +74,8 @@ def setup_sentry():
         else:
             logging.warning("BACKEND_SENTRY_DSN environment variable is not set. Sentry will not be initialized")
     else:
-        logging.warning("BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
+        logging.warning(
+            "BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
 
 
 ############################################
@@ -107,24 +108,28 @@ backend_url = os.getenv("BACKEND_URL")
 logger.info(f"Backend URL: {backend_url}")
 
 if not os.getenv("TARGET_ENVIRONMENT_TYPE"):
-    raise ValueError("Mandatory TARGET_ENVIRONMENT_TYPE env variable is not set! Please set it to the target environment type as it is "
-                     "required to set the CORS policy correctly for allowing local development if it is set to 'local' or 'dev'.")
+    raise ValueError(
+        "Mandatory TARGET_ENVIRONMENT_TYPE env variable is not set! Please set it to the target environment type as it is "
+        "required to set the CORS policy correctly for allowing local development if it is set to 'local' or 'dev'.")
 
 target_environment_type = os.getenv("TARGET_ENVIRONMENT_TYPE")
 logger.info(f"Target environment: {target_environment_type}")
 
 if not os.getenv("TARGET_ENVIRONMENT_NAME"):
-    raise ValueError("Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
-                     "Required by sentry to know on which environment some Sentry Events occurred")
+    raise ValueError(
+        "Mandatory TARGET_ENVIRONMENT_NAME env variable is not set! Please set it to the target environment name as it is "
+        "Required by sentry to know on which environment some Sentry Events occurred")
 
 enable_sentry = os.getenv("BACKEND_ENABLE_SENTRY")
 if not enable_sentry:
-    raise ValueError("Mandatory BACKEND_ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
+    raise ValueError(
+        "Mandatory BACKEND_ENABLE_SENTRY env variable is not set! Please set it to the either True or False")
 logger.info(f"BACKEND_ENABLE_SENTRY: {os.getenv('BACKEND_ENABLE_SENTRY')}")
 
 _metrics_enabled_str = os.getenv("BACKEND_ENABLE_METRICS")
 if not _metrics_enabled_str:
-    raise ValueError("Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
+    raise ValueError(
+        "Mandatory BACKEND_ENABLE_METRICS env variable is not set! Please set it to the either True or False")
 logger.info(f"BACKEND_ENABLE_METRICS: {_metrics_enabled_str}")
 
 _default_country_of_user_str = os.getenv("DEFAULT_COUNTRY_OF_USER")
@@ -184,9 +189,9 @@ else:
 
 # Validate and load BACKEND_LANGUAGE_CONFIG environment variable
 try:
-    language_config = get_language_config()
-    logger.info(f"Loaded BACKEND_LANGUAGE_CONFIG with {len(language_config.available_locales)} available locales")
-    logger.info(f"Backend default locale: {language_config.default_locale}")
+    language_config = load_language_config_from_env()
+    logger.info(f"Backend reporting locale: {language_config.reporting_locale}")
+    logger.info(f"Backend conversation fallback language: {language_config.conversation_fallback_locale}")
 except RuntimeError as e:
     _error_message = f"BACKEND_LANGUAGE_CONFIG environment variable is not set! {e}"
     logger.error(_error_message)
@@ -233,14 +238,14 @@ set_application_config(application_config)
 
 # warning log when registration code bypass is enabled
 if _disable_registration_code:
-    logger.warning("GLOBAL_DISABLE_REGISTRATION_CODE is enabled - registered users can create preferences without invitation codes.")
+    logger.warning(
+        "GLOBAL_DISABLE_REGISTRATION_CODE is enabled - registered users can create preferences without invitation codes.")
 
 ##################
 # Set Sentry Context, after setting application config.
 # because: some contexts depend on the application config variables.
 #################
 set_sentry_contexts()
-
 
 ############################################
 # Initialize Feature Loader
@@ -297,8 +302,8 @@ async def lifespan(_app: FastAPI):
 
     # close the database connections
     application_db.client.close()
-    userdata_db.client.close()
     taxonomy_db.client.close()
+    userdata_db.client.close()
     metrics_db.client.close()
 
     logger.info("Shutting down completed.")

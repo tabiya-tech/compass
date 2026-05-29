@@ -206,7 +206,7 @@ async def test_skills_explorer_agent_first_message(test_case, caplog: pytest.Log
     with caplog.at_level(logging.INFO):
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=logger, caplog=caplog)
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         conversation_manager = ConversationMemoryManager(UNSUMMARIZED_WINDOW_SIZE, TO_BE_SUMMARIZED_WINDOW_SIZE)
         conversation_manager.set_state(state=ConversationMemoryManagerState(session_id=get_random_session_id()))

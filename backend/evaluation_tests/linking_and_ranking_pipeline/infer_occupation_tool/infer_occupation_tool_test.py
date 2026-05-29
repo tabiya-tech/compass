@@ -51,7 +51,7 @@ async def _test_occupation_inference_tool(test_case: InferOccupationToolTestCase
     # However, this is not enough as a logger can be set up in the agent in such a way that it does not propagate
     # the log messages to the root logger. For this reason, we add additional guards.
     with caplog.at_level(logging.INFO):
-        get_i18n_manager().set_locale(test_case.locale)
+        get_i18n_manager().set_locales(test_case.locale, test_case.locale)
 
         # Guards to ensure that the loggers are correctly set up,
         guard_caplog(logger=tool._logger, caplog=caplog)

@@ -1,6 +1,7 @@
 import logging.config
 import random
 from datetime import datetime, timezone
+from typing import Any, Generator
 from uuid import uuid4
 
 import pytest
@@ -23,19 +24,21 @@ from app.store.database_application_state_store import DatabaseApplicationStateS
 from app.users.generate_session_id import generate_new_session_id
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity, OccupationEntity, AssociatedSkillEntity
 from common_libs.test_utilities.guard_caplog import guard_caplog
-from conftest import random_db_name
+from conftest import random_db_name, drop_database_and_close_client
 
 logger = logging.getLogger()
 
 
 @pytest.fixture(scope='function')
-def in_memory_db(in_memory_mongo_server) -> AsyncIOMotorDatabase:
-    in_memory_db = AsyncIOMotorClient(
+def in_memory_db(in_memory_mongo_server) -> Generator[AsyncIOMotorDatabase, Any, None]:
+    client = AsyncIOMotorClient(
         in_memory_mongo_server.connection_string,
         tlsAllowInvalidCertificates=True
-    ).get_database(random_db_name())
-
-    return in_memory_db
+    )
+    db_name = random_db_name()
+    in_memory_db = client.get_database(db_name)
+    yield in_memory_db
+    drop_database_and_close_client(client, in_memory_mongo_server.connection_string, db_name)
 
 
 @pytest.fixture(scope='function')

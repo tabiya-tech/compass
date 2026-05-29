@@ -134,7 +134,7 @@ test_cases_sentence_decomposition = [
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_sentence_decomposition),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_sentence_decomposition)])
 async def test_sentence_decomposition(test_case: _TestCaseSentenceDecomposition):
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     context: ConversationContext = ConversationContext()
 
     # GIVEN the previous conversation context

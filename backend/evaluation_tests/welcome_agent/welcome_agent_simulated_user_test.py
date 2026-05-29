@@ -43,7 +43,7 @@ async def test_welcome_agent_simulated_user(evals_setup, max_iterations: int, te
     print(f"Running test case {test_case.name}")
 
     session_id = hash(test_case.name) % 10 ** 10
-    get_i18n_manager().set_locale(test_case.locale)
+    get_i18n_manager().set_locales(test_case.locale, test_case.locale)
     output_folder = os.path.join(os.getcwd(), 'test_output/welcome_agent/simulated_user/', test_case.name)
 
     # The conversation manager for this test
