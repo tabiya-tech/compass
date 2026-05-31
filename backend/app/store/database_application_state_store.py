@@ -290,16 +290,20 @@ class DatabaseApplicationStateStore(ApplicationStateStore):
                 # Transfer preference vector
                 state.recommender_advisor_agent_state.preference_vector = state.preference_elicitation_agent_state.preference_vector
 
-                # Transfer BWS occupation scores, boosted by HB utilities to break integer ties
+                # Transfer BWS data to recommender. HB is the source of truth for the ranking
+                # sent to the matching service; counts are kept only as a fallback if HB failed.
                 pref_state = state.preference_elicitation_agent_state
-                if pref_state.hb_scores and pref_state.bws_scores:
+                if pref_state.hb_scores and pref_state.hb_ranking:
                     state.recommender_advisor_agent_state.bws_scores = {
-                        wa_id: count_score + 0.1 * pref_state.hb_scores[wa_id]["mean"]
-                        for wa_id, count_score in pref_state.bws_scores.items()
-                        if wa_id in pref_state.hb_scores
+                        wa_id: entry["mean"]
+                        for wa_id, entry in pref_state.hb_scores.items()
                     }
+                    state.recommender_advisor_agent_state.top_10_bws = list(pref_state.hb_ranking)
                 else:
                     state.recommender_advisor_agent_state.bws_scores = pref_state.bws_scores
+                    state.recommender_advisor_agent_state.top_10_bws = (
+                        list(pref_state.top_10_bws) if pref_state.top_10_bws else None
+                    )
 
                 # Extract and transfer skills vector
                 state.recommender_advisor_agent_state.skills_vector = self._extract_skills_from_experiences(

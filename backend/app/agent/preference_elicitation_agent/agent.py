@@ -737,6 +737,7 @@ class PreferenceElicitationAgent(Agent):
                     }
                     for item in hb_result.items
                 }
+                self._state.hb_ranking = [item.wa_id for item in hb_result.items]
                 hb_top_labels = [wa_labels.get(wa_id, wa_id) for wa_id in hb_result.top_k[:5]]
                 self.logger.info(
                     f"HB scoring complete (converged={hb_result.converged}). "

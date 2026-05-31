@@ -96,7 +96,12 @@ class RecommenderAdvisorAgentState(BaseModel):
         default=None,
         description="BWS ranking scores from Epic 2 (code → score, works for occupations or tasks)"
     )
-    
+
+    top_10_bws: Optional[list[str]] = Field(
+        default=None,
+        description="HB-ranked list of WA_Element_IDs (best → worst). Forwarded to matching service."
+    )
+
     # === NODE2VEC RECOMMENDATIONS ===
     recommendations: Optional[Node2VecRecommendations] = Field(
         default=None,

@@ -355,6 +355,7 @@ Always return a valid JSON object matching this exact schema.
                     preference_vector=state.preference_vector,
                     skills_vector=state.skills_vector,
                     bws_scores=state.bws_scores,
+                    top_10_bws=state.top_10_bws,
                 )
                 new_occs = [
                     occ for occ in fresh.occupation_recommendations

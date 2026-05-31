@@ -90,6 +90,13 @@ class PreferenceElicitationAgentState(BaseModel):
     top_10_bws: list[str] = Field(default_factory=list)
     """Top 10 codes ranked by BWS scores (occupation or task codes)"""
 
+    hb_ranking: list[str] = Field(default_factory=list)
+    """
+    Full ranked list of WA_Element_IDs (best → worst) by HB posterior mean.
+    Source of truth for the ranking forwarded to the matching service.
+    Empty if HB scoring failed (handoff falls back to count-derived top_10_bws).
+    """
+
     completed_vignettes: list[str] = Field(default_factory=list)
     """List of vignette IDs that have been completed"""
 
@@ -272,6 +279,7 @@ class PreferenceElicitationAgentState(BaseModel):
             bws_scores=doc.get("bws_scores") or doc.get("occupation_scores"),
             hb_scores=doc.get("hb_scores"),
             top_10_bws=list(doc.get("top_10_bws") or doc.get("top_10_occupations", [])),
+            hb_ranking=list(doc.get("hb_ranking", [])),
             completed_vignettes=doc.get("completed_vignettes", []),
             current_vignette_id=doc.get("current_vignette_id"),
             vignette_responses=[

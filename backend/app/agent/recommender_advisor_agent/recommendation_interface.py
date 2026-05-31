@@ -278,12 +278,19 @@ def _to_matching_skills_vector(skills_vector: Optional[dict]) -> MatchingSkillsV
     )
 
 
-def _to_matching_preference_vector(preference_vector: Optional[PreferenceVector]) -> MatchingPreferenceVector:
+def _to_matching_preference_vector(
+    preference_vector: Optional[PreferenceVector],
+    bws_scores: Optional[dict[str, float]] = None,
+    top_10_bws: Optional[list[str]] = None,
+) -> MatchingPreferenceVector:
     """Translate the agent's Bayesian PreferenceVector into the matching service's PreferenceVector.
 
     The two models use different dimension names (the agent uses importance scores like
     `financial_importance`; the matching service uses domain dimensions like
     `earnings_per_month`). Unmapped matching-service dimensions default to neutral 0.5.
+
+    Optional BWS data (per-WA scores and the HB-derived ranked list) is forwarded to the
+    matching service via the `bws_scores` and `top_10_bws` fields on its PreferenceVector.
     """
     if preference_vector is None:
         return MatchingPreferenceVector(
@@ -291,6 +298,8 @@ def _to_matching_preference_vector(preference_vector: Optional[PreferenceVector]
             physical_demand=0.5,
             social_interaction=0.5,
             career_growth=0.5,
+            bws_scores=bws_scores,
+            top_10_bws=top_10_bws,
         )
     return MatchingPreferenceVector(
         earnings_per_month=preference_vector.financial_importance,
@@ -298,6 +307,8 @@ def _to_matching_preference_vector(preference_vector: Optional[PreferenceVector]
         work_flexibility=preference_vector.work_life_balance_importance,
         social_interaction=0.5,
         career_growth=preference_vector.career_advancement_importance,
+        bws_scores=bws_scores,
+        top_10_bws=top_10_bws,
     )
 
 
@@ -329,6 +340,7 @@ class RecommendationInterface:
         preference_vector: Optional[PreferenceVector] = None,
         skills_vector: Optional[dict] = None,
         bws_scores: Optional[dict[str, float]] = None,
+        top_10_bws: Optional[list[str]] = None,
     ) -> Node2VecRecommendations:
         """
         Generate recommendations for a user.
@@ -341,7 +353,8 @@ class RecommendationInterface:
             province: User's province/state (required by matching service)
             preference_vector: Preference vector from Epic 2
             skills_vector: Skills vector from Epic 4
-            bws_scores: BWS ranking from Epic 2
+            bws_scores: Per-WA BWS scores (HB posterior means; counts on HB failure)
+            top_10_bws: HB-ranked WA_Element_IDs (best → worst)
 
         Returns:
             Node2VecRecommendations object (in agent format)
@@ -358,7 +371,11 @@ class RecommendationInterface:
                     city=city,
                     province=province,
                     skills_vector=_to_matching_skills_vector(skills_vector),
-                    preference_vector=_to_matching_preference_vector(preference_vector),
+                    preference_vector=_to_matching_preference_vector(
+                        preference_vector,
+                        bws_scores=bws_scores,
+                        top_10_bws=top_10_bws,
+                    ),
                 )
 
                 # Convert unified CompassMatchingResult to agent format

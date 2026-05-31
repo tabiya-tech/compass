@@ -412,3 +412,63 @@ class TestDatabaseApplicationStateStore:
             assert caplog.records[0].levelname == "ERROR"
             assert caplog.records[
                        0].message == f"Missing critical application state part(s) for session ID {given_session_id}. Missing part(s): ['{collection_name}']"
+
+
+class TestBwsHandoffToRecommender:
+    """
+    Tests that the preference→recommender handoff in `_upgrade_state` sends the
+    HB-derived ranking and HB posterior means when HB succeeded, and falls back
+    to the count-based scoring when HB failed (or wasn't populated).
+    """
+
+    @staticmethod
+    def _seed_pref_state(state: ApplicationState) -> None:
+        """Mark the preference agent as having done meaningful work so the handoff fires."""
+        state.preference_elicitation_agent_state.preference_vector.n_vignettes_completed = 4
+
+    @pytest.mark.asyncio
+    async def test_handoff_uses_hb_means_and_ranking_when_hb_present(
+        self, database_application_state_store: DatabaseApplicationStateStore
+    ):
+        # GIVEN a state where HB scoring populated both hb_scores and hb_ranking
+        state = ApplicationState.new_state(session_id=generate_new_session_id())
+        self._seed_pref_state(state)
+        pref = state.preference_elicitation_agent_state
+        pref.bws_scores = {"4.A.1.a.1": 2.0, "4.A.2.b.3": -1.0}
+        pref.hb_scores = {
+            "4.A.1.a.1": {"mean": 1.4, "sd": 0.3, "ci_low": 0.7, "ci_high": 2.0, "rank": 1},
+            "4.A.2.b.3": {"mean": -0.8, "sd": 0.4, "ci_low": -1.5, "ci_high": 0.0, "rank": 2},
+            "4.A.3.a.1": {"mean": 0.1, "sd": 0.5, "ci_low": -0.7, "ci_high": 0.9, "rank": 3},
+        }
+        pref.hb_ranking = ["4.A.1.a.1", "4.A.3.a.1", "4.A.2.b.3"]
+        pref.top_10_bws = ["4.A.1.a.1", "4.A.2.b.3"]  # count-derived; should NOT win
+
+        # WHEN the upgrade runs
+        upgraded = await database_application_state_store._upgrade_state(state)
+
+        # THEN bws_scores carry HB posterior means (NOT counts, NOT count+0.1*mean)
+        rec = upgraded.recommender_advisor_agent_state
+        assert rec.bws_scores == {"4.A.1.a.1": 1.4, "4.A.2.b.3": -0.8, "4.A.3.a.1": 0.1}
+        # AND top_10_bws is the HB ranking, not the count-derived list
+        assert rec.top_10_bws == ["4.A.1.a.1", "4.A.3.a.1", "4.A.2.b.3"]
+
+    @pytest.mark.asyncio
+    async def test_handoff_falls_back_to_counts_when_hb_absent(
+        self, database_application_state_store: DatabaseApplicationStateStore
+    ):
+        # GIVEN HB scoring failed (hb_scores is None) but counts exist
+        state = ApplicationState.new_state(session_id=generate_new_session_id())
+        self._seed_pref_state(state)
+        pref = state.preference_elicitation_agent_state
+        pref.bws_scores = {"4.A.1.a.1": 2.0, "4.A.2.b.3": -1.0}
+        pref.hb_scores = None
+        pref.hb_ranking = []
+        pref.top_10_bws = ["4.A.1.a.1", "4.A.2.b.3"]
+
+        # WHEN the upgrade runs
+        upgraded = await database_application_state_store._upgrade_state(state)
+
+        # THEN counts are shipped raw and top_10_bws falls back to the count-derived list
+        rec = upgraded.recommender_advisor_agent_state
+        assert rec.bws_scores == {"4.A.1.a.1": 2.0, "4.A.2.b.3": -1.0}
+        assert rec.top_10_bws == ["4.A.1.a.1", "4.A.2.b.3"]

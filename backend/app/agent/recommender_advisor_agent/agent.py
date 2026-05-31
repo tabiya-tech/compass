@@ -283,6 +283,7 @@ class RecommenderAdvisorAgent(Agent):
         preference_vector: Optional[PreferenceVector] = None,
         skills_vector: Optional[dict] = None,
         bws_scores: Optional[dict[str, float]] = None,
+        top_10_bws: Optional[list[str]] = None,
         recommendations: Optional[Node2VecRecommendations] = None,
     ) -> RecommenderAdvisorAgentState:
         """
@@ -296,6 +297,7 @@ class RecommenderAdvisorAgent(Agent):
             preference_vector: Preference vector from Epic 2
             skills_vector: Skills vector from Epic 4
             bws_scores: BWS ranking from Epic 2
+            top_10_bws: HB-ranked WA_Element_IDs forwarded to matching service
             recommendations: Pre-generated Node2Vec recommendations (optional)
 
         Returns:
@@ -311,6 +313,7 @@ class RecommenderAdvisorAgent(Agent):
             preference_vector=preference_vector,
             skills_vector=skills_vector,
             bws_scores=bws_scores,
+            top_10_bws=top_10_bws,
             recommendations=recommendations,
         )
     
@@ -431,6 +434,7 @@ class RecommenderAdvisorAgent(Agent):
                 preference_vector=self._state.preference_vector,
                 skills_vector=self._state.skills_vector,
                 bws_scores=self._state.bws_scores,
+                top_10_bws=self._state.top_10_bws,
             )
             new_occs = [o for o in fresh.occupation_recommendations if o.uuid not in seen_uuids]
             new_jobs = [j for j in fresh.opportunity_recommendations if j.uuid not in seen_uuids]
@@ -459,6 +463,7 @@ class RecommenderAdvisorAgent(Agent):
                 preference_vector=self._state.preference_vector,
                 skills_vector=self._state.skills_vector,
                 bws_scores=self._state.bws_scores,
+                top_10_bws=self._state.top_10_bws,
             )
             self.logger.info(
                 "Simple flow: generated recommendations for %s: %d occupations, %d opportunities",
