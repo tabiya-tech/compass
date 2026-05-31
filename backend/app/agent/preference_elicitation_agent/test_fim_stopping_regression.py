@@ -360,6 +360,7 @@ class TestFIMStoppingRegression:
 
 
 @pytest.mark.asyncio
+@pytest.mark.evaluation_test
 async def test_agent_adaptive_phase_not_skipped():
     """
     Integration test: run the agent through vignettes phase with mocked LLM calls
