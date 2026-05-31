@@ -146,10 +146,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
   const [initialized, setInitialized] = useState<boolean>(false);
 
   // Preference elicitation feature flag — gates BWS card rendering and input-disable behaviour.
-  const isPreferenceElicitationEnabled = useMemo(
-    () => getPreferenceElicitationEnabled() === "true",
-    []
-  );
+  const isPreferenceElicitationEnabled = useMemo(() => getPreferenceElicitationEnabled() === "true", []);
 
   // Stable ref for handleBWSSubmit — avoids a circular dep between sendMessage and handleBWSSubmit.
   const handleBWSSubmitRef = useRef<((taskId: string, bestWaId: string, worstWaId: string) => Promise<void>) | null>(
@@ -606,11 +603,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         response.messages.forEach((messageItem, idx) => {
           const isConclusionMessage = response.conversation_completed && idx === response.messages.length - 1;
           if (isConclusionMessage) return;
-          if (
-            isPreferenceElicitationEnabled &&
-            messageItem.message_type === "BWS_TASK" &&
-            messageItem.metadata
-          ) {
+          if (isPreferenceElicitationEnabled && messageItem.message_type === "BWS_TASK" && messageItem.metadata) {
             addMessageToChat(
               generateBWSTaskMessage(
                 messageItem.message_id,
@@ -691,7 +684,14 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         setAiIsTyping(false);
       }
     },
-    [addMessageToChat, exploredExperiences, fetchExperiences, activeSessionId, showSkillsRanking, isPreferenceElicitationEnabled]
+    [
+      addMessageToChat,
+      exploredExperiences,
+      fetchExperiences,
+      activeSessionId,
+      showSkillsRanking,
+      isPreferenceElicitationEnabled,
+    ]
   );
 
   const initializeChat = useCallback(
@@ -746,11 +746,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
               if (message.sender === ConversationMessageSender.USER) {
                 return generateUserMessage(message.message, message.sent_at);
               }
-              if (
-                isPreferenceElicitationEnabled &&
-                message.message_type === "BWS_TASK" &&
-                message.metadata
-              ) {
+              if (isPreferenceElicitationEnabled && message.message_type === "BWS_TASK" && message.metadata) {
                 return generateBWSTaskMessage(
                   message.message_id,
                   message.metadata,

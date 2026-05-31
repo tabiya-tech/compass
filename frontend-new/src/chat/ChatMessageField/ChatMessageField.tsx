@@ -458,7 +458,14 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
       message.trim().length === 0 ||
       message.trim().length > CHAT_MESSAGE_MAX_LENGTH // Only disable the send button when over the limit
     );
-  }, [props.isChatFinished, props.aiIsTyping, props.isUploadingCv, props.isAwaitingInteractiveResponse, isOnline, message]);
+  }, [
+    props.isChatFinished,
+    props.aiIsTyping,
+    props.isUploadingCv,
+    props.isAwaitingInteractiveResponse,
+    isOnline,
+    message,
+  ]);
 
   // Check if the input field should be disabled
   const inputIsDisabled = useCallback(() => {
