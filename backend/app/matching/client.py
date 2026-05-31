@@ -33,6 +33,18 @@ class MatchingServiceClient:
         self._logger.info(f"Sending request to {full_path}")
         # The matching service accepts a batch of users; we always send exactly one.
         request_json = [request.to_json()]
+        # One-line summary of the BWS payload that was historically dropped before reaching
+        # the matching service. Grep `[bws-payload]` to confirm the wire contract per session.
+        _pv = request_json[0].get("preference_vector", {})
+        _bws = _pv.get("bws_scores") or {}
+        _top = _pv.get("top_10_bws") or []
+        self._logger.info(
+            "[bws-payload] user=%s bws_scores=%d top_10_bws=%d top3=%s",
+            request.user_id, len(_bws), len(_top), _top[:3],
+        )
+        # Full payload at DEBUG only — contains skills/location, keep out of INFO logs.
+        import json as _json
+        self._logger.debug("[bws-payload] full: %s", _json.dumps(request_json[0], default=str))
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
