@@ -110,7 +110,8 @@
         "aiTyping": "AI is typing..., wait for it to finish.",
         "offline": "You are offline. Please connect to the internet to send a message.",
         "default": "Type your message...",
-        "uploading": "Uploading CV..."
+        "uploading": "Uploading CV...",
+        "awaitingInteractiveResponse": "Please use the buttons above to respond."
       },
       "uploadCvIntro": "You can upload your CV as soon as we start exploring your experiences",
       "uploadCvCollectExperiences": "PDF, DOCX, TXT • Max {{MAX_FILE_SIZE_MB}} MB • {{MAX_MARKDOWN_CHARS}} chars max",
@@ -122,6 +123,18 @@
       "typingChatMessage": {
         "typing": "Typing",
         "thinking": "Please wait, I'm thinking"
+      },
+      "bwsTaskMessage": {
+        "whichWouldYouPrefer": "Which would you prefer most and least?",
+        "most": "Best",
+        "least": "Worst",
+        "submit": "Submit",
+        "submitted": "Submitted"
+      },
+      "suggestedActions": {
+        "quickReplyButtons": {
+          "chooseOne": "Choose one option:"
+        }
       },
       "conversationConclusionFooter": {
         "youCanNow": "You can now",
@@ -172,6 +185,7 @@
         "intro": "Introduction",
         "collecting": "Collecting",
         "exploring": "Exploring",
+        "discoveringPreferences": "Discovering preferences",
         "finished": "Conversation finished",
         "unknown": "Unknown phase"
       }

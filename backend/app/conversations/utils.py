@@ -1,17 +1,37 @@
 from datetime import timezone, datetime
 from logging import Logger
-from typing import Optional
+from typing import Literal, Optional
 
+from app.agent.agent_director.abstract_agent_director import ConversationPhase, CounselingSubPhase
 from app.agent.explore_experiences_agent_director import DiveInPhase
-from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.explore_experiences_agent_director import ConversationPhase as CounselingConversationPhase
 from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_types import ConversationHistory, ConversationContext
 from app.conversations.types import ConversationMessage, ConversationMessageSender, MessageReaction, \
-    ConversationPhaseResponse, CurrentConversationPhaseResponse
+    ConversationPhaseResponse, CurrentConversationPhaseResponse, QuickReplyOption
 from app.conversations.reactions.types import Reaction
 from app.conversations.constants import BEGINNING_CONVERSATION_PERCENTAGE, FINISHED_CONVERSATION_PERCENTAGE, \
-    DIVE_IN_EXPERIENCES_PERCENTAGE, COLLECT_EXPERIENCES_PERCENTAGE
+    DIVE_IN_EXPERIENCES_PERCENTAGE, COLLECT_EXPERIENCES_PERCENTAGE, PREFERENCE_ELICITATION_PERCENTAGE
+
+
+def _derive_message_type(metadata: Optional[dict]) -> Literal["TEXT", "BWS_TASK"]:
+    """A BWS task message has a `task_id` and `alternatives` in its metadata payload."""
+    if metadata and metadata.get("task_id") is not None and "alternatives" in metadata:
+        return "BWS_TASK"
+    return "TEXT"
+
+
+def _quick_replies_from_metadata(metadata: Optional[dict]) -> Optional[list[QuickReplyOption]]:
+    """Extract optional quick-reply buttons from agent output metadata."""
+    if not metadata:
+        return None
+    raw = metadata.get("quick_reply_options")
+    if not raw:
+        return None
+    return [
+        QuickReplyOption(**opt) if isinstance(opt, dict) else QuickReplyOption(label=opt)
+        for opt in raw
+    ]
 
 
 def _convert_to_message_reaction(reaction: Reaction | None) -> MessageReaction | None:
@@ -54,12 +74,19 @@ async def filter_conversation_history(history: 'ConversationHistory', reactions_
                 compass_reaction = reaction
                 reactions_for_session.pop(i)
                 break
+        output_metadata = getattr(turn.output, "metadata", None)
+        # Only attach quick_reply_options to the last COMPASS message to avoid stale buttons.
+        is_last_turn = turn is history.turns[-1]
+        quick_reply_options = _quick_replies_from_metadata(output_metadata) if is_last_turn else None
         messages.append(ConversationMessage(
             message_id=turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
-            reaction=_convert_to_message_reaction(compass_reaction)
+            reaction=_convert_to_message_reaction(compass_reaction),
+            message_type=_derive_message_type(output_metadata),
+            metadata=output_metadata,
+            quick_reply_options=quick_reply_options,
         ))
     return messages
 
@@ -79,13 +106,21 @@ async def get_messages_from_conversation_manager(context: 'ConversationContext',
     _last = _hist.turns[-1]
 
     messages = []
-    for turn in context.all_history.turns[from_index:]:
+    turns_slice = context.all_history.turns[from_index:]
+    for turn in turns_slice:
         turn.output.sent_at = datetime.now(timezone.utc)
+        output_metadata = getattr(turn.output, "metadata", None)
+        # Only attach quick_reply_options to the last message in this batch.
+        is_last = turn is turns_slice[-1]
+        quick_reply_options = _quick_replies_from_metadata(output_metadata) if is_last else None
         messages.append(ConversationMessage(
             message_id=turn.output.message_id,
             message=turn.output.message_for_user,
             sent_at=turn.output.sent_at.astimezone(timezone.utc).isoformat(),
             sender=ConversationMessageSender.COMPASS,
+            message_type=_derive_message_type(output_metadata),
+            metadata=output_metadata,
+            quick_reply_options=quick_reply_options,
         ))
     return messages
 
@@ -134,6 +169,18 @@ def get_current_conversation_phase_response(state: ApplicationState, logger: Log
         ##############################
         #    2. Counseling phase.
         ##############################
+        # When preference elicitation is active, the user-visible phase is PREFERENCE_ELICITATION
+        # regardless of what the explore-experiences sub-phase says.
+        if state.agent_director_state.counseling_sub_phase == CounselingSubPhase.PREFERENCE_ELICITATION:
+            current_phase = CurrentConversationPhaseResponse.PREFERENCE_ELICITATION
+            current_phase_percentage = PREFERENCE_ELICITATION_PERCENTAGE
+            return ConversationPhaseResponse(
+                percentage=current_phase_percentage,
+                phase=current_phase,
+                current=current,
+                total=total,
+            )
+
         counseling_phase = state.explore_experiences_director_state.conversation_phase
         if counseling_phase == CounselingConversationPhase.COLLECT_EXPERIENCES:
             ##############################

@@ -31,6 +31,7 @@
     "noMoreExperiences": "Parece que no hay experiencias para seguir conversando.",
     "skippedExperienceMissingDetails": "Omití tu experiencia \"{experience_title}\" porque no compartiste suficientes detalles",
     "finishedAll": "Terminé de explorar todas tus experiencias.",
+    "transitionToPreferences": "¡Bien, ya exploramos todas tus experiencias! Ahora vamos a entender qué es lo que más valoras en un trabajo — tus preferencias. Te guío con unos breves escenarios.",
     "noSkillsIdentified": "No se identificaron habilidades",
     "linkAndRank": {
       "summaryMessage": "Según la información que brindaste sobre tu experiencia como '{experience_title}', acá va un resumen breve:\n\n{summary}\n\nPrincipales {top_count} habilidades demostradas:{skills_summary}"

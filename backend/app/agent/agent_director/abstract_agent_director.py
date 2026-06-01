@@ -20,12 +20,28 @@ class ConversationPhase(Enum):
     ENDED = 3
 
 
+class CounselingSubPhase(Enum):
+    """
+    Deterministic sub-phases within the COUNSELING phase.
+
+    When the preference elicitation feature is enabled, COUNSELING progresses
+    from EXPLORE_EXPERIENCES to PREFERENCE_ELICITATION. When the feature is
+    disabled, the sub-phase stays at EXPLORE_EXPERIENCES throughout COUNSELING.
+
+    The agent director uses this enum to deterministically route between
+    sub-phase agents rather than asking the LLM router to do it.
+    """
+    EXPLORE_EXPERIENCES = 0
+    PREFERENCE_ELICITATION = 1
+
+
 class AgentDirectorState(BaseModel):
     """
     The state of the agent director
     """
     session_id: int
     current_phase: ConversationPhase = Field(default=ConversationPhase.INTRO)
+    counseling_sub_phase: CounselingSubPhase = Field(default=CounselingSubPhase.EXPLORE_EXPERIENCES)
     conversation_conducted_at: Optional[datetime] = None
 
     class Config:
@@ -53,6 +69,16 @@ class AgentDirectorState(BaseModel):
             return ConversationPhase[value]
         return value
 
+    @field_serializer("counseling_sub_phase")
+    def serialize_counseling_sub_phase(self, counseling_sub_phase: CounselingSubPhase, _info):
+        return counseling_sub_phase.name
+
+    @field_validator("counseling_sub_phase", mode='before')
+    def deserialize_counseling_sub_phase(cls, value: str | CounselingSubPhase) -> CounselingSubPhase:
+        if isinstance(value, str):
+            return CounselingSubPhase[value]
+        return value
+
     # Deserialize the conversation_conducted_at datetime and ensure it's interpreted as UTC
     @field_validator("conversation_conducted_at", mode='before')
     def deserialize_conversation_conducted_at(cls, value: Optional[datetime]) -> Optional[datetime]:
@@ -62,6 +88,10 @@ class AgentDirectorState(BaseModel):
     def from_document(_doc: Mapping[str, Any]) -> "AgentDirectorState":
         return AgentDirectorState(session_id=_doc["session_id"],
                                   current_phase=_doc["current_phase"],
+                                  # counseling_sub_phase was introduced with the preference elicitation feature,
+                                  # so older docs may not have it — default to the initial sub-phase.
+                                  counseling_sub_phase=_doc.get("counseling_sub_phase",
+                                                                CounselingSubPhase.EXPLORE_EXPERIENCES),
                                   # The conversation_conducted_at field was introduced later, so it may not exist in all documents
                                   # For the documents that don't have this field, we'll default to None,
                                   # The implication being that the client will have to handle this case.

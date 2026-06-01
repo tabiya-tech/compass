@@ -1,0 +1,103 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-27T17:37:52.321040",
+    "type": "static_end",
+    "count": 2,
+    "format": "online_vignette_schema",
+    "note": "Vignettes converted to online format with inferred categories"
+  },
+  "vignettes": [
+    {
+      "vignette_id": "static_end_001",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 15,000/month",
+          "description": "Monthly wage: KES 15,000 | Physical demands: High physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Permanent (stable) | Work arrangement: Office-based | Career advancement: High growth potential | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 15000,
+            "physical_demand": 1,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 1,
+            "remote_work": 0,
+            "career_growth": 1,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 0
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: Low physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Contract-based (unstable) | Work arrangement: Remote work possible | Career advancement: Limited growth opportunities | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 0,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 0,
+            "remote_work": 1,
+            "career_growth": 0,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 1
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    },
+    {
+      "vignette_id": "static_end_002",
+      "category": "work_environment",
+      "scenario_text": "Consider these two job opportunities with different work environments:",
+      "options": [
+        {
+          "option_id": "A",
+          "title": "Option A: Job with KES 15,000/month",
+          "description": "Monthly wage: KES 15,000 | Physical demands: Low physical demand | Work schedule: Flexible hours | Commute time: 15 minutes | Job security: Permanent (stable) | Work arrangement: Remote work possible | Career advancement: Limited growth opportunities | Task variety: Routine, predictable tasks | Social interaction: Independent work, minimal interaction | Company values alignment: Mission-driven, social impact focus",
+          "attributes": {
+            "wage": 15000,
+            "physical_demand": 0,
+            "flexibility": 1,
+            "commute_time": 15,
+            "job_security": 1,
+            "remote_work": 1,
+            "career_growth": 0,
+            "task_variety": 0,
+            "social_interaction": 0,
+            "company_values": 1
+          }
+        },
+        {
+          "option_id": "B",
+          "title": "Option B: Job with KES 25,000/month",
+          "description": "Monthly wage: KES 25,000 | Physical demands: High physical demand | Work schedule: Flexible hours | Commute time: 60 minutes | Job security: Contract-based (unstable) | Work arrangement: Office-based | Career advancement: High growth potential | Task variety: Varied, changing tasks | Social interaction: Team-based, high collaboration | Company values alignment: Standard business practices",
+          "attributes": {
+            "wage": 25000,
+            "physical_demand": 1,
+            "flexibility": 1,
+            "commute_time": 60,
+            "job_security": 0,
+            "remote_work": 0,
+            "career_growth": 1,
+            "task_variety": 1,
+            "social_interaction": 1,
+            "company_values": 0
+          }
+        }
+      ],
+      "follow_up_questions": [],
+      "targeted_dimensions": [
+        "work_environment"
+      ],
+      "difficulty_level": "medium"
+    }
+  ]
+}

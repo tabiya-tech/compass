@@ -22,6 +22,9 @@ BACKEND_ENV_MAP: Dict[str, str] = {
     # CV Upload
     "GLOBAL_ENABLE_CV_UPLOAD": "cv.enabled",
 
+    # Preference Elicitation
+    "GLOBAL_ENABLE_PREFERENCE_ELICITATION": "preferenceElicitation.enabled",
+
     # Add more backend env vars here
 }
 
@@ -46,6 +49,9 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
 
     # CV Upload
     "GLOBAL_ENABLE_CV_UPLOAD": "cv.enabled",
+
+    # Preference Elicitation
+    "GLOBAL_ENABLE_PREFERENCE_ELICITATION": "preferenceElicitation.enabled",
 
     # i18n
     "FRONTEND_DEFAULT_LOCALE": "i18n.ui.defaultLocale",

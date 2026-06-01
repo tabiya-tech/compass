@@ -88,6 +88,14 @@ When disabled, all CV-related UI elements are hidden and CV APIs are not registe
 
 *Figure 4: CV feature enabled*
 
+### Preference Elicitation Feature
+
+- **preferenceElicitation.enabled**: Enable or disable the preference elicitation phase of the conversation
+
+When enabled, after the user finishes exploring their experiences, the conversation enters a preference elicitation phase where the assistant uses scenario-based questions (vignettes) and an interactive Best-Worst Scaling card to learn the user's job preferences. The resulting preference vector is persisted via the `/job-preferences` API for downstream consumers (matching, analytics).
+
+When disabled (default), the conversation flows directly from experience exploration to farewell, identical to the behaviour before this feature shipped. The `/job-preferences` routes are not registered.
+
 ### Authentication
 
 - **auth.disableLoginCode**: Disable login code requirement

@@ -4,16 +4,20 @@ This module contains the service layer for handling conversations.
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from typing import Optional
 
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.explore_experiences_agent_director import DiveInPhase
+from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
 from app.conversations.utils import get_messages_from_conversation_manager, filter_conversation_history, \
     get_total_explored_experiences, get_current_conversation_phase_response
+from app.job_preferences.service import IJobPreferencesService
+from app.job_preferences.types import JobPreferences
 from app.sensitive_filter import sensitive_filter
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
 
@@ -67,12 +71,20 @@ class ConversationService(IConversationService):
                  application_state_metrics_recorder: IApplicationStateMetricsRecorder,
                  agent_director: LLMAgentDirector,
                  conversation_memory_manager: IConversationMemoryManager,
-                 reaction_repository: IReactionRepository):
+                 reaction_repository: IReactionRepository,
+                 enable_preference_elicitation: bool = False,
+                 job_preferences_service: Optional[IJobPreferencesService] = None):
         self._logger = logging.getLogger(ConversationService.__name__)
         self._agent_director = agent_director
         self._application_state_metrics_recorder = application_state_metrics_recorder
         self._conversation_memory_manager = conversation_memory_manager
         self._reaction_repository = reaction_repository
+        self._enable_preference_elicitation = enable_preference_elicitation
+        self._job_preferences_service = job_preferences_service
+        if enable_preference_elicitation and job_preferences_service is None:
+            raise ValueError(
+                "job_preferences_service must be provided when preference elicitation is enabled"
+            )
 
     async def send(self, user_id: str, session_id: int, user_input: str, clear_memory: bool,
                    filter_pii: bool) -> ConversationResponse:
@@ -82,7 +94,7 @@ class ConversationService(IConversationService):
             user_input = await sensitive_filter.obfuscate(user_input)
 
         # set the sent_at for the user input
-        user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
+        agent_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
 
         # set the state of the agent director, the conversation memory manager and all the agents
         state = await self._application_state_metrics_recorder.get_state(session_id)
@@ -98,18 +110,30 @@ class ConversationService(IConversationService):
             state.collect_experience_state)
         self._agent_director.get_explore_experiences_agent().get_exploring_skills_agent().set_state(
             state.skills_explorer_agent_state)
+        if self._enable_preference_elicitation:
+            self._agent_director.get_preference_elicitation_agent().set_state(
+                state.preference_elicitation_agent_state
+            )
         self._conversation_memory_manager.set_state(state.conversation_memory_manager_state)
 
         # Handle the user input
         context = await self._conversation_memory_manager.get_conversation_context()
         # get the current index in the conversation history, so that we can return only the new messages
         current_index = len(context.all_history.turns)
-        await self._agent_director.execute(user_input=user_input)
+        previous_pref_phase = (
+            state.preference_elicitation_agent_state.conversation_phase
+            if self._enable_preference_elicitation
+            else None
+        )
+        await self._agent_director.execute(user_input=agent_input)
         # get the context again after updating the history
         context = await self._conversation_memory_manager.get_conversation_context()
         response = await get_messages_from_conversation_manager(context, from_index=current_index)
         # get the date when the conversation was conducted
         state.agent_director_state.conversation_conducted_at = datetime.now(timezone.utc)
+
+        if self._enable_preference_elicitation:
+            await self._maybe_save_preference_vector(state, previous_pref_phase)
 
         # save the state, before responding to the user
         await self._application_state_metrics_recorder.save_state(state, user_id)
@@ -120,6 +144,46 @@ class ConversationService(IConversationService):
             conversation_conducted_at=state.agent_director_state.conversation_conducted_at,
             experiences_explored=get_total_explored_experiences(state),
             current_phase=get_current_conversation_phase_response(state, self._logger)
+        )
+
+    async def _maybe_save_preference_vector(self, state: ApplicationState, previous_pref_phase: Optional[str]) -> None:
+        """
+        If the preference elicitation agent just transitioned to COMPLETE, mirror the
+        learned PreferenceVector into the `job_preferences` collection so downstream
+        consumers (matching, analytics, partner exports) can read it via REST.
+        """
+        if self._job_preferences_service is None:
+            return
+        pref_state = state.preference_elicitation_agent_state
+        if pref_state.conversation_phase != "COMPLETE":
+            return
+        if previous_pref_phase == "COMPLETE":
+            return  # Already saved on the turn it transitioned; idempotent re-saves are unnecessary.
+
+        pv = pref_state.preference_vector
+        job_preferences = JobPreferences(
+            session_id=state.session_id,
+            financial_importance=pv.financial_importance,
+            work_environment_importance=pv.work_environment_importance,
+            career_advancement_importance=pv.career_advancement_importance,
+            work_life_balance_importance=pv.work_life_balance_importance,
+            job_security_importance=pv.job_security_importance,
+            task_preference_importance=pv.task_preference_importance,
+            social_impact_importance=pv.social_impact_importance,
+            confidence_score=pv.confidence_score,
+            n_vignettes_completed=pv.n_vignettes_completed,
+            per_dimension_uncertainty=pv.per_dimension_uncertainty,
+            posterior_mean=pv.posterior_mean,
+            posterior_covariance_diagonal=pv.posterior_covariance_diagonal,
+            fim_determinant=pv.fim_determinant,
+            decision_patterns=pv.decision_patterns,
+        )
+        await self._job_preferences_service.create_or_update(
+            session_id=state.session_id,
+            preferences=job_preferences,
+        )
+        self._logger.info(
+            "Persisted PreferenceVector to job_preferences for session %s", state.session_id,
         )
 
     async def get_history_by_session_id(self, user_id: str, session_id: int) -> ConversationResponse:
