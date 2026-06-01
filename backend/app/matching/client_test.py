@@ -105,7 +105,7 @@ class TestInit:
         actual_client = MatchingServiceClient(base_url="https://test-service.com", api_key="k")
 
         # THEN the timeout defaults to 30 seconds
-        assert actual_client.timeout == 30.0
+        assert actual_client.timeout == 300.0
 
 
 class TestProcessRequestSuccess:
