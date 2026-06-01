@@ -196,9 +196,15 @@ class LLMAgentDirector(AbstractAgentDirector):
                 _will_transition = self._state.current_phase != new_phase
 
                 if not agent_for_task.is_responsible_for_conversation_history():
-                    # Don't save the outgoing agent's final response when transitioning —
-                    # the next agent will produce the response the user actually sees.
-                    if not _will_transition:
+                    # Skip saving only the WelcomeAgent's final transition message — the next
+                    # agent produces its own opener that supersedes it. Other transitions
+                    # (PreferenceElicitationAgent WRAPUP summary, FarewellAgent closing) emit
+                    # user-facing content that must be preserved.
+                    skip_on_transition = (
+                            _will_transition
+                            and agent_output.agent_type == AgentType.WELCOME_AGENT
+                    )
+                    if not skip_on_transition:
                         await self._conversation_manager.update_history(clean_input, agent_output)
                     context = await self._conversation_manager.get_conversation_context()
 

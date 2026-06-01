@@ -4,13 +4,11 @@ import { Box, Button, Tooltip, Typography, LinearProgress, useTheme } from "@mui
 import { BWSAlternative, BWSTaskMessageProps } from "./BWSTaskMessage.types";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
 import { MessageContainer } from "src/chat/chatMessage/compassChatMessage/CompassChatMessage";
-import BrandLogo from "src/chat/chatMessage/components/brandLogo/BrandLogo";
 
 const uniqueId = "bws-task-message-3c9e8f21-47b2-4a1d-9d63-c7e2f1a85b04";
 
 export const DATA_TEST_ID = {
   CONTAINER: `bws-task-container-${uniqueId}`,
-  BRAND_LOGO: `bws-task-brand-logo-${uniqueId}`,
   DESCRIPTION_BOX: `bws-task-description-${uniqueId}`,
   MOST_ROW: `bws-task-most-row-${uniqueId}`,
   LEAST_ROW: `bws-task-least-row-${uniqueId}`,
@@ -59,9 +57,6 @@ const BWSTaskMessage: React.FC<BWSTaskMessageProps> = ({ taskId, taskNumber, tot
 
   return (
     <MessageContainer origin={ConversationMessageSender.COMPASS} data-testid={DATA_TEST_ID.CONTAINER}>
-      <Box data-testid={DATA_TEST_ID.BRAND_LOGO}>
-        <BrandLogo />
-      </Box>
       <Box
         sx={{
           width: "fit-content",
