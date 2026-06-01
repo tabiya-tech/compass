@@ -287,6 +287,8 @@ class UsersService:
             email=firebase_user.email,
             continue_url=continue_url,
         )
+        # Add the admin prefix since this is for admin users.
+        link = link.replace("https://", "https://admin.")
         return PasswordResetLinkResponse(reset_link=link)
 
 
