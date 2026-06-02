@@ -23,7 +23,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
 }) => {
   const theme = useTheme();
   const [messages, setMessages] = useState<IChatMessage<any>[]>(() =>
-    mapCareerExplorerMessagesToChatMessages(initialMessages, theme.palette.brandAction.main)
+    mapCareerExplorerMessagesToChatMessages(initialMessages, theme.palette.primary.main)
   );
   const [aiIsTyping, setAiIsTyping] = useState(false);
   const [chatFinished, setChatFinished] = useState(false);
@@ -46,9 +46,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
   }, [messages, aiIsTyping, typingMessage, isLoading]);
 
   useEffect(() => {
-    setMessages(
-      mapCareerExplorerMessagesToChatMessages(initialMessages, theme.palette.brandAction.main, handleQuickReply)
-    );
+    setMessages(mapCareerExplorerMessagesToChatMessages(initialMessages, theme.palette.primary.main, handleQuickReply));
   }, [initialMessages, handleQuickReply, theme]);
 
   const handleSend = useCallback(
@@ -66,7 +64,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
       const optimisticUserMessage = generateUserMessage(
         userMessage,
         new Date().toISOString(),
-        theme.palette.brandAction.main,
+        theme.palette.primary.main,
         optimisticId
       );
       setMessages((prev) => [...prev, optimisticUserMessage]);
@@ -75,7 +73,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
       try {
         const res = await CareerExplorerService.getInstance().sendMessage(userMessage);
         setMessages(
-          mapCareerExplorerMessagesToChatMessages(res.messages, theme.palette.brandAction.main, handleQuickReply)
+          mapCareerExplorerMessagesToChatMessages(res.messages, theme.palette.primary.main, handleQuickReply)
         );
         setChatFinished(res.finished);
         setSidebarRefreshToken((t) => t + 1);
@@ -111,7 +109,7 @@ const CareerExplorerChat: React.FC<CareerExplorerChatProps> = ({
           failedSendDraft,
           placeholderKey,
           showCvUpload: false,
-          fillColor: theme.palette.brandAction.main,
+          fillColor: theme.palette.primary.main,
         },
       }}
       sidebar={<CareerExplorerSidebar refreshToken={sidebarRefreshToken} />}

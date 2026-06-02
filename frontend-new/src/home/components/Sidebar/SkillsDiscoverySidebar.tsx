@@ -17,17 +17,15 @@ export const DATA_TEST_ID = {
 
 const COLLAPSE_AFTER = 8;
 
-// Style guide tokens (hardcoded to avoid MUI theme indirection)
+// Style guide tokens — values are resolved from CSS variables so they can be overridden via env.
 const TOKEN = {
-  emerald: "#0A5C4A",
-  stone: "#7D7469",
-  black: "#1A1208",
-  // tag--teal: custom tint from style guide (not --teal-light)
-  tealBg: "#D8EFF0",
-  tealText: "#0A5C4A", // emerald
-  // tag--amber: custom tint from style guide
-  amberBg: "#FAF0D8",
-  amberText: "#1A1208", // black
+  emerald: "rgb(var(--brand-secondary))",
+  stone: "rgb(var(--text-secondary))",
+  black: "rgb(var(--text-primary))",
+  tealBg: "rgb(var(--brand-accent-light))",
+  tealText: "rgb(var(--brand-secondary))", // emerald
+  amberBg: "rgb(var(--brand-tertiary-light))",
+  amberText: "rgb(var(--text-primary))", // black
 };
 
 const subsectionLabelSx = {
@@ -115,7 +113,7 @@ const SkillsDiscoverySidebar: React.FC<SkillsDiscoverySidebarProps> = ({ current
               width: 36,
               height: 36,
               borderRadius: "50%",
-              background: "#F2F1F0", // --cloud
+              background: "rgb(var(--cloud))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

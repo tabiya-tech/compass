@@ -79,7 +79,7 @@ const BWSTaskMessage: React.FC<BWSTaskMessageProps> = ({ taskId, taskNumber, tot
             border: `1px solid ${theme.palette.grey[300]}`,
             borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
             padding: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-            backgroundColor: theme.palette.containerBackground.light,
+            backgroundColor: theme.palette.pageBackground.light,
           }}
         >
           <Typography
@@ -127,7 +127,7 @@ const BWSTaskMessage: React.FC<BWSTaskMessageProps> = ({ taskId, taskNumber, tot
             border: `1px solid ${theme.palette.grey[300]}`,
             borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
             padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.sm)}`,
-            backgroundColor: theme.palette.containerBackground.light,
+            backgroundColor: theme.palette.pageBackground.light,
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 600, minWidth: 48, color: theme.palette.text.primary }}>
@@ -188,7 +188,7 @@ const BWSTaskMessage: React.FC<BWSTaskMessageProps> = ({ taskId, taskNumber, tot
             border: `1px solid ${theme.palette.grey[300]}`,
             borderRadius: theme.fixedSpacing(theme.tabiyaRounding.sm),
             padding: `${theme.fixedSpacing(theme.tabiyaSpacing.xs)} ${theme.fixedSpacing(theme.tabiyaSpacing.sm)}`,
-            backgroundColor: theme.palette.containerBackground.light,
+            backgroundColor: theme.palette.pageBackground.light,
           }}
         >
           <Typography variant="body2" sx={{ fontWeight: 600, minWidth: 48, color: theme.palette.text.primary }}>

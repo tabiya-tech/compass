@@ -183,7 +183,7 @@ const SkillsRankingJobSeekerDisclosure: React.FC<Readonly<SkillsRankingJobSeeker
                     height: "100%",
                     borderRadius: 1,
                     fontWeight: "bold",
-                    backgroundColor: idx === selectedIndex ? theme.palette.primary.main : theme.palette.grey[200],
+                    backgroundColor: idx === selectedIndex ? theme.palette.secondary.main : theme.palette.grey[200],
                     color: "black",
                     fontSize: "0.75rem",
                     whiteSpace: "wrap",

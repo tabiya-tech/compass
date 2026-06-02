@@ -30,7 +30,7 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
         </Box>
         <Box
           data-testid={DATA_TEST_ID.PROGRESS_BAR_LABEL}
-          sx={{ ...theme.typography.caption, fontWeight: 600, color: theme.palette.primary.main, lineHeight: 1.5 }}
+          sx={{ ...theme.typography.caption, fontWeight: 600, color: theme.palette.secondary.main, lineHeight: 1.5 }}
         >
           {percentageInText}
         </Box>
@@ -51,7 +51,7 @@ const ChatProgressBar: React.FC<CurrentPhase> = (currentPhase) => {
           style={{
             height: "100%",
             borderRadius: theme.rounding(theme.tabiyaRounding.sm),
-            backgroundColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.secondary.main,
           }}
           initial={{ width: 0 }}
           animate={{ width: percentageInText }}

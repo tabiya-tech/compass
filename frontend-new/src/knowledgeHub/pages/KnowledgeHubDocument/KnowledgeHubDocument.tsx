@@ -52,7 +52,7 @@ const KnowledgeHubDocument: React.FC = () => {
                 });
               }}
               dataTestId={DATA_TEST_ID.KNOWLEDGE_HUB_DOCUMENT_BACK_BUTTON}
-              color={theme.palette.brandAction.main}
+              color={theme.palette.primary.main}
               sx={{ opacity: isOnline ? 1 : 0.5 }}
             />
           </Container>

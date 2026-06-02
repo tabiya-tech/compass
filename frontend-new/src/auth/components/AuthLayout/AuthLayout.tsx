@@ -138,7 +138,7 @@ const AuthLayout: React.FC = () => {
           variant="h1"
           sx={{
             marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
-            color: theme.palette.primary.main,
+            color: theme.palette.secondary.main,
             fontSize: { xs: "48px", lg: "64px" },
             lineHeight: 0.9,
             letterSpacing: "-0.06em",
@@ -198,7 +198,7 @@ const AuthLayout: React.FC = () => {
         />
         <Box
           sx={{
-            backgroundColor: isRegisterRoute ? theme.palette.primary.main : theme.palette.brandAction.main,
+            backgroundColor: isRegisterRoute ? theme.palette.secondary.main : theme.palette.primary.main,
             borderRadius: 2,
             p: theme.fixedSpacing(4),
             width: "100%",
@@ -246,7 +246,7 @@ const AuthLayout: React.FC = () => {
             <SecondaryButton
               showCircle
               onClick={() => navigate(showRegisterLink ? routerPaths.REGISTER : routerPaths.LOGIN)}
-              color={showRegisterLink ? "brandAction" : "primary"}
+              color={showRegisterLink ? "primary" : "primary"}
               sx={{ alignSelf: "center" }}
             >
               {showRegisterLink ? t("common.buttons.registerLink") : t("common.buttons.loginLink", { appName })}
@@ -269,7 +269,7 @@ const AuthLayout: React.FC = () => {
         >
           <Typography variant="h2" sx={{ fontWeight: 700, textAlign: "start", mb: theme.fixedSpacing(4) }}>
             {t("auth.pages.login.appHero.whatIsTitleBefore")}{" "}
-            <Box component="span" sx={{ color: theme.palette.brandAction.main }}>
+            <Box component="span" sx={{ color: theme.palette.primary.main }}>
               {t("auth.pages.login.appHero.whatIsTitleBrand", { appName })}
             </Box>
             ?
@@ -304,7 +304,7 @@ const AuthLayout: React.FC = () => {
           </Box>
         </Box>
 
-        <Footer sx={{ mt: "auto", backgroundColor: theme.palette.common.cream }} />
+        <Footer sx={{ mt: "auto", backgroundColor: theme.palette.tertiary.light }} />
       </AuthPageShell>
       <Backdrop isShown={loadingState.isLoading} message={loadingState.loadingMessage} />
     </AuthPageProvider>

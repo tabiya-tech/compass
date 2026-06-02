@@ -85,7 +85,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
   const [totalCorrectRotations, setTotalCorrectRotations] = useState(initialCorrectRotations);
   const [startTime, setStartTime] = useState<number | null>(null);
   const theme = useTheme();
-  const pulseAnimation = createPulseAnimation(theme.palette.primary.main);
+  const pulseAnimation = createPulseAnimation(theme.palette.secondary.main);
 
   const isSmallMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down("sm"));
 
@@ -284,7 +284,7 @@ const RotateToSolveTask: React.FC<RotateToSolveTaskProps> = ({
                 justifyContent: "center",
                 borderRadius: 1,
                 border: `2px solid ${borderColor}`,
-                backgroundColor: isSelected && !disabled ? theme.palette.primary.main : "transparent",
+                backgroundColor: isSelected && !disabled ? theme.palette.secondary.main : "transparent",
                 transition: "border-color 0.2s, background-color 0.2s",
                 cursor: disabled ? "default" : "pointer",
                 animation: isCelebrating && solved ? `${pulseAnimation} 0.4s ease-in-out` : "none",

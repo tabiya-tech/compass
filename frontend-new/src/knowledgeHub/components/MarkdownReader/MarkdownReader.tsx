@@ -74,7 +74,7 @@ const MarkdownContainer = styled(Box, {
       fontSize: "0.9em",
     },
     "& strong code": {
-      color: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
     },
     "& pre": {
       backgroundColor: theme.palette.grey[100],
@@ -102,10 +102,10 @@ const MarkdownContainer = styled(Box, {
       fontWeight: 600,
     },
     "& a": {
-      color: theme.palette.primary.main,
+      color: theme.palette.secondary.main,
       textDecoration: "underline",
       "&:hover": {
-        color: theme.palette.primary.dark,
+        color: theme.palette.secondary.dark,
       },
     },
     "& hr": {

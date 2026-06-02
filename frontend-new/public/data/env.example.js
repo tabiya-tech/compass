@@ -114,6 +114,7 @@ window.tabiyaConfig = {
   FRONTEND_FAVICON_URL: btoa("/favicon.svg"),
   FRONTEND_APP_ICON_URL: btoa("/compass.svg"),
   FRONTEND_FAQ_TUTORIAL_VIDEO_URL: btoa("https://player.vimeo.com/video/1193881841?h=8ee6f6190d&title=0&byline=0&portrait=0"),
+  // Override platform colours — see src/styles/variables.css for all available keys. Values are RGB triplets, e.g. "10 92 74".
   FRONTEND_THEME_CSS_VARIABLES: btoa(
     JSON.stringify({
       "brand-primary": "0 255 145",

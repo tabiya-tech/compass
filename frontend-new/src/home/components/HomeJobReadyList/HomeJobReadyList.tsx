@@ -128,7 +128,7 @@ const HomeJobReadyList: React.FC<HomeJobReadyListProps> = ({ modules, isLoading,
           disabled={!isOnline}
           onClick={() => go(routerPaths.CAREER_READINESS)}
           sx={{
-            color: "brandAction.main",
+            color: "primary.main",
             textDecoration: "none",
             whiteSpace: "nowrap",
             background: "none",

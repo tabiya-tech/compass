@@ -151,6 +151,10 @@ export interface ThemeCssVariables {
   "brand-secondary-light"?: string;
   "brand-secondary-dark"?: string;
   "brand-secondary-contrast-text"?: string;
+  "page-background"?: string;
+  "page-background-light"?: string;
+  "page-background-dark"?: string;
+  "page-background-contrast-text"?: string;
   "text-primary"?: string;
   "text-secondary"?: string;
   "text-accent"?: string;

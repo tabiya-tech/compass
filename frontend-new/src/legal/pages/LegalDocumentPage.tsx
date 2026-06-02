@@ -38,7 +38,7 @@ const LegalDocumentPage: React.FC<LegalDocumentPageProps> = ({ variant }) => {
       data-testid={DATA_TEST_ID.LEGAL_PAGE_CONTAINER}
       sx={{
         minHeight: "100vh",
-        backgroundColor: theme.palette.containerBackground.main,
+        backgroundColor: theme.palette.pageBackground.main,
         py: theme.spacing(theme.tabiyaSpacing.lg),
         px: "var(--layout-gutter-x)",
       }}

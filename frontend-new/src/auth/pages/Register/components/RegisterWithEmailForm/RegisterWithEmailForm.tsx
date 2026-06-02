@@ -121,7 +121,7 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
       />
       <PrimaryButton
         variant="contained"
-        color="primary"
+        color="secondary"
         showCircle
         style={{ marginTop: theme.fixedSpacing(3.5) }}
         type="submit"
@@ -129,8 +129,8 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
         disableWhenOffline={true}
         data-testid={DATA_TEST_ID.REGISTER_BUTTON}
         sx={{
-          backgroundColor: theme.palette.common.cream,
-          color: theme.palette.primary.main,
+          backgroundColor: theme.palette.tertiary.light,
+          color: theme.palette.secondary.main,
           alignSelf: "center",
           width: { xs: "90%", sm: "80%" },
           maxWidth: 420,
@@ -145,12 +145,12 @@ const RegisterWithEmailForm: React.FC<Readonly<RegisterFormProps>> = ({
           },
           "&.Mui-disabled": {
             opacity: 0.4,
-            color: theme.palette.primary.main,
-            WebkitTextFillColor: theme.palette.primary.main,
-            backgroundColor: theme.palette.common.cream,
+            color: theme.palette.secondary.main,
+            WebkitTextFillColor: theme.palette.secondary.main,
+            backgroundColor: theme.palette.tertiary.light,
             "& > .MuiBox-root": {
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.common.cream,
+              backgroundColor: theme.palette.secondary.main,
+              color: theme.palette.tertiary.light,
             },
           },
         }}

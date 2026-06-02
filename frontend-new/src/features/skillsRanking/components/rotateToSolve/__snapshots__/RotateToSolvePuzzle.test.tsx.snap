@@ -148,7 +148,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
     >
       <button
         aria-label="Rotate character counterclockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-hgi2ik-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary MuiIconButton-sizeSmall css-1y19w65-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-left-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
@@ -167,7 +167,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       </button>
       <button
         aria-label="Rotate character clockwise"
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeSmall css-hgi2ik-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary MuiIconButton-sizeSmall css-1y19w65-MuiButtonBase-root-MuiIconButton-root"
         data-testid="rotate-to-solve-rotate-right-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"
@@ -189,7 +189,7 @@ exports[`RotateToSolvePuzzle snapshot: initial render (non-replay) 1`] = `
       class="MuiBox-root css-1r1fsmc"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-18j7ma5-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-1r76ewv-MuiButtonBase-root-MuiButton-root"
         data-testid="rotate-to-solve-cancel-2c8d3b83-3d1c-4c2e-97b9-3d42a1ef9c11"
         tabindex="0"
         type="button"

@@ -340,10 +340,10 @@ const Login: React.FC = () => {
               onClick={handleStartNewConversation}
               data-testid={DATA_TEST_ID.START_NEW_CONVERSATION_BUTTON}
               sx={{
-                color: theme.palette.brandAction.main,
-                backgroundColor: theme.palette.common.cream,
+                color: theme.palette.primary.main,
+                backgroundColor: theme.palette.tertiary.light,
                 "&:hover:not(:disabled)": {
-                  backgroundColor: theme.palette.common.cream,
+                  backgroundColor: theme.palette.tertiary.light,
                   opacity: 0.9,
                 },
               }}
@@ -496,7 +496,7 @@ const Login: React.FC = () => {
           }
           <PrimaryButton
             variant="contained"
-            color="brandAction"
+            color="primary"
             showCircle
             style={{ marginTop: theme.fixedSpacing(3.3) }}
             type="submit"
@@ -504,8 +504,8 @@ const Login: React.FC = () => {
             disableWhenOffline={true}
             data-testid={DATA_TEST_ID.LOGIN_BUTTON}
             sx={{
-              backgroundColor: theme.palette.common.cream,
-              color: theme.palette.brandAction.main,
+              backgroundColor: theme.palette.tertiary.light,
+              color: theme.palette.primary.main,
               alignSelf: "center",
               width: { xs: "90%", sm: "80%" },
               maxWidth: 420,
@@ -520,12 +520,12 @@ const Login: React.FC = () => {
               },
               "&.Mui-disabled": {
                 opacity: 0.4,
-                color: theme.palette.brandAction.main,
-                WebkitTextFillColor: theme.palette.brandAction.main,
-                backgroundColor: theme.palette.common.cream,
+                color: theme.palette.primary.main,
+                WebkitTextFillColor: theme.palette.primary.main,
+                backgroundColor: theme.palette.tertiary.light,
                 "& > .MuiBox-root": {
-                  backgroundColor: theme.palette.brandAction.main,
-                  color: theme.palette.common.cream,
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.tertiary.light,
                 },
               },
             }}

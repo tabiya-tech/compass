@@ -59,7 +59,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   data-testid="yes-no-question-radio-no-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
                   <span
-                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1fzmqjb-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorSecondary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorSecondary MuiRadio-root MuiRadio-colorSecondary css-19hgwe4-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
                   >
                     <input
                       class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
@@ -105,7 +105,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   data-testid="yes-no-question-radio-yes-9803f91b-499a-41b3-9348-795de9e399a9"
                 >
                   <span
-                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorPrimary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorPrimary MuiRadio-root MuiRadio-colorPrimary css-1fzmqjb-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
+                    class="MuiButtonBase-root MuiRadio-root MuiRadio-colorSecondary PrivateSwitchBase-root MuiRadio-root MuiRadio-colorSecondary MuiRadio-root MuiRadio-colorSecondary css-19hgwe4-MuiButtonBase-root-MuiSwitchBase-root-MuiRadio-root"
                   >
                     <input
                       class="PrivateSwitchBase-input css-12xagqm-MuiSwitchBase-root"
@@ -174,7 +174,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -204,7 +204,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -234,7 +234,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -264,7 +264,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -294,7 +294,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -324,7 +324,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
                   class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
                 >
                   <span
-                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
                     data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
                   >
                     <input
@@ -358,16 +358,15 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
     </div>
   </div>
   <hr
-    class="MuiDivider-root MuiDivider-fullWidth css-q0cs3r-MuiDivider-root"
-    color="primary"
+    class="MuiDivider-root MuiDivider-fullWidth css-14ga047-MuiDivider-root"
     data-testid="feedback-form-content-divider-07d1ed9d-6ced-4a24-912a-9b89199df67f"
   />
   <div
-    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-1h3dhk6-MuiPaper-root-MuiMobileStepper-root"
+    class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiMobileStepper-root MuiMobileStepper-positionStatic css-rw34tj-MuiPaper-root-MuiMobileStepper-root"
     style="--Paper-shadow: var(--mui-shadows-0);"
   >
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-mcyfwo-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedSecondary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation Mui-disabled MuiButton-root MuiButton-outlined MuiButton-outlinedSecondary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-168crfk-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-back-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       disabled=""
       tabindex="-1"
@@ -389,7 +388,7 @@ exports[`FeedbackFormContent should render component successfully 1`] = `
       />
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-x7x9b9-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-oc17o8-MuiButtonBase-root-MuiButton-root"
       data-testid="feedback-form-next-button-07d1ed9d-6ced-4a24-912a-9b89199df67f"
       style="width: 100px;"
       tabindex="0"

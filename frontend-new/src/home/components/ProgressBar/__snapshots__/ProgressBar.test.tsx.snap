@@ -2,7 +2,7 @@
 
 exports[`ProgressBar should render container, progress bar, profile strength text, see profile link, and hint 1`] = `
 <div
-  class="MuiBox-root css-avek6i"
+  class="MuiBox-root css-f5roep"
   data-testid="progress-bar-container-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
 >
   <div
@@ -16,7 +16,7 @@ exports[`ProgressBar should render container, progress bar, profile strength tex
     </p>
     <a
       aria-disabled="false"
-      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-1x16sms-MuiTypography-root-MuiLink-root"
+      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-6rmt4n-MuiTypography-root-MuiLink-root"
       data-testid="progress-bar-see-profile-link-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
     >
       See profile →
@@ -27,7 +27,7 @@ exports[`ProgressBar should render container, progress bar, profile strength tex
     aria-valuemax="100"
     aria-valuemin="0"
     aria-valuenow="40"
-    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-8ktlsx-MuiLinearProgress-root"
+    class="MuiLinearProgress-root MuiLinearProgress-colorPrimary MuiLinearProgress-determinate css-i5na8l-MuiLinearProgress-root"
     data-testid="progress-bar-31a67579-b5e1-40dc-9ab1-eeffa3fc0207"
     role="progressbar"
   >

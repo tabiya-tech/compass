@@ -161,7 +161,7 @@ const Profile: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundColor: theme.palette.containerBackground.light,
+        backgroundColor: theme.palette.pageBackground.light,
       }}
       data-testid={DATA_TEST_ID.PROFILE_PAGE_CONTAINER}
     >

@@ -170,10 +170,10 @@ const JobMatchingPage: React.FC = () => {
         align: "left",
         minWidth: 180,
         cellSx: {
-          borderLeft: `3px solid ${theme.palette.primary.main}`,
+          borderLeft: `3px solid ${theme.palette.secondary.main}`,
         },
         render: (val) => (
-          <Typography variant="body2" color="primary" fontWeight={600}>
+          <Typography variant="body2" color="secondary" fontWeight={600}>
             {capitalize(val as string)}
           </Typography>
         ),
@@ -332,7 +332,7 @@ const JobMatchingPage: React.FC = () => {
       display="flex"
       flexDirection="column"
       minHeight="100vh"
-      sx={{ backgroundColor: theme.palette.containerBackground.light }}
+      sx={{ backgroundColor: theme.palette.pageBackground.light }}
       data-testid={DATA_TEST_ID.JOB_MATCHING_CONTAINER}
     >
       <Box
@@ -355,13 +355,15 @@ const JobMatchingPage: React.FC = () => {
             });
           }}
           dataTestId={DATA_TEST_ID.JOB_MATCHING_BACK_LINK}
-          color={theme.palette.brandAction.main}
+          color={theme.palette.primary.main}
           sx={{ marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.md), opacity: isOnline ? 1 : 0.5 }}
         />
         {/* Tabs */}
         <Tabs
           value={activeTab}
           onChange={(_, v) => setActiveTab(v)}
+          textColor="secondary"
+          indicatorColor="secondary"
           data-testid={DATA_TEST_ID.JOB_MATCHING_TABS}
           sx={{
             mb: theme.fixedSpacing(theme.tabiyaSpacing.lg),

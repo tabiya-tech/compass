@@ -78,10 +78,9 @@ declare module "@mui/material/styles" {
 
 declare module "@mui/material/styles" {
   interface Palette {
-    brandAction: PaletteColor;
-    brandAccent: PaletteColor;
-    containerBackground: PaletteColor;
-    careerReadiness: PaletteColor;
+    accent: PaletteColor;
+    tertiary: PaletteColor;
+    pageBackground: PaletteColor;
     tabiyaBlue: PaletteColor;
     tabiyaYellow: PaletteColor;
     tabiyaGreen: PaletteColor;
@@ -95,15 +94,10 @@ declare module "@mui/material/styles" {
     textAccent: string;
   }
 
-  interface CommonColors {
-    cream: string;
-  }
-
   interface PaletteOptions {
-    brandAction?: PaletteColorOptions;
-    brandAccent?: PaletteColorOptions;
-    containerBackground?: PaletteColorOptions;
-    careerReadiness?: PaletteColorOptions;
+    accent?: PaletteColorOptions;
+    tertiary?: PaletteColorOptions;
+    pageBackground?: PaletteColorOptions;
     tabiyaBlue?: PaletteColorOptions;
     tabiyaYellow?: PaletteColorOptions;
     tabiyaGreen?: PaletteColorOptions;
@@ -130,15 +124,13 @@ declare module "@mui/material/Typography" {
 // Allow custom palette colors on Button's color prop
 declare module "@mui/material/Button" {
   interface ButtonPropsColorOverrides {
-    brandAction: true;
-    brandAccent: true;
-    careerReadiness: true;
+    accent: true;
+    tertiary: true;
   }
 }
 
 declare module "@mui/material/IconButton" {
   interface IconButtonPropsColorOverrides {
-    brandAction: true;
-    brandAccent: true;
+    accent: true;
   }
 }

@@ -19,6 +19,12 @@
   --brand-secondary-dark: 1 121 0;
   --brand-secondary-contrast-text: 255 255 255;
 
+  /* Page background colors */
+  --page-background: 243 241 238;
+  --page-background-light: 255 255 255;
+  --page-background-dark: 223 221 217;
+  --page-background-contrast-text: 65 64 61;
+
   /* Text colors */
   --text-primary: 0 33 71;
   --text-secondary: 65 64 61;

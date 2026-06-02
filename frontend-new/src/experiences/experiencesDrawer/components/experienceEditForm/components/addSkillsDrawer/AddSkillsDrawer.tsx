@@ -98,7 +98,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
               width: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             },
             "&::-webkit-scrollbar-thumb": {
-              backgroundColor: theme.palette.primary.dark,
+              backgroundColor: theme.palette.secondary.dark,
               borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.xs),
             },
           }}
@@ -135,7 +135,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
                     >
                       {selectedSkillIds.includes(skill.UUID) ? (
                         <CheckBoxIcon
-                          sx={{ color: theme.palette.primary.dark }}
+                          sx={{ color: theme.palette.secondary.dark }}
                           data-testid={DATA_TEST_ID.SKILL_DRAWER_ITEM_CHECKED}
                         />
                       ) : (
@@ -167,7 +167,7 @@ const AddSkillsDrawer: React.FC<AddSkillsDrawerProps> = ({ onClose, skills, onAd
           bgcolor={theme.palette.background.paper}
           paddingX={isSmallMobile ? theme.fixedSpacing(theme.tabiyaSpacing.md) : theme.tabiyaSpacing.lg}
         >
-          <Divider color="primary" sx={{ height: "0.2rem" }} />
+          <Divider sx={{ height: "0.2rem", bgcolor: "secondary.main" }} />
           <Box
             display="flex"
             justifyContent="flex-start"

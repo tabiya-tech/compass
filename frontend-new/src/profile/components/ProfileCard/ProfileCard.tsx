@@ -117,7 +117,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
                 width: avatarSize,
                 height: avatarSize,
                 borderRadius: theme.rounding(theme.tabiyaRounding.full),
-                backgroundColor: theme.palette.primary.main,
+                backgroundColor: theme.palette.secondary.main,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -127,7 +127,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
               <Typography
                 variant="subtitle1"
                 sx={{
-                  color: theme.palette.primary.contrastText,
+                  color: theme.palette.secondary.contrastText,
                   fontWeight: 700,
                   lineHeight: 1,
                   fontFamily: theme.typography.body2.fontFamily,
@@ -213,7 +213,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ name, location, school
           ) : (
             <>
               <PrimaryButton
-                color="primary"
+                color="secondary"
                 showCircle
                 disableWhenOffline
                 startIcon={<DescriptionOutlinedIcon />}

@@ -124,7 +124,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         sender: ConversationMessageSender.USER,
         payload: {
           message,
-          fillColor: theme.palette.secondary.main,
+          fillColor: theme.palette.tertiary.main,
         },
         component: (p: CareerReadinessUserMessageProps) => <CareerReadinessUserMessage {...p} />,
       };
@@ -282,7 +282,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         if (getIsCancelled?.()) return;
         let chatMessages = mapCareerReadinessMessagesToChatMessages(
           res.messages,
-          theme.palette.secondary.main,
+          theme.palette.tertiary.main,
           handleQuickReply
         );
         const latestQuizSummary = getLatestQuizHistorySummary(res.messages);
@@ -414,7 +414,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
         const res = await CareerReadinessService.getInstance().sendMessage(moduleId, conversationId, userMessage);
         let chatMessages = mapCareerReadinessMessagesToChatMessages(
           res.messages,
-          theme.palette.secondary.main,
+          theme.palette.tertiary.main,
           handleQuickReply
         );
 
@@ -483,7 +483,7 @@ const CareerReadinessChat: React.FC<CareerReadinessChatProps> = ({
           isUploadingCv: false,
           failedSendDraft,
           customPlaceholder: isChatLockedForQuiz ? t("careerReadiness.chatLockedUntilQuizPassed") : inputPlaceholder,
-          fillColor: theme.palette.secondary.main,
+          fillColor: theme.palette.tertiary.main,
         },
       }}
       sidebar={<CareerReadinessSidebar moduleId={moduleId} coveredTopics={coveredTopics} />}

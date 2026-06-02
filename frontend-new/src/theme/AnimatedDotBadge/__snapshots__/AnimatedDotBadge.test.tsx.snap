@@ -31,7 +31,7 @@ exports[`AnimatedDotBadge should render the dot when show is true 1`] = `
     class="MuiBadge-badge MuiBadge-standard MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightCircular MuiBadge-overlapCircular css-1wxt7ej-MuiBadge-badge"
   >
     <span
-      class="css-nc8nih"
+      class="css-h5dq0x"
       color=""
     />
   </span>

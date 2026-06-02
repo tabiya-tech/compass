@@ -14,20 +14,20 @@ export default meta;
 type Story = StoryObj;
 
 const groupedColorCategories = [
-  ["primary", "secondary", "brandAction", "brandAccent"],
+  ["primary", "secondary", "tertiary", "accent"],
   ["error", "warning", "info", "success"],
   ["tabiyaYellow", "tabiyaBlue"],
-  ["containerBackground"],
+  ["pageBackground"],
 ] as const;
 const colorCategories = groupedColorCategories.flat();
 type ColorCategory = (typeof colorCategories)[number];
 
 const semanticColorNames: Partial<Record<ColorCategory, string>> = {
-  primary: "emerald",
-  secondary: "amber",
-  brandAction: "rust",
-  brandAccent: "teal",
-  containerBackground: "linen/surface context",
+  primary: "rust",
+  secondary: "emerald",
+  tertiary: "amber",
+  accent: "teal",
+  pageBackground: "linen/surface context",
 };
 
 // Resolves CSS variable colors to their computed values

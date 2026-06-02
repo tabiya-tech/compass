@@ -51,7 +51,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
           width: theme.fixedSpacing(theme.tabiyaSpacing.xl * 1.25),
           height: theme.fixedSpacing(theme.tabiyaSpacing.xl * 1.25),
           borderRadius: theme.rounding(theme.tabiyaRounding.sm),
-          backgroundColor: theme.palette.secondary.main,
+          backgroundColor: theme.palette.tertiary.main,
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
@@ -80,7 +80,7 @@ const ViewCVCard: React.FC<ViewCVCardProps> = ({ onClick }) => {
           sx={{
             ...theme.typography.body2,
             fontWeight: 700,
-            color: theme.palette.secondary.main,
+            color: theme.palette.tertiary.main,
             lineHeight: 1.3,
           }}
         >

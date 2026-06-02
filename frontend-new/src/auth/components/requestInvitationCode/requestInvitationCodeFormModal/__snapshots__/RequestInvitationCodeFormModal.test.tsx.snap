@@ -29,7 +29,7 @@ exports[`RequestInvitationCodeFormModal should render modal correctly when open 
         Request access to mockProduct
       </h4>
       <button
-        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-1vxw361-MuiButtonBase-root-MuiIconButton-root"
+        class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary MuiIconButton-sizeMedium css-1mqfl1g-MuiButtonBase-root-MuiIconButton-root"
         data-testid="request-invitation-code-form-close-icon-54e2f585-4c25-47d5-9414-928cb63d30cd"
         tabindex="0"
         title="Close request invitation code form"
@@ -206,7 +206,7 @@ exports[`RequestInvitationCodeFormModal should render modal correctly when open 
         </div>
       </div>
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1dobt1y-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-fullWidth css-j0x411-MuiButtonBase-root-MuiButton-root"
         data-testid="request-invitation-code-form-submit-button-54e2f585-4c25-47d5-9414-928cb63d30cd"
         disabled=""
         tabindex="-1"

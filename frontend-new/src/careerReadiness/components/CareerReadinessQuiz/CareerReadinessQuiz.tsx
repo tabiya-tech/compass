@@ -212,7 +212,7 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
         >
           <PrimaryButton
             variant="outlined"
-            color="primary"
+            color="secondary"
             size="small"
             startIcon={<ArrowBackIosNewOutlined />}
             onClick={handlePrev}
@@ -226,7 +226,7 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
           {isLastStep ? (
             <PrimaryButton
               variant="contained"
-              color="primary"
+              color="secondary"
               disabled={!canGoNext || isSubmitting || isPassed}
               onClick={handleSubmit}
               data-testid={DATA_TEST_ID.QUIZ_SUBMIT}
@@ -236,7 +236,7 @@ const CareerReadinessQuiz: React.FC<CareerReadinessQuizProps> = ({
           ) : (
             <PrimaryButton
               variant="contained"
-              color="primary"
+              color="secondary"
               disabled={!canGoNext}
               onClick={handleNext}
               endIcon={<ArrowForwardIosOutlined />}

@@ -89,19 +89,21 @@ const PillButton: React.FC<PillButtonProps> = ({ selected, onClick, startIcon, c
         paddingY: theme.spacing(0.75),
         paddingX: theme.spacing(1.5),
         borderRadius: 999,
-        border: `1px solid ${selected ? theme.palette.primary.main : theme.palette.divider}`,
-        backgroundColor: selected ? alpha(theme.palette.primary.main, 0.12) : theme.palette.background.paper,
-        color: selected ? theme.palette.primary.dark : theme.palette.text.primary,
+        border: `1px solid ${selected ? theme.palette.secondary.main : theme.palette.divider}`,
+        backgroundColor: selected ? alpha(theme.palette.secondary.main, 0.12) : theme.palette.background.paper,
+        color: selected ? theme.palette.secondary.dark : theme.palette.text.primary,
         fontSize: theme.typography.body2.fontSize,
         fontWeight: selected ? 600 : 500,
         cursor: "pointer",
         transition: "background-color 120ms ease, border-color 120ms ease, color 120ms ease",
         "&:hover": {
-          borderColor: theme.palette.primary.main,
-          backgroundColor: selected ? alpha(theme.palette.primary.main, 0.18) : alpha(theme.palette.primary.main, 0.04),
+          borderColor: theme.palette.secondary.main,
+          backgroundColor: selected
+            ? alpha(theme.palette.secondary.main, 0.18)
+            : alpha(theme.palette.secondary.main, 0.04),
         },
         "&:focus-visible": {
-          outline: `2px solid ${theme.palette.primary.main}`,
+          outline: `2px solid ${theme.palette.secondary.main}`,
           outlineOffset: 2,
         },
       }}
@@ -401,8 +403,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit
                 cursor: "pointer",
                 transition: "border-color 120ms ease, color 120ms ease",
                 "&:hover:not(:disabled)": {
-                  borderColor: theme.palette.primary.main,
-                  color: theme.palette.primary.main,
+                  borderColor: theme.palette.secondary.main,
+                  color: theme.palette.secondary.main,
                 },
                 "&:disabled": { opacity: 0.5, cursor: "default" },
               }}

@@ -80,17 +80,17 @@ const FaqTableOfContents: React.FC<FaqTableOfContentsProps> = ({ sections, activ
                   borderRadius: "8px",
                   textDecoration: "none",
                   cursor: "pointer",
-                  backgroundColor: isActive ? alpha(theme.palette.primary.main, 0.12) : "transparent",
+                  backgroundColor: isActive ? alpha(theme.palette.secondary.main, 0.12) : "transparent",
                   transition: "color 120ms ease, background-color 120ms ease",
                   "&:hover": {
                     color: theme.palette.common.black,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                    backgroundColor: alpha(theme.palette.secondary.main, 0.12),
                   },
                   "&:focus-visible": {
-                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outline: `2px solid ${theme.palette.secondary.main}`,
                     outlineOffset: "2px",
                     color: theme.palette.common.black,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                    backgroundColor: alpha(theme.palette.secondary.main, 0.12),
                   },
                 }}
               >

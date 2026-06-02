@@ -42,7 +42,7 @@ const Layout: React.FC = () => {
 
     return {
       currentHandle: handleWithTitle,
-      headerColor: handleWithTitle?.headerColor ?? firstHeaderColor ?? "brandAction",
+      headerColor: handleWithTitle?.headerColor ?? firstHeaderColor ?? "primary",
     };
   }, [matches]);
 

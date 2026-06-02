@@ -26,7 +26,7 @@ const InactiveBackdrop: React.FC<InactivityBackdropProps> = ({ isShown }) => {
       <Paper
         elevation={24}
         sx={{
-          backgroundColor: "containerBackground.main",
+          backgroundColor: "pageBackground.main",
           padding: isSmallMobile ? 6 : 4,
           position: "relative",
         }}

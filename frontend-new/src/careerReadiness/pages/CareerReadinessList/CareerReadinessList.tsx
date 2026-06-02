@@ -99,7 +99,7 @@ const CareerReadinessList: React.FC = () => {
             });
           }}
           dataTestId={DATA_TEST_ID.CAREER_READINESS_BACK_LINK}
-          color={theme.palette.brandAction.main}
+          color={theme.palette.primary.main}
           sx={{ opacity: isOnline ? 1 : 0.5 }}
         />
       </Box>
@@ -108,7 +108,7 @@ const CareerReadinessList: React.FC = () => {
       <Box
         sx={{
           flex: 1,
-          backgroundColor: theme.palette.containerBackground.main,
+          backgroundColor: theme.palette.pageBackground.main,
           paddingBottom: theme.fixedSpacing(8),
         }}
         data-testid={DATA_TEST_ID.CAREER_READINESS_LIST_CONTENT}
@@ -161,7 +161,7 @@ const CareerReadinessList: React.FC = () => {
           </Box>
         </Box>
       </Box>
-      <Footer sx={{ backgroundColor: theme.palette.containerBackground.main }} />
+      <Footer sx={{ backgroundColor: theme.palette.pageBackground.main }} />
     </Box>
   );
 };

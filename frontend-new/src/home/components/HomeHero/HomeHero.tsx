@@ -47,7 +47,7 @@ const HomeHero: React.FC = () => {
         <Typography
           variant="h1"
           sx={{
-            color: theme.palette.primary.main,
+            color: theme.palette.secondary.main,
             marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
             fontSize: { xs: "48px", lg: "64px" },
             lineHeight: 0.9,

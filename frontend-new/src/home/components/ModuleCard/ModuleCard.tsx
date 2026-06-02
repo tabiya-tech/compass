@@ -66,10 +66,10 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, badgeStatus = null }) =
         position: "relative",
         opacity: isDisabled ? 0.6 : 1,
         "&:hover": {
-          borderColor: isDisabled ? theme.palette.common.black : theme.palette.primary.main,
+          borderColor: isDisabled ? theme.palette.common.black : theme.palette.secondary.main,
           backgroundColor: isDisabled
             ? "transparent"
-            : `color-mix(in srgb, ${theme.palette.primary.light} 16%, transparent)`,
+            : `color-mix(in srgb, ${theme.palette.secondary.light} 16%, transparent)`,
         },
       }}
       data-testid={DATA_TEST_ID.MODULE_CARD}
@@ -109,13 +109,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, badgeStatus = null }) =
               sx={{
                 backgroundColor:
                   badgeStatus === BADGE_STATUS.CONTINUE
-                    ? theme.palette.primary.main
+                    ? theme.palette.secondary.main
                     : badgeStatus === BADGE_STATUS.COMPLETED
                       ? theme.palette.success.main
                       : theme.palette.grey[600],
                 color:
                   badgeStatus === BADGE_STATUS.CONTINUE
-                    ? theme.palette.primary.contrastText
+                    ? theme.palette.secondary.contrastText
                     : badgeStatus === BADGE_STATUS.COMPLETED
                       ? theme.palette.success.contrastText
                       : theme.palette.common.white,

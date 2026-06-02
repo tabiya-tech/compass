@@ -120,12 +120,12 @@ const Landing: React.FC = () => {
       <PrimaryButton
         fullWidth
         disabled={isLoading}
-        color="brandAction"
+        color="primary"
         onClick={() => navigate(routerPaths.LOGIN)}
         data-testid={DATA_TEST_ID.LANDING_LOGIN_BUTTON}
         sx={{
-          backgroundColor: theme.palette.common.cream,
-          color: theme.palette.brandAction.main,
+          backgroundColor: theme.palette.tertiary.light,
+          color: theme.palette.primary.main,
           fontWeight: 700,
           textTransform: "uppercase",
         }}
@@ -136,12 +136,12 @@ const Landing: React.FC = () => {
         <SecondaryButton
           fullWidth
           disabled={isLoading}
-          color="brandAction"
+          color="primary"
           onClick={() => navigate(routerPaths.REGISTER)}
           data-testid={DATA_TEST_ID.LANDING_SIGNUP_BUTTON}
           sx={{
-            borderColor: theme.palette.common.cream,
-            color: theme.palette.common.cream,
+            borderColor: theme.palette.tertiary.light,
+            color: theme.palette.tertiary.light,
             fontWeight: 700,
             textTransform: "uppercase",
             "&:hover:not(:disabled)": {

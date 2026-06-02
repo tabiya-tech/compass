@@ -40,8 +40,8 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onClick }) => {
         height: "100%",
         position: "relative",
         "&:hover": {
-          borderColor: theme.palette.primary.main,
-          backgroundColor: `color-mix(in srgb, ${theme.palette.primary.light} 16%, transparent)`,
+          borderColor: theme.palette.secondary.main,
+          backgroundColor: `color-mix(in srgb, ${theme.palette.secondary.light} 16%, transparent)`,
         },
       }}
       data-testid={DATA_TEST_ID.DOCUMENT_CARD}

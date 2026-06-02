@@ -1,6 +1,6 @@
 import React from "react";
 import { ConversationMessageSender } from "src/chat/ChatService/ChatService.types";
-import { Box, Typography, styled } from "@mui/material";
+import { Box, Typography, styled, useTheme } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -34,7 +34,7 @@ const MessageBubble = styled(Box, {
   border: origin === ConversationMessageSender.USER ? `2px solid ${fillColor}` : "none",
   borderRadius: origin === ConversationMessageSender.USER ? "12px 12px 0 12px" : "0 0 0 0",
   backgroundColor: origin === ConversationMessageSender.USER ? fillColor : "transparent",
-  color: origin === ConversationMessageSender.USER ? "#FFF" : theme.palette.text.primary,
+  color: origin === ConversationMessageSender.USER ? theme.palette.common.white : theme.palette.text.primary,
   position: "relative",
   alignSelf: origin === ConversationMessageSender.USER ? "flex-end" : "flex-start",
   display: "flex",
@@ -58,19 +58,17 @@ const MessageBubble = styled(Box, {
 }));
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ message, sender, children, fillColor }) => {
+  const theme = useTheme();
   const isCompassMessage = sender === ConversationMessageSender.COMPASS && typeof message === "string";
+  const userColor = sender === ConversationMessageSender.USER ? theme.palette.common.white : undefined;
 
   return (
     <MessageBubble origin={sender} data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_CONTAINER} fillColor={fillColor}>
-      <Box
-        whiteSpace="pre-wrap"
-        data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT}
-        color={sender === ConversationMessageSender.USER ? "#FFF" : undefined}
-      >
+      <Box whiteSpace="pre-wrap" data-testid={DATA_TEST_ID.CHAT_MESSAGE_BUBBLE_MESSAGE_TEXT} color={userColor}>
         {isCompassMessage ? (
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{message as string}</ReactMarkdown>
         ) : (
-          <Typography whiteSpace="pre-line" color={sender === ConversationMessageSender.USER ? "#FFF" : undefined}>
+          <Typography whiteSpace="pre-line" color={userColor}>
             {message}
           </Typography>
         )}

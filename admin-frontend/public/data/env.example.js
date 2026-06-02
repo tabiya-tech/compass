@@ -40,6 +40,7 @@ window.tabiyaConfig = {
   FRONTEND_MINISTRY_URL: btoa("/ministry-tech.png"),
   FRONTEND_FAVICON_URL: btoa("/logo.svg"),
   FRONTEND_APP_ICON_URL: btoa("/logo.svg"),
+  // Override platform colours — see src/styles/variables.css for all available keys. Values are RGB triplets, e.g. "239 123 0".
   FRONTEND_THEME_CSS_VARIABLES: btoa(
     JSON.stringify({
       "brand-primary": "0 255 145",

@@ -14,12 +14,12 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
     class="MuiBox-root css-79irh3"
   >
     <div
-      class="MuiBox-root css-js25am"
+      class="MuiBox-root css-edbro7"
       data-testid="verification-sent-badge-f1228c6a-e447-4946-b810-0c7ddc8ca833"
     >
       <svg
         aria-hidden="true"
-        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-1r8dm25-MuiSvgIcon-root"
+        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-1p097od-MuiSvgIcon-root"
         data-testid="MailOutlineRoundedIcon"
         focusable="false"
         viewBox="0 0 24 24"
@@ -34,7 +34,7 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
       class="MuiBox-root css-0"
     >
       <h1
-        class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-1lre3s8-MuiTypography-root"
+        class="MuiTypography-root MuiTypography-h1 MuiTypography-gutterBottom css-w2mqgj-MuiTypography-root"
         data-testid="verification-title-f1228c6a-e447-4946-b810-0c7ddc8ca833"
       >
         Thank you for creating an account with mockProduct.
@@ -50,7 +50,7 @@ exports[`Testing Verify Email component it should show verification page 1`] = `
       class="MuiBox-root css-1pj1m38"
     >
       <button
-        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-14pga12-MuiButtonBase-root-MuiButton-root"
+        class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-klwsnm-MuiButtonBase-root-MuiButton-root"
         data-testid="verification-back-to-login-button-f1228c6a-e447-4946-b810-0c7ddc8ca833"
         tabindex="0"
         type="button"

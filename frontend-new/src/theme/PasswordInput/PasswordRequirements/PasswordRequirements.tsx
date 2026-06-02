@@ -16,10 +16,12 @@ interface PasswordRequirementsProps {
     hasNumber: boolean;
     hasSpecialChar: boolean;
   };
+  color?: string;
 }
 
-const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationResults }) => {
+const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationResults, color }) => {
   const theme = useTheme();
+  const textColor = color ?? theme.palette.common.white;
   const { t } = useTranslation();
 
   const validationCriteria = useMemo(
@@ -52,7 +54,7 @@ const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({ validationR
             component="span"
             sx={{
               typography: "caption",
-              color: theme.palette.common.white,
+              color: textColor,
               fontWeight: 700,
             }}
           >

@@ -43,8 +43,8 @@ const SubNavBar: React.FC<SubNavBarProps> = ({
   const isOnline = useContext(IsOnlineContext);
 
   const paletteColor = theme.palette[headerColor as keyof typeof theme.palette] as PaletteColor;
-  const bgColor = paletteColor?.main ?? theme.palette.primary.main;
-  const textColor = paletteColor?.contrastText ?? theme.palette.primary.contrastText;
+  const bgColor = paletteColor?.main ?? theme.palette.secondary.main;
+  const textColor = paletteColor?.contrastText ?? theme.palette.secondary.contrastText;
 
   const backLinkSx = {
     display: "inline-flex",

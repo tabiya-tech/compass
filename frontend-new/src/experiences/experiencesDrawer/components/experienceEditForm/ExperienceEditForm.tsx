@@ -754,10 +754,10 @@ const ExperienceEditForm: React.FC<ExperienceEditFormProps> = ({
                   data-testid={DATA_TEST_ID.FORM_ADD_SKILL_BUTTON}
                   disabled={!isOnline || filteredRemainingSkills.length === 0}
                   sx={{
-                    backgroundColor: theme.palette.primary.main,
+                    backgroundColor: theme.palette.secondary.main,
                     color: theme.palette.common.white,
                     "&:hover": {
-                      backgroundColor: theme.palette.primary.dark,
+                      backgroundColor: theme.palette.secondary.dark,
                     },
                     ".MuiChip-icon": {
                       color: theme.palette.common.white,

@@ -60,7 +60,7 @@ export const FilledBrandAction: Story = {
       </Box>
     ),
     filled: true,
-    color: "brandAction",
+    color: "primary",
     title: "Copy to clipboard",
   },
 };

@@ -32,7 +32,7 @@ export const Backdrop = (props: Readonly<IBackdropProps>) => {
       <Paper
         elevation={props.transparent ? 0 : 24}
         sx={{
-          backgroundColor: "containerBackground.main",
+          backgroundColor: "pageBackground.main",
           border: props.transparent ? theme.tabiyaSpacing.md : 0,
           borderColor: "info.contrastText",
         }}

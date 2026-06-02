@@ -102,11 +102,11 @@ const lightPalette: PaletteOptions = {
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   tabiyaGreen: augmentedThemeColor(TabiyaBasicColors.DarkGreen),
   tabiyaRed: augmentedThemeColor(TabiyaBasicColors.DarkRed),
-  containerBackground: {
-    light: "#FFFFFF",
-    dark: "#DFDDD9",
-    main: TabiyaBasicColors.Gray,
-    contrastText: TabiyaBasicColors.GrayDark,
+  pageBackground: {
+    main: "rgb(var(--page-background))",
+    light: "rgb(var(--page-background-light))",
+    dark: "rgb(var(--page-background-dark))",
+    contrastText: "rgb(var(--page-background-contrast-text))",
   },
   error: {
     ...augmentedThemeColor("#FF5449"),
@@ -343,7 +343,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiTableHead: {
         defaultProps: {
           style: {
-            background: (activePalette.containerBackground as SimplePaletteColorOptions)!!.main,
+            background: (activePalette.pageBackground as SimplePaletteColorOptions)!!.main,
           },
         },
       },

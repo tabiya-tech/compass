@@ -8,16 +8,34 @@
 
 :root {
   /* Primary colors */
-  --brand-primary: 10 92 74; /* emerald */
-  --brand-primary-light: 232 244 240; /* emerald-light */
-  --brand-primary-dark: 8 61 49; /* emerald-dark */
+  --brand-primary: 212 75 26; /* rust #D44B1A */
+  --brand-primary-light: 253 240 235; /* rust-light #FDF0EB */
+  --brand-primary-dark: 176 58 18; /* rust-dark #B03A12 */
   --brand-primary-contrast-text: 255 255 255;
 
   /* Secondary colors */
-  --brand-secondary: 232 160 32; /* amber */
-  --brand-secondary-light: 254 246 228; /* amber-light */
-  --brand-secondary-dark: 230 142 22; /* amber-dark */
+  --brand-secondary: 10 92 74; /* emerald #0A5C4A */
+  --brand-secondary-light: 232 244 240; /* emerald-light #E8F4F0 */
+  --brand-secondary-dark: 8 61 49; /* emerald-dark #083D31 */
   --brand-secondary-contrast-text: 255 255 255;
+
+  /* Tertiary colors */
+  --brand-tertiary: 232 160 32; /* amber #E8A020 */
+  --brand-tertiary-light: 250 240 216; /* amber-light #FAF0D8 */
+  --brand-tertiary-dark: 230 142 22; /* amber-dark #E68E16 */
+  --brand-tertiary-contrast-text: 255 255 255;
+
+  /* Accent colors (teal) */
+  --brand-accent: 92 191 191; /* teal #5CBFBF */
+  --brand-accent-light: 216 239 240; /* teal-light #D8EFF0 */
+  --brand-accent-dark: 78 162 162; /* teal-dark #4EA2A2 */
+  --brand-accent-contrast-text: 26 18 8; /* black */
+
+  /* Page background colors */
+  --page-background: 249 246 240; /* linen #F9F6F0 */
+  --page-background-light: 255 255 255; /* white */
+  --page-background-dark: 237 233 230; /* #EDE9E6 */
+  --page-background-contrast-text: 106 99 89; /* #6A6359 */
 
   /* Text colors */
   --text-primary: 26 18 8; /* black */

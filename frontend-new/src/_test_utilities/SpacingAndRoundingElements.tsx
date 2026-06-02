@@ -32,9 +32,9 @@ const RoundingElement = (props: RoundingElementProps) => {
         justifyContent: "center",
         width: "7rem",
         height: "7rem",
-        backgroundColor: props.theme.palette.containerBackground.main,
+        backgroundColor: props.theme.palette.pageBackground.main,
         border: "0.5px solid",
-        borderColor: props.theme.palette.secondary.main,
+        borderColor: props.theme.palette.tertiary.main,
         position: "relative",
       }}
     >
@@ -51,8 +51,8 @@ const RoundingElement = (props: RoundingElementProps) => {
           position: "absolute",
           top: props.theme.responsiveBorderRounding(-1.5),
           right: "3px",
-          backgroundColor: props.theme.palette.containerBackground.light,
-          color: props.theme.palette.primary.main,
+          backgroundColor: props.theme.palette.pageBackground.light,
+          color: props.theme.palette.secondary.main,
           padding: "0rem 0.5rem",
         }}
       >
@@ -130,9 +130,9 @@ const SpacingElement = (props: SpacingElementProps) => {
         justifyContent: "center",
         width: "8rem",
         height: "8rem",
-        backgroundColor: props.theme.palette.containerBackground.main,
+        backgroundColor: props.theme.palette.pageBackground.main,
         border: "0.5px solid",
-        borderColor: props.theme.palette.secondary.main,
+        borderColor: props.theme.palette.tertiary.main,
         position: "relative",
         padding: padding,
       }}
@@ -144,8 +144,8 @@ const SpacingElement = (props: SpacingElementProps) => {
           position: "absolute",
           top: props.theme.responsiveBorderRounding(-1.5),
           right: "3px",
-          backgroundColor: props.theme.palette.containerBackground.light,
-          color: props.theme.palette.primary.main,
+          backgroundColor: props.theme.palette.pageBackground.light,
+          color: props.theme.palette.secondary.main,
           padding: "0rem 0.5rem",
         }}
       >
@@ -182,7 +182,7 @@ const SpacingElement = (props: SpacingElementProps) => {
               <Box
                 sx={{
                   width: "100%",
-                  borderTop: `0.5px solid  ${props.theme.palette.primary.main}`,
+                  borderTop: `0.5px solid  ${props.theme.palette.secondary.main}`,
                 }}
               ></Box>
               <KeyboardArrowRightIcon sx={{ height: "12px", position: "absolute", right: "-11px", top: "-5.64px" }} />

@@ -132,7 +132,7 @@ function FilterIconButton<T>({
         sx={{
           p: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           ml: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
-          color: isActive ? "primary.main" : "text.disabled",
+          color: isActive ? "secondary.main" : "text.disabled",
           opacity: 1,
           "&:hover": { color: "text.primary" },
           flexShrink: 0,
@@ -165,7 +165,7 @@ function FilterIconButton<T>({
       >
         <Box
           sx={{
-            backgroundColor: theme.palette.containerBackground.light,
+            backgroundColor: theme.palette.pageBackground.light,
             py: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           }}
         >
@@ -332,7 +332,7 @@ function DataTable<T extends { id: string }>({
   const displayRows = controlled ? rows : internalSorted;
 
   // ── Tokens ────────────────────────────────────────────────────────────────
-  const headBg = theme.palette.containerBackground.main;
+  const headBg = theme.palette.pageBackground.main;
   const borderColor = theme.palette.divider;
   const colDividerColor = theme.palette.grey[200];
 
@@ -392,9 +392,9 @@ function DataTable<T extends { id: string }>({
         </Typography>
         {isActive &&
           (activeSortDir === "asc" ? (
-            <ArrowUpwardIcon sx={{ fontSize: "0.72rem", color: "primary.main", flexShrink: 0 }} />
+            <ArrowUpwardIcon sx={{ fontSize: "0.72rem", color: "secondary.main", flexShrink: 0 }} />
           ) : (
-            <ArrowDownwardIcon sx={{ fontSize: "0.72rem", color: "primary.main", flexShrink: 0 }} />
+            <ArrowDownwardIcon sx={{ fontSize: "0.72rem", color: "secondary.main", flexShrink: 0 }} />
           ))}
         {(isSortable || col.filter) && (
           <FilterIconButton<T>
@@ -505,7 +505,7 @@ function DataTable<T extends { id: string }>({
                   onClick={() => onRowClick?.(row)}
                   sx={{
                     backgroundColor: idx % 2 === 0 ? "transparent" : alpha(theme.palette.action.hover, 0.03),
-                    "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.05) },
+                    "&:hover": { backgroundColor: alpha(theme.palette.secondary.main, 0.05) },
                     "&:last-child td": { borderBottom: 0 },
                     cursor: onRowClick ? "pointer" : "default",
                   }}
@@ -571,7 +571,7 @@ function DataTable<T extends { id: string }>({
               page={page}
               count={Math.max(1, totalPages)}
               onChange={(_event, nextPage) => onPageChange(nextPage)}
-              color="primary"
+              color="secondary"
               size="small"
               shape="rounded"
               siblingCount={0}

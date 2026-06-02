@@ -64,6 +64,17 @@ const useStatusStyles = (status: ModuleStatusDisplay) => {
 
   if (status === "done") {
     return {
+      borderColor: theme.palette.tertiary.main,
+      iconBg: `color-mix(in srgb, ${theme.palette.tertiary.main} 12%, transparent)`,
+      iconColor: theme.palette.tertiary.main,
+      statusColor: theme.palette.tertiary.main,
+      hoverBorderColor: theme.palette.tertiary.main,
+      hoverBg: `color-mix(in srgb, ${theme.palette.tertiary.light} 16%, transparent)`,
+    };
+  }
+
+  if (status === "in_progress") {
+    return {
       borderColor: theme.palette.secondary.main,
       iconBg: `color-mix(in srgb, ${theme.palette.secondary.main} 12%, transparent)`,
       iconColor: theme.palette.secondary.main,
@@ -73,25 +84,14 @@ const useStatusStyles = (status: ModuleStatusDisplay) => {
     };
   }
 
-  if (status === "in_progress") {
-    return {
-      borderColor: theme.palette.primary.main,
-      iconBg: `color-mix(in srgb, ${theme.palette.primary.main} 12%, transparent)`,
-      iconColor: theme.palette.primary.main,
-      statusColor: theme.palette.primary.main,
-      hoverBorderColor: theme.palette.primary.main,
-      hoverBg: `color-mix(in srgb, ${theme.palette.primary.light} 16%, transparent)`,
-    };
-  }
-
   // unlocked (not started)
   return {
     borderColor: theme.palette.grey[200],
     iconBg: theme.palette.grey[200],
     iconColor: theme.palette.text.primary,
     statusColor: theme.palette.text.secondary,
-    hoverBorderColor: theme.palette.primary.main,
-    hoverBg: `color-mix(in srgb, ${theme.palette.primary.light} 16%, transparent)`,
+    hoverBorderColor: theme.palette.secondary.main,
+    hoverBg: `color-mix(in srgb, ${theme.palette.secondary.light} 16%, transparent)`,
   };
 };
 

@@ -138,7 +138,7 @@ const FAQPage: React.FC = () => {
       data-testid={DATA_TEST_ID.FAQ_PAGE_CONTAINER}
       sx={{
         minHeight: "100vh",
-        backgroundColor: theme.palette.containerBackground.main,
+        backgroundColor: theme.palette.pageBackground.main,
       }}
     >
       <Box
@@ -169,7 +169,7 @@ const FAQPage: React.FC = () => {
                 });
               }}
               dataTestId={DATA_TEST_ID.FAQ_PAGE_BACK_LINK}
-              color={theme.palette.brandAction.main}
+              color={theme.palette.primary.main}
               sx={{
                 marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.xl),
                 opacity: isOnline ? 1 : 0.5,
@@ -234,9 +234,9 @@ const FAQPage: React.FC = () => {
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: theme.palette.primary.main },
-                    "&:hover fieldset": { borderColor: theme.palette.primary.main },
-                    "&.Mui-focused fieldset": { borderColor: theme.palette.primary.main },
+                    "& fieldset": { borderColor: theme.palette.secondary.main },
+                    "&:hover fieldset": { borderColor: theme.palette.secondary.main },
+                    "&.Mui-focused fieldset": { borderColor: theme.palette.secondary.main },
                   },
                 }}
               />
@@ -261,7 +261,7 @@ const FAQPage: React.FC = () => {
                 fontWeight: 600,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: theme.palette.brandAction.main,
+                color: theme.palette.primary.main,
                 marginBottom: theme.fixedSpacing(theme.tabiyaSpacing.sm),
               }}
             >
@@ -291,7 +291,7 @@ const FAQPage: React.FC = () => {
                 overflow: "hidden",
                 boxSizing: "border-box",
                 border: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.containerBackground.main,
+                backgroundColor: theme.palette.pageBackground.main,
               }}
             >
               <Box
@@ -345,7 +345,7 @@ const FAQPage: React.FC = () => {
           top: 0,
           zIndex: theme.zIndex.appBar,
           height: "4px",
-          backgroundColor: theme.palette.containerBackground.main,
+          backgroundColor: theme.palette.pageBackground.main,
         }}
       >
         <Box
@@ -370,7 +370,7 @@ const FAQPage: React.FC = () => {
             top: 0,
             bottom: 0,
             width: `max(80px, ${scrollProgress * 100}%)`,
-            backgroundColor: theme.palette.brandAction.main,
+            backgroundColor: theme.palette.primary.main,
             borderRadius: "0 2px 2px 0",
             transition: "width 80ms linear",
           }}
@@ -430,7 +430,7 @@ const FAQPage: React.FC = () => {
                   marginBottom: "16px",
                 }}
               >
-                <Box component="span" sx={{ color: theme.palette.brandAction.main, marginRight: "6px" }}>
+                <Box component="span" sx={{ color: theme.palette.primary.main, marginRight: "6px" }}>
                   {section.number}.
                 </Box>
                 {section.title}

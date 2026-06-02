@@ -47,16 +47,16 @@ const FaqAccordionItem: React.FC<FaqAccordionItemProps> = ({ item, query, forceO
           border: "none",
           padding: "18px 4px 18px 0",
           cursor: "pointer",
-          color: isOpen ? theme.palette.primary.main : theme.palette.common.black,
+          color: isOpen ? theme.palette.secondary.main : theme.palette.common.black,
           fontFamily: theme.typography.body1.fontFamily,
           fontWeight: 500,
           fontSize: "1rem",
           lineHeight: 1.45,
           transition: "color 120ms ease",
-          "&:hover": { color: theme.palette.primary.main },
+          "&:hover": { color: theme.palette.secondary.main },
           "&:focus-visible": {
-            color: theme.palette.primary.main,
-            outline: `2px solid ${theme.palette.primary.main}`,
+            color: theme.palette.secondary.main,
+            outline: `2px solid ${theme.palette.secondary.main}`,
             outlineOffset: "2px",
             borderRadius: "2px",
           },
@@ -66,7 +66,7 @@ const FaqAccordionItem: React.FC<FaqAccordionItemProps> = ({ item, query, forceO
           <HighlightText
             text={item.question}
             query={query}
-            markBg={theme.palette.brandAccent.main}
+            markBg={theme.palette.accent.main}
             markColor={theme.palette.common.black}
           />
         </Box>
@@ -77,7 +77,7 @@ const FaqAccordionItem: React.FC<FaqAccordionItemProps> = ({ item, query, forceO
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            color: isOpen ? theme.palette.primary.main : theme.palette.text.secondary,
+            color: isOpen ? theme.palette.secondary.main : theme.palette.text.secondary,
             transition: "transform 200ms ease, color 120ms ease",
             transform: isOpen ? "rotate(-180deg)" : "rotate(0deg)",
             flexShrink: 0,

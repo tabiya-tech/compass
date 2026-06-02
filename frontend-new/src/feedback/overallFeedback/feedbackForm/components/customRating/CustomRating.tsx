@@ -81,7 +81,7 @@ const CustomRating: React.FC<CustomRatingProps> = ({
               size="small"
               disabled={disabled}
               sx={{
-                color: theme.palette.primary.main,
+                color: theme.palette.secondary.main,
                 "& .MuiSvgIcon-root": {
                   fontSize: isSmallMobile
                     ? theme.fixedSpacing(theme.tabiyaSpacing.lg)

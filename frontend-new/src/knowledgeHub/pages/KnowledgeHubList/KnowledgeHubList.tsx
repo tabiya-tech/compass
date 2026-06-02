@@ -62,7 +62,7 @@ const KnowledgeHubList: React.FC = () => {
       display="flex"
       flexDirection="column"
       minHeight="100vh"
-      sx={{ backgroundColor: theme.palette.containerBackground.main }}
+      sx={{ backgroundColor: theme.palette.pageBackground.main }}
       data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_LIST_CONTAINER}
     >
       <Box
@@ -92,7 +92,7 @@ const KnowledgeHubList: React.FC = () => {
                   });
                 }}
                 dataTestId={DATA_TEST_ID.KNOWLEDGE_HUB_BACK_LINK}
-                color={theme.palette.brandAction.main}
+                color={theme.palette.primary.main}
                 sx={{ opacity: isOnline ? 1 : 0.5 }}
               />
             </Box>
@@ -156,7 +156,7 @@ const KnowledgeHubList: React.FC = () => {
                   }}
                 >
                   {t("knowledgeHub.heroTitlePrefix")}
-                  <span style={{ color: theme.palette.brandAction.main }}>:</span>
+                  <span style={{ color: theme.palette.primary.main }}>:</span>
                   <br />
                   {t("knowledgeHub.heroTitleQuestion")}
                 </Typography>
@@ -178,7 +178,7 @@ const KnowledgeHubList: React.FC = () => {
           sx={{
             flex: 1,
             width: "100%",
-            backgroundColor: theme.palette.containerBackground.main,
+            backgroundColor: theme.palette.pageBackground.main,
             position: "relative",
             zIndex: 0,
             pt: theme.fixedSpacing(8),
@@ -242,7 +242,7 @@ const KnowledgeHubList: React.FC = () => {
                           cursor: isOnline ? "pointer" : "default",
                           opacity: isOnline ? 1 : 0.5,
                           background: "transparent",
-                          color: theme.palette.brandAction.main,
+                          color: theme.palette.primary.main,
                           fontWeight: 600,
                           fontSize: "0.95rem",
                           textAlign: "left",
@@ -274,7 +274,7 @@ const KnowledgeHubList: React.FC = () => {
           </Box>
         </Box>
       </Box>
-      <Footer sx={{ backgroundColor: theme.palette.containerBackground.main }} />
+      <Footer sx={{ backgroundColor: theme.palette.pageBackground.main }} />
     </Box>
   );
 };

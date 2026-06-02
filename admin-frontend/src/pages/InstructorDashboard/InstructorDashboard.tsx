@@ -114,7 +114,7 @@ const InstructorDashboard: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundColor: theme.palette.containerBackground.light,
+        backgroundColor: theme.palette.pageBackground.light,
       }}
     >
       <Header />

@@ -23,7 +23,7 @@ export const CareerExplorerRust: Story = {
   args: {
     title: "careerExplorer.title",
     subtitle: "careerExplorer.subtitle",
-    headerColor: "brandAction",
+    headerColor: "primary",
   },
 };
 

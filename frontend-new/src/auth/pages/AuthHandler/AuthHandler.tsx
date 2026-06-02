@@ -223,11 +223,11 @@ const AuthHandler: React.FC = () => {
         fullWidth
         showCircle
         onClick={goToLogin}
-        color="brandAction"
+        color="primary"
         data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
         sx={{
-          backgroundColor: theme.palette.common.cream,
-          color: theme.palette.brandAction.main,
+          backgroundColor: theme.palette.tertiary.light,
+          color: theme.palette.primary.main,
           alignSelf: "center",
         }}
       >
@@ -283,12 +283,12 @@ const AuthHandler: React.FC = () => {
         type="submit"
         showCircle
         disableWhenOffline={true}
-        color="brandAction"
+        color="primary"
         disabled={isSubmitting || !isPasswordValid || newPassword !== confirmPassword}
         data-testid={DATA_TEST_ID.SUBMIT_BUTTON}
         sx={{
-          backgroundColor: theme.palette.common.cream,
-          color: theme.palette.brandAction.main,
+          backgroundColor: theme.palette.tertiary.light,
+          color: theme.palette.primary.main,
           alignSelf: "center",
         }}
       >
@@ -323,12 +323,12 @@ const AuthHandler: React.FC = () => {
         </Typography>
         <PrimaryButton
           showCircle
-          color="brandAction"
+          color="primary"
           onClick={goToLogin}
           data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
           sx={{
-            backgroundColor: theme.palette.common.cream,
-            color: theme.palette.brandAction.main,
+            backgroundColor: theme.palette.tertiary.light,
+            color: theme.palette.primary.main,
             alignSelf: "center",
           }}
         >

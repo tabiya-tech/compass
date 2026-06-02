@@ -716,7 +716,7 @@ const SensitiveDataForm: React.FC = () => {
               <PrimaryButton
                 showCircle
                 variant="contained"
-                color="primary"
+                color="secondary"
                 disabled={!isSubmitButtonEnabled || isSkipping}
                 disableWhenOffline={true}
                 onClick={handleSaveSensitivePersonalData}
@@ -748,7 +748,7 @@ const SensitiveDataForm: React.FC = () => {
         <AuthPageShell
           logoUrl={logoSrc}
           whiteBandContent={whiteBandContent}
-          whiteBandBackgroundColor={theme.palette.containerBackground.main}
+          whiteBandBackgroundColor={theme.palette.pageBackground.main}
         />
         <TextConfirmModalDialog
           isOpen={confirmingReject}

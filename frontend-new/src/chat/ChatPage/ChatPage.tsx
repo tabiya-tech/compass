@@ -29,7 +29,7 @@ const ChatPage: React.FC<ChatPageProps> = ({ chatViewProps, aboveChatView, below
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: theme.palette.containerBackground.main,
+        backgroundColor: theme.palette.pageBackground.main,
         overflow: "hidden",
       }}
     >

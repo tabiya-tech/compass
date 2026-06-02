@@ -27,7 +27,7 @@ import { getDarkLogoUrl } from "src/envService";
 const uniqueId = "1dee3ba4-1853-40c6-aaad-eeeb0e94788d";
 
 export const HighlightedSpan = styled("span")(({ theme }) => ({
-  backgroundColor: theme.palette.common.cream,
+  backgroundColor: theme.palette.tertiary.light,
   padding: "0 0.2em",
   borderRadius: "0.2em",
 }));
@@ -239,7 +239,7 @@ const Consent: React.FC = () => {
         }}
       >
         <Box display="flex" flexDirection="column" alignItems="left" justifyContent={"space-evenly"}>
-          <Typography variant="h1" color="primary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
+          <Typography variant="h1" color="secondary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
             {t("consent.components.consentPage.beforeWeBeginTitle")}
           </Typography>
           <Box
@@ -339,7 +339,7 @@ const Consent: React.FC = () => {
             <PrimaryButton
               variant="contained"
               showCircle
-              color="primary"
+              color="secondary"
               disabled={isAccepting || !isTCAccepted || !isDPAccepted || isRejecting}
               disableWhenOffline={true}
               data-testid={DATA_TEST_ID.ACCEPT_BUTTON}
@@ -358,7 +358,7 @@ const Consent: React.FC = () => {
       <AuthPageShell
         logoUrl={logoSrc}
         whiteBandContent={whiteBandContent}
-        whiteBandBackgroundColor={theme.palette.containerBackground.main}
+        whiteBandBackgroundColor={theme.palette.pageBackground.main}
       />
       <Backdrop isShown={isLoggingOut} message={t("common.backdrop.loggingYouOut")} />
       <ConfirmModalDialog

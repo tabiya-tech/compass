@@ -92,10 +92,10 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
               let opacity = 1;
 
               if (isComplete) {
-                bgColor = theme.palette.primary.main;
+                bgColor = theme.palette.secondary.main;
                 opacity = 1;
               } else if (isNext) {
-                bgColor = theme.palette.primary.main;
+                bgColor = theme.palette.secondary.main;
                 opacity = 0.55;
               }
 
@@ -120,7 +120,7 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
 
         {nextModule && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-            <Typography variant="caption" fontWeight="700" color="primary.main">
+            <Typography variant="caption" fontWeight="700" color="secondary.main">
               {t("careerReadiness.upNext")}:
             </Typography>
             <Typography variant="caption" color="text.secondary">
@@ -132,7 +132,7 @@ const CareerReadinessProgressBanner: React.FC<CareerReadinessProgressBannerProps
         {nextModule && (
           <PrimaryButton
             type="button"
-            color="primary"
+            color="secondary"
             showCircle
             disableWhenOffline
             disabled={isNavigating}

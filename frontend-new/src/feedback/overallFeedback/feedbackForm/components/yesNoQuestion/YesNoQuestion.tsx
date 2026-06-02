@@ -92,14 +92,14 @@ const YesNoQuestion: React.FC<YesNoQuestionProps> = ({
       >
         <FormControlLabel
           value="false"
-          control={<Radio sx={{ padding: 0 }} />}
+          control={<Radio color="secondary" sx={{ padding: 0 }} />}
           label={t("common.buttons.no")}
           data-testid={DATA_TEST_ID.RADIO_NO}
           sx={{ margin: 0 }}
         />
         <FormControlLabel
           value="true"
-          control={<Radio sx={{ padding: 0 }} />}
+          control={<Radio color="secondary" sx={{ padding: 0 }} />}
           label={t("common.buttons.yes")}
           data-testid={DATA_TEST_ID.RADIO_YES}
           sx={{ margin: 0 }}

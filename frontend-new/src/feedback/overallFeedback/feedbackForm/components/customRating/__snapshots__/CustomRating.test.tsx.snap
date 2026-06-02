@@ -18,7 +18,7 @@ exports[`CustomRating should render component successfully 1`] = `
       class="MuiBox-root css-a0ovpn"
     >
       <span
-        class="MuiRating-root MuiRating-sizeSmall css-5zcknv-MuiRating-root"
+        class="MuiRating-root MuiRating-sizeSmall css-11zzyli-MuiRating-root"
         data-testid="custom-rating-field-7bb1da6e-bd0f-4edf-bbbb-ff7ade168944"
       >
         <label

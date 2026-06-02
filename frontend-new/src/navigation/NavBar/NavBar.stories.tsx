@@ -67,14 +67,14 @@ export default meta;
 
 type Story = StoryObj<typeof NavBar>;
 
-export const BrandAction: Story = {
-  args: { headerColor: "brandAction" },
-};
-
 export const Primary: Story = {
   args: { headerColor: "primary" },
 };
 
 export const Secondary: Story = {
   args: { headerColor: "secondary" },
+};
+
+export const Tertiary: Story = {
+  args: { headerColor: "tertiary" },
 };

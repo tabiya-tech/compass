@@ -100,30 +100,27 @@ const lightPalette: PaletteOptions = {
     dark: "rgb(var(--brand-secondary-dark))",
     contrastText: "rgb(var(--brand-secondary-contrast-text))",
   },
-  brandAction: {
-    ...augmentedThemeColor("#D44B1A", "#FFFFFF"),
-    dark: "#B03A12",
-    light: "#FDF0EB",
+  tertiary: {
+    main: "rgb(var(--brand-tertiary))",
+    light: "rgb(var(--brand-tertiary-light))",
+    dark: "rgb(var(--brand-tertiary-dark))",
+    contrastText: "rgb(var(--brand-tertiary-contrast-text))",
   },
-  brandAccent: {
-    ...augmentedThemeColor("#5CBFBF", "#1A1208"),
-    dark: "#4EA2A2",
-    light: "#D8EFF0",
-  },
-  careerReadiness: {
-    ...augmentedThemeColor("#E68E16", "#FFFFFF"),
-    dark: "#B86A0E",
-    light: "#FEF3E2",
+  accent: {
+    main: "rgb(var(--brand-accent))",
+    light: "rgb(var(--brand-accent-light))",
+    dark: "rgb(var(--brand-accent-dark))",
+    contrastText: "rgb(var(--brand-accent-contrast-text))",
   },
   tabiyaYellow: augmentedThemeColor(TabiyaBasicColors.Yellow),
   tabiyaBlue: augmentedThemeColor(TabiyaBasicColors.DarkBlue),
   tabiyaGreen: augmentedThemeColor(TabiyaBasicColors.DarkGreen),
   tabiyaRed: augmentedThemeColor(TabiyaBasicColors.DarkRed),
-  containerBackground: {
-    light: "#FFFFFF",
-    dark: "#EDE9E6",
-    main: "#F9F6F0",
-    contrastText: "#6A6359",
+  pageBackground: {
+    main: "rgb(var(--page-background))",
+    light: "rgb(var(--page-background-light))",
+    dark: "rgb(var(--page-background-dark))",
+    contrastText: "rgb(var(--page-background-contrast-text))",
   },
   error: {
     ...augmentedThemeColor("#FF5449"),
@@ -156,11 +153,10 @@ const lightPalette: PaletteOptions = {
   },
   common: {
     white: "#FFFFFF",
-    black: "#1A1208",
-    cream: "#FAF0D8",
+    black: "rgb(var(--text-primary))",
   },
   background: {
-    default: "#F9F6F0",
+    default: "rgb(var(--page-background))",
     paper: "#FFFFFF",
   },
   divider: "#E1DFDD",
@@ -371,7 +367,7 @@ export const applicationTheme = (theme: ThemeMode) => {
       MuiTableHead: {
         defaultProps: {
           style: {
-            background: (activePalette.containerBackground as SimplePaletteColorOptions)!!.main,
+            background: (activePalette.pageBackground as SimplePaletteColorOptions)!!.main,
           },
         },
       },

@@ -441,7 +441,7 @@ const WithCustomFillColorRenderer: React.FC = () => {
         handleSend: action("Message sent"),
         aiIsTyping: false,
         isChatFinished: false,
-        fillColor: theme.palette.primary.main,
+        fillColor: theme.palette.secondary.main,
       }}
     />
   );
@@ -467,7 +467,7 @@ const WithBrandActionColorRenderer: React.FC = () => {
         handleSend: action("Message sent"),
         aiIsTyping: false,
         isChatFinished: false,
-        fillColor: theme.palette.brandAction?.main || theme.palette.info.main,
+        fillColor: theme.palette.primary?.main || theme.palette.info.main,
       }}
     />
   );
@@ -580,7 +580,7 @@ const InteractiveChatView: React.FC = () => {
         handleSend,
         aiIsTyping,
         isChatFinished: false,
-        fillColor: theme.palette.secondary.main,
+        fillColor: theme.palette.tertiary.main,
       }}
     />
   );

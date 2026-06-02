@@ -86,17 +86,17 @@ const VerifyEmail: React.FC = () => {
             px: theme.fixedSpacing(1.2),
             py: theme.fixedSpacing(0.8),
             borderRadius: theme.fixedSpacing(theme.tabiyaSpacing.xl),
-            backgroundColor: theme.palette.common.cream,
+            backgroundColor: theme.palette.tertiary.light,
             color: theme.palette.text.primary,
             fontWeight: 600,
             fontSize: "0.85rem",
           }}
         >
-          <MailOutlineRoundedIcon fontSize="small" sx={{ color: theme.palette.secondary.main }} />
+          <MailOutlineRoundedIcon fontSize="small" sx={{ color: theme.palette.tertiary.main }} />
           {t("auth.pages.verifyEmail.verificationEmailSentBadge")}
         </Box>
         <Box>
-          <Typography variant="h1" color="primary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
+          <Typography variant="h1" color="secondary.main" gutterBottom data-testid={DATA_TEST_ID.TITLE}>
             {t("auth.pages.verifyEmail.registrationThankYou", { appName })}
           </Typography>
           <Typography variant="body2" data-testid={DATA_TEST_ID.VERIFICATION_BODY}>
@@ -111,7 +111,7 @@ const VerifyEmail: React.FC = () => {
         >
           <PrimaryButton
             variant="contained"
-            color="primary"
+            color="secondary"
             data-testid={DATA_TEST_ID.BACK_TO_LOGIN_BUTTON}
             onClick={handleBackToLogin}
             sx={{
@@ -130,7 +130,7 @@ const VerifyEmail: React.FC = () => {
     <AuthPageShell
       logoUrl={logoSrc}
       whiteBandContent={whiteBandContent}
-      whiteBandBackgroundColor={theme.palette.containerBackground.main}
+      whiteBandBackgroundColor={theme.palette.pageBackground.main}
     />
   );
 };

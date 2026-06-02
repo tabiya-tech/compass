@@ -64,11 +64,11 @@ export interface HighlightedMarkdownProps {
 
 const HighlightedMarkdown: React.FC<HighlightedMarkdownProps> = ({ content, query = "" }) => {
   const theme = useTheme();
-  const markBg = theme.palette.brandAccent.main;
+  const markBg = theme.palette.accent.main;
   const markColor = theme.palette.common.black;
-  const linkColor = theme.palette.primary.main;
-  const linkHover = theme.palette.primary.dark;
-  const bulletColor = theme.palette.primary.main;
+  const linkColor = theme.palette.secondary.main;
+  const linkHover = theme.palette.secondary.dark;
+  const bulletColor = theme.palette.secondary.main;
   const textColor = theme.palette.common.black;
   const dividerColor = theme.palette.divider;
 

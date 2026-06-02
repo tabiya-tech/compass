@@ -39,7 +39,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
           Sample Title?
         </span>
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-12ux9aj-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary MuiIconButton-sizeMedium css-1q5mhqh-MuiButtonBase-root-MuiIconButton-root"
           data-testid="confirm-modal-close-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           title="close confirm modal"
@@ -71,7 +71,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
         class="MuiDialogActions-root MuiDialogActions-spacing css-lvai81-MuiDialogActions-root"
       >
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-mcyfwo-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedSecondary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-outlined MuiButton-outlinedSecondary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-168crfk-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-cancel-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"
@@ -79,7 +79,7 @@ exports[`ConfirmModalDialog should render component correctly 1`] = `
           Cancel
         </button>
         <button
-          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation css-x7x9b9-MuiButtonBase-root-MuiButton-root"
+          class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation css-oc17o8-MuiButtonBase-root-MuiButton-root"
           data-testid="confirm-modal-confirm-edc0ac15-67a7-4c1f-9934-94fa65757046"
           tabindex="0"
           type="button"

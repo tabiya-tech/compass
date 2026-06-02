@@ -85,6 +85,7 @@ const CheckboxQuestion: React.FC<CheckboxQuestionProps> = ({
               <Checkbox
                 checked={checkedOptions.includes(option.key)}
                 onChange={() => handleCheckboxChange(option.key)}
+                color="secondary"
                 data-testid={DATA_TEST_ID.CHECKBOX_OPTION}
                 sx={{ padding: 0, marginRight: theme.tabiyaSpacing.sm }}
               />

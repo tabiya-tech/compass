@@ -204,6 +204,7 @@ const AnonymousAccountConversionDialog: React.FC<AnonymousAccountConversionDialo
             margin="normal"
             required
             onValidityChange={setIsPasswordValid}
+            requirementsColor={theme.palette.error.main}
           />
         </Box>
 

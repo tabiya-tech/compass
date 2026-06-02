@@ -42,7 +42,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
         flexDirection: "column",
         gap: theme.fixedSpacing(theme.tabiyaSpacing.sm),
         padding: theme.spacing(theme.tabiyaSpacing.lg),
-        backgroundColor: `color-mix(in srgb, ${theme.palette.secondary.light} 16%, transparent)`,
+        backgroundColor: `color-mix(in srgb, ${theme.palette.tertiary.light} 16%, transparent)`,
         borderRadius: theme.rounding(theme.tabiyaRounding.sm),
       }}
     >
@@ -66,11 +66,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
           onClick={navigateToProfile}
           sx={{
             ...theme.typography.body2,
-            color: theme.palette.secondary.dark,
+            color: theme.palette.tertiary.dark,
             textDecoration: "none",
             fontWeight: "bold",
             "&:hover": {
-              color: theme.palette.secondary.light,
+              color: theme.palette.tertiary.light,
               textDecoration: "underline",
             },
           }}
@@ -91,7 +91,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
           backgroundColor: theme.palette.grey[300],
           "& .MuiLinearProgress-bar": {
             borderRadius: 0,
-            backgroundColor: theme.palette.secondary.main,
+            backgroundColor: theme.palette.tertiary.main,
           },
         }}
       />

@@ -22,7 +22,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
     tabindex="-1"
   >
     <button
-      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorPrimary MuiIconButton-sizeMedium css-bz8oxb-MuiButtonBase-root-MuiIconButton-root"
+      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorSecondary MuiIconButton-sizeMedium css-1tx9fg4-MuiButtonBase-root-MuiIconButton-root"
       data-testid="invitation-code-close-icon-f782907a-6904-482c-b148-3c6682bf7b54"
       tabindex="0"
       title="Close registration code form"
@@ -100,7 +100,7 @@ exports[`RegistrationCodeFormModal renders correctly when modal is shown and cal
       </div>
     </div>
     <button
-      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-disableElevation MuiButton-fullWidth css-1dobt1y-MuiButtonBase-root-MuiButton-root"
+      class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-fullWidth Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedSecondary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorSecondary MuiButton-disableElevation MuiButton-fullWidth css-j0x411-MuiButtonBase-root-MuiButton-root"
       data-testid="invitation-code-submit-button-f782907a-6904-482c-b148-3c6682bf7b54"
       disabled=""
       tabindex="-1"

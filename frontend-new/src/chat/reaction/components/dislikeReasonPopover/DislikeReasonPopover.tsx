@@ -60,13 +60,13 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({ anch
         data-testid={DATA_TEST_ID.CONTAINER}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" color={theme.palette.text.secondary} data-testid={DATA_TEST_ID.TITLE}>
+          <Typography variant="subtitle1" color={theme.palette.text.primary} data-testid={DATA_TEST_ID.TITLE}>
             {t("chat.reaction.components.dislikeReasonPopover.title")}
           </Typography>
           <PrimaryIconButton
             onClick={() => onClose([])} // close without selecting a reason
             title={t("chat.reaction.components.dislikeReasonPopover.closeButton")}
-            sx={{ color: theme.palette.text.secondary }}
+            sx={{ color: theme.palette.text.primary }}
             data-testid={DATA_TEST_ID.CLOSE_ICON_BUTTON}
           >
             <CloseIcon data-testid={DATA_TEST_ID.CLOSE_ICON} />
@@ -81,7 +81,7 @@ export const DislikeReasonPopover: React.FC<DislikeReasonPopoverProps> = ({ anch
                 key={reason}
                 onClick={() => handleReasonClick(reason)}
                 title={label}
-                style={{ color: theme.palette.text.secondary }}
+                style={{ color: theme.palette.common.white }}
                 data-testid={DATA_TEST_ID.BUTTON}
                 disabled={!isOnline}
               >

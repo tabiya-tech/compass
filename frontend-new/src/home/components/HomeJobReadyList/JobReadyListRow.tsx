@@ -60,7 +60,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
   const isOnline = useContext(IsOnlineContext);
   const [isNavigating, setIsNavigating] = useState(false);
   const isSmallMobile = useMediaQuery((th: Theme) => th.breakpoints.down("sm"));
-  const secondary = theme.palette.secondary;
+  const tertiary = theme.palette.tertiary;
 
   const n = moduleIndex + 1;
   const isExpanded = module.id === expandedModuleId;
@@ -86,7 +86,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
         <Box
           data-testid={`${rowTestIdPrefix}-${module.id}`}
           sx={{
-            border: `2px solid ${secondary.main}`,
+            border: `2px solid ${tertiary.main}`,
             borderRadius: theme.rounding(theme.tabiyaRounding.sm),
             padding: {
               xs: theme.fixedSpacing(theme.tabiyaSpacing.md),
@@ -109,8 +109,8 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
                 width: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.xl * 1.2 : theme.tabiyaSpacing.xl * 1.5),
                 height: theme.fixedSpacing(isSmallMobile ? theme.tabiyaSpacing.xl * 1.2 : theme.tabiyaSpacing.xl * 1.5),
                 borderRadius: "50%",
-                bgcolor: secondary.main,
-                color: secondary.contrastText,
+                bgcolor: tertiary.main,
+                color: tertiary.contrastText,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -169,7 +169,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
               </Box>
               {primaryCtaLabel !== null && (
                 <PrimaryButton
-                  color="secondary"
+                  color="tertiary"
                   showCircle
                   disableWhenOffline
                   disabled={isNavigating}
@@ -207,9 +207,9 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
               width: theme.fixedSpacing(theme.tabiyaSpacing.xl),
               height: theme.fixedSpacing(theme.tabiyaSpacing.xl),
               borderRadius: "50%",
-              border: `2px solid ${secondary.main}`,
-              color: isDone ? secondary.contrastText : secondary.main,
-              bgcolor: isDone ? secondary.main : "transparent",
+              border: `2px solid ${tertiary.main}`,
+              color: isDone ? tertiary.contrastText : tertiary.main,
+              bgcolor: isDone ? tertiary.main : "transparent",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -261,7 +261,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
           >
             {isInProgress && (
               <PrimaryButton
-                color="secondary"
+                color="tertiary"
                 disableWhenOffline
                 disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
@@ -277,7 +277,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
             )}
             {isUnlocked && (
               <SecondaryButton
-                color="secondary"
+                color="tertiary"
                 disableWhenOffline
                 disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
@@ -291,7 +291,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
             )}
             {isDone && (
               <PrimaryButton
-                color="secondary"
+                color="tertiary"
                 disableWhenOffline
                 disabled={isNavigating}
                 onClick={() => goToModule(module.id)}
@@ -309,7 +309,7 @@ const JobReadyListRow: React.FC<JobReadyListRowProps> = ({
       {shouldShowRowDivider(moduleIndex, module.id, sorted, expandedModuleId) && (
         <Divider
           sx={{
-            borderColor: `color-mix(in srgb, ${secondary.main} 35%, transparent)`,
+            borderColor: `color-mix(in srgb, ${tertiary.main} 35%, transparent)`,
           }}
         />
       )}

@@ -113,7 +113,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
         )}
 
         {!isLoading && uploadedCVs.length === 0 && (
-          <Typography variant="caption" color="secondary">
+          <Typography variant="caption" color="tertiary">
             {t("cv.uploadedCVsMenu.empty")}
           </Typography>
         )}
@@ -144,11 +144,7 @@ const UploadedCVsMenu: React.FC<UploadedCVsMenuContentProps> = ({
                   data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_DESCRIPTION_ICON}
                 />
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography
-                    variant="caption"
-                    color="secondary"
-                    data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_FILE_NAME}
-                  >
+                  <Typography variant="caption" color="tertiary" data-testid={DATA_TEST_ID.UPLOADED_CVS_MENU_FILE_NAME}>
                     {cv.filename}
                   </Typography>
                   <Typography

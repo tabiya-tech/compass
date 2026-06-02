@@ -55,7 +55,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
         >
           {/* Main Giant Progress */}
           <Box>
-            <Typography variant="h5" fontWeight="bold" color="primary.main">
+            <Typography variant="h5" fontWeight="bold" color="secondary.main">
               {safeOverallProgress}%
             </Typography>
             <LinearProgress
@@ -68,7 +68,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
                 mt: 1,
                 borderRadius: 999,
                 backgroundColor: theme.palette.divider,
-                "& .MuiLinearProgress-bar": { backgroundColor: theme.palette.primary.main },
+                "& .MuiLinearProgress-bar": { backgroundColor: theme.palette.secondary.main },
               }}
             />
           </Box>
@@ -89,7 +89,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
                   borderRadius: 999,
                   backgroundColor: theme.palette.divider,
                   "& .MuiLinearProgress-bar": {
-                    backgroundColor: theme.palette.primary.main,
+                    backgroundColor: theme.palette.secondary.main,
                     opacity: 0.6,
                   },
                 }}
@@ -118,7 +118,7 @@ export const ModuleProgressCard: React.FC<ModuleProgressCardProps> = ({
                   borderRadius: 999,
                   backgroundColor: theme.palette.divider,
                   "& .MuiLinearProgress-bar": {
-                    backgroundColor: theme.palette.primary.main,
+                    backgroundColor: theme.palette.secondary.main,
                     opacity: 0.6,
                   },
                 }}

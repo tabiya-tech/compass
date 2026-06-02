@@ -192,7 +192,10 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
           </motion.div>
         </AnimatePresence>
       </Box>
-      <Divider color="primary" sx={{ height: "0.2rem" }} data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER} />
+      <Divider
+        sx={{ height: "0.2rem", bgcolor: "secondary.main" }}
+        data-testid={DATA_TEST_ID.FEEDBACK_FORM_CONTENT_DIVIDER}
+      />
       <MobileStepper
         variant="dots"
         steps={maxSteps}
@@ -220,7 +223,11 @@ const FeedbackFormContent: React.FC<FeedbackFormContentProps> = ({ notifySubmit 
             {t("feedback.overallFeedback.feedbackForm.components.feedbackFormContent.previous")}
           </SecondaryButton>
         }
-        sx={{ padding: 0 }}
+        sx={{
+          padding: 0,
+          backgroundColor: theme.palette.background.paper,
+          "& .MuiMobileStepper-dotActive": { backgroundColor: theme.palette.secondary.main },
+        }}
       />
     </Box>
   );

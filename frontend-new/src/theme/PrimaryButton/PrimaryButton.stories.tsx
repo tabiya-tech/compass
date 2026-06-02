@@ -38,7 +38,7 @@ export const Secondary: Story = {
 export const BrandAction: Story = {
   args: {
     children: "Explore Pathways",
-    color: "brandAction",
+    color: "primary",
     showCircle: true,
   },
 };

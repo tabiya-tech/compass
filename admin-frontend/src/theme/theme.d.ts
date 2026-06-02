@@ -78,7 +78,7 @@ declare module "@mui/material/styles" {
 
 declare module "@mui/material/styles" {
   interface Palette {
-    containerBackground: PaletteColor;
+    pageBackground: PaletteColor;
     tabiyaBlue: PaletteColor;
     tabiyaYellow: PaletteColor;
     tabiyaGreen: PaletteColor;
@@ -93,7 +93,7 @@ declare module "@mui/material/styles" {
   }
 
   interface PaletteOptions {
-    containerBackground?: PaletteColorOptions;
+    pageBackground?: PaletteColorOptions;
     tabiyaBlue?: PaletteColorOptions;
     tabiyaYellow?: PaletteColorOptions;
     tabiyaGreen?: PaletteColorOptions;

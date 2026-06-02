@@ -137,7 +137,7 @@ const FaqChecklist: React.FC<FaqChecklistProps> = ({ markdown, query = "" }) => 
                 <HighlightText
                   text={item}
                   query={query}
-                  markBg={theme.palette.brandAccent.main}
+                  markBg={theme.palette.accent.main}
                   markColor={theme.palette.common.black}
                 />
               </Box>

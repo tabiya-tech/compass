@@ -40,7 +40,7 @@ const Home: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        backgroundColor: theme.palette.containerBackground.main,
+        backgroundColor: theme.palette.pageBackground.main,
         overflowX: "hidden",
         overflowY: "auto",
       }}
@@ -95,7 +95,7 @@ const Home: React.FC = () => {
           sx={{
             width: "100%",
             flex: 1,
-            backgroundColor: theme.palette.containerBackground.main,
+            backgroundColor: theme.palette.pageBackground.main,
             paddingTop: theme.fixedSpacing(theme.tabiyaSpacing.xl),
             paddingBottom: theme.fixedSpacing(isMobile ? 8 : 12),
           }}

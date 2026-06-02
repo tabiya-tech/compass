@@ -37,9 +37,9 @@ const HomeSidebar: React.FC<HomeSidebarProps> = ({ showViewCvButton = true }) =>
     return drawerWorkSkills.length > 0 ? drawerWorkSkills : uniqueProfileSkills;
   }, [profileData.skills, drawerWorkSkills]);
 
-  const accentColor = theme.palette.primary.main;
-  const tealBg = theme.palette.brandAccent.light;
-  const amberBg = theme.palette.common.cream;
+  const accentColor = theme.palette.secondary.main;
+  const tealBg = theme.palette.accent.light;
+  const amberBg = theme.palette.tertiary.light;
 
   const handleViewCV = () => void openExperiencesDrawer();
 

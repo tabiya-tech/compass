@@ -33,7 +33,7 @@ const Dot = styled("span")(({ theme, color }) => ({
   width: theme.fixedSpacing(theme.tabiyaSpacing.sm),
   height: theme.fixedSpacing(theme.tabiyaSpacing.sm),
   borderRadius: "50%",
-  backgroundColor: color || theme.palette.primary.main,
+  backgroundColor: color || theme.palette.secondary.main,
   animation: `${pulse} 1.4s infinite`,
 }));
 

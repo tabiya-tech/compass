@@ -65,7 +65,7 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
       {/* Title row */}
       <DialogTitle sx={{ padding: 0, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <Box>
-          <Typography variant="h6" component="div" color="primary" fontWeight={700}>
+          <Typography variant="h6" component="div" color="secondary" fontWeight={700}>
             {capitalize(job.jobTitle)}
           </Typography>
           {job.company && (
@@ -97,9 +97,9 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
               label={capitalize(job.employmentType)}
               size="small"
               sx={{
-                backgroundColor: theme.palette.primary.light,
+                backgroundColor: theme.palette.secondary.light,
                 color: theme.palette.common.black,
-                border: `1px solid ${theme.palette.primary.main}`,
+                border: `1px solid ${theme.palette.secondary.main}`,
                 fontWeight: 600,
                 fontSize: "0.75rem",
               }}
@@ -110,7 +110,11 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
               label={capitalize(job.location)}
               size="small"
               variant="outlined"
-              sx={{ fontSize: "0.75rem", borderColor: theme.palette.primary.main, color: theme.palette.primary.main }}
+              sx={{
+                fontSize: "0.75rem",
+                borderColor: theme.palette.secondary.main,
+                color: theme.palette.secondary.main,
+              }}
             />
           )}
           {job.posted && (
@@ -163,8 +167,8 @@ const JobDetailModal: React.FC<JobDetailModalProps> = ({ job, open, onClose }) =
                   size="small"
                   sx={{
                     backgroundColor: "transparent",
-                    border: `1px solid ${theme.palette.primary.main}`,
-                    color: theme.palette.primary.main,
+                    border: `1px solid ${theme.palette.secondary.main}`,
+                    color: theme.palette.secondary.main,
                     borderRadius: theme.rounding(theme.tabiyaRounding.xs),
                     fontSize: "0.75rem",
                   }}

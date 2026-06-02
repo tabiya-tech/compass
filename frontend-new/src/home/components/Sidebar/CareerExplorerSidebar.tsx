@@ -98,7 +98,7 @@ const CareerExplorerSidebar: React.FC<CareerExplorerSidebarProps> = ({ refreshTo
   const [data, setData] = useState<SectorData | null>(null);
   const cancelledRef = useRef(false);
 
-  const accentColor = theme.palette.brandAction.main;
+  const accentColor = theme.palette.primary.main;
 
   const load = useCallback(async () => {
     const result = await SidebarService.getInstance().getSectorData();

@@ -395,7 +395,7 @@ const InteractiveChatPage: React.FC = () => {
           handleSend,
           aiIsTyping,
           isChatFinished: false,
-          fillColor: theme.palette.primary.main,
+          fillColor: theme.palette.secondary.main,
         },
       }}
       sidebar={

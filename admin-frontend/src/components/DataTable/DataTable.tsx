@@ -172,7 +172,7 @@ function FilterIconButton<T>({
       >
         <Box
           sx={{
-            backgroundColor: theme.palette.containerBackground.light,
+            backgroundColor: theme.palette.pageBackground.light,
             py: theme.fixedSpacing(theme.tabiyaSpacing.xxs),
           }}
         >
@@ -300,8 +300,8 @@ function DataTable<T extends { id: string }>({
   const displayRows = controlled ? rows : internalSorted;
 
   // ── Tokens ────────────────────────────────────────────────────────────────
-  // Use containerBackground.main for header — matches the MuiTableHead default override
-  const headBg = theme.palette.containerBackground.main;
+  // Use pageBackground.main for header — matches the MuiTableHead default override
+  const headBg = theme.palette.pageBackground.main;
   // Full-strength divider for outer borders; grey[200] for faint internal column dividers
   const borderColor = theme.palette.divider;
   const colDividerColor = theme.palette.grey[200];

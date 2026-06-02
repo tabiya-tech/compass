@@ -86,7 +86,7 @@ const getInitials = (name: string): string => {
     .slice(0, 2);
 };
 
-const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
+const NavBar: React.FC<NavBarProps> = ({ headerColor = "primary" }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const appName = getProductName();
@@ -111,8 +111,8 @@ const NavBar: React.FC<NavBarProps> = ({ headerColor = "brandAction" }) => {
   const userName = profileData.name || "";
 
   const paletteColor = theme.palette[headerColor as keyof typeof theme.palette] as PaletteColor;
-  const bgColor = paletteColor?.main ?? theme.palette.brandAction.main;
-  const textColor = paletteColor?.contrastText ?? theme.palette.brandAction.contrastText;
+  const bgColor = paletteColor?.main ?? theme.palette.primary.main;
+  const textColor = paletteColor?.contrastText ?? theme.palette.primary.contrastText;
 
   const logoUrlFromEnv = getAppIconUrl();
   const logoSrc = logoUrlFromEnv || `${process.env.PUBLIC_URL}/njila_logo.svg`;

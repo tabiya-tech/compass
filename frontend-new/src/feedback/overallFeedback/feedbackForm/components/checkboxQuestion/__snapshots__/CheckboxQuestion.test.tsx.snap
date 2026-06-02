@@ -23,7 +23,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -54,7 +54,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium Mui-checked MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -85,7 +85,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input
@@ -115,7 +115,7 @@ exports[`CheckboxQuestion should render component successfully 1`] = `
       class="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-1t8zf5u-MuiFormControlLabel-root"
     >
       <span
-        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeMedium css-ayfl4m-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
+        class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium MuiCheckbox-root MuiCheckbox-colorSecondary MuiCheckbox-sizeMedium css-14e759d-MuiButtonBase-root-MuiSwitchBase-root-MuiCheckbox-root"
         data-testid="checkbox-with-textarea-checkbox-option-989402f0-9fda-4400-958c-2d6c7bce9821"
       >
         <input

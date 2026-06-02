@@ -35,7 +35,7 @@ const Footer: React.FC = () => {
       component="footer"
       data-testid={DATA_TEST_ID.FOOTER_CONTAINER}
       sx={{
-        backgroundColor: theme.palette.containerBackground.light,
+        backgroundColor: theme.palette.pageBackground.light,
         marginTop: isMobile
           ? theme.fixedSpacing(theme.tabiyaSpacing.xl * 1.5)
           : theme.fixedSpacing(theme.tabiyaSpacing.xl * 2),

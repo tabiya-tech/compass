@@ -37,7 +37,8 @@ const StyledBadgeContent = styled("span")(({ theme }) => ({
   fontSize: theme.typography.subtitle2.fontSize,
   minWidth: theme.fixedSpacing(theme.tabiyaSpacing.lg),
   height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.secondary.contrastText,
   animation: `${pulse} 1.5s infinite`,
 }));
 

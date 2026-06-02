@@ -160,7 +160,7 @@ export const SkillsDiscoveredCard: React.FC<SkillsDiscoveredCardProps> = ({
           emptyText={t("home.profile.noEducationSkillsYet")}
           isLoading={isLoading}
           startIndex={0}
-          chipBgColor={theme.palette.common.cream}
+          chipBgColor={theme.palette.tertiary.light}
           chipTextColor={theme.palette.common.black}
         />
 
@@ -172,8 +172,8 @@ export const SkillsDiscoveredCard: React.FC<SkillsDiscoveredCardProps> = ({
           emptyText={t("home.profile.noSkillsYet")}
           isLoading={isLoading}
           startIndex={educationSkills.length}
-          chipBgColor={theme.palette.brandAccent.light}
-          chipTextColor={theme.palette.primary.main}
+          chipBgColor={theme.palette.accent.light}
+          chipTextColor={theme.palette.secondary.main}
           emptyTestId={DATA_TEST_ID.SKILLS_EMPTY}
         />
       </Box>

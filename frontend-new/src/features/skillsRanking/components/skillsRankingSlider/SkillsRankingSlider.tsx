@@ -39,7 +39,7 @@ const SkillsRankingSlider: React.FC<SkillsRankingSliderProps> = ({
       sx={{
         height: theme.fixedSpacing(theme.tabiyaSpacing.md),
         "& .MuiSlider-track": {
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: theme.palette.secondary.main,
           opacity: disabled ? 0.5 : 1,
           borderRadius: theme.rounding(theme.tabiyaRounding.xs),
         },
@@ -54,10 +54,10 @@ const SkillsRankingSlider: React.FC<SkillsRankingSliderProps> = ({
           borderRadius: theme.rounding(theme.tabiyaRounding.xs),
           width: theme.fixedSpacing(theme.tabiyaSpacing.lg),
           height: theme.fixedSpacing(theme.tabiyaSpacing.lg),
-          backgroundColor: disabled ? theme.palette.secondary.light : theme.palette.primary.dark,
+          backgroundColor: disabled ? theme.palette.tertiary.light : theme.palette.secondary.dark,
         },
         "& .MuiSlider-valueLabel": {
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: theme.palette.secondary.main,
           color: theme.palette.common.black,
           fontWeight: "bold",
           fontSize: theme.typography.caption.fontSize,
@@ -66,7 +66,7 @@ const SkillsRankingSlider: React.FC<SkillsRankingSliderProps> = ({
           opacity: disabled ? 0.7 : 1,
           "&::before": {
             top: "-8px",
-            borderTopColor: theme.palette.primary.main,
+            borderTopColor: theme.palette.secondary.main,
             borderBottomColor: "transparent",
           },
         },

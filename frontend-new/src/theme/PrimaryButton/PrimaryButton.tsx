@@ -16,7 +16,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   children,
   disableWhenOffline,
   showCircle = false,
-  color = "primary",
+  color = "secondary",
   variant = "contained",
   sx,
   ...props
@@ -28,7 +28,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
     throw new ComponentError("Children are required for PrimaryButton component");
   }
 
-  const cream = theme.palette.common.cream;
+  const cream = theme.palette.tertiary.light;
   const paletteColor = theme.palette[color as keyof typeof theme.palette] as PaletteColor;
   const isOutlined = variant === "outlined";
   const sxObject = sx as Record<string, unknown> | undefined;
@@ -78,7 +78,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         textTransform: "none",
         cursor: "pointer",
         "&:focus-visible": {
-          outline: `3px solid ${theme.palette.brandAccent.main}`,
+          outline: `3px solid ${theme.palette.accent.main}`,
           outlineOffset: "2px",
         },
         ...outlinedHoverSx,

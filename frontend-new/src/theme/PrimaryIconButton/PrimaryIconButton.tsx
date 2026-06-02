@@ -7,14 +7,14 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   borderRadius: "50%",
   lineHeight: "0",
   padding: theme.spacing(theme.tabiyaSpacing.xs),
-  color: theme.palette.primary.main,
+  color: theme.palette.secondary.main,
   ":hover": {
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.secondary.contrastText,
   },
   ":active": {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText,
   },
   "&.Mui-disabled": {
     opacity: 0.38,
@@ -33,7 +33,7 @@ const PrimaryIconButton: React.FC<PrimaryIconButtonProps> = ({
   children,
   disabled,
   filled = false,
-  color = "primary",
+  color = "secondary",
   sx,
   ...props
 }: Readonly<PrimaryIconButtonProps>) => {

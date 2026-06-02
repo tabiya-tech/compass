@@ -99,7 +99,7 @@ export const MAX_FILE_SIZE_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const StyledTextField = styled(TextField, {
   shouldForwardProp: (prop) => prop !== "fillColor",
 })<{ fillColor?: string }>(({ theme, disabled, fillColor }) => {
-  const color = fillColor || theme.palette.primary.main;
+  const color = fillColor || theme.palette.secondary.main;
   return {
     "& .MuiOutlinedInput-root": {
       "& fieldset": {
@@ -607,9 +607,9 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                         title={t("chat.chatMessageField.moreActionsTooltip")}
                         data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_BUTTON}
                       >
-                        <AnimatedDotBadge show={showPlusBadge} color={props.fillColor || theme.palette.primary.dark}>
+                        <AnimatedDotBadge show={showPlusBadge} color={props.fillColor || theme.palette.secondary.dark}>
                           <AddIcon
-                            sx={{ color: props.fillColor || theme.palette.primary.dark }}
+                            sx={{ color: props.fillColor || theme.palette.secondary.dark }}
                             data-testid={DATA_TEST_ID.CHAT_MESSAGE_FIELD_PLUS_ICON}
                           />
                         </AnimatedDotBadge>
@@ -630,11 +630,11 @@ const ChatMessageField: React.FC<ChatMessageFieldProps> = (props) => {
                   sx={{
                     backgroundColor: sendIsDisabled()
                       ? theme.palette.grey[900]
-                      : props.fillColor || theme.palette.primary.main,
+                      : props.fillColor || theme.palette.secondary.main,
                     "&:hover": {
                       backgroundColor: sendIsDisabled()
                         ? theme.palette.grey[300]
-                        : props.fillColor || theme.palette.primary.dark,
+                        : props.fillColor || theme.palette.secondary.dark,
                     },
                     "&.Mui-disabled": {
                       backgroundColor: theme.palette.grey[300],

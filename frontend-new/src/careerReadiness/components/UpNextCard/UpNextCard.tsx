@@ -38,7 +38,7 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ module }) => {
     <Box
       data-testid={DATA_TEST_ID.UP_NEXT_CARD}
       sx={{
-        border: `1px solid ${theme.palette.careerReadiness.main}`,
+        border: `1px solid ${theme.palette.tertiary.main}`,
         borderRadius: theme.rounding(theme.tabiyaRounding.sm),
         padding: theme.fixedSpacing(theme.tabiyaSpacing.md),
         backgroundColor: theme.palette.background.paper,
@@ -81,7 +81,7 @@ const UpNextCard: React.FC<UpNextCardProps> = ({ module }) => {
       <PrimaryButton
         data-testid={DATA_TEST_ID.UP_NEXT_CARD_CONTINUE}
         onClick={handleContinue}
-        color="careerReadiness"
+        color="tertiary"
         showCircle
         disableWhenOffline
         disabled={isNavigating}

@@ -50,7 +50,7 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({
   whiteBandBackgroundColor,
 }) => {
   const theme = useTheme();
-  const cream = theme.palette.common.cream;
+  const cream = theme.palette.tertiary.light;
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -137,7 +137,7 @@ const AuthPageShell: React.FC<AuthPageShellProps> = ({
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {!isOnFaqPage && (
                   <SecondaryButton
-                    color="brandAction"
+                    color="primary"
                     onClick={handleFaqClick}
                     startIcon={<HelpCircle size={18} />}
                     aria-label={t("nav.faqAriaLabel")}

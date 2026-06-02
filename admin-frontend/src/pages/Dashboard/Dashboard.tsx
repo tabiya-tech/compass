@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundColor: theme.palette.containerBackground.light,
+        backgroundColor: theme.palette.pageBackground.light,
       }}
       data-testid={DATA_TEST_ID.DASHBOARD_PAGE_CONTAINER}
     >

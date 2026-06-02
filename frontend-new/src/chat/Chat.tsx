@@ -651,7 +651,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
         const message = generateUserMessage(
           chatText,
           new Date().toISOString(),
-          theme.palette.primary.main,
+          theme.palette.secondary.main,
           optimisticMessageId
         );
         addMessageToChat(message);
@@ -829,7 +829,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                   const parsed = JSON.parse(message.message);
                   if (parsed.type === "bws_response") return [];
                 } catch {}
-                return [generateUserMessage(message.message, message.sent_at, theme.palette.primary.main)];
+                return [generateUserMessage(message.message, message.sent_at, theme.palette.secondary.main)];
               }
               const isLast = idx === arr.length - 1;
               if (message.message_type === "BWS_TASK" && message.metadata) {
@@ -1196,7 +1196,7 @@ export const Chat: React.FC<Readonly<ChatProps>> = ({
                 prefillMessage,
                 failedSendDraft,
                 cvUploadError,
-                fillColor: theme.palette.primary.main,
+                fillColor: theme.palette.secondary.main,
                 isInputDisabled: isAwaitingBWSResponse,
                 placeholderKey: isAwaitingBWSResponse ? "chat.chatMessageField.placeholders.bws" : undefined,
               },

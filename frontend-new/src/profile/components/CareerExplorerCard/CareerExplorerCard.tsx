@@ -47,11 +47,11 @@ const ALL_SECTORS: readonly {
   emoji: string;
   bg: string;
 }[] = [
-  { id: "mining-pathway", slug: "mining", emoji: "⛏️", bg: "secondary.light" },
+  { id: "mining-pathway", slug: "mining", emoji: "⛏️", bg: "tertiary.light" },
   { id: "energy-pathway", slug: "energy", emoji: "⚡️", bg: "info.light" },
   { id: "agriculture-pathway", slug: "agriculture", emoji: "🌾", bg: "success.light" },
-  { id: "hospitality-pathway", slug: "hospitality", emoji: "🏞", bg: "brandAction.light" },
-  { id: "water-pathway", slug: "water", emoji: "💧", bg: "primary.light" },
+  { id: "hospitality-pathway", slug: "hospitality", emoji: "🏞", bg: "primary.light" },
+  { id: "water-pathway", slug: "water", emoji: "💧", bg: "secondary.light" },
   { id: "health-pathway", slug: "health", emoji: "🩺", bg: "warning.light" },
 ];
 export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors: _sectors, isLoading }) => {
@@ -93,7 +93,7 @@ export const CareerExplorerCard: React.FC<CareerExplorerCardProps> = ({ sectors:
           disabled={!isOnline}
           onClick={handleBrowseAll}
           variant="body2"
-          color="brandAction"
+          color="primary"
           sx={{
             fontWeight: "bold",
             background: "none",

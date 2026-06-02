@@ -25,13 +25,13 @@ const StyledPrimaryIconButton = styled(PrimaryIconButton)(({ theme }) => ({
   padding: theme.spacing(theme.tabiyaSpacing.xs),
   color: theme.palette.common.black,
   ":hover": {
-    backgroundColor: theme.palette.secondary.dark,
-    color: theme.palette.secondary.contrastText,
+    backgroundColor: theme.palette.tertiary.dark,
+    color: theme.palette.tertiary.contrastText,
     border: "none",
   },
   ":active": {
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.secondary.contrastText,
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.tertiary.contrastText,
     border: "none",
   },
 }));

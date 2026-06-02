@@ -41,7 +41,7 @@ const UserChatMessage: React.FC<UserChatMessageProps> = ({ message, sent_at, fil
         <ChatBubble
           message={message}
           sender={ConversationMessageSender.USER}
-          fillColor={fill_color || theme.palette.primary.main}
+          fillColor={fill_color || theme.palette.secondary.main}
         />
       </Box>
     </MessageContainer>
