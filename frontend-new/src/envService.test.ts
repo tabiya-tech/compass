@@ -29,6 +29,8 @@ import {
   getRegistrationCodeDisabled,
   getSkillsReportOutputConfigEnvVar,
   getFaqTutorialVideoUrl,
+  getMinistryUrl,
+  DEFAULT_MINISTRY_URL,
 } from "./envService";
 import { getRandomString } from "./_test_utilities/specialCharacters";
 
@@ -147,6 +149,35 @@ describe.each([
         new EnvError(`Error loading environment variable ${ENV_KEY}`, expect.any(Error))
       );
     });
+  });
+});
+
+describe("FRONTEND_MINISTRY_URL Getter (getMinistryUrl) tests", () => {
+  test("should return the default ministry logo path when the FRONTEND_MINISTRY_URL is not set", () => {
+    // GIVEN the FRONTEND_MINISTRY_URL environment variable is not set
+    Object.defineProperty(window, "tabiyaConfig", {
+      value: {},
+      writable: true,
+    });
+    // WHEN getMinistryUrl is called
+    const actualMinistryUrl = getMinistryUrl();
+    // THEN expect it to return the default ministry logo path
+    expect(actualMinistryUrl).toBe(DEFAULT_MINISTRY_URL);
+  });
+
+  test("should return the decoded value when the FRONTEND_MINISTRY_URL is set", () => {
+    // GIVEN the FRONTEND_MINISTRY_URL environment variable is set to a base64 encoded string
+    const givenValue = "https://example.org/custom-ministry-logo.png";
+    Object.defineProperty(window, "tabiyaConfig", {
+      value: {
+        FRONTEND_MINISTRY_URL: btoa(givenValue),
+      },
+      writable: true,
+    });
+    // WHEN getMinistryUrl is called
+    const actualMinistryUrl = getMinistryUrl();
+    // THEN expect it to return the decoded value
+    expect(actualMinistryUrl).toBe(givenValue);
   });
 });
 

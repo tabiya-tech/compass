@@ -37,6 +37,7 @@ window.tabiyaConfig = {
   FRONTEND_BROWSER_TAB_TITLE: btoa("Compass Admin"),
   FRONTEND_META_DESCRIPTION: btoa("Compass Admin Portal - Manage and configure Compass platform settings."),
   FRONTEND_LOGO_URL: btoa("/logo.svg"),
+  FRONTEND_MINISTRY_URL: btoa("/ministry-tech.png"),
   FRONTEND_FAVICON_URL: btoa("/logo.svg"),
   FRONTEND_APP_ICON_URL: btoa("/logo.svg"),
   FRONTEND_THEME_CSS_VARIABLES: btoa(

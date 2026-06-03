@@ -19,6 +19,7 @@ export enum EnvVariables {
   FRONTEND_META_DESCRIPTION = "FRONTEND_META_DESCRIPTION",
   FRONTEND_SEO = "FRONTEND_SEO",
   FRONTEND_LOGO_URL = "FRONTEND_LOGO_URL",
+  FRONTEND_MINISTRY_URL = "FRONTEND_MINISTRY_URL",
   FRONTEND_DARK_LOGO_URL = "FRONTEND_DARK_LOGO_URL",
   FRONTEND_FAVICON_URL = "FRONTEND_FAVICON_URL",
   FRONTEND_APP_ICON_URL = "FRONTEND_APP_ICON_URL",
@@ -130,6 +131,10 @@ export const getMetaDescription = () => getEnv(EnvVariables.FRONTEND_META_DESCRI
 export const getSeoEnvVar = () => getEnv(EnvVariables.FRONTEND_SEO);
 
 export const getLogoUrl = () => getEnv(EnvVariables.FRONTEND_LOGO_URL);
+
+export const DEFAULT_MINISTRY_URL = "/ministry-tech.png";
+
+export const getMinistryUrl = () => getEnv(EnvVariables.FRONTEND_MINISTRY_URL) || DEFAULT_MINISTRY_URL;
 
 export const getDarkLogoUrl = () => getEnv(EnvVariables.FRONTEND_DARK_LOGO_URL);
 

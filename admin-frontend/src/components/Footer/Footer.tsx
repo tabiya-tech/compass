@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Container, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import CustomLink from "src/theme/CustomLink/CustomLink";
-import { getProductName } from "src/envService";
+import { getMinistryUrl, getProductName } from "src/envService";
 import { getLegalDocumentAbsoluteUrl, LEGAL_DOCUMENT_ROUTE_PATHS } from "src/legal/legalDocumentUrls";
 import type { Theme } from "@mui/material/styles";
 
@@ -77,7 +77,7 @@ const Footer: React.FC = () => {
               data-testid={DATA_TEST_ID.FOOTER_WORLD_BANK_LOGO}
             />
             <img
-              src={`${process.env.PUBLIC_URL}/ministry-tech.png`}
+              src={getMinistryUrl()}
               alt={t("footer.ministryTechLogoAlt")}
               style={{
                 height: 36,

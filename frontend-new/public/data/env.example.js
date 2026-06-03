@@ -109,6 +109,7 @@ window.tabiyaConfig = {
     })
   ),
   FRONTEND_LOGO_URL: btoa("/logo.svg"),
+  FRONTEND_MINISTRY_URL: btoa("/ministry-tech.png"),
   FRONTEND_DARK_LOGO_URL: btoa("/njila-logo-dark.svg"),
   FRONTEND_FAVICON_URL: btoa("/favicon.svg"),
   FRONTEND_APP_ICON_URL: btoa("/compass.svg"),

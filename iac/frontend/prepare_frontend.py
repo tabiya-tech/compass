@@ -134,6 +134,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_browser_tab_title: Optional[str] = getenv("FRONTEND_BROWSER_TAB_TITLE", False, False)
     frontend_meta_description: Optional[str] = getenv("FRONTEND_META_DESCRIPTION", False, False)
     frontend_logo_url: Optional[str] = getenv("FRONTEND_LOGO_URL", False, False)
+    frontend_ministry_url: Optional[str] = getenv("FRONTEND_MINISTRY_URL", False, False)
     frontend_dark_logo_url: Optional[str] = getenv("FRONTEND_DARK_LOGO_URL", False, False)
     frontend_favicon_url: Optional[str] = getenv("FRONTEND_FAVICON_URL", False, False)
     frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
@@ -191,6 +192,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_BROWSER_TAB_TITLE": base64_encode(frontend_browser_tab_title),
         "FRONTEND_META_DESCRIPTION": base64_encode(frontend_meta_description),
         "FRONTEND_LOGO_URL": base64_encode(frontend_logo_url),
+        "FRONTEND_MINISTRY_URL": base64_encode(frontend_ministry_url or ""),
         "FRONTEND_DARK_LOGO_URL": base64_encode(frontend_dark_logo_url),
         "FRONTEND_FAVICON_URL": base64_encode(frontend_favicon_url),
         "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
