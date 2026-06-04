@@ -105,6 +105,42 @@ def download_frontend_bundle(
         raise
 
 
+def _patch_index_html(*, artifacts_dir: str, stack_name: str):
+    browser_tab_title = getenv("FRONTEND_BROWSER_TAB_TITLE", False, False)
+    meta_description = getenv("FRONTEND_META_DESCRIPTION", False, False)
+    frontend_seo_raw = getenv("FRONTEND_SEO", False, False)
+
+    index_html_path = os.path.join(artifacts_dir, "index.html")
+    if not os.path.exists(index_html_path):
+        print(f"warning: index.html not found at {index_html_path}, skipping HTML patching.")
+        return
+
+    content = open(index_html_path, encoding="utf-8").read()
+
+    if browser_tab_title:
+        content = content.replace("%%FRONTEND_BROWSER_TAB_TITLE%%", browser_tab_title)
+
+    if meta_description:
+        content = content.replace("%%FRONTEND_META_DESCRIPTION%%", meta_description)
+
+    if frontend_seo_raw:
+        try:
+            seo = json.loads(frontend_seo_raw)
+            if seo.get("name"):
+                content = content.replace("%%FRONTEND_SEO_NAME%%", seo["name"])
+            if seo.get("url"):
+                content = content.replace("%%FRONTEND_SEO_URL%%", seo["url"])
+            if seo.get("image"):
+                content = content.replace("%%FRONTEND_SEO_IMAGE%%", seo["image"])
+            if seo.get("description"):
+                content = content.replace("%%FRONTEND_SEO_DESCRIPTION%%", seo["description"])
+        except (json.JSONDecodeError, TypeError) as e:
+            print(f"warning: could not parse FRONTEND_SEO for stack {stack_name}: {e}")
+
+    open(index_html_path, "w", encoding="utf-8").write(content)
+    print(f"Done patching index.html for stack: {stack_name}.")
+
+
 def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     sentry_dsn: str = getenv("FRONTEND_SENTRY_DSN", True, False)
     enable_sentry: str = getenv("FRONTEND_ENABLE_SENTRY", False, False)
@@ -270,6 +306,12 @@ def prepare_frontend(
 
     # construct the env.js content for this deployment and stack.
     _construct_env_js_content(
+        stack_name=stack_name,
+        artifacts_dir=stack_artifacts_dir
+    )
+
+    # patch index.html with deploy-time branding/metadata for SEO.
+    _patch_index_html(
         stack_name=stack_name,
         artifacts_dir=stack_artifacts_dir
     )
