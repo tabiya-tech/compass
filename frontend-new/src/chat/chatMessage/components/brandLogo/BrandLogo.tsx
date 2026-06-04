@@ -1,6 +1,7 @@
 import React from "react";
+import { getChatAvatarUrl } from "src/envService";
 
-const BrandLogoSVG = () => (
+const BrandLogoFallback = () => (
   <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="3" y="3" width="38" height="38" rx="19" fill="#F8E4B9" />
     <rect x="3" y="3" width="38" height="38" rx="19" stroke="#F9F7F3" strokeWidth="6" />
@@ -16,7 +17,19 @@ const BrandLogoSVG = () => (
 );
 
 const BrandLogo: React.FC = () => {
-  return <BrandLogoSVG />;
+  const chatAvatarUrl = getChatAvatarUrl();
+  if (chatAvatarUrl) {
+    return (
+      <img
+        src={chatAvatarUrl}
+        alt="brand logo"
+        width={44}
+        height={44}
+        style={{ borderRadius: "50%", objectFit: "contain" }}
+      />
+    );
+  }
+  return <BrandLogoFallback />;
 };
 
 export default BrandLogo;

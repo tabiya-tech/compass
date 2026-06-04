@@ -29,4 +29,5 @@ jest.mock("src/envService", () => ({
   getRegistrationCodeDisabled: jest.fn(() => "false"),
   getGtmContainerId: jest.fn(() => ""),
   getGtmEnabled: jest.fn(() => "false"),
+  getChatAvatarUrl: jest.fn(() => ""),
 }));

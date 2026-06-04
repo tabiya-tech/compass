@@ -33,6 +33,7 @@ export enum EnvVariables {
   FRONTEND_DARK_LOGO_URL = "FRONTEND_DARK_LOGO_URL",
   FRONTEND_FAVICON_URL = "FRONTEND_FAVICON_URL",
   FRONTEND_APP_ICON_URL = "FRONTEND_APP_ICON_URL",
+  FRONTEND_CHAT_AVATAR_URL = "FRONTEND_CHAT_AVATAR_URL",
   FRONTEND_THEME_CSS_VARIABLES = "FRONTEND_THEME_CSS_VARIABLES",
   FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG = "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG",
   FRONTEND_GTM_CONTAINER_ID = "FRONTEND_GTM_CONTAINER_ID",
@@ -247,6 +248,8 @@ export const getDarkLogoUrl = () => getEnv(EnvVariables.FRONTEND_DARK_LOGO_URL);
 export const getFaviconUrl = () => getEnv(EnvVariables.FRONTEND_FAVICON_URL);
 
 export const getAppIconUrl = () => getEnv(EnvVariables.FRONTEND_APP_ICON_URL);
+
+export const getChatAvatarUrl = () => getEnv(EnvVariables.FRONTEND_CHAT_AVATAR_URL);
 
 export interface ThemeCssVariables {
   "brand-primary"?: string;

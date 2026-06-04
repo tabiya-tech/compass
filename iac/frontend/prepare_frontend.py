@@ -174,6 +174,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
     frontend_dark_logo_url: Optional[str] = getenv("FRONTEND_DARK_LOGO_URL", False, False)
     frontend_favicon_url: Optional[str] = getenv("FRONTEND_FAVICON_URL", False, False)
     frontend_app_icon_url: Optional[str] = getenv("FRONTEND_APP_ICON_URL", False, False)
+    frontend_chat_avatar_url: Optional[str] = getenv("FRONTEND_CHAT_AVATAR_URL", False, False)
     frontend_theme_css_variables: Optional[str] = getenv("FRONTEND_THEME_CSS_VARIABLES", False, False)
     frontend_seo: Optional[str] = getenv("FRONTEND_SEO", False, False)
     skills_report_config: Optional[str] = getenv("FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG", False, False)
@@ -232,6 +233,7 @@ def _construct_env_js_content(*, artifacts_dir: str, stack_name: str):
         "FRONTEND_DARK_LOGO_URL": base64_encode(frontend_dark_logo_url),
         "FRONTEND_FAVICON_URL": base64_encode(frontend_favicon_url),
         "FRONTEND_APP_ICON_URL": base64_encode(frontend_app_icon_url),
+        "FRONTEND_CHAT_AVATAR_URL": base64_encode(frontend_chat_avatar_url),
         "FRONTEND_THEME_CSS_VARIABLES": base64_encode(frontend_theme_css_variables),
         "FRONTEND_SEO": base64_encode(frontend_seo),
         "FRONTEND_SKILLS_REPORT_OUTPUT_CONFIG": base64_encode(skills_report_config),

@@ -32,6 +32,7 @@ FRONTEND_ENV_MAP: Dict[str, str] = {
     'FRONTEND_LOGO_URL': 'branding.assets.logo',
     'FRONTEND_FAVICON_URL': 'branding.assets.favicon',
     'FRONTEND_APP_ICON_URL': 'branding.assets.appIcon',
+    'FRONTEND_CHAT_AVATAR_URL': 'branding.assets.chatAvatar',
     'FRONTEND_FAQ_TUTORIAL_VIDEO_URL': 'faq.tutorialVideoUrl',
     'FRONTEND_THEME_CSS_VARIABLES': 'branding.theme',
     'FRONTEND_SEO': 'branding.seo',
