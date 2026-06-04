@@ -78,5 +78,11 @@
       "unpaidTrainee": "Unafikiri ni nini muhimu unapofanya kazi kama mfunzwa asiyelipwa?",
       "unseenUnpaid": "Unafikiri ni nini muhimu zaidi unaposaidia jamii au kutunza wengine?"
     }
+  },
+  "careerReadiness": {
+    "moduleCompleted": "Kazi nzuri! Umeshughulikia mada zote muhimu za moduli hii. Sasa unaweza kuniuliza swali lolote la ufuatiliaji kuhusu mada hii.",
+    "quizReady": "Kazi nzuri! Umeshughulikia mada muhimu. Ni wakati wa jaribio fupi ili kupima uelewa wako.",
+    "quizPassed": "Umepata {score}/{total}. Hongera, umefaulu! Sasa unaweza kuendelea kuniuliza swali lolote la ufuatiliaji kuhusu mada hii.",
+    "quizFailed": "Umepata {score}/{total}. Unahitaji angalau majibu sahihi {threshold_count} ili kufaulu. Hebu tupitie mada tena na ujaribu tena."
   }
 }

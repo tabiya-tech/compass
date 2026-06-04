@@ -78,5 +78,11 @@
       "unpaidTrainee": "O que acha importante ao trabalhar como estagiário não remunerado?",
       "unseenUnpaid": "O que acha mais importante ao ajudar a comunidade ou ao cuidar de outros?"
     }
+  },
+  "careerReadiness": {
+    "moduleCompleted": "Excelente trabalho! Cobriu todos os tópicos principais deste módulo. Agora pode fazer-me qualquer pergunta de seguimento sobre este tema.",
+    "quizReady": "Excelente trabalho! Cobriu os tópicos principais. Está na hora de um pequeno questionário para verificar a sua compreensão.",
+    "quizPassed": "Obteve {score}/{total}. Parabéns, foi aprovado! Agora pode continuar a fazer-me qualquer pergunta de seguimento sobre este tema.",
+    "quizFailed": "Obteve {score}/{total}. Precisa de pelo menos {threshold_count} respostas correctas para passar. Vamos rever os tópicos e tentar novamente."
   }
 }

@@ -78,5 +78,11 @@
       "unpaidTrainee": "What do you think is important when working as an unpaid trainee?",
       "unseenUnpaid": "What do you think is most important when helping out in the community or caring for others?"
     }
+  },
+  "careerReadiness": {
+    "moduleCompleted": "Great work! You've covered all the key topics for this module. You can now ask me any follow-up questions about this topic.",
+    "quizReady": "Great work! You've covered the key topics. It's time for a short quiz to check your understanding.",
+    "quizPassed": "You scored {score}/{total}. Congratulations, you passed! You can now continue to ask me any follow-up questions about this topic.",
+    "quizFailed": "You scored {score}/{total}. You need at least {threshold_count} correct answers to pass. Let's review the topics and try again."
   }
 }

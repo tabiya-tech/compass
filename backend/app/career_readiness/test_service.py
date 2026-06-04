@@ -36,6 +36,16 @@ from app.career_readiness.types import (
     TopicStatus,
     TopicStatusRecord,
 )
+from app.context_vars import user_language_ctx_var
+from app.i18n.types import Locale
+
+
+@pytest.fixture(autouse=True)
+def set_locale():
+    """Set the active locale required by the translated service messages (via t())."""
+    token = user_language_ctx_var.set(Locale.EN_US)
+    yield
+    user_language_ctx_var.reset(token)
 
 
 # ---------------------------------------------------------------------------

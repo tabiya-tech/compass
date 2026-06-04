@@ -24,7 +24,7 @@ from app.career_readiness.errors import (
     QuizAlreadyPassedError,
     QuizNotAvailableError,
 )
-from app.career_readiness.module_loader import ModuleConfig, ModuleRegistry, QuizConfig
+from app.career_readiness.module_loader import ModuleConfig, ModuleRegistry, QuizConfig, get_module_registry
 from app.career_readiness.repository import ICareerReadinessConversationRepository
 from app.career_readiness.types import (
     CareerReadinessConversationDocument,
@@ -48,6 +48,7 @@ from app.conversation_memory.conversation_memory_types import (
     ConversationHistory,
     ConversationTurn,
 )
+from app.i18n.translation_service import t
 
 
 SILENCE_MESSAGE = "(silence)"
@@ -316,17 +317,32 @@ class CareerReadinessService(ICareerReadinessService):
     def __init__(
         self,
         repository: ICareerReadinessConversationRepository,
-        module_registry: ModuleRegistry,
+        module_registry: ModuleRegistry | None = None,
         agent_factory: Callable[..., CareerReadinessAgent] | None = None,
+        registry_provider: Callable[[], ModuleRegistry] | None = None,
     ):
         self._repository = repository
-        self._module_registry = module_registry
+        # A fixed registry pins the service to one language (used in tests). When absent, the
+        # registry is resolved per call from the active locale via `registry_provider`, so the
+        # modules served always match the conversation's language.
+        self._static_registry = module_registry
+        self._registry_provider = registry_provider or get_module_registry
         self._agent_factory = agent_factory or _default_agent_factory
         self._logger = logging.getLogger(CareerReadinessService.__name__)
 
+    def _get_registry(self) -> ModuleRegistry:
+        """Resolve the module registry for the current request's active locale.
+
+        Returns the fixed registry when one was supplied at construction; otherwise asks the
+        provider, which selects the registry for the active locale.
+        """
+        if self._static_registry is not None:
+            return self._static_registry
+        return self._registry_provider()
+
     def _get_module_or_raise(self, module_id: str) -> ModuleConfig:
         """Get a module from the registry or raise CareerReadinessModuleNotFoundError."""
-        module = self._module_registry.get_module(module_id)
+        module = self._get_registry().get_module(module_id)
         if module is None:
             raise CareerReadinessModuleNotFoundError(module_id)
         return module
@@ -347,7 +363,7 @@ class CareerReadinessService(ICareerReadinessService):
             raise ConversationModuleMismatchError(conversation.conversation_id, module_id)
 
     async def list_modules(self, user_id: str) -> ModuleListResponse:
-        all_modules = self._module_registry.get_all_modules()
+        all_modules = self._get_registry().get_all_modules()
         user_conversations = await self._repository.find_all_by_user(user_id)
         statuses = _derive_module_statuses(all_modules, user_conversations)
 
@@ -372,7 +388,7 @@ class CareerReadinessService(ICareerReadinessService):
 
     async def get_module(self, user_id: str, module_id: str) -> ModuleDetail:
         module = self._get_module_or_raise(module_id)
-        all_modules = self._module_registry.get_all_modules()
+        all_modules = self._get_registry().get_all_modules()
         user_conversations = await self._repository.find_all_by_user(user_id)
         statuses = _derive_module_statuses(all_modules, user_conversations)
         conversation = next((c for c in user_conversations if c.module_id == module_id), None)
@@ -526,8 +542,11 @@ class CareerReadinessService(ICareerReadinessService):
             # Quiz-less module (e.g. entrepreneurship): all topics covered completes it.
             completion_message = CareerReadinessMessage(
                 message_id=str(ObjectId()),
-                message="Great work! You've covered all the key topics for this module. "
-                        "You can now ask me any follow-up questions about this topic.",
+                message=t(
+                    "messages", "careerReadiness.moduleCompleted",
+                    fallback_message="Great work! You've covered all the key topics for this module. "
+                                     "You can now ask me any follow-up questions about this topic.",
+                ),
                 sender=CareerReadinessMessageSender.AGENT,
                 sent_at=datetime.now(timezone.utc),
             )
@@ -542,8 +561,11 @@ class CareerReadinessService(ICareerReadinessService):
                 and module.quiz is not None and not conversation.quiz_delivered):
             marker_message = CareerReadinessMessage(
                 message_id=str(ObjectId()),
-                message="Great work! You've covered the key topics. "
-                        "It's time for a short quiz to check your understanding.",
+                message=t(
+                    "messages", "careerReadiness.quizReady",
+                    fallback_message="Great work! You've covered the key topics. "
+                                     "It's time for a short quiz to check your understanding.",
+                ),
                 sender=CareerReadinessMessageSender.AGENT,
                 sent_at=datetime.now(timezone.utc),
             )
@@ -684,16 +706,24 @@ class CareerReadinessService(ICareerReadinessService):
         ]
 
         if passed:
-            feedback = (f"You scored {score}/{total}. Congratulations, you passed! "
-                        "You can now continue to ask me any follow-up questions about this topic.")
+            feedback = t(
+                "messages", "careerReadiness.quizPassed",
+                fallback_message="You scored {score}/{total}. Congratulations, you passed! "
+                                 "You can now continue to ask me any follow-up questions about this topic.",
+                score=score, total=total,
+            )
             await self._repository.update_quiz_passed(conversation.conversation_id, True)
             await self._repository.update_conversation_mode(
                 conversation.conversation_id, ConversationMode.SUPPORT)
             result_mode = ConversationMode.SUPPORT
         else:
             threshold_count = math.ceil(module.quiz.pass_threshold * total)
-            feedback = (f"You scored {score}/{total}. You need at least {threshold_count} "
-                        "correct answers to pass. Let's review the topics and try again.")
+            feedback = t(
+                "messages", "careerReadiness.quizFailed",
+                fallback_message="You scored {score}/{total}. You need at least {threshold_count} "
+                                 "correct answers to pass. Let's review the topics and try again.",
+                score=score, total=total, threshold_count=threshold_count,
+            )
             result_mode = ConversationMode.INSTRUCTION
 
         feedback_message = CareerReadinessMessage(

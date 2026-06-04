@@ -17,6 +17,9 @@ from pydantic import BaseModel, ConfigDict, create_model, model_validator
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMQuickReplyOption, LLMStats, AgentOutputWithReasoning
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.locale_style import get_language_style
+from app.app_config import get_application_config
+from app.context_vars import user_language_ctx_var
+from app.i18n.types import Locale
 from app.agent.prompt_template.quick_reply_prompt import QUICK_REPLY_PROMPT
 from app.agent.prompt_template.format_prompt import append_user_ctx
 from app.agent.simple_llm_agent.prompt_response_template import (
@@ -164,10 +167,32 @@ def _build_module_response_model(
     return CareerReadinessModelResponseWithTopicEnum
 
 
+def _ensure_active_locale() -> None:
+    """Ensure an active locale is set before building locale-aware instructions.
+
+    The career readiness agent must reply in the active language, so the prompt's language
+    style is built with the locale section enabled (`with_locale=True`), which requires the
+    active locale to be set. Routes set it from the configured `default_locale`; this guard
+    backstops any caller (and unit tests) that build instructions without having done so,
+    falling back to the configured `default_locale` and finally to English.
+    """
+    try:
+        user_language_ctx_var.get()
+        return
+    except LookupError:
+        pass
+    try:
+        locale = get_application_config().language_config.default_locale
+    except Exception:  # pylint: disable=broad-except
+        locale = Locale.EN_US
+    user_language_ctx_var.set(locale)
+
+
 def _build_instruction_mode_instructions(module_title: str, module_content: str, topics: list[str]) -> str:
     """Build system instructions for instruction mode (scaffolded Socratic tutoring)."""
+    _ensure_active_locale()
     topics_list = "\n".join(f"- {topic}" for topic in topics)
-    language_style = get_language_style(with_locale=False, for_json_output=True)
+    language_style = get_language_style(with_locale=True, for_json_output=True)
 
     response_instructions = dedent("""\
         # Response Format
@@ -304,7 +329,8 @@ def _build_support_mode_instructions(module_title: str, module_content: str,
     The student has already passed the lesson plan; topic coverage is no longer tracked,
     so the support-mode response carries an empty topic_status list.
     """
-    language_style = get_language_style(with_locale=False, for_json_output=True)
+    _ensure_active_locale()
+    language_style = get_language_style(with_locale=True, for_json_output=True)
 
     response_instructions = dedent("""\
         # Response Format

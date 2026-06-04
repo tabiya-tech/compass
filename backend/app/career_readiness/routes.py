@@ -19,7 +19,6 @@ from app.career_readiness.errors import (
     QuizAlreadyPassedError,
     QuizNotAvailableError,
 )
-from app.career_readiness.module_loader import get_module_registry
 from app.career_readiness.repository import CareerReadinessConversationRepository
 from app.career_readiness.service import CareerReadinessService, ICareerReadinessService
 from app.career_readiness.types import (
@@ -31,8 +30,10 @@ from app.career_readiness.types import (
     QuizSubmissionInput,
     QuizSubmissionResponse,
 )
+from app.app_config import get_application_config
 from app.constants.errors import HTTPErrorResponse
-from app.context_vars import user_profile_context_var
+from app.context_vars import user_profile_context_var, user_language_ctx_var
+from app.i18n.translation_service import get_i18n_manager
 from app.conversations.constants import MAX_MESSAGE_LENGTH
 from app.server_dependencies.db_dependencies import CompassDBProvider
 from app.users.auth import Authentication, UserInfo
@@ -59,11 +60,27 @@ async def get_career_readiness_service(
     if _career_readiness_service_singleton is None:
         async with _career_readiness_service_lock:
             if _career_readiness_service_singleton is None:
+                # No fixed registry: the service resolves the module registry per request
+                # from the active locale, so modules are served in the active language.
                 _career_readiness_service_singleton = CareerReadinessService(
                     repository=CareerReadinessConversationRepository(application_db),
-                    module_registry=get_module_registry(),
                 )
     return _career_readiness_service_singleton
+
+
+def _set_request_locale() -> None:
+    """Set the active locale for the request from the configured ``default_locale``.
+
+    This drives both which language's modules are loaded and the language the agent replies
+    in. Applied as a router-level dependency so every career readiness route shares it. Never
+    raises — if the app config is unavailable the request proceeds with whatever locale is
+    already in context (or none).
+    """
+    try:
+        app_config = get_application_config()
+        get_i18n_manager().set_locale(app_config.language_config.default_locale)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning("Could not set active locale for career readiness request: %s", e)
 
 
 def add_career_readiness_routes(app: FastAPI, authentication: Authentication):
@@ -74,7 +91,11 @@ def add_career_readiness_routes(app: FastAPI, authentication: Authentication):
     :param authentication: Authentication Module Dependency: The authentication instance to use for the routes.
     """
 
-    router = APIRouter(prefix="/career-readiness", tags=["career-readiness"])
+    router = APIRouter(
+        prefix="/career-readiness",
+        tags=["career-readiness"],
+        dependencies=[Depends(_set_request_locale)],
+    )
 
     @router.get(
         path="/modules",
@@ -434,7 +455,9 @@ def add_career_readiness_routes(app: FastAPI, authentication: Authentication):
         ],
         user_info: UserInfo = Depends(authentication.get_user_info()),
         service: ICareerReadinessService = Depends(get_career_readiness_service),
+        default_locale = Depends(lambda: get_application_config().language_config.default_locale)
     ):
+        user_language_ctx_var.set(default_locale)
         try:
             return await service.submit_quiz(
                 user_info.user_id, module_id, conversation_id, body.answers

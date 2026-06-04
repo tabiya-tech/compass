@@ -1,5 +1,11 @@
 """
 This module loads career readiness module definitions from markdown files with frontmatter.
+
+Module markdown files are organised into per-language subdirectories of the modules
+directory (e.g. ``modules/en``, ``modules/pt``). The registry that is loaded for a given
+request is selected from the active locale — the per-request locale when one is set,
+otherwise the configured ``app_config.language_config.default_locale`` — so the content the
+agent is grounded in matches the language the conversation is held in.
 """
 import logging
 import re
@@ -7,9 +13,42 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
 
+from app.app_config import get_application_config
+from app.context_vars import user_language_ctx_var
+from app.i18n.types import Locale
+
 logger = logging.getLogger(__name__)
 
 _MODULES_DIR = Path(__file__).parent / "modules"
+
+# The language subdirectory used when the resolved locale has no dedicated module set.
+_FALLBACK_LANG_DIR = "en"
+
+
+def _locale_to_lang_dir(locale: Locale) -> str:
+    """Map a Locale to its module subdirectory — the ISO-639 language part of the locale.
+
+    e.g. ``Locale.EN_US`` -> ``"en"``, ``Locale.PT_MZ`` -> ``"pt"``.
+    """
+    return locale.value.split("-", 1)[0].lower()
+
+
+def _resolve_active_locale() -> Locale:
+    """Resolve the locale modules should be loaded for.
+
+    Prefers the per-request active locale (``user_language_ctx_var``); falls back to the
+    configured ``default_locale`` and finally to English. Never raises — module loading must
+    not fail just because no locale has been established yet (e.g. at import time or in unit
+    tests that do not configure the app).
+    """
+    try:
+        return user_language_ctx_var.get()
+    except LookupError:
+        pass
+    try:
+        return get_application_config().language_config.default_locale
+    except Exception:  # pylint: disable=broad-except
+        return Locale.EN_US
 
 
 class QuizQuestion(BaseModel):
@@ -239,13 +278,50 @@ def _load_module_from_file(file_path: Path) -> ModuleConfig:
 
 class ModuleRegistry:
     """
-    Registry of all available career readiness modules.
-    Loads modules from markdown files in the modules directory.
+    Registry of all available career readiness modules for a single language.
+
+    Modules are loaded from markdown files in a language-specific subdirectory of the
+    modules directory (e.g. ``modules/en``). When ``modules_dir`` is given explicitly it is
+    used verbatim (the files directly inside it are loaded); otherwise the directory is
+    resolved from ``locale`` (or the active locale when ``locale`` is None), falling back to
+    the English module set when no dedicated directory exists for that language.
     """
 
-    def __init__(self, modules_dir: Path = _MODULES_DIR):
+    def __init__(self, modules_dir: Path | None = None, locale: Locale | None = None):
         self._modules: dict[str, ModuleConfig] = {}
-        self._load_modules(modules_dir)
+        self._locale: Locale = locale or _resolve_active_locale()
+        resolved_dir = self._resolve_modules_dir(modules_dir, self._locale)
+        self._load_modules(resolved_dir)
+
+    @staticmethod
+    def _resolve_modules_dir(modules_dir: Path | None, locale: Locale) -> Path:
+        """Resolve which directory to load module files from.
+
+        An explicit ``modules_dir`` is honoured as-is. Otherwise the locale's language
+        subdirectory is used, falling back to the English subdirectory and finally to the
+        flat modules directory.
+        """
+        if modules_dir is not None:
+            return modules_dir
+
+        lang = _locale_to_lang_dir(locale)
+        candidate = _MODULES_DIR / lang
+        if candidate.is_dir():
+            return candidate
+
+        fallback = _MODULES_DIR / _FALLBACK_LANG_DIR
+        if fallback.is_dir():
+            logger.warning(
+                "No career readiness modules for locale '%s' (missing %s); falling back to '%s'",
+                locale.value, candidate, _FALLBACK_LANG_DIR,
+            )
+            return fallback
+
+        logger.warning(
+            "No language-specific career readiness module directory found; "
+            "falling back to flat modules directory %s", _MODULES_DIR,
+        )
+        return _MODULES_DIR
 
     def _load_modules(self, modules_dir: Path) -> None:
         """
@@ -279,15 +355,23 @@ class ModuleRegistry:
         return self._modules.get(module_id)
 
 
-# Module-level singleton
-_registry: ModuleRegistry | None = None
+# One cached registry per language directory, keyed by the language code (e.g. "en", "pt").
+_registries: dict[str, ModuleRegistry] = {}
 
 
-def get_module_registry() -> ModuleRegistry:
+def get_module_registry(locale: Locale | None = None) -> ModuleRegistry:
     """
-    Get the singleton module registry instance.
+    Get the module registry for the given locale (defaulting to the active locale).
+
+    Registries are cached per language so each language's modules are parsed at most once.
+    The active locale is the per-request locale when set, otherwise the configured
+    ``default_locale``.
     """
-    global _registry
-    if _registry is None:
-        _registry = ModuleRegistry()
-    return _registry
+    resolved_locale = locale or _resolve_active_locale()
+    lang = _locale_to_lang_dir(resolved_locale)
+
+    registry = _registries.get(lang)
+    if registry is None:
+        registry = ModuleRegistry(locale=resolved_locale)
+        _registries[lang] = registry
+    return registry

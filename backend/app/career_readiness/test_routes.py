@@ -81,7 +81,7 @@ def _make_conversation_response(
 
 
 @pytest.fixture(scope="function")
-def client_with_mocks() -> TestClientWithMocks:
+def client_with_mocks(setup_application_config) -> TestClientWithMocks:
     """Create a FastAPI test client with mocked service and auth."""
 
     class MockPlainPersonalDataService(IPlainPersonalDataService):

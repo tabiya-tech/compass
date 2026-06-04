@@ -210,14 +210,23 @@ class LLM(ABC):
         """
         raise NotImplementedError()
 
+_llm_initialized: bool = False
+def _init_once(location: str, _logger: logging.Logger):
+    global _llm_initialized
+    if _llm_initialized:
+        return
+
+    _logger.info("Initializing VertexAI client with location: %s", location)
+    vertexai.init(location=location)
+    _llm_initialized = True
+
 
 class BasicLLM(LLM):
     def __init__(self, *, config: LLMConfig = LLMConfig()):
         # Before constructing the llm model, we need to initialize the VertexAI client
         # as the init function may have been called in another module with different parameters
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.info("Initializing VertexAI client with location: %s", config.location)
-        vertexai.init(location=config.location)
+        _init_once(location=config.location, _logger=self.logger)
         self._retry_config = config.retry_config
         self._model = None
         self._chat = None

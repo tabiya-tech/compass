@@ -78,5 +78,11 @@
       "unpaidTrainee": "¿Qué pensás que es importante al trabajar como aprendiz no remunerado?",
       "unseenUnpaid": "¿Qué pensás que es más importante al ayudar en la comunidad o cuidar a otras personas?"
     }
+  },
+  "careerReadiness": {
+    "moduleCompleted": "¡Buen trabajo! Cubriste todos los temas clave de este módulo. Ahora podés hacerme cualquier pregunta de seguimiento sobre este tema.",
+    "quizReady": "¡Buen trabajo! Cubriste los temas clave. Es hora de un breve cuestionario para comprobar tu comprensión.",
+    "quizPassed": "Obtuviste {score}/{total}. ¡Felicitaciones, aprobaste! Ahora podés seguir haciéndome cualquier pregunta de seguimiento sobre este tema.",
+    "quizFailed": "Obtuviste {score}/{total}. Necesitás al menos {threshold_count} respuestas correctas para aprobar. Repasemos los temas e intentá de nuevo."
   }
 }
