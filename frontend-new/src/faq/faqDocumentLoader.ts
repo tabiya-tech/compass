@@ -1,4 +1,4 @@
-import { parseYamlFrontmatter } from "src/knowledgeHub/parseYamlFrontmatter";
+import { parseYamlFrontmatter } from "src/utils/parseYamlFrontmatter";
 
 import faqEnGbMd from "!!raw-loader!./documents/faq.en-GB.md";
 import faqEnUsMd from "!!raw-loader!./documents/faq.en-US.md";

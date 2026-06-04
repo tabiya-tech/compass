@@ -1,4 +1,4 @@
-import { parseYamlFrontmatter } from "src/knowledgeHub/parseYamlFrontmatter";
+import { parseYamlFrontmatter } from "src/utils/parseYamlFrontmatter";
 
 import privacyPolicyMd from "!!raw-loader!./documents/privacy-policy.md";
 import termsOfUseMd from "!!raw-loader!./documents/terms-of-use.md";

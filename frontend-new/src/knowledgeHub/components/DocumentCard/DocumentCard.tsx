@@ -1,7 +1,14 @@
 import React from "react";
 import { Box, Card, CardActionArea, Typography, useTheme } from "@mui/material";
-import { DocumentMetadata } from "src/knowledgeHub/types";
 import { getDocumentIcon } from "src/knowledgeHub/iconRegistry";
+
+interface DocumentMetadata {
+  id: string;
+  title: string;
+  description: string;
+  sector?: string;
+  icon?: string;
+}
 
 const uniqueId = "c5e8f7a2-9b3d-4e6f-8a1c-2d5e7f9b3c4a";
 

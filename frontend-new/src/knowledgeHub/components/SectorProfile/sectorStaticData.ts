@@ -9,6 +9,9 @@ export interface Consideration {
 }
 
 export interface SectorStaticData {
+  /** Short key used for icon lookup and i18n translation (e.g. "agriculture") */
+  sector: string;
+  description: string;
   displayName: string;
   sectorApiParam: string;
   heroColor: string;
@@ -25,8 +28,36 @@ export interface SectorStaticData {
   sources: string;
 }
 
+/**
+ * Which pathway pages to show per app name (value of GLOBAL_PRODUCT_NAME).
+ * Unknown app names fall back to showing all sectors.
+ */
+export const PATHWAY_PAGES_BY_APP: Record<string, string[]> = {
+  Njila: [
+    "agriculture-pathway",
+    "mining-pathway",
+    "energy-pathway",
+    "hospitality-pathway",
+    "health-pathway",
+    "water-pathway",
+  ],
+  Njira: ["energy-pathway"],
+};
+
+/**
+ * Returns the ordered list of sector IDs to display for the given app name.
+ * Falls back to all sectors if the app name is not in PATHWAY_PAGES_BY_APP.
+ */
+export const getSectorsForApp = (appName: string): SectorStaticData[] => {
+  const ids = PATHWAY_PAGES_BY_APP[appName] ?? Object.keys(SECTOR_DATA);
+  return ids.flatMap((id) => (SECTOR_DATA[id] ? [SECTOR_DATA[id]] : []));
+};
+
 const SECTOR_DATA: Record<string, SectorStaticData> = {
   "agriculture-pathway": {
+    sector: "agriculture",
+    description:
+      "Agriculture is the largest employer in Zambia, but it is shifting from subsistence farming to commercial agribusiness and technology-driven production.",
     displayName: "Agriculture",
     sectorApiParam: "Agriculture",
     heroColor: "#2D7D46",
@@ -87,6 +118,9 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
   },
 
   "mining-pathway": {
+    sector: "mining",
+    description:
+      "Zambia is the world's seventh-largest copper producer. Mining is the highest-paying industrial sector, with jobs concentrated in the Copperbelt and North-Western provinces.",
     displayName: "Mining",
     sectorApiParam: "Mining",
     heroColor: "#0A5C4A",
@@ -147,6 +181,9 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
   },
 
   "energy-pathway": {
+    sector: "energy",
+    description:
+      "Zambia is undergoing a major energy transformation. Solar capacity is expanding 17x by 2030, creating thousands of new skilled jobs across generation, transmission, and distribution.",
     displayName: "Energy",
     sectorApiParam: "Energy",
     heroColor: "#D44B1A",
@@ -203,6 +240,9 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
   },
 
   "hospitality-pathway": {
+    sector: "hospitality",
+    description:
+      "Zambia's tourism sector is anchored by Victoria Falls and 20 national parks. Over 102,000 people work in accommodation and food services, with entry programmes as short as three months.",
     displayName: "Hospitality & Tourism",
     sectorApiParam: "Hospitality",
     heroColor: "#B45309",
@@ -264,6 +304,9 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
   },
 
   "health-pathway": {
+    sector: "health",
+    description:
+      "Allied health sciences support clinical care through diagnostics, rehabilitation, pharmacy, laboratory work, and environmental health. TEVET programmes lead to regulated roles registered with the HPCZ.",
     displayName: "Health Sciences",
     sectorApiParam: "Health",
     heroColor: "#0F766E",
@@ -329,6 +372,9 @@ const SECTOR_DATA: Record<string, SectorStaticData> = {
   },
 
   "water-pathway": {
+    sector: "water",
+    description:
+      "Only 36% of Zambians have access to safely managed drinking water. The sector spans over 70 occupations across water supply, wastewater, solid waste, hydrology, and environmental services.",
     displayName: "Water & Sanitation",
     sectorApiParam: "Water",
     heroColor: "#0E7490",

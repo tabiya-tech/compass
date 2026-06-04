@@ -3,10 +3,10 @@ import { Box, Stack, Typography, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { IsOnlineContext } from "src/app/isOnlineProvider/IsOnlineProvider";
-import { getAllDocuments } from "src/knowledgeHub/documentLoader";
+import { getSectorsForApp } from "src/knowledgeHub/components/SectorProfile/sectorStaticData";
+import { getProductName } from "src/envService";
 import { routerPaths } from "src/app/routerPaths";
 import Footer from "src/home/components/Footer/Footer";
-import type { DocumentMetadata } from "src/knowledgeHub/types";
 import BackLink from "src/navigation/BackLink/BackLink";
 
 const uniqueId = "b3d4e5f6-7890-abcd-ef12-345678901234";
@@ -20,54 +20,7 @@ export const DATA_TEST_ID = {
   KNOWLEDGE_HUB_BACK_LINK: `knowledge-hub-back-link-${uniqueId}`,
 };
 
-const ICON_BY_SECTOR: Record<string, string> = {
-  energy: `${process.env.PUBLIC_URL}/energy.svg`,
-  mining: `${process.env.PUBLIC_URL}/mining.svg`,
-  hospitality: `${process.env.PUBLIC_URL}/hospitality.svg`,
-  agriculture: `${process.env.PUBLIC_URL}/agriculture.svg`,
-  water: `${process.env.PUBLIC_URL}/water.svg`,
-  health: `${process.env.PUBLIC_URL}/health.svg`,
-};
-
-const SECTOR_TRANSLATION_KEYS = {
-  energy: {
-    title: "knowledgeHub.sectors.energy.title",
-    description: "knowledgeHub.sectors.energy.description",
-  },
-  mining: {
-    title: "knowledgeHub.sectors.mining.title",
-    description: "knowledgeHub.sectors.mining.description",
-  },
-  hospitality: {
-    title: "knowledgeHub.sectors.hospitality.title",
-    description: "knowledgeHub.sectors.hospitality.description",
-  },
-  agriculture: {
-    title: "knowledgeHub.sectors.agriculture.title",
-    description: "knowledgeHub.sectors.agriculture.description",
-  },
-  water: {
-    title: "knowledgeHub.sectors.water.title",
-    description: "knowledgeHub.sectors.water.description",
-  },
-  health: {
-    title: "knowledgeHub.sectors.health.title",
-    description: "knowledgeHub.sectors.health.description",
-  },
-} as const;
-
-type SectorTranslationKey = keyof typeof SECTOR_TRANSLATION_KEYS;
-
-const isSectorTranslationKey = (value: string): value is SectorTranslationKey => {
-  return value in SECTOR_TRANSLATION_KEYS;
-};
-
-const getSectorKey = (document: DocumentMetadata) => (document.sector ?? document.title).toLowerCase();
-
-const getSectorIconSrc = (document: DocumentMetadata): string => {
-  const key = getSectorKey(document);
-  return ICON_BY_SECTOR[key];
-};
+const getSectorIconSrc = (sector: string): string => `${process.env.PUBLIC_URL}/${sector}.svg`;
 
 const KnowledgeHubList: React.FC = () => {
   const theme = useTheme();
@@ -75,7 +28,7 @@ const KnowledgeHubList: React.FC = () => {
   const { t } = useTranslation();
   const isOnline = useContext(IsOnlineContext);
 
-  const documents = useMemo(() => getAllDocuments(), []);
+  const sectors = useMemo(() => getSectorsForApp(getProductName()), []);
 
   const handleDocumentClick = (id: string) => {
     if (!isOnline) return;
@@ -234,19 +187,20 @@ const KnowledgeHubList: React.FC = () => {
         >
           <Box sx={contentColumnSx}>
             <Stack spacing={theme.fixedSpacing(6)} data-testid={DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_LIST}>
-              {documents.map((doc) => {
-                const sectorKey = getSectorKey(doc);
-                if (!isSectorTranslationKey(sectorKey)) return null;
-                const sectorTranslation = SECTOR_TRANSLATION_KEYS[sectorKey];
-                const iconSrc = getSectorIconSrc(doc);
-                const displayName = t(sectorTranslation.title);
+              {sectors.map((staticData) => {
+                const sectorKey = staticData.sector;
+                const titleKey = `knowledgeHub.sectors.${sectorKey}.title`;
+                const descriptionKey = `knowledgeHub.sectors.${sectorKey}.description`;
+                const iconSrc = getSectorIconSrc(sectorKey);
+                const displayName = t(titleKey as any);
                 const discoverLabel = displayName.toLowerCase();
+                const pathwayId = `${sectorKey}-pathway`;
 
                 return (
                   <Box
-                    key={doc.id}
+                    key={pathwayId}
                     sx={textAlignGrid}
-                    data-testid={`${DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_ITEM}-${doc.id}`}
+                    data-testid={`${DATA_TEST_ID.KNOWLEDGE_HUB_SECTOR_ITEM}-${pathwayId}`}
                   >
                     <Box
                       component="img"
@@ -273,14 +227,14 @@ const KnowledgeHubList: React.FC = () => {
                           color: theme.palette.text.primary,
                         }}
                       >
-                        {t(sectorTranslation.description)}
+                        {t(descriptionKey as any, { defaultValue: staticData.description })}
                       </Typography>
                       <Typography
                         component="button"
                         type="button"
                         disabled={!isOnline}
                         aria-disabled={!isOnline}
-                        onClick={() => handleDocumentClick(doc.id)}
+                        onClick={() => handleDocumentClick(pathwayId)}
                         sx={{
                           mt: theme.fixedSpacing(theme.tabiyaSpacing.sm),
                           border: 0,
@@ -304,7 +258,7 @@ const KnowledgeHubList: React.FC = () => {
               })}
             </Stack>
 
-            {documents.length === 0 && (
+            {sectors.length === 0 && (
               <Box
                 display="flex"
                 flexDirection="column"

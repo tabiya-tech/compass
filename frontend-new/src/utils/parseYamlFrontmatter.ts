@@ -1,13 +1,15 @@
-import { DocumentFrontmatter } from "./types";
+export interface FrontmatterData {
+  [key: string]: string;
+}
 
 export interface ParsedFrontmatter {
-  data: DocumentFrontmatter;
+  data: FrontmatterData & { title: string; description: string; sector?: string; icon?: string };
   content: string;
 }
 
 /**
- * Simple YAML frontmatter parser that works in the browser
- * Parses frontmatter delimited by --- at the start of markdown files
+ * Simple YAML frontmatter parser that works in the browser.
+ * Parses frontmatter delimited by --- at the start of markdown files.
  */
 export const parseYamlFrontmatter = (content: string): ParsedFrontmatter => {
   const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
@@ -42,9 +44,11 @@ export const parseYamlFrontmatter = (content: string): ParsedFrontmatter => {
 
   return {
     data: {
+      ...data,
       title: data.title || "Untitled",
       description: data.description || "",
       sector: data.sector,
+      icon: data.icon,
     },
     content: markdownContent,
   };
