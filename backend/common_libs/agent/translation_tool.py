@@ -9,6 +9,7 @@ from app.i18n.types import Locale
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.schema_builder import with_response_schema
+from common_libs.observability.decorators import traced_tool
 
 
 class _Output(BaseModel):
@@ -57,6 +58,8 @@ class TranslationTool:
                                 user_input=user_input,
                                 translation=translation)
 
+    # A cross-cutting tool: it inherits whichever module its caller opened the trace with.
+    @traced_tool("translation_tool.translate")
     async def translate(self, text: str) -> str:
         if not text:
             self._logger.warning("Empty text to translate")

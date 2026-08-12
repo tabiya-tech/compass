@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from vertexai.generative_models import HarmCategory, HarmBlockThreshold, SafetySetting
 
 from app.agent.config import AgentsConfig
+from common_libs.observability.tracing import traced_observation, update_observation
 from common_libs.retry import RetryConfigWithExponentialBackOff, DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF, Retry
 
 logger = logging.getLogger(__name__)
@@ -207,6 +208,18 @@ class LLM(ABC):
         raise NotImplementedError()
 
 
+def llm_input_to_traceable(llm_input: LLMInput | str) -> str | list[dict]:
+    """
+    Render an LLM input as something a trace payload can carry.
+
+    :param llm_input: The input to the LLM.
+    :return: The raw string, or the turns as a list of role/content dicts.
+    """
+    if isinstance(llm_input, str):
+        return llm_input
+    return [{"role": turn.role, "content": turn.content} for turn in llm_input.turns]
+
+
 class BasicLLM(LLM):
     def __init__(self, *, config: LLMConfig = LLMConfig()):
         # Before constructing the llm model, we need to initialize the VertexAI client
@@ -218,6 +231,10 @@ class BasicLLM(LLM):
         self._model = None
         self._chat = None
         self._resource_name = ""
+        # Kept so that the observability layer can report which model and parameters produced a
+        # generation. The concrete wrappers hand the same values to the underlying Vertex model.
+        self._model_name = config.language_model_name
+        self._generation_config = config.generation_config
 
     async def generate_content(self, llm_input: LLMInput | str) -> LLMResponse:
         async def _generate_content() -> LLMResponse:
@@ -232,7 +249,32 @@ class BasicLLM(LLM):
                              self._resource_name, exc_info=True)
                 raise e
 
-        return await Retry[str].call_with_exponential_backoff(callback=_generate_content, logger=logger)
+        # This is the single funnel for nearly every LLM call in the backend, which is why the
+        # generation observation lives here rather than in each of the ~40 call sites.
+        with traced_observation(
+                name=f"{self.__class__.__name__}.generate_content",
+                as_type="generation",
+                input=llm_input_to_traceable(llm_input),
+                model=self._model_name,
+                model_parameters=self._generation_config,
+                metadata={"resource_name": self._resource_name},
+        ) as generation:
+            try:
+                response = await Retry[str].call_with_exponential_backoff(callback=_generate_content, logger=logger)
+            except Exception as e:
+                update_observation(generation, level="ERROR", status_message=str(e))
+                raise
+
+            update_observation(
+                generation,
+                output=response.text,
+                usage_details={
+                    "input": response.prompt_token_count,
+                    "output": response.response_token_count,
+                    "total": response.prompt_token_count + response.response_token_count,
+                },
+            )
+            return response
 
     @abstractmethod
     async def internal_generate_content(self, llm_input: LLMInput | str) -> LLMResponse:

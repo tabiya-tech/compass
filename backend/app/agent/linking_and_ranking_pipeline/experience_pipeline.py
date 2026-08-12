@@ -9,8 +9,11 @@ from pydantic import BaseModel, ConfigDict
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
 from app.agent.linking_and_ranking_pipeline.cluster_responsibilities_tool import ClusterResponsibilitiesTool
+from app.context_vars import session_id_ctx_var
 from app.vector_search.esco_entities import SkillEntity, OccupationSkillEntity
 from app.vector_search.vector_search_dependencies import SearchServices
+from common_libs.observability.sampling import SamplingTier
+from common_libs.observability.tracing import sampled_scope, traced_observation, update_observation
 from .infer_occupation_tool import InferOccupationTool
 from .pick_top_skills_tool import PickTopSkillsTool
 from .skill_linking_tool import SkillLinkingTool
@@ -169,6 +172,47 @@ class ExperiencePipeline:
         2.2 Link responsibilities to the associated skills
         # 2.3 Rank the skills to get the top skills of the cluster
         3. Return the top skills of each cluster
+        """
+        # This pipeline fans out to roughly 50-60 LLM calls per experience and is by far the
+        # largest contributor to trace volume, so it is sampled at its own (lower) rate. The scope
+        # suppresses the whole subtree rather than just this span, so an unsampled run does not
+        # leave dozens of orphaned generations hanging off the conversation trace.
+        with sampled_scope(tier=SamplingTier.PIPELINE, sampling_key=f"{session_id_ctx_var.get()}:{experience_title}"):
+            with traced_observation(
+                    name="experience_pipeline",
+                    as_type="chain",
+                    input={"experience_title": experience_title, "responsibilities": responsibilities},
+                    metadata={
+                        "company_name": company_name,
+                        "country_of_interest": country_of_interest.value,
+                        "work_type": work_type.name,
+                        "number_of_clusters": self._config.number_of_clusters,
+                    },
+            ) as pipeline_observation:
+                response = await self._execute(
+                    experience_title=experience_title,
+                    responsibilities=responsibilities,
+                    company_name=company_name,
+                    country_of_interest=country_of_interest,
+                    work_type=work_type,
+                )
+                update_observation(
+                    pipeline_observation,
+                    output={
+                        "top_skills": [skill.preferredLabel for skill in response.top_skills],
+                        "remaining_skills_count": len(response.remaining_skills),
+                    },
+                )
+                return response
+
+    async def _execute(self, *,
+                       experience_title: str,
+                       responsibilities: list[str],
+                       company_name: Optional[str],
+                       country_of_interest: Country,
+                       work_type: WorkType) -> ExperiencePipelineResponse:
+        """
+        Run the pipeline. See `execute`, which wraps this with sampling and observability.
         """
         llm_stats = []
         if len(responsibilities) == 0:

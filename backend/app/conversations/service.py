@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Optional
 
-from app.agent.agent_director.abstract_agent_director import ConversationPhase
+from app.agent.agent_director.abstract_agent_director import ConversationPhase, CounselingSubPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.explore_experiences_agent_director import DiveInPhase
@@ -20,6 +20,50 @@ from app.job_preferences.service import IJobPreferencesService
 from app.job_preferences.types import JobPreferences
 from app.sensitive_filter import sensitive_filter
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
+
+from app.observability.module_types import TraceModule, TraceSubModule, sub_module_label
+from common_libs.observability.tracing import get_tracing_config, start_trace, update_observation
+
+_JOB_MATCHING_SUB_PHASES = (CounselingSubPhase.PREFERENCE_ELICITATION,)
+
+_SUB_MODULES_BY_SUB_PHASE = {
+    CounselingSubPhase.EXPLORE_EXPERIENCES: TraceSubModule.EXPLORE_EXPERIENCES,
+    CounselingSubPhase.PREFERENCE_ELICITATION: TraceSubModule.PREFERENCE_ELICITATION,
+}
+
+
+def _trace_module_for_conversation(state: ApplicationState) -> str:
+    """
+    Decide which trace module a conversation turn belongs to.
+
+    Preference Elicitation runs inside the Build Your Profile conversation,
+    so whether it is its own module is a product question (the ticket's "should Matched jobs /
+    All jobs get their own module-level traces?"). It is reported as part of Build Your Profile
+    unless `split_job_matching` is turned on; either way the sub module is available as a tag.
+
+    :param state: The application state for the session, already loaded for this turn.
+    :return: The `TraceModule` value for the turn.
+    """
+    if (get_tracing_config().split_job_matching
+            and state.agent_director_state.counseling_sub_phase in _JOB_MATCHING_SUB_PHASES):
+        return TraceModule.JOB_MATCHING.value
+
+    return TraceModule.BUILD_YOUR_PROFILE.value
+
+
+def _trace_sub_module_for_conversation(sub_phase: CounselingSubPhase) -> str:
+    """
+    Decide which sub module a conversation turn belongs to.
+
+    The counseling sub-phase is the Build Your Profile sub module: it is what tells Preference
+    Elicitation apart from experience exploration inside one and the same conversation.
+
+    :param sub_phase: The counseling sub-phase the turn is in.
+    :return: The `TraceSubModule` value for the turn, humanised from the sub-phase name if the
+        sub-phase is a new one that has not been mapped yet.
+    """
+    known = _SUB_MODULES_BY_SUB_PHASE.get(sub_phase)
+    return known.value if known else sub_module_label(sub_phase.name)
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -93,11 +137,39 @@ class ConversationService(IConversationService):
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+
+        # The root trace for one conversation turn. Everything the turn triggers — the agent
+        # director, the agents it routes to, the experience pipeline — nests underneath it. The
+        # Build your Profile conversation session is the trace session, which is also what the turn
+        # is sampled on, so a sampled conversation stays sampled for its whole life.
+        # The state is loaded first because the sub-phase decides which module and sub module the
+        # turn belongs to.
+        sub_phase = state.agent_director_state.counseling_sub_phase
+        with start_trace(
+                name="conversation.turn",
+                module=_trace_module_for_conversation(state),
+                sub_module=_trace_sub_module_for_conversation(sub_phase),
+                user_id=user_id,
+                session_id=session_id,
+                input=user_input,
+        ) as trace:
+            response = await self._send(user_id, session_id, user_input, state)
+            update_observation(
+                trace,
+                output=[message.message for message in response.messages],
+                metadata={
+                    "current_phase": response.current_phase.phase if response.current_phase else None,
+                    "conversation_completed": response.conversation_completed,
+                    "experiences_explored": response.experiences_explored,
+                },
+            )
+            return response
+
+    async def _send(self, user_id: str, session_id: int, user_input: str,
+                    state: ApplicationState) -> ConversationResponse:
         # set the sent_at for the user input
         agent_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
-
-        # set the state of the agent director, the conversation memory manager and all the agents
-        state = await self._application_state_metrics_recorder.get_state(session_id)
 
         # Check if the conversation has ended
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:

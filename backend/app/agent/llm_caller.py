@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 from app.agent.agent_types import LLMStats
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.llm.models_utils import LLMInput
+from common_libs.llm.models_utils import LLMInput, llm_input_to_traceable
+from common_libs.observability.tracing import record_score, traced_observation, update_observation
 from common_libs.text_formatters.extract_json import extract_json, ExtractJSONError
 
 # retries to call the LLM, if it fails to respond or with a valid JSON object.
@@ -52,7 +53,51 @@ class LLMCaller(Generic[RESPONSE_T]):
 
         :return: The model response and the statistics of the LLM calls.
         """
+        # One observation per logical call, with the per-attempt generations nested underneath it.
+        # This is where the retry/JSON-repair behaviour becomes visible: today it only surfaces as
+        # WARNING logs, so "how often do we hit the repetition trap, and on which prompts" is a
+        # log-grep rather than a dashboard.
+        with traced_observation(
+                name=f"llm_caller.{self._model_response_type.__name__}",
+                as_type="chain",
+                input=llm_input_to_traceable(llm_input),
+                metadata={"expected_response_type": self._model_response_type.__name__},
+        ) as call_observation:
+            model_response, llm_stats_list = await self._call_llm_with_retries(
+                llm=llm, llm_input=llm_input, logger=logger,
+            )
 
+            failed_attempts = [stats for stats in llm_stats_list if stats.error]
+            update_observation(
+                call_observation,
+                output=model_response,
+                metadata={
+                    "expected_response_type": self._model_response_type.__name__,
+                    "attempts": len(llm_stats_list),
+                    "failed_attempts": len(failed_attempts),
+                },
+                level="WARNING" if failed_attempts else None,
+                status_message=failed_attempts[-1].error if failed_attempts else None,
+            )
+            if failed_attempts:
+                # Only scored on failure: scores are billable units, and a score per successful call
+                # would roughly double the volume for no signal.
+                record_score(
+                    name="llm_call_failed_attempts",
+                    value=len(failed_attempts),
+                    comment=failed_attempts[-1].error,
+                )
+
+            return model_response, llm_stats_list
+
+    async def _call_llm_with_retries(self, *,
+                                     llm: GeminiGenerativeLLM,
+                                     llm_input: LLMInput | str,
+                                     logger: logging.Logger,
+                                     ) -> Tuple[RESPONSE_T | None, list[LLMStats]]:
+        """
+        Run the retry/JSON-repair loop. See `call_llm`, which wraps this with observability.
+        """
         llm_stats_list: list[LLMStats] = []
         success = False
         attempt_count = 0
@@ -132,6 +177,12 @@ class LLMCaller(Generic[RESPONSE_T]):
                                        generation_config.max_output_tokens,
                                        generation_config.frequency_penalty,
                                        generation_config.temperature)
+                        record_score(
+                            name="llm_repetition_trap",
+                            value=1,
+                            comment=f"attempt {attempt_count}: frequency_penalty raised to {generation_config.frequency_penalty}, "
+                                    f"temperature raised to {generation_config.temperature}",
+                        )
             finally:
                 llm_stats_list.append(llm_stats)
 

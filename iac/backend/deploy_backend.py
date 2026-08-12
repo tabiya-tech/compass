@@ -41,6 +41,13 @@ class BackendServiceConfig:
     sentry_dsn: str
     sentry_config: Optional[str]
     enable_sentry: str
+    # LLM tracing (Langfuse). Off unless enable_tracing is "True"; the secret key must be
+    # provisioned as a secret, never as a plain environment value.
+    enable_tracing: Optional[str]
+    langfuse_host: Optional[str]
+    langfuse_public_key: Optional[str]
+    langfuse_secret_key: Optional[str | pulumi.Output[str]]
+    tracing_config: Optional[str]
     enable_metrics: str
     default_country_of_user: str
     gcp_oauth_client_id: str
@@ -393,6 +400,21 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_SENTRY",
                             value=backend_service_cfg.enable_sentry),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_ENABLE_TRACING",
+                            value=backend_service_cfg.enable_tracing),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_LANGFUSE_HOST",
+                            value=backend_service_cfg.langfuse_host),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_LANGFUSE_PUBLIC_KEY",
+                            value=backend_service_cfg.langfuse_public_key),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_LANGFUSE_SECRET_KEY",
+                            value=backend_service_cfg.langfuse_secret_key),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="BACKEND_TRACING_CONFIG",
+                            value=backend_service_cfg.tracing_config),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_METRICS",
                             value=backend_service_cfg.enable_metrics),
