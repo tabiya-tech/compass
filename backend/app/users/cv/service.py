@@ -187,6 +187,7 @@ class CVUploadService(ICVUploadService):
                         upload_id,
                         self._experiences_extractor.extract_experiences,
                         md,
+                        user_id=user_id,
                     )
                     self._logger.info("[Upload %s] Experiences extracted {items=%s}", upload_id, len(bullets_local))
 

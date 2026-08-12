@@ -1,7 +1,13 @@
 import json
 import logging
 
-from app.context_vars import session_id_ctx_var, user_id_ctx_var
+from app.context_vars import (
+    session_id_ctx_var,
+    user_id_ctx_var,
+    module_ctx_var,
+    sub_module_ctx_var
+)
+from common_libs.observability.tracing import current_trace_id
 
 
 class SessionIdLogFilter(logging.Filter):
@@ -15,6 +21,13 @@ class SessionIdLogFilter(logging.Filter):
         # This will allow us to correlate log messages
         record.session_id = session_id_ctx_var.get()
         record.user_id = user_id_ctx_var.get()
+
+        # The Compass suite area, the area within it and the Langfuse trace, so a log line
+        # can be pivoted straight to the trace it belongs to. Named trace_module rather than module
+        # because LogRecord already defines `module` as the name of the module that emitted the record.
+        record.trace_module = module_ctx_var.get()
+        record.trace_sub_module = sub_module_ctx_var.get()
+        record.trace_id = current_trace_id()
 
         return True
 
@@ -51,5 +64,9 @@ class JsonLogFormatter(logging.Formatter):
             "user_id": user_id,
             "logger_name": record.name,
             "session_id": str(session_id),
-            "timestamp": record.asctime
+            "timestamp": record.asctime,
+            # LLM tracing correlation (CC-1)
+            "trace_module": getattr(record, 'trace_module', ':none:'),
+            "trace_sub_module": getattr(record, 'trace_sub_module', ':none:'),
+            "trace_id": getattr(record, 'trace_id', None)
         })

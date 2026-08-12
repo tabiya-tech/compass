@@ -64,6 +64,13 @@ def main():
         sentry_dsn=getenv("BACKEND_SENTRY_DSN", True, False),
         sentry_config=getenv("BACKEND_SENTRY_CONFIG", True, False),
         enable_sentry=getenv("BACKEND_ENABLE_SENTRY"),
+
+        # LLM tracing (Langfuse) - all optional, so an environment that has not opted in deploys unchanged.
+        enable_tracing=getenv("BACKEND_ENABLE_TRACING", False, False),
+        langfuse_host=getenv("BACKEND_LANGFUSE_HOST", False, False),
+        langfuse_public_key=getenv("BACKEND_LANGFUSE_PUBLIC_KEY", False, False),
+        langfuse_secret_key=getenv("BACKEND_LANGFUSE_SECRET_KEY", True, False),
+        tracing_config=getenv("BACKEND_TRACING_CONFIG", False, False),
         enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         default_country_of_user=getenv("DEFAULT_COUNTRY_OF_USER"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),

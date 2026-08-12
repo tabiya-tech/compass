@@ -29,6 +29,8 @@ from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
+from common_libs.observability.config import TracingConfig, parse_tracing_config
+from common_libs.observability.tracing import init_tracing, shutdown_tracing
 from features.loader import FeatureLoader
 from starlette.datastructures import State
 from app.middleware.brotli_request import BrotliRequestMiddleware
@@ -77,6 +79,33 @@ def setup_sentry():
     else:
         logging.warning(
             "BACKEND_ENABLE_SENTRY environment variable is not set to True.  Sentry will not be initialized")
+
+
+def load_tracing_config(version_info) -> TracingConfig:
+    """
+    Build the LLM tracing configuration from the environment.
+
+    Tracing is off unless BACKEND_ENABLE_TRACING is explicitly opted in to, so the feature ships dark
+    and a deployment that has not been given Langfuse credentials behaves exactly as it did before.
+    The opt-in is matched case-insensitively ("True", "true", "1", "yes"), because environment values
+    reach the process in whatever casing the deployment tooling happens to use.
+
+    :param version_info: The loaded backend version, reported to Langfuse as the release.
+    :return: The resolved tracing configuration.
+    """
+    enabled = os.getenv("BACKEND_ENABLE_TRACING", "False").strip().lower() in ("true", "1", "yes")
+    if not enabled:
+        logging.info("BACKEND_ENABLE_TRACING is not set to True. LLM tracing will not be initialized.")
+
+    return parse_tracing_config(
+        enabled=enabled,
+        public_key=os.getenv("BACKEND_LANGFUSE_PUBLIC_KEY"),
+        secret_key=os.getenv("BACKEND_LANGFUSE_SECRET_KEY"),
+        host=os.getenv("BACKEND_LANGFUSE_HOST"),
+        environment=os.getenv("TARGET_ENVIRONMENT_NAME"),
+        release=version_info.to_version_string(),
+        raw_config=os.getenv("BACKEND_TRACING_CONFIG", ""),
+    )
 
 
 ############################################
@@ -221,9 +250,11 @@ _enable_preference_elicitation_str = os.getenv("GLOBAL_ENABLE_PREFERENCE_ELICITA
 _enable_preference_elicitation = _enable_preference_elicitation_str.lower() == "true"
 logger.info(f"GLOBAL_ENABLE_PREFERENCE_ELICITATION: {_enable_preference_elicitation}")
 
+_version_info = load_version_info()
+
 application_config = ApplicationConfig(
     environment_name=os.getenv("TARGET_ENVIRONMENT_NAME"),
-    version_info=load_version_info(),
+    version_info=_version_info,
     enable_metrics=_metrics_enabled_str.lower() == "true",
     default_country_of_user=get_country_from_string(_default_country_of_user_str),
     taxonomy_model_id=os.getenv('TAXONOMY_MODEL_ID'),
@@ -239,9 +270,16 @@ application_config = ApplicationConfig(
     language_config=language_config,
     app_name=_global_product_name.strip(),
     disable_registration_code=_disable_registration_code,
+    tracing_config=load_tracing_config(_version_info),
 )
 
 set_application_config(application_config)
+
+##################
+# Set up LLM tracing, after setting the application config, because the release and the
+# environment are taken from it. Flushed on shutdown from the lifespan below.
+#################
+init_tracing(application_config.tracing_config)
 
 # warning log when registration code bypass is enabled
 if _disable_registration_code:
@@ -312,6 +350,10 @@ async def lifespan(_app: FastAPI):
     taxonomy_db.client.close()
     userdata_db.client.close()
     metrics_db.client.close()
+
+    # Flush any buffered LLM traces. Cloud Run tears containers down aggressively and without this
+    # the last conversation's spans are simply lost.
+    shutdown_tracing()
 
     logger.info("Shutting down completed.")
     # noinspection PyUnresolvedReferences

@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
 from app.conversation_memory.conversation_memory_manager import ConversationContext
+from common_libs.observability.decorators import instrument_agent_execute
 
 
 class Agent(ABC):
@@ -14,6 +15,12 @@ class Agent(ABC):
     conversation manager and handle the conversation history themselves.
     Otherwise, their owner should handle the conversation history.
     """
+
+    def __init_subclass__(cls, **kwargs):
+        # Every concrete agent gets an "agent" observation around its execute() and has its agent
+        # type pushed onto the context, without each subclass having to remember a decorator.
+        super().__init_subclass__(**kwargs)
+        instrument_agent_execute(cls)
 
     def __init__(self, *, agent_type: AgentType, is_responsible_for_conversation_history: bool = False):
         self._agent_type = agent_type

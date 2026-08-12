@@ -7,8 +7,10 @@ from pydantic import BaseModel, Field
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
 from app.agent.prompt_template import sanitize_input
+from app.observability.module_types import TraceModule
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, JSON_GENERATION_CONFIG, get_config_variation
+from common_libs.observability.tracing import start_trace, update_observation
 from common_libs.retry import Retry
 
 _TAGS_TO_FILTER = [
@@ -80,7 +82,21 @@ class CVExperienceExtractor:
             """
         )
 
-    async def extract_experiences(self, markdown_cv: str) -> list[str]:
+    async def extract_experiences(self, markdown_cv: str, *, user_id: Optional[str] = None) -> list[str]:
+        # CV extraction runs outside any conversation, so it opens its own root trace. It has no
+        # session of its own, and it runs in a background task whose context does not carry the
+        # user, so the user is passed explicitly — it is also what the extraction is sampled on.
+        with start_trace(
+                name="cv.extract_experiences",
+                module=TraceModule.CV_UPLOAD.value,
+                user_id=user_id,
+                metadata={"cv_length_chars": len(markdown_cv or "")},
+        ) as trace:
+            items = await self._extract_experiences(markdown_cv)
+            update_observation(trace, output=items, metadata={"extracted_count": len(items)})
+            return items
+
+    async def _extract_experiences(self, markdown_cv: str) -> list[str]:
         self._logger.info("Extracting experiences from markdown {md_length_chars=%s}", len(markdown_cv or ""))
         prompt = self._prompt((markdown_cv or "").strip())
         self._logger.debug("Prompt preview: %s", prompt[:200].replace("\n", " "))
