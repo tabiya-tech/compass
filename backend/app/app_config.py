@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from app.countries import Country
 from app.users.cv.constants import DEFAULT_MAX_UPLOADS_PER_USER, DEFAULT_RATE_LIMIT_PER_MINUTE
 from app.version.types import Version
+from common_libs.observability.config import TracingConfig
 
 from features.types import FeatureSetupConfig
 
@@ -68,6 +69,12 @@ class ApplicationConfig(BaseModel):
     cv_storage_bucket: str
     cv_max_uploads_per_user: Optional[int] = Field(default=DEFAULT_MAX_UPLOADS_PER_USER, gt=0)
     cv_rate_limit_per_minute: Optional[int] = Field(default=DEFAULT_RATE_LIMIT_PER_MINUTE, gt=0)
+
+    tracing_config: TracingConfig = Field(default_factory=TracingConfig)
+    """
+    The LLM tracing (Langfuse) configuration. Disabled by default; see
+    `common_libs.observability.config.parse_tracing_config` for how it is loaded from the environment.
+    """
 
 
 _application_config: ApplicationConfig | None = None

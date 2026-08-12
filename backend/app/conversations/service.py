@@ -9,6 +9,7 @@ from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_director.llm_agent_director import LLMAgentDirector
 from app.agent.agent_types import AgentInput
 from app.agent.explore_experiences_agent_director import DiveInPhase
+from app.application_state import ApplicationState
 from app.conversation_memory.conversation_memory_manager import IConversationMemoryManager
 from app.conversations.reactions.repository import IReactionRepository
 from app.conversations.types import ConversationResponse
@@ -16,6 +17,28 @@ from app.conversations.utils import get_messages_from_conversation_manager, filt
     get_total_explored_experiences, get_current_conversation_phase_response
 from app.sensitive_filter import sensitive_filter
 from app.metrics.application_state_metrics_recorder.recorder import IApplicationStateMetricsRecorder
+
+from app.observability.module_types import TraceModule, TraceSubModule, sub_module_label
+from common_libs.observability.tracing import start_trace, update_observation
+
+_SUB_MODULES_BY_PHASE = {
+    ConversationPhase.COUNSELING: TraceSubModule.EXPLORE_EXPERIENCES,
+}
+
+
+def _trace_sub_module_for_conversation(phase: ConversationPhase) -> str:
+    """
+    Decide which sub module a conversation turn belongs to.
+
+    The conversation phase is the Build Your Profile sub module: the counseling phase is where
+    experiences are collected and explored, the other phases are reported by their own name.
+
+    :param phase: The conversation phase the turn is in.
+    :return: The `TraceSubModule` value for the turn, humanised from the phase name if the
+        phase has not been mapped to a sub module.
+    """
+    known = _SUB_MODULES_BY_PHASE.get(phase)
+    return known.value if known else sub_module_label(phase.name)
 
 
 class ConversationAlreadyConcludedError(Exception):
@@ -81,11 +104,38 @@ class ConversationService(IConversationService):
         if filter_pii:
             user_input = await sensitive_filter.obfuscate(user_input)
 
+        state = await self._application_state_metrics_recorder.get_state(session_id)
+
+        # The root trace for one conversation turn. Everything the turn triggers — the agent
+        # director, the agents it routes to, the experience pipeline — nests underneath it. The
+        # Build your Profile conversation session is the trace session, which is also what the turn
+        # is sampled on, so a sampled conversation stays sampled for its whole life.
+        # The state is loaded first because the conversation phase decides which sub module the
+        # turn belongs to.
+        with start_trace(
+                name="conversation.turn",
+                module=TraceModule.BUILD_YOUR_PROFILE.value,
+                sub_module=_trace_sub_module_for_conversation(state.agent_director_state.current_phase),
+                user_id=user_id,
+                session_id=session_id,
+                input=user_input,
+        ) as trace:
+            response = await self._send(user_id, session_id, user_input, state)
+            update_observation(
+                trace,
+                output=[message.message for message in response.messages],
+                metadata={
+                    "current_phase": response.current_phase.phase if response.current_phase else None,
+                    "conversation_completed": response.conversation_completed,
+                    "experiences_explored": response.experiences_explored,
+                },
+            )
+            return response
+
+    async def _send(self, user_id: str, session_id: int, user_input: str,
+                    state: ApplicationState) -> ConversationResponse:
         # set the sent_at for the user input
         user_input = AgentInput(message=user_input, sent_at=datetime.now(timezone.utc))
-
-        # set the state of the agent director, the conversation memory manager and all the agents
-        state = await self._application_state_metrics_recorder.get_state(session_id)
 
         # Check if the conversation has ended
         if state.agent_director_state.current_phase == ConversationPhase.ENDED:

@@ -5,6 +5,7 @@ from app.conversation_memory.conversation_formatter import ConversationHistoryFo
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig, HIGH_TEMPERATURE_GENERATION_CONFIG
+from common_libs.observability.decorators import traced_tool
 
 
 class Summarizer:
@@ -30,6 +31,7 @@ class Summarizer:
         self._llm = GeminiGenerativeLLM(config=LLMConfig(generation_config=HIGH_TEMPERATURE_GENERATION_CONFIG))
         self._logger = logging.getLogger(self.__class__.__name__)
 
+    @traced_tool("conversation_memory.summarize")
     async def summarize(self, context: ConversationContext) -> str:
         model_input = ConversationHistoryFormatter.format_for_summary_prompt(
                 system_instructions=self._summarize_system_instructions,

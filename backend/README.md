@@ -311,6 +311,88 @@ Run the image using the following command:
 > Note: The `-v "$(pwd)/logs/:/code/logs/"` option is used to mount a volume to store the logs specified in `logging.cfg.dev.yaml`
 >
 
+## LLM tracing
+
+Every LLM call the backend makes can be traced to [Langfuse](https://langfuse.com), grouped by
+**module** (Build your Profile, CV Upload), by the **sub module** within it (Explore Experiences,
+Intro, Checkout, ...) and by the **agent** that produced it. Tracing is **off by default** — a deployment with no Langfuse credentials behaves
+exactly as it did before.
+
+### Turning it on
+
+Set the following in `.env` (see `.env.example`):
+
+```bash
+BACKEND_ENABLE_TRACING=True
+BACKEND_LANGFUSE_HOST=http://localhost:3000
+BACKEND_LANGFUSE_PUBLIC_KEY=pk-lf-...
+BACKEND_LANGFUSE_SECRET_KEY=sk-lf-...
+BACKEND_TRACING_CONFIG={"turnSampleRate": 1.0, "pipelineSampleRate": 1.0, "maskPii": true}
+```
+
+### Running Langfuse locally
+
+```bash
+git clone https://github.com/langfuse/langfuse.git
+cd langfuse && docker compose up -d
+```
+
+Then open http://localhost:3000, create a project and copy its keys into `.env`.
+
+### Configuration (`BACKEND_TRACING_CONFIG`)
+
+All keys are optional; see `common_libs/observability/config.py` for the authoritative list.
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `turnSampleRate` | `1.0` | Fraction of conversation turns traced. Deterministic per session (per user where there is no session), so a session is never half-traced. |
+| `pipelineSampleRate` | `1.0` | Fraction of experience-pipeline runs traced. The pipeline fans out to ~50-60 LLM calls per experience and dominates volume, so set this lower (0.1-0.2) in production. |
+| `maskPii` | `true` | Redact e-mail addresses, phone numbers and long digit runs before export. |
+| `maxPayloadChars` | `10000` | Truncate each string in a payload to this length. |
+| `flushAt` / `flushInterval` / `timeout` | `512` / `5.0` / `10` | Exporter batching and its hard HTTP timeout. |
+
+### What is traced
+
+- **Root trace per unit of user-facing work**, tagged `module:<module>` and `sub_module:<sub module>`,
+  carrying the user id and the session id so the Langfuse session view groups a whole conversation.
+  Both dimensions are human readable, exactly as they read in the UI ("Build your Profile",
+  "Explore Experiences"), and are also trace *metadata*, which is what the module and sub module
+  breakdowns group on.
+- **The session** is the Build your Profile session id. The session is also the sampling key, so a
+  sampled session stays sampled for its whole life; a CV upload, which has no session, is sampled on
+  the user.
+- **Sub modules** come from the conversation phase for Build your Profile (see
+  `app/observability/module_types.py`).
+- **One agent observation per agent execution**, named after the agent type. Applied automatically to
+  every `Agent` subclass via `Agent.__init_subclass__`.
+- **One generation per LLM call**, from the single chokepoint `BasicLLM.generate_content`, with the
+  model, generation parameters, prompt, completion and token usage.
+- **Retry and JSON-repair behaviour** from `LLMCaller`, as attempt counts and a
+  `llm_call_failed_attempts` / `llm_repetition_trap` score.
+
+Log records carry `trace_id`, `trace_module` and `trace_sub_module`, so a Cloud Logging line can be
+pivoted straight to the trace it belongs to.
+
+### Privacy
+
+Compass prompts contain users' life stories. Masking is **client-side and heuristic** — it redacts
+mechanically detectable identifiers and truncates payloads, but it is a blast-radius control, not a
+guarantee. Two consequences:
+
+- Deployments with a data-residency obligation (e.g. Zambia, Mozambique) should point
+  `BACKEND_LANGFUSE_HOST` at a **self-hosted** Langfuse rather than Langfuse Cloud.
+- **Data retention** is a Langfuse project setting, not an SDK setting. Configure it per project in
+  the Langfuse UI (Cloud) or via the deployment's retention configuration (self-hosted).
+
+Masking deliberately does **not** use `app.sensitive_filter.sensitive_filter.obfuscate()`: that is a
+Google DLP network call per string, which is unusable inline on the hundreds of spans a single
+conversation produces.
+
+### Cost
+
+A completed Build Your Profile conversation produces roughly 650 billable Langfuse units, about 80%
+of which come from the experience pipeline. Lower `pipelineSampleRate` first.
+
 ## Testing Locally
 
 ### Running the linter
