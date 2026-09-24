@@ -16,6 +16,7 @@ from app.context_vars import (
     module_ctx_var,
     session_id_ctx_var,
     sub_module_ctx_var,
+    treatment_group_ctx_var,
     user_id_ctx_var,
 )
 from common_libs.observability.config import TracingConfig
@@ -29,6 +30,7 @@ from common_libs.observability.testing import (
 )
 
 from common_libs.observability.tracing import (
+    annotate_trace,
     current_trace_id,
     init_tracing,
     is_tracing_enabled,
@@ -325,6 +327,37 @@ class TestTraceAttributes:
         assert "module:Career Readiness" in actual_tags
         assert "mode:instruction" in actual_tags
 
+    def test_tags_the_trace_with_the_treatment_group(self, recorded_spans):
+        """Tags the trace with the treatment group."""
+        # GIVEN a request whose user is in treatment group T1
+        given_treatment_group = "T1"
+        token = treatment_group_ctx_var.set(given_treatment_group)
+
+        try:
+            # WHEN a root trace is opened
+            with start_trace(name="conversation.turn", module="Build your Profile"):
+                pass
+        finally:
+            treatment_group_ctx_var.reset(token)
+
+        # THEN expect the treatment group to be tagged, so traces can be filtered by it
+        actual_span = recorded_spans.by_name("conversation.turn")
+        assert f"treatment_group:{given_treatment_group}" in actual_span.attributes["langfuse.trace.tags"]
+        # AND expect it to be available as trace metadata
+        assert actual_span.attributes["langfuse.trace.metadata.treatment_group"] == given_treatment_group
+
+    def test_omits_the_treatment_group_when_the_user_has_none(self, recorded_spans):
+        """Omits the treatment group when the user has none."""
+        # GIVEN a request whose user is not in a treatment group
+        # WHEN a root trace is opened
+        with start_trace(name="conversation.turn", module="Build your Profile"):
+            pass
+
+        # THEN expect no treatment group tag and no treatment group metadata
+        actual_span = recorded_spans.by_name("conversation.turn")
+        assert not [tag for tag in actual_span.attributes["langfuse.trace.tags"] if tag.startswith("treatment_group:")]
+        assert "langfuse.trace.metadata.treatment_group" not in actual_span.attributes
+
     def test_nests_observations_under_the_trace(self, recorded_spans):
         """Nests observations under the trace."""
         # GIVEN a conversation turn
@@ -576,3 +609,77 @@ class TestTraceIdCorrelation:
         # AND expect no warning from Langfuse: the log filter asks on every record, and a warning
         # here is itself a record, which recurses back into the filter until it blows the stack.
         assert caplog.records == []
+
+
+class TestAnnotateTrace:
+    """
+    Tests for annotating the trace in progress.
+    """
+
+    def test_sets_the_sub_module_of_the_trace_in_progress(self, recorded_spans):
+        """Sets the sub module of the trace in progress."""
+        # GIVEN a Career Explorer turn opened without a sub module
+        given_sub_module = "Priority Sector"
+
+        # WHEN the turn's sub module becomes known part way through, and is annotated
+        with start_trace(name="career_explorer.turn", module="Career Explorer"):
+            annotate_trace(sub_module=given_sub_module)
+            # THEN expect observations opened from here on to report it too
+            assert sub_module_ctx_var.get() == given_sub_module
+
+        # AND expect the root span to be tagged with it
+        actual_span = recorded_spans.by_name("career_explorer.turn")
+        assert f"sub_module:{given_sub_module}" in actual_span.attributes["langfuse.trace.tags"]
+        # AND expect the module tag to be kept
+        assert "module:Career Explorer" in actual_span.attributes["langfuse.trace.tags"]
+        # AND expect it to be available as trace metadata
+        assert actual_span.attributes["langfuse.trace.metadata.sub_module"] == given_sub_module
+
+    def test_replaces_the_sub_module_the_trace_was_opened_with(self, recorded_spans):
+        """Replaces the sub module the trace was opened with."""
+        # GIVEN a trace opened with a sub module
+        # WHEN it is annotated with a different one
+        with start_trace(name="career_explorer.turn", module="Career Explorer", sub_module="Non Priority Sector"):
+            annotate_trace(sub_module="Sector Classifier Failed")
+
+        # THEN expect only the new sub module to be tagged
+        actual_tags = recorded_spans.by_name("career_explorer.turn").attributes["langfuse.trace.tags"]
+        assert [tag for tag in actual_tags if tag.startswith("sub_module:")] == ["sub_module:Sector Classifier Failed"]
+
+    def test_adds_tags_and_metadata_to_the_trace_in_progress(self, recorded_spans):
+        """Adds tags and metadata to the trace in progress."""
+        # GIVEN a trace opened with extra tags
+        # WHEN it is annotated with a tag and metadata
+        with start_trace(name="career_explorer.turn", module="Career Explorer", tags=["mode:instruction"]):
+            annotate_trace(tags=["sector_classifier:failed"], metadata={"sector_classifier_fallback": "Non Priority Sector"})
+
+        # THEN expect the new tag alongside the ones the trace was opened with
+        actual_span = recorded_spans.by_name("career_explorer.turn")
+        assert "sector_classifier:failed" in actual_span.attributes["langfuse.trace.tags"]
+        assert "mode:instruction" in actual_span.attributes["langfuse.trace.tags"]
+        # AND expect the metadata on the trace
+        assert actual_span.attributes["langfuse.trace.metadata.sector_classifier_fallback"] == "Non Priority Sector"
+
+    def test_restores_the_sub_module_context_after_the_trace(self, recorded_spans):
+        """Restores the sub module context after the trace."""
+        # GIVEN no sub module in the request context
+        given_sub_module_before = sub_module_ctx_var.get()
+
+        # WHEN a trace is annotated with a sub module and closed
+        with start_trace(name="career_explorer.turn", module="Career Explorer"):
+            annotate_trace(sub_module="Priority Sector")
+
+        # THEN expect the sub module context variable to be back where it was
+        assert sub_module_ctx_var.get() == given_sub_module_before
+
+    def test_is_a_no_op_when_tracing_is_disabled(self):
+        """Is a no-op when tracing is disabled."""
+        # GIVEN tracing is disabled
+        init_tracing(TracingConfig(enabled=False))
+
+        # WHEN a trace is annotated
+        with start_trace(name="career_explorer.turn", module="Career Explorer"):
+            annotate_trace(sub_module="Priority Sector", tags=["sector_classifier:failed"], metadata={"k": "v"})
+
+        # THEN expect no error
+        assert True

@@ -37,3 +37,9 @@ module_ctx_var = contextvars.ContextVar("module", default=":none:")
 # Build Your Profile turn.
 # Set at the service entry points and used to group LLM traces one level below the module.
 sub_module_ctx_var = contextvars.ContextVar("sub_module", default=":none:")
+
+# The RCT treatment group the current user is assigned to ("T1", "T2", ...), read from
+# `user_preferences.experiments.treatment_group`. Set by the routes that open a trace, and used to
+# tag LLM traces so they can be split by treatment group.
+treatment_group_ctx_var = contextvars.ContextVar("treatment_group", default=":none:")
+

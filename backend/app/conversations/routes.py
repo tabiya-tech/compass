@@ -24,6 +24,7 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
+from app.observability.treatment_group import set_treatment_group
 from app.job_preferences.get_job_preferences_service import get_job_preferences_service
 from app.job_preferences.service import IJobPreferencesService
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
@@ -160,6 +161,8 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
 
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
+            # and the treatment group, so the turn's trace is tagged with it
+            set_treatment_group(current_user_preferences.experiments)
 
             # Set up the language to have the conversation in.
             # And set it into the headers for the Client, so that they know which language the response is in.
