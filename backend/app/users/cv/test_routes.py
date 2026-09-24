@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from typing import Optional
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_mock
@@ -7,6 +8,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 
 from app.users.auth import UserInfo
+from app.users.get_user_preferences_repository import get_user_preferences_repository
 from app.users.cv.routes import (
     add_user_cv_routes,
     get_cv_service,
@@ -53,6 +55,9 @@ def client_with_mocks() -> TestClientWithMocks:
     api_router = APIRouter()
     app = FastAPI()
     app.dependency_overrides[get_cv_service] = _mocked_get_cv_service
+    _mock_user_preferences_repository = MagicMock()
+    _mock_user_preferences_repository.get_experiments_by_user_id = AsyncMock(return_value={})
+    app.dependency_overrides[get_user_preferences_repository] = lambda: _mock_user_preferences_repository
 
     add_user_cv_routes(api_router, auth=_instance_auth)
     app.include_router(api_router)

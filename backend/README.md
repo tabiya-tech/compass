@@ -363,6 +363,11 @@ All keys are optional; see `common_libs/observability/config.py` for the authori
   the user.
 - **Sub modules** come from the conversation phase for Build your Profile (see
   `app/observability/module_types.py`).
+- **The treatment group** (`T1`, `T2`, from `user_preferences.experiments.treatment_group`) is tagged
+  `treatment_group:<group>` and carried as trace metadata, for users that are in one. The routes that
+  open a trace bind it to the request (`app/observability/treatment_group.py`).
+- **The conversation phase** is reported as its name (`INTRO`, `COUNSELING`, `CHECKOUT`, `ENDED`) in
+  the observation metadata, rather than as its enum value.
 - **One agent observation per agent execution**, named after the agent type. Applied automatically to
   every `Agent` subclass via `Agent.__init_subclass__`.
 - **One generation per LLM call**, from the single chokepoint `BasicLLM.generate_content`, with the

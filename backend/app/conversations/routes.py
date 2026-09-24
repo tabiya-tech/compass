@@ -22,6 +22,7 @@ from app.conversations.service import ConversationAlreadyConcludedError, IConver
 from app.conversations.types import ConversationResponse, ConversationInput
 from app.errors.constants import NO_PERMISSION_FOR_SESSION
 from app.errors.errors import UnauthorizedSessionAccessError
+from app.observability.treatment_group import set_treatment_group
 from app.metrics.application_state_metrics_recorder.recorder import ApplicationStateMetricsRecorder
 from app.metrics.services.get_metrics_service import get_metrics_service
 from app.metrics.services.service import IMetricsService
@@ -101,6 +102,8 @@ def add_conversation_routes(app: FastAPI, authentication: Authentication):
 
             # set the client_id in the context variable.
             client_id_ctx_var.set(current_user_preferences.client_id)
+            # and the treatment group, so the turn's trace is tagged with it
+            set_treatment_group(current_user_preferences.experiments)
 
             return await service.send(user_id, session_id, user_input, clear_memory, filter_pii)
         except ConversationAlreadyConcludedError as e:
