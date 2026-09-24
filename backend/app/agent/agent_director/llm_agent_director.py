@@ -6,6 +6,7 @@ from app.agent.explore_experiences_agent_director import ExploreExperiencesAgent
 from app.agent.farewell_agent import FarewellAgent
 from app.agent.linking_and_ranking_pipeline import ExperiencePipelineConfig
 from app.agent.welcome_agent import WelcomeAgent
+from app.context_vars import phase_ctx_var
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationContext
 from app.vector_search.vector_search_dependencies import SearchServices
@@ -111,6 +112,10 @@ class LLMAgentDirector(AbstractAgentDirector):
         :return: The output from the agent
         """
         try:
+            # Set initial phase in context for observability logging. The name ("COUNSELING") rather than
+            # the enum value (1), so logs and traces carry a readable label.
+            phase_ctx_var.set(self._state.current_phase.name)
+
             first_call: bool = True
             transitioned_to_new_phase: bool = False
             agent_output: AgentOutput | None = None
@@ -155,6 +160,7 @@ class LLMAgentDirector(AbstractAgentDirector):
                         is_artificial=True
                     )
                     self._state.current_phase = new_phase
+                    phase_ctx_var.set(new_phase.name if new_phase else ":none:")
 
             # return the last agent output in case
             return agent_output
