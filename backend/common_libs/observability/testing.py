@@ -107,6 +107,8 @@ def in_memory_tracing(config: Optional[TracingConfig] = None) -> Iterator[Record
     :return: An accessor over the spans recorded inside the block.
     """
     client, exporter = _get_or_create_client()
+    # Drain the spans an earlier block left in the batch processor, so they are not exported into this one.
+    client.flush()
     exporter.clear()
 
     previous_client = tracing_module._client  # pylint: disable=protected-access

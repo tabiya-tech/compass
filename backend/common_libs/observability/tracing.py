@@ -22,6 +22,7 @@ and both OpenTelemetry and Langfuse propagate through context variables.
 import logging
 from contextlib import contextmanager
 from contextvars import ContextVar
+from dataclasses import dataclass, field
 from typing import Any, Iterator, Optional
 
 from langfuse import Langfuse, propagate_attributes
@@ -37,6 +38,7 @@ from app.context_vars import (
     phase_ctx_var,
     module_ctx_var,
     sub_module_ctx_var,
+    treatment_group_ctx_var,
 )
 from common_libs.observability.config import TracingConfig
 from common_libs.observability.masking import build_mask_function
@@ -52,6 +54,17 @@ _config: TracingConfig = TracingConfig()
 
 # Set while inside a `suppress_tracing()` block, i.e. a unit of work that sampling decided to skip.
 _suppressed_ctx_var: ContextVar[bool] = ContextVar("tracing_suppressed", default=False)
+
+
+@dataclass
+class _OpenTrace:
+    """The root span of the trace in progress, and the tags it was opened with, so it can be annotated later."""
+    root_span: Any
+    tags: list[str] = field(default_factory=list)
+
+
+# Set while inside a recorded `start_trace()` block.
+_open_trace_ctx_var: ContextVar[Optional[_OpenTrace]] = ContextVar("open_trace", default=None)
 
 
 def init_tracing(config: TracingConfig) -> None:
@@ -234,6 +247,7 @@ def current_context_metadata() -> dict:
             ("sub_module", _clean(sub_module_ctx_var.get())),
             ("agent_type", _clean(agent_type_ctx_var.get())),
             ("phase", _clean(phase_ctx_var.get())),
+            ("treatment_group", _clean(treatment_group_ctx_var.get())),
             ("correlation_id", _clean(correlation_id_ctx_var.get())),
             ("client_id", _clean(client_id_ctx_var.get())),
     ):
@@ -317,6 +331,9 @@ def start_trace(
       - Career Explorer     ->  ``<user id>-career-explorer``
       - Career Readiness    ->  ``<user id>-career-readiness``
 
+    The user's RCT treatment group, when the route has bound one to `treatment_group_ctx_var`, is
+    attached as a ``treatment_group:<group>`` tag and as metadata, so traces can be split by group.
+
     The session is also the sampling key, so a sampled session stays sampled for its whole life
     rather than producing half-recorded traces; work with no session at all (a CV upload) falls back
     to the user, and then to the trace name.
@@ -332,13 +349,16 @@ def start_trace(
         and log records report it too.
     :param input: The input payload of the unit of work.
     :param metadata: Extra trace metadata.
-    :param tags: Extra trace tags, on top of the module and sub module tags.
+    :param tags: Extra trace tags, on top of the module, sub module and treatment group tags.
     :param tier: The sampling tier this unit of work belongs to.
     :return: The root Langfuse observation, or None when tracing is off or the work was not sampled.
     """
-    tokens = [(module_ctx_var, module_ctx_var.set(module))]
-    if sub_module:
-        tokens.append((sub_module_ctx_var, sub_module_ctx_var.set(sub_module)))
+    # The sub module is always pushed, even when not given, so that `annotate_trace` can refine it
+    # mid-turn and the refinement still ends with the block.
+    tokens = [
+        (module_ctx_var, module_ctx_var.set(module)),
+        (sub_module_ctx_var, sub_module_ctx_var.set(sub_module or sub_module_ctx_var.get())),
+    ]
     if user_id is not None:
         tokens.append((user_id_ctx_var, user_id_ctx_var.set(user_id)))
     if session_id is not None:
@@ -355,7 +375,12 @@ def start_trace(
                 yield None
             return
 
-        grouping = {"module": module, **({"sub_module": sub_module} if sub_module else {})}
+        treatment_group = _clean(treatment_group_ctx_var.get())
+        grouping = {
+            "module": module,
+            **({"sub_module": sub_module} if sub_module else {}),
+            **({"treatment_group": treatment_group} if treatment_group else {}),
+        }
         all_tags = [f"{dimension}:{value}" for dimension, value in grouping.items()] + list(tags or [])
 
         try:
@@ -379,10 +404,64 @@ def start_trace(
                     tags=all_tags,
                     metadata={**grouping, **(metadata or {})},
             ):
-                yield root
+                open_trace_token = _open_trace_ctx_var.set(
+                    _OpenTrace(root_span=otel_trace_api.get_current_span(), tags=list(all_tags))
+                )
+                try:
+                    yield root
+                finally:
+                    _open_trace_ctx_var.reset(open_trace_token)
     finally:
         for context_var, token in reversed(tokens):
             context_var.reset(token)
+
+
+def annotate_trace(
+        *,
+        sub_module: Optional[str] = None,
+        tags: Optional[list[str]] = None,
+        metadata: Optional[dict] = None,
+) -> None:
+    """
+    Refine the trace in progress with what is only known part way through the unit of work.
+
+    The Career Explorer, for example, only knows which sub module a turn belongs to once the sector
+    classifier has run, well after its root trace was opened. The values are written onto the root
+    span, which is what the Langfuse trace view and its filters read. The sub module is also pushed
+    onto its context variable, so that observations opened from here on report it too; it is
+    restored when the trace ends.
+
+    A no-op when tracing is off, when the turn was not sampled, or outside `start_trace`.
+
+    :param sub_module: The sub module the trace belongs to, replacing the one it was opened with.
+    :param tags: Tags to add to the trace.
+    :param metadata: Metadata to add to the trace. Values are coerced to strings.
+    """
+    if sub_module:
+        sub_module_ctx_var.set(sub_module)
+
+    open_trace = _open_trace_ctx_var.get()
+    if open_trace is None or not is_tracing_enabled():
+        return
+
+    try:
+        span = open_trace.root_span
+        if not span.is_recording():
+            return
+
+        new_metadata = {**({"sub_module": sub_module} if sub_module else {}), **(metadata or {})}
+        for key, value in new_metadata.items():
+            if value is not None:
+                span.set_attribute(f"langfuse.trace.metadata.{key}", value if isinstance(value, str) else str(value))
+
+        new_tags = list(tags or [])
+        if sub_module:
+            open_trace.tags = [tag for tag in open_trace.tags if not tag.startswith("sub_module:")]
+            new_tags.insert(0, f"sub_module:{sub_module}")
+        open_trace.tags += [tag for tag in new_tags if tag not in open_trace.tags]
+        span.set_attribute("langfuse.trace.tags", open_trace.tags)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning("Failed to annotate the trace. Error: %s", e)
 
 
 def record_score(*, name: str, value: float, comment: Optional[str] = None) -> None:
