@@ -168,7 +168,7 @@ test_cases: list[ScriptedLoopDetectionTestCase] = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
+@pytest.mark.evaluation_test("gemini-3.5-flash-lite/")
 @pytest.mark.repeat(3)
 @pytest.mark.parametrize(
     "test_case",

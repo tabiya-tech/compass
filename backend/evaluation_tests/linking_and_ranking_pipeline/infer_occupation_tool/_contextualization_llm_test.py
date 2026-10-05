@@ -94,7 +94,7 @@ test_cases = [
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
+@pytest.mark.evaluation_test("gemini-3.5-flash-lite/")
 @pytest.mark.parametrize("test_case", get_test_cases_to_run(test_cases), ids=[test_case.name for test_case in get_test_cases_to_run(test_cases)])
 async def test_relevant_occupations_classifier_llm(test_case: ContextualizationTestCase, caplog: LogCaptureFixture):
     logger = logging.getLogger(__name__)
