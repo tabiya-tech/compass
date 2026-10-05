@@ -19,6 +19,12 @@ _ROLE_TO_STEP_TYPE = {
 
 _clients: dict[tuple[str, int], genai.Client] = {}
 
+_REQUEST_TIMEOUT_MS = 180_000
+"""
+The timeout of a request to the API. Without it the client waits forever on a connection that was dropped silently,
+the timeout error is transient, so the call is retried (see `common_libs.retry.is_retryable_error`).
+"""
+
 
 def get_genai_client(location: str) -> genai.Client:
     """
@@ -35,7 +41,8 @@ def get_genai_client(location: str) -> genai.Client:
     key = (location, loop_id)
     client = _clients.get(key)
     if client is None:
-        client = genai.Client(vertexai=True, location=location)
+        client = genai.Client(vertexai=True, location=location,
+                              http_options=genai.types.HttpOptions(timeout=_REQUEST_TIMEOUT_MS))
         _clients[key] = client
     return client
 

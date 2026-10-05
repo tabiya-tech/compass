@@ -187,7 +187,7 @@ test_cases = [
         expected_experiences_count_max=1,
         expected_work_types={
             WorkType.SELF_EMPLOYMENT: (0, 0),
-            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),
+            WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT: (1, 1),  # paid job as a shoe salesperson, never did an internship
             WorkType.FORMAL_SECTOR_UNPAID_TRAINEE_WORK: (0, 0),
             WorkType.UNSEEN_UNPAID: (0, 0),
         },

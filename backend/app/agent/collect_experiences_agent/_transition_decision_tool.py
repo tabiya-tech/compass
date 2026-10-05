@@ -58,13 +58,14 @@ class TransitionReasoning(BaseModel):
 
 
 class _TransitionDecisionOutput(BaseModel):
+    # The reasoning comes first, so that the model reasons before it answers the two questions.
+    reasoning: str = Field(
+        description="A brief 1-2 sentence explanation of the decision.")
     continue_current_type: bool = Field(
         description="Whether to continue asking about the current work type, see the '#Decision Logic'.")
     done_with_collection: bool = Field(
         description="Whether we are completely done collecting all work experiences (only true if continue_current_type is false), "
                     "see the '#Decision Logic'.")
-    reasoning: str = Field(
-        description="A brief 1-2 sentence explanation of the decision.")
 
     class Config:
         extra = "forbid"
@@ -290,6 +291,12 @@ Answer two boolean questions:
 #Constraints
 - Use semantic understanding, not keyword matching
 - If incomplete experiences exist, continue_current_type must be true
+- When the user clearly indicates no more experiences of this type (e.g. "no", "nope"), return continue_current_type=false
+- A "no" followed by a closing phrase (e.g. "No, that's cool", "No, it's fine", "No, that's ok") means the user has nothing
+  more to add or change, even when the agent's last question was a confirmation like "Does that sound right?".
+  If the experiences of this type are complete, return continue_current_type=false.
+  A plain confirmation of the details (e.g. "Yes, that's correct") is different: it does not say there are no more experiences,
+  so return continue_current_type=true to let the agent ask about other experiences of this type.
 - If unexplored_types is not empty, done_with_collection must be false
 - This is for collecting experience data excluding tasks, skills and responsibilties.
   If the agent itself keeps asking the user about tasks, skills or responsibilities, return continue_current_type=false.
