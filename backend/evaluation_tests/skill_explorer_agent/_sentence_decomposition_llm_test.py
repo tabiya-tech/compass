@@ -61,8 +61,9 @@ test_cases_sentence_decomposition = [
              "Can you tell me more about how you shape the dough"),
         ],
         given_user_input="""We do it using our hands. It is a difficult procedure, John uses his senses and I observe the process""",
+        # The user's own wording is kept ("using our hands"), only the pronouns are resolved
         expected_resolved_pronouns=['I observe the process.',
-                                    'John and I shape the dough with our hands.',
+                                    'John and I shape the dough using our hands.',
                                     "John uses his senses.",
                                     'Shaping the dough is a difficult procedure.'],
     ),
@@ -76,7 +77,8 @@ test_cases_sentence_decomposition = [
              "Can you tell me more about how you decide what to bake each day?"),
         ],
         given_user_input="""my boss decides that""",
-        expected_resolved_pronouns=["My boss decides that."],
+        # "that" is resolved to what the agent asked about
+        expected_resolved_pronouns=["My boss decides what to bake each day."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -85,7 +87,8 @@ test_cases_sentence_decomposition = [
         given_turns=[
         ],
         given_user_input="""My aunt eats the cake that I baked that was decided by my boss""",
-        expected_resolved_pronouns=["My aunt is eating the cake.", "I baked the cake.", "My boss decided on the cake."],
+        # The user's own wording and tense are kept
+        expected_resolved_pronouns=["My aunt eats the cake.", "I baked the cake.", "The cake was decided by my boss."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -94,7 +97,8 @@ test_cases_sentence_decomposition = [
         given_turns=[
         ],
         given_user_input="""My aunt eats the cake that I baked after I did not clean the place""",
-        expected_resolved_pronouns=["My aunt is eating the cake I baked.", "I baked the cake.", "I did not clean the place after baking the cake."],
+        # The user's own wording and tense are kept, the time clause stays with the action it belongs to
+        expected_resolved_pronouns=["My aunt eats the cake.", "I baked the cake after I did not clean the place."],
     ),
 
     _TestCaseSentenceDecomposition(
@@ -111,19 +115,19 @@ test_cases_sentence_decomposition = [
     My brother sells the bread and we meet later the same day and split the money.
     I use part of the money to buy the stuff we need to make the bread. 
     It is important to keep track of what I have spent, so that I can get my money back.""",
-        expected_resolved_pronouns=['After the bread is ready, I clean my work area.',
-                                    'I clean the bakery.',
-                                    'I heat the ovens.',
+        # The user's own wording is kept, purpose, reason and time clauses stay with the action they belong to
+        expected_resolved_pronouns=['I can go home after the bread is ready.',
+                                    'I clean the place.',
+                                    'I clean up my area after the bread is ready.',
+                                    'I have to be at the bakery early because the bread must be ready when the customers come.',
+                                    'I heat up the ovens.',
                                     'I make the bread.',
-                                    'I must be at the bakery early because the bread needs to be ready when customers arrive.',
-                                    'I use part of the money to buy the ingredients we need to make the bread.',
-                                    'I wake up very early to be at the bakery on time.',
-                                    "It's important to track my expenses.",
-                                    'My brother and I meet later that day.',
-                                    'My brother sells the bread.',
-                                    'Then, I can go home.',
-                                    'This way, I can get my money back.',
-                                    'We split the money.'],
+                                    'I use part of the money to buy the stuff my brother and I need to make the bread.',
+                                    'I wake up very early in the morning to be at the bakery on time.',
+                                    'Keeping track of the money I have spent is important so that I can get my money back.',
+                                    'My brother and I meet later the same day.',
+                                    'My brother and I split the money.',
+                                    'My brother sells the bread.'],
     ),
 ]
 

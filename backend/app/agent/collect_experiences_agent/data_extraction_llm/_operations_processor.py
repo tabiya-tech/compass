@@ -194,7 +194,14 @@ class OperationsProcessor:
 
     def _find_same_experience_for_add(self, add_payload: Operation, work_type_str: str | None,
                                       collected: list[CollectedData]) -> int:
-        """Return index of an existing experience that is the same (same work_type, similar title), or -1."""
+        """Return index of an existing experience that is the same (same work_type, exact title), or -1.
+
+        Only merges when both work_type AND title match exactly (case-insensitive).
+        Substring matching is intentionally avoided to prevent merging distinct experiences
+        that share a common title prefix (e.g. two different 'Retail Sales Assistant' roles).
+        Experiences with the same title whose company, location or dates conflict are distinct
+        (e.g. a 'Research Assistant' job at two different labs), so they are not merged either.
+        """
         new_title = (add_payload.experience_title or "").strip().lower()
         if not new_title:
             return -1
@@ -204,9 +211,19 @@ class OperationsProcessor:
             existing_title = (existing.experience_title or "").strip().lower()
             if not existing_title:
                 continue
-            if new_title == existing_title or new_title in existing_title or existing_title in new_title:
+            if new_title == existing_title and not self._has_conflicting_details(add_payload, existing):
                 return i
         return -1
+
+    @staticmethod
+    def _has_conflicting_details(add_payload: Operation, existing: CollectedData) -> bool:
+        """True if the ADD and the existing experience have different non-empty company, location or dates."""
+        for field in ("company", "location", "start_date", "end_date"):
+            new_value = (getattr(add_payload, field) or "").strip().lower()
+            existing_value = (getattr(existing, field) or "").strip().lower()
+            if new_value and existing_value and new_value != existing_value:
+                return True
+        return False
 
     @staticmethod
     def _merge_add_into_existing(add_payload: Operation, work_type_str: str | None,

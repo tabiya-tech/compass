@@ -4,6 +4,7 @@ from typing import Any
 from app.agent.experience.experience_entity import ExperienceEntity
 from app.agent.experience.work_type import WorkType
 from app.countries import Country
+from app.i18n.types import Locale
 from evaluation_tests.conversation_libs.conversation_test_function import EvaluationTestCase, Evaluation
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationType
 from app.agent.experience.timeline import Timeline
@@ -161,6 +162,7 @@ test_cases = [
     SkillsExplorerAgentTestCase(
         conversation_rounds=10,
         name='argentina_asistente_ventas',
+        locale=Locale.ES_AR,
         simulated_user_prompt=dedent("""
             Actúa como una persona joven de Argentina.
             Trabajaste como asistente de ventas en el local de tu viejo.
@@ -190,6 +192,7 @@ test_cases = [
     SkillsExplorerAgentTestCase(
         conversation_rounds=10,
         name='argentina_casa_madre',
+        locale=Locale.ES_AR,
         simulated_user_prompt=dedent("""
             Actúa como una persona joven de Argentina.
             Trabajaste en la casa de tu madre (voluntario).

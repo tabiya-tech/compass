@@ -27,12 +27,12 @@ class EvaluationEntry(BaseModel):
     A single entry in the evaluation dictionary.
     """
 
-    reasoning: Optional[str] = Field(default=None, description="A detailed, step-by-step explanation of how the entity was scored.")
+    reasoning: Optional[str] = Field(description="A detailed, step-by-step explanation of how the entity was scored.")
     """
     Let the model articulate how it evaluates the relevance to help it 'rationalize' the selection process.
     """
 
-    score: Optional[int] = Field(default=None, description="The score of the entity from 0 to 10, where 0 is not relevant and 10 is very relevant.")
+    score: Optional[int] = Field(description="The score of the entity from 0 to 10, where 0 is not relevant and 10 is very relevant.")
     """
     The score of the entity from 0 to 10, where 0 is not relevant and 10 is very relevant.
     """
@@ -40,7 +40,6 @@ class EvaluationEntry(BaseModel):
 
 class _RelevantEntityClassifierLLMOutput(BaseModel):
     evaluation: Optional[dict[str, EvaluationEntry]] = Field(
-        default=None,
         description="The evaluation of each given entity, where the key is the evaluated entity's title and the value is its evaluation.")
     """
     The evaluation of each entity, as a key-value pair of JSON strings, 

@@ -631,6 +631,130 @@ class TestExperienceDataProcessor:
                                             mock_logger.warning.call_args[0][1])
 
 
+    def test_add_two_experiences_with_similar_titles_are_not_merged(self, processor, mock_logger):
+        """Should NOT merge two distinct experiences that share a title substring."""
+        # GIVEN empty collected data
+        given_collected_data = []
+
+        # AND two ADD operations with similar (but distinct) titles - reproduces the bug
+        given_experiences_data = [
+            create_experience_data(
+                data_operation="ADD",
+                index=0,
+                experience_title="Retail Sales Assistant",
+                company="Shoprite",
+                start_date="2020",
+                end_date="2022",
+                paid_work=True,
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            ),
+            create_experience_data(
+                data_operation="ADD",
+                index=1,
+                experience_title="Retail Sales Assistant and School Admin",
+                company="Springfield Primary School",
+                paid_work=True,
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            )
+        ]
+
+        # AND current turn index
+        given_current_turn_index = 2
+
+        # WHEN processing the experience operations
+        actual_last_processed_index, actual_collected_data = processor.process(
+            given_experiences_data, given_collected_data, given_current_turn_index
+        )
+
+        # THEN both experiences should be kept as separate entries (not merged)
+        assert len(actual_collected_data) == 2
+        assert actual_collected_data[0].experience_title == "Retail Sales Assistant"
+        assert actual_collected_data[0].company == "Shoprite"
+        assert actual_collected_data[1].experience_title == "Retail Sales Assistant and School Admin"
+        assert actual_collected_data[1].company == "Springfield Primary School"
+
+    def test_add_duplicate_experience_is_merged(self, processor, mock_logger):
+        """Should merge an ADD that exactly matches an existing experience title and work_type."""
+        # GIVEN an existing experience
+        given_collected_data = [
+            _create_collected_data(
+                index=0,
+                experience_title="Retail Sales Assistant",
+                company=None,
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            )
+        ]
+
+        # AND a new ADD with the exact same title/work_type (re-mention of same job)
+        given_experiences_data = [
+            create_experience_data(
+                data_operation="ADD",
+                index=1,
+                experience_title="Retail Sales Assistant",
+                company="Shoprite",
+                start_date="2020",
+                end_date="2022",
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            )
+        ]
+
+        # AND current turn index
+        given_current_turn_index = 3
+
+        # WHEN processing the experience operations
+        actual_last_processed_index, actual_collected_data = processor.process(
+            given_experiences_data, given_collected_data, given_current_turn_index
+        )
+
+        # THEN the experiences should be merged (not duplicated)
+        assert len(actual_collected_data) == 1
+        assert actual_collected_data[0].experience_title == "Retail Sales Assistant"
+        assert actual_collected_data[0].company == "Shoprite"
+        assert actual_collected_data[0].start_date == "2020"
+
+
+    def test_add_same_title_with_conflicting_details_is_not_merged(self, processor, mock_logger):
+        """Should NOT merge two ADDs with the same title and work_type whose company and dates differ."""
+        # GIVEN empty collected data
+        given_collected_data = []
+
+        # AND two ADD operations with the same title and work_type, but at different companies and dates
+        given_experiences_data = [
+            create_experience_data(
+                data_operation="ADD",
+                index=0,
+                experience_title="Research Assistant",
+                company="Cool Lab",
+                start_date="06/2020",
+                end_date="Present",
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            ),
+            create_experience_data(
+                data_operation="ADD",
+                index=1,
+                experience_title="Research Assistant",
+                company="Fancy Science Lab",
+                start_date="01/2018",
+                end_date="05/2020",
+                work_type=WorkType.FORMAL_SECTOR_WAGED_EMPLOYMENT.name
+            )
+        ]
+
+        # AND current turn index
+        given_current_turn_index = 1
+
+        # WHEN processing the experience operations
+        actual_last_processed_index, actual_collected_data = processor.process(
+            given_experiences_data, given_collected_data, given_current_turn_index
+        )
+
+        # THEN both experiences should be kept as separate entries
+        assert len(actual_collected_data) == 2
+        # AND each should keep its own company
+        assert actual_collected_data[0].company == "Cool Lab"
+        assert actual_collected_data[1].company == "Fancy Science Lab"
+
+
 class TestDataOperation:
     """Test suite for _DataOperation class."""
 
