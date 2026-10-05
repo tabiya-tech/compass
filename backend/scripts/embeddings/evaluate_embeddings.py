@@ -7,7 +7,6 @@ import os
 import sys
 from typing import List, Optional, Tuple, Any
 
-import vertexai
 from datasets import load_dataset, Features, Value, VerificationMode
 from dotenv import load_dotenv
 from tqdm import tqdm
@@ -169,7 +168,6 @@ async def main(*, do_skills: bool = False, do_occupations: bool = False):
     region = os.getenv("VERTEX_API_REGION")
     if not region:
         raise ValueError("VERTEX_API_REGION environment variable is not set.")
-    vertexai.init(location=region)
 
     search_services = await get_search_services()
 
