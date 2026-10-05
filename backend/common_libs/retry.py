@@ -3,6 +3,7 @@ import logging
 import random
 from typing import TypeVar, Generic, Callable, Awaitable, Tuple, Optional
 
+import httpx
 from google.api_core.exceptions import ServerError, TooManyRequests, ResourceExhausted
 from pydantic import BaseModel
 
@@ -45,6 +46,29 @@ class RetryConfigWithExponentialBackOff(BaseModel):
 DEFAULT_RETRY_CONFIG_WITH_EXP_BACKOFF = RetryConfigWithExponentialBackOff()
 
 
+_RETRYABLE_STATUS_CODES = frozenset({408, 429, 500, 502, 503, 504})
+"""The HTTP status codes of transient errors: timeouts, rate limits and server errors."""
+
+_RETRYABLE_ERROR_NAMES = frozenset({"APIConnectionError", "APITimeoutError"})
+"""The names of the google-genai Interactions API errors for connection failures and timeouts."""
+
+
+def is_retryable_error(e: BaseException) -> bool:
+    """
+    Whether the error is transient, so the operation is worth retrying:
+      - the google.api_core rate limit and server errors.
+      - the google-genai errors with a timeout, rate limit or server error status code
+        (`code` for the models API, `status_code` for the Interactions API).
+      - connection failures and timeouts.
+    """
+    if isinstance(e, (TooManyRequests, ResourceExhausted, ServerError, httpx.TransportError)):
+        return True
+    if type(e).__name__ in _RETRYABLE_ERROR_NAMES:
+        return True
+    status_code = getattr(e, "status_code", None) or getattr(e, "code", None)
+    return isinstance(status_code, int) and status_code in _RETRYABLE_STATUS_CODES
+
+
 class RetryLimitExceededError(Exception):
     """
     Exception for when the maximum number of retry attempts is exceeded.
@@ -77,16 +101,16 @@ class Retry(Generic[T]):
                 result: T = await callback()
                 logger.debug("Attempt %d to call %s succeeded", attempt + 1, callback.__name__)
                 return result
-            except (TooManyRequests, ResourceExhausted, ServerError) as e:
+            except Exception as e:  # pylint: disable=broad-except
+                if not is_retryable_error(e):
+                    # rethrow the errors that are not transient
+                    logger.error("An error occurred", exc_info=True)
+                    raise e
                 logger.warning("Attempt %d to call %s failed, error: %s, retrying in %.2f seconds", attempt + 1,
                                callback.__name__, e, wait_time)
                 await asyncio.sleep(wait_time)
                 wait_time = Retry._get_random_wait_time(wait_time, retry_config.base_backoff_factor,
                                                         retry_config.jitter)
-            # rethrow other exceptions
-            except Exception as e:
-                logger.error("An error occurred", exc_info=True)
-                raise e
         raise RetryLimitExceededError(retries=retry_config.max_retries)
 
     @staticmethod

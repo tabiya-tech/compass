@@ -2,8 +2,7 @@ import logging
 import time
 from typing import Generic, TypeVar, Type, Tuple
 
-from google.cloud.aiplatform_v1 import GenerationConfig
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from app.agent.agent_types import LLMStats
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -15,7 +14,6 @@ from common_libs.text_formatters.extract_json import extract_json, ExtractJSONEr
 _MAX_ATTEMPTS = 3
 
 # Maximum values for generation parameters
-_MAX_FREQUENCY_PENALTY = 1.0
 _MAX_TEMPERATURE = 1.0
 
 # Increment step for adjusting generation parameters
@@ -28,8 +26,8 @@ RESPONSE_T = TypeVar('RESPONSE_T', bound=BaseModel)
 class LLMCaller(Generic[RESPONSE_T]):
     """
     A class that calls the LLM to generate a response to an input.
-    It can retry multiple times if the LLM fails to respond with a JSON object that
-    complies with the model_response_type.
+    The model_response_type is passed to the LLM as the schema of the response (structured output),
+    so the LLM responds with a JSON object that complies with it. It retries multiple times if the LLM fails to.
     Additionally, it logs errors it captures the statistics of the LLM calls.
     """
 
@@ -103,10 +101,10 @@ class LLMCaller(Generic[RESPONSE_T]):
         attempt_count = 0
         model_response: RESPONSE_T | None = None
 
-        # This is a hack as we do not have access to the model config any more.
-        generation_config: GenerationConfig = llm._model._generation_config._raw_generation_config
-        original_frequency_penalty = generation_config.frequency_penalty
-        original_temperature = generation_config.temperature  # usually for json we use 0.0
+        # Raise the temperature to escape repetition traps, for the LLMs whose generation config is read at call time.
+        # The other LLMs skip this — retries still fire but sampling params won't change.
+        generation_config: dict | None = getattr(llm, "generation_config", None)
+        original_temperature = generation_config.get("temperature") if generation_config is not None else None
 
         while not success and attempt_count < _MAX_ATTEMPTS:
             attempt_count += 1
@@ -118,7 +116,8 @@ class LLMCaller(Generic[RESPONSE_T]):
             try:
                 # Call the LLM to generate content.
                 llm_response = await llm.generate_content(
-                    llm_input=llm_input
+                    llm_input=llm_input,
+                    response_schema=self._model_response_type,
                 )
             except Exception as e:
                 # If for some reason, the LLM fails to call, we log the error and continue to the next attempt.
@@ -141,56 +140,57 @@ class LLMCaller(Generic[RESPONSE_T]):
                                  response_time_in_sec=round(llm_end_time - llm_start_time, 2))
             response_text = llm_response.text
             try:
-                model_response = extract_json(response_text, self._model_response_type)
+                model_response = self._parse_response(response_text)
                 success = True
             except ExtractJSONError as e:
                 log_message = f"Attempt {attempt_count} failed to extract JSON caused by: {e}"
                 llm_stats.error = log_message
                 logger.warning("Raw LLM response text (first 500 chars): %s", response_text[:500] if response_text else "None")
                 logger.warning("Raw LLM response text length: %d characters", len(response_text) if response_text else 0)
-                logger.warning("Response token count: %d, Max output tokens: %d", llm_stats.response_token_count, generation_config.max_output_tokens)
+                max_output_tokens = generation_config.get("max_output_tokens") if generation_config is not None else None
+                if max_output_tokens is not None:
+                    logger.warning("Response token count: %d, Max output tokens: %d", llm_stats.response_token_count, max_output_tokens)
                 if attempt_count == _MAX_ATTEMPTS:
                     # The agent failed to respond with a JSON object after the last attempt,
                     logger.error(log_message)
                     # And set the response to the model output and hope that the caller can handle it
                 else:
                     logger.warning(log_message)
-                    if llm_stats.response_token_count == generation_config.max_output_tokens:
+                    if max_output_tokens is not None and llm_stats.response_token_count >= max_output_tokens:
                         # Most-likely we run into a "repetition trap". This happens often with prompts that have Chain Of Thought reasoning tasks.
-                        # We will increase the frequency_penalty and the temperature and return the model to avoid repetition.
-                        # However, higher frequency_penalty might cause the model to penalize punctuation and JSON format characters,
-                        # and in combination with the higher the temperature will most likely result in an invalid JSON.
-                        # Therefore, there is no guarantee that the result is a valid JSON.
-                        # However, we must perform this process to get unstuck from the repetition trap as experiments have
-                        # shown that just rerunning the model will not solve the problem on its own, but changing the parameters will.
-                        generation_config.frequency_penalty += _PENALTY_INCREMENT
-                        if generation_config.frequency_penalty > _MAX_FREQUENCY_PENALTY:
-                            generation_config.frequency_penalty = _MAX_FREQUENCY_PENALTY
-
-                        generation_config.temperature += _PENALTY_INCREMENT
-                        if generation_config.temperature > _MAX_TEMPERATURE:
-                            generation_config.temperature = _MAX_TEMPERATURE
+                        # Experiments have shown that just rerunning the model will not solve the problem on its own,
+                        # but changing the parameters will, so we increase the temperature for the next attempt.
+                        temperature = min((generation_config.get("temperature") or 0.0) + _PENALTY_INCREMENT, _MAX_TEMPERATURE)
+                        generation_config["temperature"] = temperature
 
                         logger.warning("The model reached the maximum number of tokens %s.\n"
-                                       "To escape the repetition trap, we increased the frequency_penalty to %s\n"
                                        "To escape the repetition trap, we increased the temperature to %s",
-                                       generation_config.max_output_tokens,
-                                       generation_config.frequency_penalty,
-                                       generation_config.temperature)
+                                       max_output_tokens, temperature)
                         record_score(
                             name="llm_repetition_trap",
                             value=1,
-                            comment=f"attempt {attempt_count}: frequency_penalty raised to {generation_config.frequency_penalty}, "
-                                    f"temperature raised to {generation_config.temperature}",
+                            comment=f"attempt {attempt_count}: temperature raised to {temperature}",
                         )
             finally:
                 llm_stats_list.append(llm_stats)
 
-        # Reset the frequency_penalty to the original value
-        generation_config.frequency_penalty = original_frequency_penalty
-        # Reset the temperature to the original value
-        generation_config.temperature = original_temperature
+        if generation_config is not None:
+            if original_temperature is None:
+                generation_config.pop("temperature", None)
+            else:
+                generation_config["temperature"] = original_temperature
 
         logger.debug("Model input: %s", llm_input)
         logger.debug("Model output: %s", model_response)
         return model_response, llm_stats_list
+
+    def _parse_response(self, response_text: str) -> RESPONSE_T:
+        """
+        Parse the JSON response of the LLM into the model_response_type.
+        The structured output makes the response a JSON object that follows the schema, so it is validated directly.
+        Falls back to extracting the JSON object from the text, for LLMs that wrap it (e.g. in a markdown code block).
+        """
+        try:
+            return self._model_response_type.model_validate_json(response_text)
+        except ValidationError:
+            return extract_json(response_text, self._model_response_type)
