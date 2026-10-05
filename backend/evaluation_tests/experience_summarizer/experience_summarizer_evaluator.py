@@ -3,6 +3,8 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
+from pydantic import Field
+
 from app.agent.config import AgentsConfig
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
@@ -23,7 +25,15 @@ class ExperienceSummarizerEvaluationOutput(EvaluationResult):
     evaluator_name: str = "Experience Summarizer Evaluator"
     """The name of the evaluator"""
 
-    meets_requirements: bool
+    reasoning: str = Field(description="A free-text explanation of your judgment on how well the summary aligns with the task "
+                                       "instructions, including any strengths or areas for improvement.")
+    """The reasoning behind the evaluation"""
+
+    score: int = Field(description="A numerical rating from 0 to 100 based on the overall quality and alignment of the summary, where: "
+                                   "<=50: Poor, >50: Fair, >60: Good, >80: Very Good, >90: Excellent.")
+    """The score of the summary"""
+
+    meets_requirements: bool = Field(description="Whether the summary meets the core task requirements.")
     """Whether the summary meets the core task requirements"""
 
     class Config:
@@ -84,19 +94,6 @@ class ExperienceSummarizerEvaluator:
                         'Questions & Answers': A list of questions the user was asked about their experience and the user's answers to those questions.
                         'LLM Output Summary': The text summary produced by the LLM being evaluated.
                         'LLM Output Summary Length': The number of words in the LLM output summary.
-        
-                # JSON Output instructions
-                    You will respond with a JSON object that contains the following fields:
-                        - ExperienceSummarizerEvaluationOutput: A free-text explanation of your judgment on how well the summary aligns with the task instructions, including any strengths or areas for improvement.
-                        - score: A numerical rating from 0 to 100 based on the overall quality and alignment of the summary, where:
-                                <=50 : Poor
-                                 >50 : Fair
-                                 >60 : Good
-                                 >80 : Very Good
-                                 >90 : Excellent
-                        - meets_requirements: A boolean field indicating whether the summary meets the core task requirements.
-        
-                Your response must always be a JSON object with the schema above.
             </System Instructions>
             """)
         return replace_placeholders_with_indent(

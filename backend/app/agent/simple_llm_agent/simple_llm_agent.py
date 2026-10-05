@@ -4,7 +4,7 @@ from app.agent.agent import Agent
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats, AgentOutputWithReasoning
 from app.agent.llm_caller import LLMCaller
 from app.agent.simple_llm_agent.llm_response import ModelResponse
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_manager import ConversationContext
 from common_libs.llm.generative_models import GeminiGenerativeLLM
@@ -46,7 +46,7 @@ class SimpleLLMAgent(Agent):
             model_response, llm_stats_list = await self._llm_caller.call_llm(
                 llm=self._llm,
                 llm_input=ConversationHistoryFormatter.format_for_agent_generative_prompt(
-                    model_response_instructions=get_json_response_instructions(),
+                    model_response_instructions=get_response_instructions(),
                     context=context, user_input=msg),
                 logger=self.logger
             )

@@ -2,7 +2,7 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
@@ -24,18 +24,37 @@ _TAGS_TO_FILTER = [
 ]
 
 
+_REFERENCES_DESCRIPTION = ("A short (up to 100 words) explanation in prose about the information you intend to collect for the {field} "
+                           "based on the '<User's Last Input>' and the '<Conversation History>', and where you found it, "
+                           "e.g. the user responded in the '<...' to the model's question in '<...'. "
+                           "The reason why you shared the value or an empty value.")
+
+
+class DataExtractionReferences(BaseModel):
+    """
+    The LLM's explanations of where it found the value of each field.
+    The keys are typed (rather than a free-form dict) because an untyped object in the response schema makes
+    the Gemini 3.x models intermittently return null for every extracted field.
+    """
+    experience_title_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="experience_title"))
+    company_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="company"))
+    location_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="location"))
+
+
 class ExtractedData(BaseModel):
     """
     Extract data per an experience from the EntityExtractionTool.
     """
 
     # References and Reasoning.
-    data_extraction_references: Optional[dict] = None
+    data_extraction_references: Optional[DataExtractionReferences] = Field(
+        default=None,
+        description="Where you found the information for the experience details, see the '#Extract data instructions'.")
 
     # Experience Details
-    experience_title: Optional[str] = None
-    company: Optional[str] = None
-    location: Optional[str] = None
+    experience_title: Optional[str] = Field(default=None, description="A title for the experience, see the \"##'experience_title' instructions\".")
+    company: Optional[str] = Field(default=None, description="The name of the company or its type, see the \"##'company' instructions\".")
+    location: Optional[str] = Field(default=None, description="The location in which the job was performed, see the \"##'location' instructions\".")
 
 
 # Empty/Default extracted data.
@@ -47,8 +66,16 @@ class _LLMOutput(BaseModel):
     LLM Model Output.
     """
 
-    associations: Optional[str]
-    experience_details: ExtractedData
+    associations: Optional[str] = Field(
+        description="A linear chain of associations in the form of ...-> ...->... that starts from the User's Last Input "
+                    "and follows the relevant entries it refers to in the Conversation History, until it terminates at the "
+                    "Previously Extracted Experience Data, if relevant. Skip unrelated or tangential turns to preserve a coherent "
+                    "causal chain: filter for semantic lineage rather than strictly temporal proximity. "
+                    "Once you reach the Previously Extracted Experience Data, do not follow the associations anymore. "
+                    "e.g. \"user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)\". "
+                    "Each step is a summarized version of the actual user or model turn, and the chain has at most 10 steps to avoid circular references.")
+    experience_details: ExtractedData = Field(
+        description="The experience details you extracted from the user's statement and the conversation history.")
 
 
 class EntityExtractionTool:
@@ -195,33 +222,6 @@ _SYSTEM_INSTRUCTIONS = """
         Use `null`: If the user has not mentioned their location and has not yet been asked to provide it.
         Use "": If the user explicitly declines to provide their location when explicitly asked, or requests that previously stored location data be deleted.
 
-#JSON Output instructions
-    - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
-        and follow the relevant entries they refer to in the Conversation History until they terminate to the Previously Extracted Experience Data, if relevant. 
-        ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
-        ///You are filtering for semantic lineage rather than strictly temporal proximity.
-        Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
-        Each step in the sequence should be a summarized version of the actual user or model turn.
-        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
-    - experience_details: an Object of experience details you extracted from the user's statement and conversation history.
-        {{
-            - data_extraction_references: a dictionary with short (up to 100 words) explanations in prose (not json) about 
-                what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.
-                Constrain the explanation to the data relevant for the fields 'experience_title', 'company' and 'location' 
-                Explain where you found the information e.g in '<User's Last Input>'.
-                More of like the reason why you shared the respective values or empty values.
-                Formatted as a json string.
-                Example: ... the user responded in the '<...' to the model's question in '<...' ...
-                {{
-                    - experience_title_references: 
-                    - company_references:
-                    - location_references:
-                }}
-            - experience_title: A title for the experience. Formatted as a json string. Refer to the "##'experience_title' instructions" section.
-            - company: The name of the company or type. Formatted as a json string. Refer to the "##'company' instructions" section.
-            - location: The location in which the job was performed. Formatted as a json string. Refer to the "##'location' instructions" section.
-        }}                            
 </System Instructions>
 """
 

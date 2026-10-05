@@ -3,7 +3,7 @@ import logging
 from textwrap import dedent
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.config import AgentsConfig
 from app.agent.experience import ExperienceEntity
@@ -30,15 +30,6 @@ def _get_system_instructions() -> str:
         Every expected experience must be matched to the most relevant actual experience only once.
         If there are multiple actual experiences that match the same expected experience, choose the one that is the best fit.
         If an expected experience does not match any actual experience, return it as unmatched and fail the match and return match_success as false.
-        
-    # Response Format
-        Your response must always be a JSON object with the following schema:
-        {
-            "explanation": "<string>",  # Explanation of the match result
-            "matches": [[expected, actual]]  # List of matches between expected and actual experiences tuples
-            "score": <integer>  # Score of the match result as a percentage (0-100)
-            "match_success": <boolean>,  # Whether the actual and expected results match            
-        }
     """)
 
 
@@ -69,21 +60,22 @@ def _get_actual_json(actual: ExperienceEntity) -> str:
 
 
 class MatchResult(BaseModel):
-    explanation: str
+    explanation: str = Field(description="Explanation of the match result.")
     """
     Explanation of the match result.
     """
-    matches: list[list[Any]]
+    matches: list[list[Any]] = Field(description="The matches between the expected and the actual experiences, "
+                                                 "as a list of [expected, actual] pairs.")
     """
     List of matches between expected and actual experiences.
     """
 
-    match_success: bool
+    match_success: bool = Field(description="Whether the actual and expected results match.")
     """
     Whether the actual and expected results match.
     """
 
-    score: int
+    score: int = Field(description="Score of the match result as a percentage (0-100).")
     """
     Score of the match result.
     """

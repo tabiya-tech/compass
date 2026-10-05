@@ -22,7 +22,10 @@ _TAGS_TO_FILTER = [
 
 
 class CVExtractionResponse(BaseModel):
-    experiences: list[str] = Field(default_factory=list)
+    experiences: list[str] = Field(
+        default_factory=list,
+        description="The job/livelihood experiences found in the CV, each one a single sentence describing a work/livelihood experience, "
+                    "see the 'Rules for experiences'.")
 
 
 class CVExperienceExtractor:
@@ -47,17 +50,12 @@ class CVExperienceExtractor:
         ).format(markdown=clean_md)
 
     @staticmethod
-    def _json_system_instructions() -> str:
+    def _system_instructions() -> str:
         return dedent(
             """
             <System Instructions>
             You are an expert CV parser.
-            Task: From the provided <CV Markdown> content, output ONLY job/livelihood experiences as a JSON object with the schema below.
-
-            JSON Output Schema (must strictly follow):
-            {
-              "experiences": ["string", ...]
-            }
+            Task: From the provided <CV Markdown> content, extract ONLY job/livelihood experiences.
 
             Rules for experiences:
             - Each item must be a single sentence describing a work/livelihood experience.
@@ -72,12 +70,13 @@ class CVExperienceExtractor:
               and city/country locations are allowed.
             - Some CVs might have responsibilities linked to an experience, do not include the responsibilities in experiences ('experiences' field).
             - Do not include only experience title without other details (at least one more detail).
-            
+            - Keep role titles, company/organization names and locations exactly as written in the CV, in their original
+              language and script. Do not translate or transliterate them (e.g. keep "腾讯", do not write "Tencent").
+
             Examples (format to emulate; style guidance, not strict):
             Worked as a project manager at the University of Oxford, from 2018 to 2020. It was a paid job and you worked remotely.
             Co-founded Acme Inc. in 2022, a gen-ai startup based in DC, USA. You owned this business and your role was CEO.
             Volunteered as an instructor at Community Center in Berlin, from 2015 to 2017.
-            - No prose outside the JSON. Respond with JSON only.
             </System Instructions>
             """
         )
@@ -107,7 +106,7 @@ class CVExperienceExtractor:
                                                    start_top_p=0.9, end_top_p=1.0,
                                                    attempt=attempt, max_retries=max_retries)
             llm = GeminiGenerativeLLM(
-                system_instructions=self._json_system_instructions(),
+                system_instructions=self._system_instructions(),
                 config=LLMConfig(
                     generation_config=temperature_cfg | JSON_GENERATION_CONFIG | {
                         "max_output_tokens": 2048
