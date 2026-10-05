@@ -3,7 +3,7 @@ import logging
 from textwrap import dedent
 from typing import Optional, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.linking_and_ranking_pipeline.deduplicate_entities import deduplicate_entities
@@ -23,19 +23,21 @@ class EvaluationEntry(BaseModel):
     A single entry in the evaluation dictionary.
     """
 
-    reasoning: Optional[str] = None
+    reasoning: Optional[str] = Field(default=None, description="A detailed, step-by-step explanation of how the skill was scored.")
     """
     Let the model articulate how it evaluates the relevance to help it 'rationalize' the selection process.
     """
 
-    score: Optional[int] = None
+    score: Optional[int] = Field(default=None, description="The score of the skill from 0 to 10, where 0 is not relevant and 10 is very relevant.")
     """
     The score of the skill from 0 to 10, where 0 is not relevant and 10 is very relevant.
     """
 
 
 class _PickTopSkillsLLMOutput(BaseModel):
-    evaluation: Optional[dict[str, EvaluationEntry]] = None
+    evaluation: Optional[dict[str, EvaluationEntry]] = Field(
+        default=None,
+        description="The evaluation of each given skill, where the key is the evaluated skill's title and the value is its evaluation.")
     """
     The evaluation of each entity, as a key-value pair of JSON strings, 
     where the key is the entity's preferred label.
@@ -302,17 +304,9 @@ class PickTopSkillsTool:
                 'Given Responsibilities Group Name': The name of the group of responsibilities
                 'Given Responsibilities': The responsibilities/activities/skills/behaviours
                 'Given Skills': The list of skills with their titles and descriptions
-            # JSON Output Instructions
-                Your response must always be a JSON object with the following schema:
-                {
-                    "evaluation": The evaluation result is a JSON object dictionary where the key is the evaluated skill's title and should follow the following schema:
-                        {
-                            "skill title": { 
-                                "reasoning": Detailed, step-by-step explanation of how the skill was scored as a JSON string.,
-                                "score": The score of the skill as an integer
-                                }
-                        }
-                }
+            # Output Instructions
+                In the 'evaluation', use the 'skill title' of each evaluated skill as the key,
+                and explain step-by-step how the skill was scored before giving its score.
             </System Instructions>
             """)
         return system_instructions

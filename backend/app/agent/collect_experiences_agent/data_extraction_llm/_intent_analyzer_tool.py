@@ -3,7 +3,7 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import AgentInput, LLMStats
 from app.agent.llm_caller import LLMCaller
@@ -32,24 +32,62 @@ _OPERATIONS_REQUIRING_INDEX = [DataOperation.UPDATE.value.lower(), DataOperation
 
 
 class Operation(BaseModel):
-    index: Optional[int] = None
+    index: Optional[int] = Field(
+        default=None,
+        description="The unique identifier of the experience. If the experience already exists in <Previously Extracted Experience Data>, "
+                    "the existing index, otherwise `null`.")
 
-    associations: Optional[str] = ""
+    associations: Optional[str] = Field(
+        default="",
+        description="A linear chain of associations in the form of ...-> ...->... that starts from the User's Last Input "
+                    "and follows the relevant entries it refers to in the Conversation History, until it terminates at the "
+                    "Previously Extracted Experience Data, if relevant. Skip unrelated or tangential turns to preserve a coherent "
+                    "causal chain: filter for semantic lineage rather than strictly temporal proximity. "
+                    "Once you reach the Previously Extracted Experience Data, do not follow the associations anymore. "
+                    "e.g. \"user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)\". "
+                    "Each step is a summarized version of the actual user or model turn, and the chain has at most 10 steps to avoid circular references.")
 
-    data_operation_reasoning: Optional[str] = ""
-    data_operation: str
+    data_operation_reasoning: Optional[str] = Field(
+        default="",
+        description="A detailed, step-by-step explanation in prose of what data operation should be performed. "
+                    "Consider the conversation context carefully: if the user is answering a question about existing work, "
+                    "this should be an UPDATE. If they are describing completely new work, this should be an ADD.")
+    data_operation: str = Field(
+        description="The operation that should be performed to the experience data, one of: 'ADD', 'UPDATE', 'DELETE', 'NOOP'. "
+                    "'NOOP' means that no operation should be performed.")
 
-    potential_new_experience_title: Optional[str] = ""
-    users_statement: str
+    potential_new_experience_title: Optional[str] = Field(
+        default="",
+        description="The potential experience title from the details described by the user in the '<User's Last Input>', "
+                    "like the title to be put on a CV when describing the experience. If the experience already exists in "
+                    "<Previously Extracted Experience Data> and the user is not updating it, the existing title. "
+                    "An empty string if you can't figure it out.")
+    users_statement: str = Field(
+        description="The user's statement about the experience in the '<User's Last Input>', see the '#Experience User statement handling'. "
+                    "Fill in the references in the statement where possible based on the user's last input and the conversation history, "
+                    "especially where the user used demonstrative pronouns.")
 
     def is_empty(self):
         return not self.users_statement or not self.data_operation
 
 
 class _LLMOutput(BaseModel):
-    ignored_experiences: Optional[str] = None
-    users_statements: Optional[str | list[str]] = None
-    collected_operations: list[Operation]
+    ignored_experiences: Optional[str] = Field(
+        default=None,
+        description="A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added "
+                    "to the 'collected_operations' and why (the ignored experiences), following the '#New Experience handling', "
+                    "'#Update Experience handling' and '#Delete Experience handling' instructions. "
+                    "e.g. Experience was not referred in the '<User's Last Input>'. An empty string \"\" if no experiences will be ignored.")
+    users_statements: Optional[str | list[str]] = Field(
+        default=None,
+        description="A detailed, decomposed list of sentences describing each distinct experience mentioned in the user's last statement: "
+                    "if the user mentioned m experiences, m user statements, each a unique entry describing one experience. "
+                    "e.g. 'I worked at A and B since C' is decomposed to ['I worked at A since C', 'I worked at B since C']. "
+                    "A statement can contain more than one sentence if the user was describing the same one experience, "
+                    "e.g. ['I worked at C. I started in 2020'].")
+    collected_operations: list[Operation] = Field(
+        description="The information about the experiences referenced by the user: each phrase or statement saying an activity (experience) "
+                    "in the '<User's Last Input>' is an item. An empty list if no experiences are referenced or they should be ignored.")
 
     class Config:
         """
@@ -267,45 +305,6 @@ _SYSTEM_INSTRUCTIONS = """
         for each experience pick a statement or phrase related to the experience and that should be the experience user statement.
     - If the user did not describe any experience, do not add any row in the 'collected_operations' field.
 
-#JSON Output instructions
-    - ignored_experiences: A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added to the 
-       'collected_operations' and why. These are experiences that will be ignored.
-       Follow the instructions in '#New Experience handling', '#Update Experience handling' and '#Delete Experience handling' to determine which experience you will be ignoring.
-       An empty string "" if no experiences will be ignored. 
-       e.g. Experience was not referred in the '<User's Last Input>'.
-       Formatted as a json string.      
-    - users_statements: A detailed, decomposed list of sentences describing each distinct experiences mentioned in the user’s last statement.
-        If the user mentioned multiple experiences (m), return m user statements — each as a unique entry describing one experience.
-        The output should be a JSON-formatted string. eg: 'I worked at A and B since C' should be decomposed to ['I worked at A since C', 'I worked at B since C']
-        A statement can contain more than one sentence if the user was describing the same one experience. eg: ['I worked at C. I started in 2020'] 
-        
-    - collected_operations: an array of dictionaries with the information about the experiences referenced by the user.
-        For each phrase or statement saying an activity (experience) in User's last input it is an item in the collected_operations;
-        Empty array `[]` if no experiences are referenced or they should be ignored. Otherwise, each dictionary in the array should contain the following fields:
-            {{
-                - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
-                    and follow the relevant entries they refer to in the Conversation History until they terminate to the Previously Extracted Experience Data, if relevant. 
-                    ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
-                    ///You are filtering for semantic lineage rather than strictly temporal proximity.
-                    Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-                    e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
-                    Each step in the sequence should be a summarized version of the actual user or model turn.
-                    You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
-                - potential_new_experience_title: The potential experience title from the details described by the user in the 'User's Last Input'
-                    This is like the title to be put on a CV when describing the experience title. 
-                    If the experience already exists in <Previously Extracted Experience Data>, and the user is not updating it, return the existing title.
-                    If you can't figure it out return an empty string.
-                - data_operation_reasoning: A detailed, step-by-step explanation in prose of what data operation should be performed.
-                    Consider the conversation context carefully - if the user is answering a question about existing work, 
-                    this should be an UPDATE. If they are describing completely new work, this should be an ADD. 
-                - data_operation: The operation that should be performed to the experience data, choose one of the following values:
-                    'ADD', 'UPDATE', 'DELETE', 'NOOP'. The value 'NOOP' means that no operation should be performed.
-                - index: The unique identifier of the experience. If the experience already exists in <Previously Extracted Experience Data>, return the existing index, otherwise `null` 
-                - users_statement: The user's statement about the experience in the '<User's Last Input>'.
-                    Refer to the #Experience User statement handling section for more details.
-                    Try to fill in the references in the statement where possible based on the user's last input and conversation history especially where the user used
-                    demonstrative pronouns.
-            }}                
 </System Instructions>
 <Previously Extracted Experience Data> 
     {previously_extracted_data} 

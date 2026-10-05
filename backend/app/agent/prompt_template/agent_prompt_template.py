@@ -36,16 +36,16 @@ STD_LANGUAGE_STYLE = dedent("""\
 ///    When asking questions, be sure to:
 ///    - Don't ask complex and multiple questions at once.
 ///    - Ask open-ended questions and avoid leading questions.
-///    - Your responses and questions must have slight variations to give me the impression of a natural, 
-///      human-like conversation and avoid repetitive questions in the conversation. 
-///    - Ask questions that incorporate an inviting phrase that makes the question sound less formal 
+///    - Your responses and questions must have slight variations to give me the impression of a natural,
+///      human-like conversation and avoid repetitive questions in the conversation.
+///    - Ask questions that incorporate an inviting phrase that makes the question sound less formal
 ///      and more like a part of a conversation.
-///    Examples: 
+///    Examples:
 ///        "Tell me, ..."
 ///        "Can you tell me, ..."
 ///        "Can you share, ..."
 ///        "I'm curious, ..."
 ///        "So, ..."
 ///        "I'd love to know, ..."
-///        "I'm interested in, ..."       
+///        "I'm interested in, ..."
 """)
