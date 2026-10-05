@@ -67,7 +67,7 @@ async def setup_collect_experiences_agent() -> tuple[
 
 
 @pytest.mark.asyncio
-@pytest.mark.evaluation_test("gemini-2.5-flash-lite/")
+@pytest.mark.evaluation_test("gemini-3.5-flash-lite/")
 @pytest.mark.repeat(3)
 async def test_kenyan_user_multiple_experiences_transition_issues(caplog: LogCaptureFixture,
                                                                   setup_collect_experiences_agent: Awaitable[tuple[
@@ -198,3 +198,47 @@ async def test_stuck_after_recap_confirmation(caplog: LogCaptureFixture,
 
     context = await conversation_manager.get_conversation_context()
     assert context.history.turns[-1].output.finished
+
+
+@pytest.mark.asyncio
+@pytest.mark.evaluation_test("gemini-3.5-flash-lite/")
+@pytest.mark.repeat(3)
+async def test_quick_reply_options_appear_at_yes_no_questions(caplog: LogCaptureFixture,
+                                                              setup_collect_experiences_agent: Awaitable[tuple[
+                                                                  ConversationMemoryManager, Callable[
+                                                                      [LogCaptureFixture, ScriptedUserEvaluationTestCase, Country],
+                                                                      Coroutine[None, None, None]
+                                                                  ]]],
+                                                              setup_multi_locale_app_config):
+    """
+    Verify the LLM includes quick_reply_options when asking yes/no questions.
+    The conversation LLM now uses structured JSON output and decides when to include quick-reply buttons.
+    At minimum, the first message (asking about paid work) should have quick_reply_options.
+    """
+
+    given_test_case = ScriptedUserEvaluationTestCase(
+        name='quick_reply_options_test',
+        simulated_user_prompt="Scripted user: Zambian user with one paid work experience",
+        scripted_user=[
+            "yes",
+            "I was a cook at Jack's Grill",
+            "last october until now",
+            "lusaka",
+            "no",
+        ],
+        evaluations=[]
+    )
+
+    conversation_manager, collect_experiences_exec = await setup_collect_experiences_agent
+    await collect_experiences_exec(caplog, given_test_case, Country.KENYA)
+
+    context = await conversation_manager.get_conversation_context()
+    # Verify at least one turn has quick_reply_options in metadata
+    turns_with_options = [
+        turn for turn in context.history.turns
+        if turn.output.metadata and turn.output.metadata.get("quick_reply_options")
+    ]
+    assert len(turns_with_options) > 0, (
+        "Expected at least one turn with quick_reply_options in metadata, but none were found. "
+        f"Turn metadata: {[t.output.metadata for t in context.history.turns]}"
+    )

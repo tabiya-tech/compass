@@ -158,7 +158,7 @@ The backend uses the following environment variables:
 - `METRICS_MONGODB_URI`: The URI of the MongoDB instance for the metrics database.
 - `METRICS_DATABASE_NAME`: The name of the mongo db database used by the application to store metrics data.
 - `VERTEX_API_EMBEDDINGS_REGION`: The region of the Vertex API to use for embedding models. Must be a regional location (e.g. `us-central1`) — embedding models such as `text-embedding-005` are not published in the global publisher catalog.
-- `VERTEX_API_GEN_AI_REGION`: (optional) The region of the Vertex API to use for generative-AI calls (Gemini etc.). Can be a regional location or `global`. If not set, defaults to `us-central1`.
+- `VERTEX_API_GEN_AI_REGION`: (optional) The region of the Vertex API to use for generative-AI calls (Gemini etc.). Can be a regional location or `global`. If not set, defaults to `global`. The Gemini 3.x models are only served from `global`.
 - `EMBEDDINGS_SERVICE_NAME`: The name of the embeddings service to use. Currently, the only supported service is `GOOGLE-VERTEX-AI`.
 - `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models for the list of supported models.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.

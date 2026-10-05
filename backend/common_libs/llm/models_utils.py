@@ -20,8 +20,9 @@ load_dotenv()
 
 DEFAULT_VERTEX_API_GEN_AI_REGION = os.getenv("VERTEX_API_GEN_AI_REGION")
 if not DEFAULT_VERTEX_API_GEN_AI_REGION:
-    logging.warning("VERTEX_API_GEN_AI_REGION is not set. Using 'us-central1' as the default region.")
-    DEFAULT_VERTEX_API_GEN_AI_REGION = "us-central1"
+    # The Gemini 3.x models are only served from the global location, regional locations return a 404 for them.
+    logging.warning("VERTEX_API_GEN_AI_REGION is not set. Using 'global' as the default region.")
+    DEFAULT_VERTEX_API_GEN_AI_REGION = "global"
 else:
     logging.info("Default Vertex AI gen-AI region is %s", DEFAULT_VERTEX_API_GEN_AI_REGION)
 
