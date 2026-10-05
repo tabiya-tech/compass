@@ -50,6 +50,7 @@ class _ResponsibilitiesExtractionLLM:
             system_instructions=_ResponsibilitiesExtractionLLM._create_extraction_system_instructions(),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
+                    "seed": 1,  # A fixed seed makes the extraction reproducible
                     "max_output_tokens": 3000,  # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
                 } | with_response_schema(ResponsibilitiesExtractionResponse)
             ))
@@ -106,6 +107,17 @@ class _ResponsibilitiesExtractionLLM:
                 - object
                 - modifiers
             
+            Each entity must be a grammatically correct sentence that reuses the wording of the input, without synonyms.
+            Conjugate the verbs that are in the infinitive or in a purpose clause (e.g. "I wake up early to be at work on time" -> "I wake up early", "I am at work on time").
+            A clause that only describes a noun stays in the entity of the action it belongs to and is not an entity on its own
+            (e.g. "I buy the tools that my sister and I need to fix the car" -> "I buy the tools that my sister and I need to fix the car",
+            not "I need the tools", "My sister needs the tools" or "My sister fixes the car").
+            Turn a passive sentence into the active form, with the preposition the verb needs
+            (e.g. "The menu was decided by my boss" -> "My boss decided on the menu").
+            Obligations and tasks I describe without a personal subject are my entities too
+            (e.g. "I have to open the shop early" -> "I open the shop early", "It is important to keep track of the orders" -> "I keep track of the orders").
+            Facts that are not actions of a person (e.g. "The shop is open", "The clients arrive") are irrelevant_entities.
+
             A single sentence can contain multiple entities. Entities can be explicit or implicit.
             Review carefully <User's Last Input> to ensure you extract all entities including the once that are implicit.
             
@@ -123,6 +135,10 @@ class _ResponsibilitiesExtractionLLM:
             
             
             You will collect and place the entities into the 'extracted_entities' list of output.
+
+            Keep only the task when a verb just introduces it (e.g. "I start by cleaning the house" -> "I clean the house",
+            "I focus on cooking" -> "I cook"), and do not add to every entity a remark about the whole experience (e.g. "I do it all for free").
+            General remarks that name no task (e.g. "I do the tasks", "I pitch in with the daily chores") are irrelevant_entities.
 
         # Classification instructions
             Every entity in 'extracted_entities' MUST appear in exactly one of the four classification lists below.

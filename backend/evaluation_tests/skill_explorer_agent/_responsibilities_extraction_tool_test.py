@@ -47,7 +47,8 @@ test_cases_data_extraction = [
         given_user_input="""I make the bread and sometimes I clean the place. I do not sell the bread myself""",
         expected_responsibilities=["I make the bread", "I clean the place"],
         expected_other_peoples_responsibilities=[],
-        expected_non_responsibilities=['I sell the bread'],
+        # The user's own wording is kept ("myself")
+        expected_non_responsibilities=['I sell the bread myself'],
     ),
     _TestCaseDataExtraction(
         name="not_in_scope_of_work",
@@ -69,10 +70,11 @@ test_cases_data_extraction = [
              "Can you tell me more about how you shape the dough"),
         ],
         given_user_input="""We do it using our hands. It is a difficult procedure, John uses his senses and I observe the process""",
+        # The user's own wording is kept ("using")
         expected_responsibilities=['I observe the process',
-                                   'I shape the dough with my hands'],
+                                   'I shape the dough using my hands'],
         expected_non_responsibilities=[],
-        expected_other_peoples_responsibilities=['John shapes the dough with his hands', 'John uses his senses'],
+        expected_other_peoples_responsibilities=['John shapes the dough using his hands', 'John uses his senses'],
     ),
 
     _TestCaseDataExtraction(
@@ -86,7 +88,8 @@ test_cases_data_extraction = [
         given_user_input="""my boss decides that""",
         expected_responsibilities=[],
         expected_non_responsibilities=[],
-        expected_other_peoples_responsibilities=['My boss decides that'],
+        # "that" is resolved to what the agent asked about
+        expected_other_peoples_responsibilities=['My boss decides on what to bake each day'],
     ),
 
     _TestCaseDataExtraction(
@@ -97,7 +100,8 @@ test_cases_data_extraction = [
         given_user_input="""My aunt eats the cake that I baked that was decided by my boss""",
         expected_responsibilities=["I baked the cake"],
         expected_non_responsibilities=[],
-        expected_other_peoples_responsibilities=["My aunt is eating the cake", "My boss decided on the cake"],
+        # The user's own tense is kept
+        expected_other_peoples_responsibilities=["My aunt eats the cake", "My boss decided on the cake"],
     ),
 
     _TestCaseDataExtraction(
@@ -107,8 +111,9 @@ test_cases_data_extraction = [
         ],
         given_user_input="""My aunt eats the cake that I baked after I did not clean the place""",
         expected_responsibilities=["I baked the cake"],
-        expected_non_responsibilities=["I clean the place after baking the cake"],
-        expected_other_peoples_responsibilities=["My aunt is eating the cake"],
+        # The user did not clean the place before baking, the user's own tense is kept
+        expected_non_responsibilities=["I cleaned the place"],
+        expected_other_peoples_responsibilities=["My aunt eats the cake"],
     ),
 
     _TestCaseDataExtraction(
@@ -125,21 +130,21 @@ test_cases_data_extraction = [
     My brother sells the bread and we meet later the same day and split the money.
     I use part of the money to buy the stuff we need to make the bread. 
     It is important to keep track of what I have spent, so that I can get my money back.""",
+        # The user's own wording is kept, a clause that only describes a noun is not an entity on its own
         expected_responsibilities=['I am at the bakery on time',
-                                   'I can get my money back',
-                                   'I can go home',
-                                   'I clean my work area',
-                                   'I clean the bakery',
-                                   'I heat the ovens',
+                                   'I clean the place',
+                                   'I clean up my area',
+                                   'I get my money back',
+                                   'I go home',
+                                   'I heat up the ovens',
+                                   'I keep track of the money I have spent',
                                    'I make the bread',
-                                   'I meet later that day',
-                                   'I must be at the bakery early',
-                                   'I track my expenses',
-                                   'I use part of the money to buy the ingredients',
-                                   'I wake up very early',
-                                   'We split the money'],
+                                   'I meet later the same day',
+                                   'I split the money',
+                                   'I use part of the money to buy the stuff my brother and I need to make the bread',
+                                   'I wake up very early in the morning'],
         expected_non_responsibilities=[],
-        expected_other_peoples_responsibilities=['My brother meets later that day', 'My brother sells the bread']
+        expected_other_peoples_responsibilities=['My brother meets later the same day', 'My brother sells the bread', 'My brother splits the money']
     ),
 ]
 

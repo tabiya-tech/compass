@@ -23,6 +23,8 @@ class Summarizer:
             "I" in the summary will refer to me "the user". Example: "I told you ..."
             "You" in the summary will refer to you "the model". Example: "You asked me ..."
             The summary should be concise and capture the essence of the conversation, not the details.
+            Always keep the key facts: the experiences, projects and organizations I mentioned, and every skill
+            that either of us named (including the skills you pointed out), as they are needed later in the conversation.
             You will respond with the new updated summary text
             Do not include the '_SUMMARY_' tag in the response.
             Your response will be in a raw formatted non markdown text 

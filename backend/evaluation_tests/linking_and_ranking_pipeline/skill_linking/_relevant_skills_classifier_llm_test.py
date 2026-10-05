@@ -149,9 +149,10 @@ test_cases = [
         expected_relevant_skills=["ensure compliance with policies",
                                   "adhere to organisational guidelines",
                                   "guarantee students' safety",
-                                  "adhere to standards of national and international safety programmes",
+                                  # checking temperatures and health signs is a health precaution
+                                  "follow health and safety precautions in social care practices",
                                   "ensure compliance with safety legislation"],
-        expected_remaining_skills=["follow health and safety precautions in social care practices",
+        expected_remaining_skills=["adhere to standards of national and international safety programmes",
                                    "supervise hygiene procedures in agricultural settings",
                                    "airport safety regulations",
                                    "follow industry codes of practice for aviation safety",

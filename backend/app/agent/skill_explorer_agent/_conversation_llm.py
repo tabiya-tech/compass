@@ -143,13 +143,12 @@ class _ConversationLLM:
                 agent_response_time_in_sec=round(llm_end_time - llm_start_time, 2),
                 llm_stats=[llm_stats]), 100, ValueError("LLM response is empty")
 
-        if llm_response.text == "<END_OF_CONVERSATION>":
-            llm_response.text = t("messages", _FINAL_MESSAGE_KEY)
-            finished = True
         if llm_response.text.find("<END_OF_CONVERSATION>") != -1:
+            if llm_response.text != "<END_OF_CONVERSATION>":
+                # The models often add a closing remark to the token, it is replaced by the final message anyway.
+                logger.info("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
             llm_response.text = t("messages", _FINAL_MESSAGE_KEY)
             finished = True
-            logger.warning("The response contains '<END_OF_CONVERSATION>' and additional text: %s", llm_response.text)
 
         return AgentOutput(
             message_for_user=llm_response.text,
@@ -268,7 +267,8 @@ class _ConversationLLM:
             - Continuing would be redundant based on the information already provided, OR
             - You would otherwise repeat a question already in <question_asked_until_now>
 
-            Do not add anything before or after the <END_OF_CONVERSATION> message.
+            When you end, respond with exactly <END_OF_CONVERSATION> and nothing else:
+            no thanks, no closing remark, no text before or after it.
 
             If I have not shared any meaningful information about my experience as {experience_title}{work_type},
             ask me once if I really want to stop. If I confirm, end the conversation.
@@ -309,7 +309,7 @@ class _ConversationLLM:
                 
                 Add new line to separate the above from the following question.
                 
-                Ask me to describe a typical day as {experience_title}.
+                Ask me to describe a typical day as {experience_title}, using the words "typical day" (or their direct translation in the language of the conversation).
             
         {language_style}
         """)
