@@ -52,9 +52,9 @@ class _DataExtractionReferences(BaseModel):
     The keys are typed (rather than a free-form dict) because an untyped object in the response schema makes
     the Gemini 3.x models intermittently return null for every extracted field.
     """
-    dates_mentioned_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="start_date and end_date"))
-    work_type_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="work_type"))
-    paid_work_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="paid_work"))
+    dates_mentioned_references: str = Field(description=_REFERENCES_DESCRIPTION.format(field="start_date and end_date"))
+    work_type_references: str = Field(description=_REFERENCES_DESCRIPTION.format(field="work_type"))
+    paid_work_references: str = Field(description=_REFERENCES_DESCRIPTION.format(field="paid_work"))
 
 
 class _ExtractedData(BaseModel):
@@ -84,8 +84,12 @@ class _ExtractedData(BaseModel):
 
 
 class _LLMOutput(BaseModel):
+    """
+    LLM Model Output.
+    Every field is required (no defaults, `null` stays a valid value where it is allowed): a field with a default is left out
+    of the schema's `required` list, and the model then skips it so it silently takes the default value.
+    """
     associations: Optional[str] = Field(
-        default=None,
         description="A linear chain of associations in the form of ...-> ...->... that starts from the User's Last Input "
                     "and follows the relevant entries it refers to in the Conversation History, until it terminates at the "
                     "Previously Extracted Experience Data, if relevant. Skip unrelated or tangential turns to preserve a coherent "
@@ -124,8 +128,10 @@ class TemporalAndWorkTypeClassifierTool:
             config=LLMConfig(
                 language_model_name=AgentsConfig.deep_reasoning_model,
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 3000
-                    # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                    "max_output_tokens": 8192
+                    # Limit the output to avoid the "reasoning recursion issues".
+                    # The limit includes the thinking tokens of the Gemini 3.x models (often 1000-1500, more on long
+                    # conversations): with a lower limit, the thinking used it up and the JSON answer got cut off.
                 } | temperature_config | with_response_schema(_LLMOutput)
             ))
 
@@ -210,7 +216,10 @@ _SYSTEM_INSTRUCTIONS = """
 #Extract data instructions
     Make sure you are extracting information about experiences that should be added to the 'experience_details' field.
     Ignore irrelevant information.
-    
+    If the <Experience Title> is empty or None and the '<User's Last Input>' does not answer the question about the user's work experiences
+    (e.g. the user shares their feelings or what is happening in their personal life), it is irrelevant information:
+    do not classify it as an experience and use `null` for all the fields.
+
     You will collect information for the following fields:-
     - paid_work
     - work_type
@@ -235,7 +244,9 @@ _SYSTEM_INSTRUCTIONS = """
         Use the '<User's Last Input>' and relate it to the'<Conversation History>' to determine the type of work.
         Base also on the <Experience Title> and try to infer the work type from it.
         Choose one of the following values:
-            {work_type_definitions}   
+            {work_type_definitions}
+        Paid work the user does for themselves (running their own business, selling goods, freelance or contract work)
+        is FORMAL_SECTOR_WAGED_EMPLOYMENT, as it is the only work type for paid work.
         Use `null`: If the user has not mentioned `work type` and has not yet been asked to provide it.
         Use "": If the user explicitly declines to provide the `work type` when asked, or requests that previously stored `work type` data be deleted.
         
@@ -245,6 +256,10 @@ _SYSTEM_INSTRUCTIONS = """
         The user may mention only one date, you may consider it as the start and the end of the experience.
         The user may provide unstructured dates like I worked in the first four months of 2020, and we expect you to extract the dates in (YYYY-MM).
         If the user provides only one date and no additional context, do not infer or assume a second date.
+        A single date that answers a question about the start (e.g. "When did you start?" -> "in 2018") is only the start date.
+        A single date that places the whole experience in one period (e.g. "Assistant Instructor at University X in 2014",
+        "I worked there in March 2019") is a point in time: use it as both the start date and the end date.
+        Describing the work in the present tense (e.g. "I sell shoes") is not a date: without a mentioned date, keep the dates unchanged.
         Strictly maintain input date precision. Never infer or default specific dates (e.g., 01/01, 31/12) for partial timestamps like 'Year only' or 'Month-Year'.
         
         For reference, my current date is {current_date}

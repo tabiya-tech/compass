@@ -1,6 +1,7 @@
 import pytest
 
 from app.agent.agent_types import AgentInput
+from app.agent.config import AgentsConfig
 from app.agent.qna_agent import QnaAgent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
@@ -13,7 +14,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(model_name="gemini-1.5-pro-preview-0409"))
+    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model))
     return (await llm.generate_content(prompt)).text
 
 
@@ -166,8 +167,9 @@ async def test_qna_agent_responds_to_multiple_questions_in_a_row(fake_conversati
         evaluation_record.evaluations.append(conciseness_eval)
         assert conciseness_eval.score > 70, f"reasoning: {conciseness_eval.reasoning}"
         assert "TRUE" in await _evaluate_with_llm(
-            f"""Respond with TRUE if given the conversation below, the EVALUATED_AGENT responds to each question 
-                about Compass, not going into unnecessary detail and sticking to facts. 
+            f"""Respond with TRUE if given the conversation below, the EVALUATED_AGENT responds to each question
+                about Compass, not going into unnecessary detail and sticking to facts.
+                The conversation is cut off after the last SIMULATED_USER message, so ignore it if it is not answered.
                 Otherwise respond with FALSE. Provide a reason.
                 CONVERSATION:
                 {evaluation_record.generate_conversation()}

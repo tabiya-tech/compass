@@ -1,6 +1,9 @@
 import asyncio
 from datetime import datetime, timezone
 
+from app.app_config import ApplicationConfig, get_application_config, set_application_config
+from app.countries import Country
+from app.version.types import Version
 from app.vector_search.vector_search_dependencies import SearchServices
 from evaluation_tests.conversation_libs.fake_conversation_context import FakeConversationContext
 from evaluation_tests.conversation_libs.search_service_fixtures import get_search_services
@@ -51,3 +54,46 @@ def common_folder_path() -> str:
 async def setup_search_services() -> SearchServices:
     search_services = await get_search_services()
     return search_services
+
+
+def _eval_application_config() -> ApplicationConfig:
+    """
+    The ApplicationConfig used by evaluation tests.
+    """
+    return ApplicationConfig(
+        environment_name="test",
+        version_info=Version(date="test", branch="test", buildNumber="test", sha="test"),
+        enable_metrics=False,
+        default_country_of_user=Country.UNSPECIFIED,
+        taxonomy_model_id="test",
+        embeddings_service_name="test",
+        embeddings_model_name="test",
+        cv_storage_bucket="test",
+        features={},
+    )
+
+
+@pytest.fixture(scope="function", autouse=True)
+def ensure_application_config():
+    """
+    Makes sure an ApplicationConfig is set for every evaluation test.
+    Tests that request a specific config (e.g. `setup_application_config`) still override it.
+    """
+    try:
+        get_application_config()
+        config_was_set = True
+    except RuntimeError:
+        config_was_set = False
+
+    if not config_was_set:
+        set_application_config(_eval_application_config())
+
+    yield
+
+    if not config_was_set:
+        set_application_config(None)
+
+
+@pytest.fixture(scope="function")
+def evals_setup(setup_application_config):
+    return True

@@ -1,5 +1,6 @@
 import pytest
 
+from app.agent.config import AgentsConfig
 from app.conversation_memory.summarizer import Summarizer
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
@@ -12,7 +13,7 @@ SUMMARY_EVALUATION_TYPES = [EvaluationType.SUMMARY_CONSISTENCY, EvaluationType.S
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.5-pro"))
+    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model))
     return (await llm.generate_content(prompt)).text
 
 
@@ -59,7 +60,7 @@ async def test_summarizer_without_existing_summary(fake_conversation_context: Fa
             assert summary_eval.score > 3, f"reasoning: {summary_eval.reasoning}"
 
         assert "TRUE" in await _evaluate_with_llm(
-            f"""Respond only with TRUE if the _SUMMARY_:"{summary}" is no longer then 100 words. Otherwise respond with FALSE."""), f"output: {summary}"
+            f"""Respond only with TRUE if the _SUMMARY_:"{summary}" is no longer than 100 words. Otherwise respond with FALSE."""), f"output: {summary}"
 
         assert "TRUE" in await _evaluate_with_llm(
             f"""Respond only with TRUE if the _SUMMARY_:"{summary}" mentions that the user was working on a big writing project for Huum Hub and that they used problem-solving and research skills to complete the project. Otherwise respond with FALSE."""), f"output: {summary}"
@@ -100,10 +101,10 @@ async def test_summarizer_with_existing_summary(fake_conversation_context: FakeC
             assert summary_eval.score > 3, f"reasoning: {summary_eval.reasoning}"
 
         assert "TRUE" in await _evaluate_with_llm(
-            f"""Respond only with TRUE if the _SUMMARY_:"{new_summary}" is no longer then 100 words. Otherwise respond with FALSE."""), f"output: {new_summary}"
+            f"""Respond only with TRUE if the _SUMMARY_:"{new_summary}" is no longer than 100 words. Otherwise respond with FALSE."""), f"output: {new_summary}"
 
         assert "TRUE" in await _evaluate_with_llm(
-            f"""Respond only with TRUE if the _SUMMARY_:"{new_summary}"  mentions that the user has a good English writing and speaking skills. Otherwise respond with FALSE."""), f"output: {new_summary}"
+            f"""Respond only with TRUE if the _SUMMARY_:"{new_summary}"  mentions the user's English writing and speaking skills. Otherwise respond with FALSE."""), f"output: {new_summary}"
 
     finally:
         folder = common_folder_path + 'summarizer_with_existing_summary'

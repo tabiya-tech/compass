@@ -32,13 +32,13 @@ _OPERATIONS_REQUIRING_INDEX = [DataOperation.UPDATE.value.lower(), DataOperation
 
 
 class Operation(BaseModel):
-    index: Optional[int] = Field(
-        default=None,
-        description="The unique identifier of the experience. If the experience already exists in <Previously Extracted Experience Data>, "
-                    "the existing index, otherwise `null`.")
-
+    """
+    An operation in the LLM output.
+    Every field is required (no defaults, `null` stays a valid value where it is allowed): a field with a default is left out
+    of the schema's `required` list, and the model then skips it so it silently takes the default value.
+    The associations and the reasoning come before the answer fields, so that the model reasons before answering.
+    """
     associations: Optional[str] = Field(
-        default="",
         description="A linear chain of associations in the form of ...-> ...->... that starts from the User's Last Input "
                     "and follows the relevant entries it refers to in the Conversation History, until it terminates at the "
                     "Previously Extracted Experience Data, if relevant. Skip unrelated or tangential turns to preserve a coherent "
@@ -48,18 +48,22 @@ class Operation(BaseModel):
                     "Each step is a summarized version of the actual user or model turn, and the chain has at most 10 steps to avoid circular references.")
 
     data_operation_reasoning: Optional[str] = Field(
-        default="",
         description="A detailed, step-by-step explanation in prose of what data operation should be performed. "
                     "Consider the conversation context carefully: if the user is answering a question about existing work, "
                     "this should be an UPDATE. If they are describing completely new work, this should be an ADD.")
     data_operation: str = Field(
         description="The operation that should be performed to the experience data, one of: 'ADD', 'UPDATE', 'DELETE', 'NOOP'. "
                     "'NOOP' means that no operation should be performed.")
+    index: Optional[int] = Field(
+        description="The unique identifier of the experience. If the experience already exists in <Previously Extracted Experience Data>, "
+                    "the existing index, otherwise `null`.")
 
     potential_new_experience_title: Optional[str] = Field(
-        default="",
         description="The potential experience title from the details described by the user in the '<User's Last Input>', "
-                    "like the title to be put on a CV when describing the experience. If the experience already exists in "
+                    "like the title to be put on a CV when describing the experience. "
+                    "When the user did not state a role (e.g. helping out at home or for the family), keep where or for whom "
+                    "the work was done in the title (e.g. 'Helping at my mother's house'), not a generic title (e.g. 'General helper'). "
+                    "If the experience already exists in "
                     "<Previously Extracted Experience Data> and the user is not updating it, the existing title. "
                     "An empty string if you can't figure it out.")
     users_statement: str = Field(
@@ -72,6 +76,9 @@ class Operation(BaseModel):
 
 
 class _LLMOutput(BaseModel):
+    # ignored_experiences and users_statements are deliberately optional (not in the schema's `required` list):
+    # their values are not used, and when the model is forced to write ignored_experiences first, it talks itself into
+    # ignoring requests it should act on (e.g. "figure out which one should be deleted" ends up with no DELETE).
     ignored_experiences: Optional[str] = Field(
         default=None,
         description="A detailed, step-by-step explanation in prose of the experiences referenced by the user that will not be added "
@@ -112,8 +119,10 @@ class IntentAnalyzerTool:
             system_instructions=_SYSTEM_INSTRUCTIONS.format(previously_extracted_data=previously_extracted_data),
             config=LLMConfig(
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
-                    "max_output_tokens": 3000
-                    # Limit the output to 3000 tokens to avoid the "reasoning recursion issues"
+                    "max_output_tokens": 8192
+                    # Limit the output to avoid the "reasoning recursion issues".
+                    # The limit includes the thinking tokens of the Gemini 3.x models (often 1000-1500, more on long
+                    # conversations): with a lower limit, the thinking used it up and the JSON answer got cut off.
                 } | temperature_config | with_response_schema(_LLMOutput)
             ))
 

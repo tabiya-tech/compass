@@ -269,6 +269,8 @@ class LLMRouter:
                     - Each agent is responsible for clarifying the questions and doubts the user may have regarding its tasks.
                     - When the User Input contains a keyword or phrase that the agent asked the user to say in the Conversation History,
                       select the model responsible for the task the keyword was asked for, even if the User Input also contains other information.
+                    - When the User Input asks to explain, clarify or repeat a question that was asked earlier in the Conversation History,
+                      it is not a question about the process or the tool: select the model responsible for the task the conversation is currently focused on.
 
                 {examples}
                 
