@@ -4,8 +4,8 @@ import time
 from abc import ABC, abstractmethod
 from typing import Coroutine, Any
 
-import vertexai
-from vertexai.language_models import TextEmbeddingInput, TextEmbeddingModel, TextEmbedding
+from google import genai
+from google.genai.types import EmbedContentConfig
 
 from common_libs.retry import Retry
 
@@ -47,15 +47,15 @@ class GoogleEmbeddingService(EmbeddingService):
         super().__init__(service_name="GOOGLE-VERTEX-AI", model_name=model_name)
         # Embeddings run in their own region, separate from the generative-AI region, because
         # legacy embedding models (e.g. text-embedding-005) are not published in the global
-        # publisher catalog. Resolving via vertexai.init(location=...) before from_pretrained
-        # binds the returned model to that regional endpoint for all subsequent embed calls.
+        # publisher catalog.
         self.region = os.getenv("VERTEX_API_EMBEDDINGS_REGION")
         if not self.region:
             raise ValueError("Environment variable 'VERTEX_API_EMBEDDINGS_REGION' is not set.")
         self.logger.info(f"Constructing {self.__class__.__name__} with model: {model_name} and region: {self.region}")
 
-        vertexai.init(location=self.region)
-        self.model = TextEmbeddingModel.from_pretrained(model_name)
+        # The client is bound to the embeddings region, independently of the generative-AI client (see GeminiGenerativeLLM).
+        self._client = genai.Client(vertexai=True, location=self.region)
+        self._config = EmbedContentConfig(task_type=self._TASK)
 
     async def embed(self, text: str) -> list[float]:
         """
@@ -74,8 +74,6 @@ class GoogleEmbeddingService(EmbeddingService):
         empty_indices = [idx for idx, txt in enumerate(text_list) if not isinstance(txt, str) or not txt.strip()]
         if empty_indices:
             raise ValueError(f"embed_batch received empty texts at indices: {empty_indices}")
-        # make sure we are in the correct region
-        vertexai.init(location=self.region)
 
         # https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models
         # As of 14 August 2024, the maximum batch size is 250 of us-central1, and in other regions it is 5
@@ -85,19 +83,20 @@ class GoogleEmbeddingService(EmbeddingService):
             batch_size = 5
         embeddings = []
         for i in range(0, len(text_list), batch_size):
-            def _callback() -> Coroutine[Any, Any, list[TextEmbedding]]:
-                inputs: list[TextEmbeddingInput] = [TextEmbeddingInput(query, self._TASK) for query in text_list[i:i + batch_size]]
-                return self._run_batch(inputs)
+            def _callback() -> Coroutine[Any, Any, list[list[float]]]:
+                return self._run_batch(text_list[i:i + batch_size])
 
-            batch_embeddings: list[TextEmbedding] = await Retry[list[TextEmbedding]].call_with_exponential_backoff(callback=_callback,logger=self.logger)
+            batch_embeddings: list[list[float]] = await Retry[list[list[float]]].call_with_exponential_backoff(callback=_callback,
+                                                                                                             logger=self.logger)
             embeddings.extend(batch_embeddings)
-        return [embedding.values for embedding in embeddings]
+        return embeddings
 
-    async def _run_batch(self, inputs: list[TextEmbeddingInput]) -> list[TextEmbedding]:
+    async def _run_batch(self, inputs: list[str]) -> list[list[float]]:
         try:
             # measure how long it takes to generate the embeddings
             start_time = time.time()
-            result = await self.model.get_embeddings_async(inputs)
+            response = await self._client.aio.models.embed_content(model=self.model_name, contents=inputs, config=self._config)
+            result = [embedding.values for embedding in response.embeddings]
             end_time = time.time()
             self.logger.debug(f"Time taken to generate embeddings: {end_time - start_time:.2f} seconds for {len(inputs)} queries, "
                               f"{len(result)/(end_time - start_time):.2f} queries/seconds")

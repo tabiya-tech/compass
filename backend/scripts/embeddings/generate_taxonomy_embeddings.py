@@ -6,7 +6,6 @@ import time
 from datetime import datetime
 from typing import Any
 
-import vertexai
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -21,7 +20,6 @@ from common_libs.time_utilities import get_now, datetime_to_mongo_date
 from scripts.embeddings._common import EmbeddingContext, generate_indexes, redact_credentials_from_uri
 
 load_dotenv()
-vertexai.init()
 
 # Set up logging
 setup_logging_config("logging.cfg.yaml")
