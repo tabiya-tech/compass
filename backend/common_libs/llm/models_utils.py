@@ -15,14 +15,16 @@ logger = logging.getLogger(__name__)
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize the default region for the Vertex AI client
+# The default Vertex AI location of the generative-AI client.
+# Embeddings use a separate region (VERTEX_API_EMBEDDINGS_REGION) — see GoogleEmbeddingService.
 
-DEFAULT_VERTEX_API_REGION = os.getenv("VERTEX_API_REGION")
-if not DEFAULT_VERTEX_API_REGION:
-    logging.warning("Default Vertex AI region is not set. Using 'us-central1' as the default region.")
-    DEFAULT_VERTEX_API_REGION = "us-central1"
+DEFAULT_VERTEX_API_GEN_AI_REGION = os.getenv("VERTEX_API_GEN_AI_REGION")
+if not DEFAULT_VERTEX_API_GEN_AI_REGION:
+    # The Gemini 3.x models are only served from the global location, regional locations return a 404 for them.
+    logging.warning("VERTEX_API_GEN_AI_REGION is not set. Using 'global' as the default region.")
+    DEFAULT_VERTEX_API_GEN_AI_REGION = "global"
 else:
-    logging.debug("Default Vertex AI region is %s", DEFAULT_VERTEX_API_REGION)
+    logging.debug("Default Vertex AI gen-AI region is %s", DEFAULT_VERTEX_API_GEN_AI_REGION)
 
 DEFAULT_GENERATION_CONFIG = {
     "temperature": 0.1,
@@ -122,7 +124,7 @@ class LLMConfig(BaseModel):
     Configuration for the LLM.
     """
     language_model_name: str = AgentsConfig.default_model
-    location: str = DEFAULT_VERTEX_API_REGION
+    location: str = DEFAULT_VERTEX_API_GEN_AI_REGION
     generation_config: dict = DEFAULT_GENERATION_CONFIG
     """
     The generation parameters (temperature, top_p, max_output_tokens, ...). It may also carry the structured output
