@@ -2,7 +2,7 @@ import logging
 from textwrap import dedent
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.llm_caller import LLMCaller
 from app.i18n.types import Locale
@@ -13,7 +13,7 @@ from common_libs.observability.decorators import traced_tool
 
 
 class _Output(BaseModel):
-    text: str
+    text: str = Field(description="The result of the task, as instructed: the translated text, or the result of the comparison.")
 
 
 class TranslationTool:
@@ -33,10 +33,7 @@ class TranslationTool:
             To this language {target_language}
     
             # Output.
-    
-            {{
-                "text": the translated text in {target_language}
-            }}
+                Set the text to the translated text in {target_language}.
         """)
         return _template.format(target_language=self._target_locale.label(),
                                 user_input=user_input)
@@ -48,10 +45,7 @@ class TranslationTool:
             {translation}
     
             # Output.
-    
-            {{
-                "text": "SIMILAR" if they are semantically equivalent, "DIFFERENT" otherwise.
-            }}
+                Set the text to "SIMILAR" if they are semantically equivalent, "DIFFERENT" otherwise.
         """)
 
         return _template.format(target_language=self._target_locale.label(),

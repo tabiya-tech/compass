@@ -39,7 +39,7 @@ class ConversationHistoryFormatter:
         """
         Format the conversation history and the user input in a suitable way to pass as an
         input to the agent LLM that converses with the user.
-        :param model_response_instructions: The instruction to the model to return a JSON object
+        :param model_response_instructions: The instructions for the response of the model (e.g. example responses, turn specific reminders)
         :param context: The conversation context to be formatted
         :param user_input: The user input
         :return: A LLMInput object
@@ -55,10 +55,11 @@ class ConversationHistoryFormatter:
         # Finally the user input
         ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER, user_input)
 
-        # Eventually, add instructions for the model to return a JSON object.
-        # This reinforces that the model should respond with a JSON object.
-        # Without these instructions, the model might respond with a non-JSON object,
-        # as it tends to adapt to the conversation history and may overlook the JSON format requirements.
+        # Eventually, add the instructions for the response of the model, after the user input.
+        # The structure of the response is enforced by the response schema (structured output),
+        # so these instructions only complement it, e.g. with example responses or turn specific reminders.
+        # Placing them last reinforces them, as the model tends to adapt to the conversation history
+        # and may overlook instructions given only in the system instructions.
         if model_response_instructions != "" and model_response_instructions is not None:
             ConversationHistoryFormatter._append_part(llm_input, ConversationHistoryFormatter.USER,
                                                       "\n" + model_response_instructions)

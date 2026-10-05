@@ -3,7 +3,7 @@ from datetime import datetime
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
@@ -43,23 +43,60 @@ class ExtractedData(BaseModel):
 _EMPTY_EXTRACTED_DATA = ExtractedData()
 
 
+_REFERENCES_DESCRIPTION = ("A short (up to 100 words) explanation in prose about the information you intend to collect for the {field} "
+                           "based on the '<User's Last Input>' and the '<Conversation History>', and where you found it, "
+                           "e.g. the user responded in the '<...' to the model's question in '<...'.")
+
+
+class _DataExtractionReferences(BaseModel):
+    """
+    The LLM's explanations of where it found the information for the dates, the work type and the paid work.
+    The keys are typed (rather than a free-form dict) because an untyped object in the response schema makes
+    the Gemini 3.x models intermittently return null for every extracted field.
+    """
+    dates_mentioned_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="start_date and end_date"))
+    work_type_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="work_type"))
+    paid_work_references: Optional[str] = Field(default=None, description=_REFERENCES_DESCRIPTION.format(field="paid_work"))
+
+
 class _ExtractedData(BaseModel):
     # References and Reasoning.
-    data_extraction_references: Optional[dict]
-    dates_mentioned: Optional[str]
-    dates_calculations: Optional[str]
-    work_type_classification_reasoning: Optional[str]
+    data_extraction_references: Optional[_DataExtractionReferences] = Field(
+        description="Where you found the information for the paid_work, work_type, start_date and end_date, see the '#Extract data instructions'.")
+    dates_mentioned: Optional[str] = Field(
+        description="The experience dates mentioned in the conversation, see the \"###'dates_mentioned' instructions\". "
+                    "Empty string \"\" if you could not find any.")
+    dates_calculations: Optional[str] = Field(
+        description="A detailed, step-by-step explanation of any date calculations done to produce the start_date and end_date values. "
+                    "Empty string \"\" if you did not perform any calculations.")
+    work_type_classification_reasoning: Optional[str] = Field(
+        description="A detailed, step-by-step explanation of how the information collected until now is evaluated based on "
+                    "the \"##'work_type' instructions\", to classify the type of work of the experience.")
 
     # Extracted Data Details
-    start_date: Optional[str]
-    end_date: Optional[str]
-    paid_work: Optional[bool | str]
-    work_type: Optional[str]
+    start_date: Optional[str] = Field(
+        description="The start date in the user's locale-specific format, see the \"###'start_date' instructions\".")
+    end_date: Optional[str] = Field(
+        description="The end date in the user's locale-specific format or 'Present', see the \"###'end_date' instructions\".")
+    paid_work: Optional[bool | str] = Field(
+        description="Whether the work was paid or not, see the \"##'paid_work' instructions\".")
+    work_type: Optional[str] = Field(
+        description="The type of work of the experience: 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 'FORMAL_SECTOR_UNPAID_TRAINEE_WORK', "
+                    "'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' or 'None'. Other values are not permitted. See the \"##'work_type' instructions\".")
 
 
 class _LLMOutput(BaseModel):
-    associations: Optional[str] = None
-    experience_details: Optional[_ExtractedData]
+    associations: Optional[str] = Field(
+        default=None,
+        description="A linear chain of associations in the form of ...-> ...->... that starts from the User's Last Input "
+                    "and follows the relevant entries it refers to in the Conversation History, until it terminates at the "
+                    "Previously Extracted Experience Data, if relevant. Skip unrelated or tangential turns to preserve a coherent "
+                    "causal chain: filter for semantic lineage rather than strictly temporal proximity. "
+                    "Once you reach the Previously Extracted Experience Data, do not follow the associations anymore. "
+                    "e.g. \"user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)\". "
+                    "Each step is a summarized version of the actual user or model turn, and the chain has at most 10 steps to avoid circular references.")
+    experience_details: Optional[_ExtractedData] = Field(
+        description="The experience details you extracted from the user's statement and the conversation history.")
 
     class Config:
         """
@@ -239,6 +276,9 @@ _SYSTEM_INSTRUCTIONS = """
             - Full date: {date_format_full}
             - Month and year: {date_format_month_year}
             - Year only: {date_format_year}
+        Use {date_format_full} when day, month, and year are known,
+        {date_format_month_year} when only month and year are known,
+        and {date_format_year} when only the year is known.
         Use the exact separators shown above.
         
         ###'dates_mentioned' instructions
@@ -259,58 +299,7 @@ _SYSTEM_INSTRUCTIONS = """
             Return a string value containing the end date using the locale-specific format described above.
             Use `null`: If the user has not mentioned their `end date` and has not yet been asked to provide it.
             Use "": If the user explicitly declines to provide their `start date` when asked, or requests that previously stored `end date` data be deleted.
-            
-#JSON Output instructions
-    - associations: Generate a linear chain of associations in the form of ...-> ...->... that start from the User's Last Input 
-        and follow the relevant entries they refer to in the Conversation History until they terminate to the Previously Extracted Experience Data, if relevant. 
-        ///Skip unrelated or tangential turns to preserve a coherent causal chain of associations.
-        ///You are filtering for semantic lineage rather than strictly temporal proximity.
-        Once you reach the Previously Extracted Experience Data, you will not follow the associations anymore.
-        e.g. "user(<answer>) -> model(<question>) -> ... -> user(<answer>) -> model(<question>) -> Previously Extracted Experience Data(...)"
-        Each step in the sequence should be a summarized version of the actual user or model turn.
-        You are not expected to reach a maximum of 10 steps in this linear chain to avoid circular references.
-    
-    - experience_details: an Object of experience details you extracted from the user's statement and conversation history. 
-        {{
-            - data_extraction_references: a dictionary with short (up to 100 words) explanations in prose (not json) about 
-                what information you intend to collect based on the '<User's Last Input>' and the '<Conversation History>'.
-                Constrain the explanation to the data relevant for the fields 'paid_work', 'work_type', 'start_date' and 'end_date' 
-                Explain where you found the information e.g in '<User's Last Input>'.
-                Formatted as a json string.
-                Example: ... the user responded in the '<...' to the model's question in '<...' ...
-                {{
-                    - dates_mentioned_references: 
-                    - work_type_references:
-                    - paid_work_references:
-                }}
-            - paid_work: A boolean value indicating whether the work was paid or not. 
-                     Formatted as a json boolean.
-            - work_type_classification_reasoning: A detailed, step-by-step explanation of how the information collected 
-                        until now, is evaluated based on the instructions of 'work_type', to classify the type of work of the experience.
-                        Formatted as a JSON string.
-            - work_type: type of work of the experience, 'FORMAL_SECTOR_WAGED_EMPLOYMENT', 
-                         'FORMAL_SECTOR_UNPAID_TRAINEE_WORK', 'SELF_EMPLOYMENT', 'UNSEEN_UNPAID' or 'None'. 
-                         Other values are not permitted.
-            - dates_mentioned: The experience dates mentioned in the conversation. 
-                               Empty string "" If you could not find any.
-                               Formatted as a json string.                                    
-            - dates_calculations: A detailed, step-by-step explanation of any date calculations done to 
-                                produce the start_date, and end_date values. 
-                                Empty string "" If you did not perform any calculations.
-                                Formatted as a json string.         
-            - start_date: The start date formatted using the locale-specific format described above.
-                                Use {date_format_full} when day, month, and year are known,
-                                {date_format_month_year} when only month and year are known,
-                                and {date_format_year} when only the year is known.
-                                Formatted as a json string.
-                                Refer to the "###'start_date' instructions"
-            - end_date: The end date formatted using the locale-specific format described above or 'Present'.
-                                Use {date_format_full} when day, month, and year are known,
-                                {date_format_month_year} when only month and year are known,
-                                and {date_format_year} when only the year is known.
-                                Formatted as a json string.
-                                Refer to the "###'end_date' instructions"
-        }}                            
+
 </System Instructions>
 """
 

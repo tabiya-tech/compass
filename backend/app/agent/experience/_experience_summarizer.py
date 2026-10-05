@@ -3,7 +3,7 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
@@ -23,10 +23,13 @@ class ExperienceSummarizerResponse(BaseModel):
     The response from the ExperienceSummarizer.
     Contains the summarized experience and reasoning behind it.
     """
-    reasoning: str
+    reasoning: str = Field(
+        description="A detailed step-by-step explanation in free text of the reasoning behind the summary you generated, "
+                    "explaining your thought process.")
     """The reasoning behind the summary"""
 
-    experience_summary: str
+    experience_summary: str = Field(
+        description="The summary of the user's experience in a short paragraph, in raw non-markdown text, see the '# Task'.")
     """The summarized experience in a short paragraph"""
 
     class Config:
@@ -76,14 +79,6 @@ class ExperienceSummarizer:
                     'Responsibilities': The list of responsibilities/activities/skills/behaviours of the user in this experience.
                     'Top skills': The list of top skills the user has used in this experience.
                     'Questions & Answers': A list of questions the user was asked about their experience and the user's answers to those questions.
-            
-            # JSON Output instructions
-                You will respond with a JSON object that contains the following fields:
-                    - reasoning: a detailed step-by-step explanation of the reasoning behind the summary you generated
-                                 this is a free text field that should  explain your thought process.
-                    - experience_summary: the summary of the user's experience in a raw formatted non markdown text as a JSON string.
-                
-                Your response must always be a JSON object with the schema above
         </System Instructions>
             """)
         return replace_placeholders_with_indent(

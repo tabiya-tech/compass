@@ -16,7 +16,8 @@ from ...i18n.translation_service import get_i18n_manager
 
 
 class _SentenceDecompositionResponse(BaseModel):
-    decomposed_and_dereferenced: list[str] = Field(default_factory=list)
+    decomposed_and_dereferenced: list[str] = Field(default_factory=list, description=(
+        "The reviewed and fixed sentences, one item for each sentence of the input."))
     """
     The decomposed and dereferenced sentences from the user's input.
     This is the final output of the second pass and what the SentenceDecompositionLLM returns to the caller.
@@ -25,12 +26,13 @@ class _SentenceDecompositionResponse(BaseModel):
 
 class _SentenceDecompositionFirstPassResponse(BaseModel):
     decomposed_sentences: list[str] = Field(default_factory=list, description=dedent("""
-    The decomposed sentences from the user's input.
+    The decomposed sentences from the user's input, one sub-sentence per item, see the '# 'decomposed_sentences' instructions'.
     This is used to help the model complete the task in steps as dereferencing the pronouns is too complex for the model to do in one step.
     """))
 
     pronouns_indexing: list[str] = Field(default_factory=list, description=dedent("""
-    The unique pronouns from the user's input and their types.
+    The unique pronouns from the user's input and their types, each item in the format: "pronoun -> pronoun type".
+    See the '# 'pronouns_indexing' instructions'. This is a helper field, keep it brief and not repetitive.
     Helps the model to identify the pronouns and complete the task in steps.
     Each pronoun should appear only once in this list, even if it appears multiple times in the text.
     Keep this list concise - only include pronouns that need to be resolved.
@@ -39,14 +41,16 @@ class _SentenceDecompositionFirstPassResponse(BaseModel):
     """))
 
     pronouns_antecedents: list[str] = Field(default_factory=list, description=dedent("""
-    The unique pronouns from the user's input and their antecedents.
+    The unique pronouns from the user's input and their antecedents, each item in the format: "pronoun -> antecedent".
+    See the '# 'pronouns_antecedents' instructions'. This is a helper field, keep it brief and not repetitive.
     This is used to help the model complete the task in steps.
     Each pronoun should appear only once in this list, even if it appears multiple times in the text.
     Keep this list concise - only include pronouns that need to be resolved.
     """))
 
     resolved_pronouns: list[str] = Field(default_factory=list, description=dedent("""
-    The resolved pronouns from the user's input. This is the final output of the first pass.
+    The resolved pronouns from the user's input, one rephrased sentence per item, see the '# 'resolved_pronouns' instructions'.
+    This is the final output of the first pass (the main output).
     The original sentences are decomposed into sub-sentences and the pronouns are resolved to their antecedents.
     However, models struggle to correctly frame the sentences in a natural way. This is due to the pronouns_antecedents 
     which condition the output to return expressions like "Ben helps Ben's" or "Ben uses Ben's hands".
@@ -150,7 +154,7 @@ class _SentenceDecompositionLLM:
             The sub-sentence must incorporate parts of the <Conversation History>, so that the sub-sentence is standalone and can be understood
             without the need to refer back to the <Conversation History>. Adjust phrasing as necessary to maintain clarity and coherence.
             Include all information about the action, including the subject, verb, and object.
-            Place each sub-sentence in a separate JSON string in the 'decomposed_sentences' list.
+            Place each sub-sentence as a separate item in the 'decomposed_sentences' list.
         # 'pronouns_indexing' instructions
             Identify all unique pronouns in <My Last Input> and <Conversation History>.
             Include all possessive, reflexive, demonstrative, relative, interrogative, indefinite, reciprocal, and intensive pronouns.
@@ -173,15 +177,9 @@ class _SentenceDecompositionLLM:
             The antecedent should not show up multiple times in the same sentence.
             Use <My Last Input> and <Conversation History> to determine the antecedent.            
             All information from the original sentence is preserved and covered.
-            Place each rephrased sentence in a separate JSON string in the 'resolved_pronouns' list.
+            Place each rephrased sentence as a separate item in the 'resolved_pronouns' list.
         
-        # JSON Output instructions
-            Your response must always be a JSON object with the following schema:
-            - 'decomposed_sentences': list of JSON strings
-            - 'pronouns_indexing': list of JSON strings in the format: pronoun -> pronoun type (helper field, keep concise)
-            - 'pronouns_antecedents': list of JSON strings in the format: pronoun -> antecedent (helper field, keep concise)
-            - 'resolved_pronouns': list of JSON strings (this is the main output)
-            
+        # Helper fields
             IMPORTANT: Do not repeat entries in pronouns_indexing or pronouns_antecedents. Each unique pronoun should appear only once in each list.
             These are helper fields to guide your reasoning - they should be brief and not repetitive.
         # Example
@@ -191,8 +189,6 @@ class _SentenceDecompositionLLM:
             pronouns_indexing: ["him -> third person pronoun", "it -> third person pronoun", "this -> demonstrative pronoun"]
             pronouns_antecedents: ["him -> Ben", "it -> the bread", "this -> the action of making and selling the bread"]
             resolved_pronouns: ["I help Ben", "Ben makes the bread", "I help Ben sell the bread", "Ben sells the bread to the neighbours", "Ben gives me money for helping him"]
-            
-        Your response must always be a JSON object with the schema above
         </System Instructions>
         """)
 
@@ -241,14 +237,6 @@ class _SentenceDecompositionLLM:
         # Input Structure
             The input structure is a list of sentences:
             "sentences": list of sentences 
-        
-        # JSON Output instructions
-            Your response must always be a JSON object with the following schema:
-            {
-              "decomposed_and_dereferenced": list of JSON strings
-            }
-            
-        Your response must always be a JSON object with the schema above
         </System Instructions>
         """)
 

@@ -69,7 +69,7 @@ except ImportError:
     PosteriorDistribution = None
     StoppingCriterion = None
     AdaptiveConfig = None
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions
 from app.conversation_memory.conversation_formatter import ConversationHistoryFormatter
 from app.conversation_memory.conversation_memory_manager import ConversationContext
 from app.agent.experience.experience_entity import ExperienceEntity
@@ -96,19 +96,25 @@ class ConversationResponse(BaseModel):
     Handles presenting vignettes and responding to user input
     in a natural, conversational way.
     """
-    reasoning: str
+    reasoning: str = Field(description="A step by step explanation of how my message relates to your instructions, "
+                                       "why you set the finished flag to the specific value and why you chose the message. "
+                                       "In the form of \"..., therefore I will set the finished flag to true|false, and I will ...\".")
     """Chain of thought reasoning about the response"""
 
-    message: str
+    message: str = Field(description="Your message to the user.")
     """Message to present to the user"""
 
-    finished: bool
+    finished: bool = Field(description="Set to true if you have finished your task, false otherwise.")
     """Whether the preference elicitation is complete"""
 
-    metadata: Optional[dict] = None
+    metadata: Optional[dict] = Field(
+        default=None,
+        description="Structured metadata for UI rendering (e.g. BWS tasks, vignettes), set by the application. Leave it null.")
     """Optional structured metadata for UI rendering (e.g., BWS tasks, vignettes)"""
 
-    quick_reply_options: list[LLMQuickReplyOption] | None = None
+    quick_reply_options: list[LLMQuickReplyOption] | None = Field(
+        default=None,
+        description="Quick-reply button options for the user, see the '#Quick Reply Options' instructions. Null when not applicable.")
     """Optional quick-reply button options"""
 
     class Config:
@@ -882,9 +888,9 @@ class PreferenceElicitationAgent(Agent):
         if not user_input.strip() and is_first_question:
             response = None
         else:
-            # Combine the experience-based prompt with JSON instructions
+            # Combine the experience-based prompt with the response instructions
             combined_instructions = f"""{prompt}
-                {get_json_response_instructions()}
+                {get_response_instructions()}
             """
 
             response, llm_stats = await self._conversation_caller.call_llm(
@@ -1252,7 +1258,7 @@ Examples:
 
 Keep it conversational, not interrogative.
 
-{get_json_response_instructions()}"""
+{get_response_instructions()}"""
 
         try:
             response, _ = await self._conversation_caller.call_llm(
@@ -1439,7 +1445,7 @@ Choose the MOST informative question that hasn't been addressed yet. Consider:
 The question can be open-ended, yes/no, or a mini-scenario presenting two concrete job options.
 Keep it short (1-3 sentences), conversational, and easy to answer.
 
-{get_json_response_instructions()}"""
+{get_response_instructions()}"""
 
         try:
             gate_response, gate_stats = await self._gate_caller.call_llm(
@@ -1923,7 +1929,7 @@ Vignettes Completed: {pv.n_vignettes_completed}
 
             {QUICK_REPLY_PROMPT}
 
-            {get_json_response_instructions()}"""
+            {get_response_instructions()}"""
 
     async def _update_bayesian_posterior(
             self,

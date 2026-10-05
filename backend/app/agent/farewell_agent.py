@@ -2,7 +2,7 @@ from textwrap import dedent
 
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
 from app.agent.prompt_template.locale_style import get_language_style
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions, \
     get_conversation_finish_instructions
 from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.conversation_memory.conversation_memory_types import ConversationContext
@@ -18,7 +18,7 @@ class FarewellAgent(SimpleLLMAgent):
 
     def __init__(self):
         # Define the response part of the prompt with some example responses
-        response_part = get_json_response_instructions()
+        response_part = get_response_instructions()
 
         finish_instructions = get_conversation_finish_instructions(dedent("""Once you have completed your task"""))
 
