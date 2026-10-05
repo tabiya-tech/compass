@@ -165,9 +165,9 @@ def evaluate_top_k_hits(
 
 
 async def main(*, do_skills: bool = False, do_occupations: bool = False):
-    region = os.getenv("VERTEX_API_REGION")
+    region = os.getenv("VERTEX_API_EMBEDDINGS_REGION")
     if not region:
-        raise ValueError("VERTEX_API_REGION environment variable is not set.")
+        raise ValueError("VERTEX_API_EMBEDDINGS_REGION environment variable is not set.")
 
     search_services = await get_search_services()
 
