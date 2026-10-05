@@ -2,7 +2,6 @@ import asyncio
 import os
 from typing import List, Tuple
 
-import vertexai
 import pandas as pd
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.vector_search.embeddings_model import EmbeddingService
@@ -113,7 +112,6 @@ async def process_batch(batch_df, embedding_service, file_name, mode='w'):
 
 
 if __name__ == "__main__":
-    vertexai.init()
     compass_db = AsyncIOMotorClient(os.getenv('TAXONOMY_MONGODB_URI')).get_database(DATABASE_NAME)
     collection = compass_db[EMBEDDINGS_COLLECTION]
 
