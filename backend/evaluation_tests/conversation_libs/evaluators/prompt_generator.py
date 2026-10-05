@@ -117,20 +117,8 @@ class PromptGenerator:
             counselor AI chatbot (EVALUATED_AGENT). {criteria_string}
             
             Rate it from 0 to 100, 0 being worst 100 being best.
-                    
-            Respond only using a valid JSON format as follows:
             
-            {{
-                "score": 0, 
-                "reason": ""
-            }}
-            
-            Example Response:
-            
-            {{
-                "score": 50,
-                "reason": "{example_response}"
-            }}
+            Example: a score of 50, with the reason: "{example_response}"
     
             Conversation Data:
             [BEGIN DATA]
@@ -154,20 +142,8 @@ class PromptGenerator:
         template = textwrap.dedent(f"""
             You are assessing a summary that was created from the original conversation. 
             {criteria_string}
-                    
-            Respond only using a valid JSON format as follows:
             
-            {{
-                "score": 0, 
-                "reason": ""
-            }}
-            
-            Example Response:
-            
-            {{
-                "score": 3,
-                "reason": "{example_response}"
-            }}
+            Example: a score of 3, with the reason: "{example_response}"
     
             [BEGIN DATA]
             [Current Summary]: {current_summary}

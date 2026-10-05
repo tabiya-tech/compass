@@ -3,7 +3,7 @@ import logging
 from textwrap import dedent
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.experience.work_type import WorkType
@@ -24,8 +24,8 @@ class ContextualizationLLMResponse(BaseModel):
 
 
 class _ContextualizationLLMOutput(BaseModel):
-    reasoning: Optional[str]
-    contextual_titles: list[str]
+    reasoning: Optional[str] = Field(description="Why you chose to return the specific titles and how they align with the input.")
+    contextual_titles: list[str] = Field(description="The job title variations, exactly the 'Number of titles' requested.")
 
 
 def _get_system_instructions(country_of_interest: Country, number_of_titles: int):
@@ -62,12 +62,6 @@ def _get_system_instructions(country_of_interest: Country, number_of_titles: int
             'Number of titles': The number of job title to return.
             You should use the above information only to infer the context and you shouldn't return it as output. 
         {glossary}
-        #JSON Output instructions
-            Your response must always be a JSON object with the following schema:
-            {
-                "reasoning": Why you chose to return the specific title and how it aligns with the input,
-                "contextual_titles": The titles as a list of json strings
-            }
         </System Instructions>
         """)
     return replace_placeholders_with_indent(system_instructions_template,

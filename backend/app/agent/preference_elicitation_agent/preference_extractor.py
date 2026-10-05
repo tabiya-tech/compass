@@ -33,22 +33,29 @@ class PreferenceExtractionResult(BaseModel):
 
     Contains the LLM's reasoning and the extracted preference updates.
     """
-    reasoning: str
+    reasoning: str = Field(description="Your chain of thought analysis explaining your interpretation of the user's choice.")
     """Chain of thought reasoning about the user's choice"""
 
-    chosen_option_id: str | None = None
+    chosen_option_id: str | None = Field(
+        default=None,
+        description="Which option the user chose (A, B, etc.), or null if the user found both acceptable.")
     """Which option the user chose (A, B, etc.), or None if the user found both acceptable"""
 
-    stated_reasons: list[str]
+    stated_reasons: list[str] = Field(description="The explicit reasons the user gave for their choice.")
     """Explicit reasons the user gave for their choice"""
 
-    inferred_preferences: dict[str, Any]
+    inferred_preferences: dict[str, Any] = Field(
+        description="Maps preference dimension paths in dot notation (e.g. \"financial.importance\") to their values, "
+                    "see the '#Preference Dimensions'.")
     """Preference signals extracted from the response"""
 
-    confidence: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0,
+                              description="Your confidence in the extraction, from 0.0 to 1.0, see the '#Confidence Grading Rubric'.")
     """Confidence in the extraction (0.0-1.0)"""
 
-    suggested_follow_up: str = ""
+    suggested_follow_up: str = Field(
+        default="",
+        description="A follow-up question if clarification would help (required when confidence is below 0.7), or an empty string.")
     """Suggested follow-up question to clarify preferences"""
 
     class Config:
@@ -148,15 +155,6 @@ _EXTRACTION_SYSTEM_INSTRUCTIONS = """
     - task_preferences.routine_tasks_tolerance (0.0-1.0): Tolerance for repetitive work
     - task_preferences.cognitive_tasks_preference (0.0-1.0): Preference for analytical work
     - task_preferences.manual_tasks_preference (0.0-1.0): Preference for hands-on work
-
-#Output Schema
-    You must return a JSON object with exactly these fields:
-    - reasoning (string): Your chain of thought analysis explaining your interpretation
-    - chosen_option_id (string): Which option they chose (A, B, etc.)
-    - stated_reasons (array of strings): Explicit reasons they gave for their choice
-    - inferred_preferences (object): Dictionary mapping preference dimension paths to values
-    - confidence (number): Your confidence score from 0.0 to 1.0
-    - suggested_follow_up (string): A follow-up question if clarification would help, or empty string
 
 #Example Input and Output
     User chose Option A (remote job at ZMW 8,000/month) over Option B (office job at ZMW 11,000/month with 1.5 hour commute).
@@ -604,14 +602,6 @@ _EXPERIENCE_EXTRACTION_SYSTEM_INSTRUCTIONS = """
     - task_preferences.cognitive_tasks_preference (0.0-1.0): Preference for analytical work
     - task_preferences.manual_tasks_preference (0.0-1.0): Preference for hands-on work
 
-#Output Schema
-    You must return a JSON object with exactly these fields:
-    - reasoning (string): Your analysis of what the user values based on their experience reflection
-    - enjoyed_aspects (array of strings): Things they explicitly enjoyed/valued
-    - disliked_aspects (array of strings): Things they explicitly disliked/found frustrating
-    - inferred_preferences (object): Dictionary mapping preference dimension paths to values
-    - confidence (number): Your confidence score from 0.1 to 0.7 (max)
-
 #Example Input and Output
     Experience Context: "You worked as a Software Developer at a tech company from 2020-2022"
     Question: "What aspects of that work did you find most satisfying?"
@@ -648,19 +638,22 @@ class ExperiencePreferenceExtractionResult(BaseModel):
     """
     Result of extracting preferences from an experience-based question response.
     """
-    reasoning: str
+    reasoning: str = Field(description="Your analysis of what the user values based on their experience reflection.")
     """Analysis of what the user values based on their experience reflection"""
 
-    enjoyed_aspects: list[str]
+    enjoyed_aspects: list[str] = Field(description="The things the user explicitly enjoyed or valued.")
     """Things they explicitly enjoyed or valued"""
 
-    disliked_aspects: list[str]
+    disliked_aspects: list[str] = Field(description="The things the user explicitly disliked or found frustrating.")
     """Things they explicitly disliked or found frustrating"""
 
-    inferred_preferences: dict[str, Any]
+    inferred_preferences: dict[str, Any] = Field(
+        description="Maps preference dimension paths in dot notation (e.g. \"financial.importance\") to their values, "
+                    "see the '#Preference Dimensions'.")
     """Preference signals extracted from the response"""
 
-    confidence: float = Field(ge=0.0, le=0.7)
+    confidence: float = Field(ge=0.0, le=0.7,
+                              description="Your confidence in the extraction, from 0.1 to 0.7 (max), see the '#Confidence Grading Rubric'.")
     """Confidence in the extraction (0.0-0.7, lower than vignette extraction)"""
 
     class Config:

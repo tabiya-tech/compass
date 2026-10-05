@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 import logging
 
 from app.agent.llm_caller import LLMCaller
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import (
     LLMConfig,
@@ -30,29 +30,42 @@ class QualitativeMetadata(BaseModel):
     These patterns are unbiased - they don't depend on vignette attribute values.
     """
 
-    decision_patterns: dict[str, Any] = Field(default_factory=dict)
+    decision_patterns: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Patterns in the language/themes the user repeats across responses (e.g. \"mentions_family_frequently\": true), "
+                    "see '## 1. DECISION PATTERNS'.")
     """Patterns in how user makes decisions (frequency of certain themes)"""
 
-    tradeoff_willingness: dict[str, bool] = Field(default_factory=dict)
+    tradeoff_willingness: dict[str, bool] = Field(
+        default_factory=dict,
+        description="Tradeoffs the user explicitly states they are willing/unwilling to make "
+                    "(e.g. \"will_sacrifice_salary_for_flexibility\": true), see '## 2. TRADEOFF WILLINGNESS'.")
     """Explicit tradeoffs user mentions (willing/unwilling to make)"""
 
-    values_signals: dict[str, bool] = Field(default_factory=dict)
+    values_signals: dict[str, bool] = Field(
+        default_factory=dict,
+        description="Deep values the user expresses in their reasoning (e.g. \"purpose_driven\": true), see '## 3. VALUES SIGNALS'.")
     """Deep values expressed beyond job attributes"""
 
-    consistency_indicators: dict[str, float] = Field(default_factory=dict)
+    consistency_indicators: dict[str, float] = Field(
+        default_factory=dict,
+        description="Scores between 0.0 and 1.0 for \"response_consistency\", \"conviction_strength\" and \"preference_stability\", "
+                    "see '## 4. CONSISTENCY INDICATORS'.")
     """Consistency/conviction in responses (0-1)"""
 
-    extracted_constraints: dict[str, Any] = Field(default_factory=dict)
+    extracted_constraints: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Hard constraints the user explicitly states (e.g. \"must_work_remotely\": true), see '## 5. EXTRACTED CONSTRAINTS'.")
     """Hard constraints explicitly stated (not inferred from choices)"""
 
-    reasoning: str = ""
+    reasoning: str = Field(default="", description="A plain-text summary of your extraction logic.")
     """Chain of thought for metadata extraction"""
 
     class Config:
         extra = "ignore"
 
 
-# Few-shot examples passed to get_json_response_instructions
+# Few-shot examples passed to get_response_instructions
 _METADATA_EXAMPLES: list[QualitativeMetadata] = [
     QualitativeMetadata(
         decision_patterns={
@@ -108,7 +121,7 @@ _METADATA_EXAMPLES: list[QualitativeMetadata] = [
 ]
 
 
-# System instructions for metadata extraction LLM — {json_response_instructions} is filled at init
+# System instructions for metadata extraction LLM — {response_instructions} is filled at init
 _METADATA_EXTRACTION_PROMPT_TEMPLATE = """
 <System Instructions>
 #Role
@@ -193,10 +206,9 @@ Invalid examples (inferred, not explicit):
 - User chose high salary → DO NOT add "minimum_salary": X
 
 #Output Format
-{json_response_instructions}
+{response_instructions}
 
 Only include fields where you have POSITIVE evidence (do not include empty dicts).
-"reasoning" MUST be a plain string summarising your extraction logic — never a nested object or dict.
 
 #Remember
 - EXPLICIT statements only, never infer
@@ -215,7 +227,7 @@ class MetadataExtractor:
         self._logger = logging.getLogger(self.__class__.__name__)
 
         system_instructions = _METADATA_EXTRACTION_PROMPT_TEMPLATE.format(
-            json_response_instructions=get_json_response_instructions(examples=_METADATA_EXAMPLES)
+            response_instructions=get_response_instructions(examples=_METADATA_EXAMPLES)
         )
 
         # Create LLM with metadata extraction instructions

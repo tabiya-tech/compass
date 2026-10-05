@@ -1,6 +1,6 @@
+from app.agent.config import AgentsConfig
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
-from common_libs.text_formatters import extract_json
 from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
 from evaluation_tests.conversation_libs.evaluators.evaluation_result import EvaluationResult, EvaluationType,\
     SummaryEvaluationRecord
@@ -17,13 +17,13 @@ class SummaryCriteriaEvaluator(BaseEvaluator):
         super().__init__(criteria)
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
-        self.llm = GeminiGenerativeLLM(config=LLMConfig())
+        self.llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model))
 
     async def evaluate(self, actual: SummaryEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_summary_prompt(conversation=actual.generate_conversation(),
                                                          current_summary=actual.current_summary, new_summary=actual.new_summary,
                                                          criteria=self.criteria)
-        result = await self.llm.generate_content(prompt)
-        parsed_result = extract_json.extract_json(result.text, LlmEvaluatorOutput)
+        result = await self.llm.generate_content(prompt, response_schema=LlmEvaluatorOutput)
+        parsed_result = LlmEvaluatorOutput.model_validate_json(result.text)
         return EvaluationResult(evaluator_name=self.criteria.value, score=parsed_result.score,
                                 reasoning=parsed_result.reason)

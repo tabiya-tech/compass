@@ -165,15 +165,6 @@ Examples of good personalization:
 - Teacher → "Public school teacher (secure, lower pay)" vs "Private tutoring (variable, higher ceiling)"
 - Sales → "Corporate sales rep (stable, structured)" vs "Commission-only broker (risky, unlimited upside)"
 
-Output Schema:
-You must return a JSON object with exactly these fields:
-- scenario_intro (string): Brief introduction to the scenario (1-2 sentences)
-- option_a_title (string): Short job title for option A
-- option_a_description (string): Detailed description including salary, benefits, and trade-offs (3-5 sentences)
-- option_b_title (string): Short job title for option B
-- option_b_description (string): Detailed description including salary, benefits, and trade-offs (3-5 sentences)
-- reasoning (string): Brief explanation of how this was personalized
-
 Example Output:
 {{
   "scenario_intro": "You're weighing two paths in software development with very different risk profiles.",

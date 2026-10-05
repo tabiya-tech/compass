@@ -21,16 +21,23 @@ class ResponsibilitiesExtractionResponse(BaseModel):
     # The JSON schema is generated in field-declaration order, and the model fills
     # fields left-to-right — if classification fields appear first the model outputs
     # empty buckets before it has done any reasoning.
-    extracted_entities: list[str] = Field(default_factory=list)
+    extracted_entities: list[str] = Field(default_factory=list, description=(
+        "All the named entities extracted from the user's input, can be empty. "
+        "This is a reasoning field, fill it before the classes, see the '# Name Entity Extraction instructions'."))
     """
     The extracted entities from the user's input.
     This acts as a "reasoning" field and should be predicted before the classes.
     """
 
-    other_peoples_responsibilities: list[str] = Field(default_factory=list)
-    non_responsibilities: list[str] = Field(default_factory=list)
-    responsibilities: list[str] = Field(default_factory=list)
-    irrelevant_entities: Optional[list[str]] = Field(default_factory=list)
+    other_peoples_responsibilities: list[str] = Field(default_factory=list, description=(
+        "The extracted entities that other people are responsible for, can be empty, see the '# Classification instructions'."))
+    non_responsibilities: list[str] = Field(default_factory=list, description=(
+        "The extracted entities that the user is not responsible for, in their positive form, can be empty, "
+        "see the '# Classification instructions'."))
+    responsibilities: list[str] = Field(default_factory=list, description=(
+        "The extracted entities that the user is responsible for, can be empty, see the '# Classification instructions'."))
+    irrelevant_entities: Optional[list[str]] = Field(default_factory=list, description=(
+        "The extracted entities that are irrelevant to the user's experience, can be empty, see the '# Classification instructions'."))
     """
     The irrelevant entities from the user's input.
     """
@@ -164,16 +171,6 @@ class _ResponsibilitiesExtractionLLM:
                     responsibilities: ["I observe the process", "I shape the dough with my hands"]
                     other_peoples_responsibilities: ["John uses his senses", "John shapes the dough with his hands"]
                     irrelevant_entities: ["It is a difficult procedure"]
-                    
-        # JSON Output instructions
-            Your response must always be a JSON object with the following schema:
-            - extracted_entities: list of JSON strings, can be empty
-            - other_peoples_responsibilities: list of JSON strings, can be empty
-            - non_responsibilities: list of JSON strings, can be empty
-            - responsibilities: list of JSON strings, can be empty
-            - irrelevant_entities: list of JSON strings, can be empty
-            
-            Your response must always be a JSON object with the schema above
         </System Instructions>
         """)
 

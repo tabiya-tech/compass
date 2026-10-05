@@ -3,7 +3,7 @@ from textwrap import dedent
 from app.agent.simple_llm_agent.simple_llm_agent import SimpleLLMAgent
 from app.agent.simple_llm_agent.llm_response import ModelResponse
 from app.agent.agent_types import AgentType, AgentInput, AgentOutput
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions, \
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions, \
     get_conversation_finish_instructions
 from app.conversation_memory.conversation_memory_types import ConversationContext
 
@@ -12,7 +12,7 @@ class QnaAgent(SimpleLLMAgent):
 
     def __init__(self):
         # Define the response part of the prompt with some example responses
-        response_part = get_json_response_instructions([
+        response_part = get_response_instructions([
             ModelResponse(message="Example response. Your answer to the user's question.",
                           finished=True,
                           reasoning="Reasoning for the response"),

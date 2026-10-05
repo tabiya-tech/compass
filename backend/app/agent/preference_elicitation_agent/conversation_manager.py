@@ -21,7 +21,7 @@ from app.agent.prompt_template.agent_prompt_template import (
     STD_AGENT_CHARACTER,
     STD_LANGUAGE_STYLE
 )
-from app.agent.simple_llm_agent.prompt_response_template import get_json_response_instructions
+from app.agent.simple_llm_agent.prompt_response_template import get_response_instructions
 
 
 class ConversationResponse(BaseModel):
@@ -31,13 +31,15 @@ class ConversationResponse(BaseModel):
     Handles presenting vignettes and responding to user input
     in a natural, conversational way.
     """
-    reasoning: str
+    reasoning: str = Field(description="A step by step explanation of how my message relates to your instructions, "
+                                       "why you set the finished flag to the specific value and why you chose the message. "
+                                       "In the form of \"..., therefore I will set the finished flag to true|false, and I will ...\".")
     """Chain of thought reasoning about the response"""
 
-    message: str
+    message: str = Field(description="Your message to the user.")
     """Message to present to the user"""
 
-    finished: bool
+    finished: bool = Field(description="Set to true if the preference elicitation is complete, false otherwise.")
     """Whether the preference elicitation is complete"""
 
     class Config:
@@ -126,7 +128,7 @@ Your task is to guide the user through preference discovery using:
 - When presenting vignettes, format them clearly with options A and B
 - Don't use complex psychological or technical terminology
 
-{get_json_response_instructions(ConversationResponse)}
+{get_response_instructions()}
 """
 
     async def generate_response(

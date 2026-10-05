@@ -3,7 +3,7 @@ import logging
 from collections import Counter
 from textwrap import dedent
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.llm_caller import LLMCaller
@@ -16,16 +16,16 @@ from common_libs.retry import Retry
 
 
 class Cluster(BaseModel):
-    cluster_name: str
-    responsibilities: list[str]
+    cluster_name: str = Field(description="The name for the cluster, representative of the responsibilities it contains.")
+    responsibilities: list[str] = Field(description="The responsibilities of the cluster, at least one.")
 
     class Config:
         extra = "forbid"
 
 
 class ClusterResponsibilitiesLLMResponse(BaseModel):
-    reasoning: str
-    clusters: list[Cluster]
+    reasoning: str = Field(description="The detailed, step-by-step explanation of why the responsibilities are similar and clustered together.")
+    clusters: list[Cluster] = Field(description="The clusters, exactly the 'Number of Clusters' requested.")
 
     class Config:
         extra = "forbid"
@@ -56,16 +56,6 @@ def _get_system_instructions():
             The input structure is composed of: 
             'Responsibilities': A list of responsibilities 
             'Number of Clusters': The number of clusters to return
-            # JSON Output Instructions
-                Your response must always be a JSON object with the following schema:
-                {
-                    "reasoning": The detailed, step-by-step explanation of why the responsibilities are similar and clustered together, as JSON string,
-                    "clusters": The array of clusters, each cluster is a dictionary with the following schema:
-                        [{ 
-                            "cluster_name": The name for the cluster, as JSON string,
-                            "responsibilities": The responsibilities of the cluster, as an array of JSON strings
-                        }] 
-                }
         </System Instructions>
         """)
     return system_prompt_template
