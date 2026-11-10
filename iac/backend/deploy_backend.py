@@ -48,6 +48,10 @@ class BackendServiceConfig:
     langfuse_public_key: Optional[str]
     langfuse_secret_key: Optional[str | pulumi.Output[str]]
     tracing_config: Optional[str]
+    # Per-tier models. All optional; unset deploys on the Gemini defaults.
+    llm_default_model: Optional[str]
+    llm_reasoning_model: Optional[str]
+    llm_deep_reasoning_model: Optional[str]
     enable_metrics: str
     default_country_of_user: str
     gcp_oauth_client_id: str
@@ -415,6 +419,15 @@ def _deploy_cloud_run_service(
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_TRACING_CONFIG",
                             value=backend_service_cfg.tracing_config),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="LLM_DEFAULT_MODEL",
+                            value=backend_service_cfg.llm_default_model),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="LLM_REASONING_MODEL",
+                            value=backend_service_cfg.llm_reasoning_model),
+                        gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
+                            name="LLM_DEEP_REASONING_MODEL",
+                            value=backend_service_cfg.llm_deep_reasoning_model),
                         gcp.cloudrunv2.ServiceTemplateContainerEnvArgs(
                             name="BACKEND_ENABLE_METRICS",
                             value=backend_service_cfg.enable_metrics),
