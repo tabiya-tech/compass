@@ -6,7 +6,7 @@ from pydantic import ConfigDict
 from app.agent.agent_director._llm_router import LLMRouter
 from app.agent.agent_director.abstract_agent_director import ConversationPhase
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType
-from app.agent.config import AgentsConfig
+from app.agent.config import GEMINI_DEFAULT_MODELS, ModelTier
 from app.conversation_memory.conversation_memory_types import ConversationContext, ConversationHistory, ConversationTurn
 from app.i18n.translation_service import get_i18n_manager
 from common_libs.test_utilities.guard_caplog import guard_caplog, assert_log_error_warnings
@@ -190,7 +190,7 @@ test_cases_router = [
 
 @pytest.mark.asyncio
 @pytest.mark.repeat(3)
-@pytest.mark.evaluation_test(AgentsConfig.deep_reasoning_model)
+@pytest.mark.evaluation_test(GEMINI_DEFAULT_MODELS[ModelTier.REASONING])
 @pytest.mark.parametrize('test_case', get_test_cases_to_run(test_cases_router),
                          ids=[case.name for case in get_test_cases_to_run(test_cases_router)])
 async def test_router_extraction(test_case: RouterTestCase, caplog: pytest.LogCaptureFixture):

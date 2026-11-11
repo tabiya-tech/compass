@@ -27,6 +27,8 @@ from contextlib import asynccontextmanager
 from app.users.routes import add_users_routes
 from app.conversations.poc import add_poc_routes
 from app.app_config import ApplicationConfig, set_application_config, get_application_config
+from app.agent.config import ModelTier
+from common_libs.llm.models_utils import resolve_model_name
 from app.version.utils import load_version_info
 from common_libs.logging.log_utilities import setup_logging_config
 from common_libs.observability.config import TracingConfig, parse_tracing_config
@@ -271,9 +273,14 @@ application_config = ApplicationConfig(
     app_name=_global_product_name.strip(),
     disable_registration_code=_disable_registration_code,
     tracing_config=load_tracing_config(_version_info),
+    llm_default_model=os.getenv("LLM_DEFAULT_MODEL") or None,
+    llm_reasoning_model=os.getenv("LLM_REASONING_MODEL") or None,
+    llm_deep_reasoning_model=os.getenv("LLM_DEEP_REASONING_MODEL") or None,
 )
 
 set_application_config(application_config)
+
+logger.info("LLM models: %s", {tier.value: resolve_model_name(tier=tier) for tier in ModelTier})
 
 ##################
 # Set up LLM tracing, after setting the application config, because the release and the

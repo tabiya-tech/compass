@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from app.agent.agent_types import AgentInput, AgentOutput, AgentType, LLMStats
 from app.agent.collect_experiences_agent._types import CollectedData
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.experience import ExperienceEntity
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT, WorkType
 from app.agent.penalty import get_penalty
@@ -222,7 +222,7 @@ class _ConversationLLM:
             llm = GeminiGenerativeLLM(
                 system_instructions=system_instructions,
                 config=LLMConfig(
-                    language_model_name=AgentsConfig.deep_reasoning_model,
+                    model_tier=ModelTier.REASONING,
                     generation_config=temperature_config
                 ))
             # Drop the first message from the conversation history, which is the welcome message from the welcome agent.

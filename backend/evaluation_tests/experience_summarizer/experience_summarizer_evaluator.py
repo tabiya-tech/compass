@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import Field
 
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.experience import WorkType
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
@@ -48,7 +48,7 @@ class ExperienceSummarizerEvaluator:
             model_response_type=ExperienceSummarizerEvaluationOutput)
         self._llm = GeminiGenerativeLLM(
             system_instructions=ExperienceSummarizerEvaluator.get_system_instructions(country_of_user=country_of_user),
-            config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model,
+            config=LLMConfig(model_tier=ModelTier.DEEP_REASONING,
                              generation_config=MODERATE_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(ExperienceSummarizerEvaluationOutput))
         )
 
