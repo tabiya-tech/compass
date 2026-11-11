@@ -39,7 +39,9 @@ jobs:
         working-directory: frontend-new
 
   accessibility:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.49 installs its system dependencies by their Ubuntu 24.04 package names
+    # (libicu74, libxml2, ...), which do not exist on ubuntu-latest (26.04). Unpin after upgrading Playwright.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
