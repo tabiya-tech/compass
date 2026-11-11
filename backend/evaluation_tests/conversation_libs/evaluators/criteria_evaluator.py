@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+from app.agent.config import ModelTier
 from common_libs.llm.models_utils import LLMConfig
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from evaluation_tests.conversation_libs.evaluators.base_evaluator import BaseEvaluator
@@ -26,7 +27,7 @@ class CriteriaEvaluator(BaseEvaluator):
         self.criteria = criteria
         # Use GeminiGenerativeLLM as the LLM for evaluation
         # as we are not interested in conducting a conversation, with an in-memory state (history).
-        self.llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name="gemini-2.5-pro"))
+        self.llm = GeminiGenerativeLLM(config=LLMConfig(model_tier=ModelTier.DEEP_REASONING))
 
     async def evaluate(self, actual: ConversationEvaluationRecord) -> EvaluationResult:
         prompt = PromptGenerator.generate_prompt(conversation=actual.generate_conversation(),

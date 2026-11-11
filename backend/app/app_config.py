@@ -76,6 +76,27 @@ class ApplicationConfig(BaseModel):
     `common_libs.observability.config.parse_tracing_config` for how it is loaded from the environment.
     """
 
+    llm_default_model: Optional[str] = None
+    """
+    The model for the default tier (ModelTier.DEFAULT).
+    When unset, the Gemini default of the tier is used, see `app.agent.config.GEMINI_DEFAULT_MODELS`.
+    Set via LLM_DEFAULT_MODEL environment variable.
+    """
+
+    llm_reasoning_model: Optional[str] = None
+    """
+    The model for the reasoning tier (ModelTier.REASONING).
+    When unset, the Gemini default of the tier is used, see `app.agent.config.GEMINI_DEFAULT_MODELS`.
+    Set via LLM_REASONING_MODEL environment variable.
+    """
+
+    llm_deep_reasoning_model: Optional[str] = None
+    """
+    The model for the deep reasoning tier (ModelTier.DEEP_REASONING).
+    When unset, the Gemini default of the tier is used, see `app.agent.config.GEMINI_DEFAULT_MODELS`.
+    Set via LLM_DEEP_REASONING_MODEL environment variable.
+    """
+
 
 _application_config: ApplicationConfig | None = None
 

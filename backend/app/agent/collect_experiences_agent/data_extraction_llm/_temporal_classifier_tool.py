@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from app.agent.agent_types import LLMStats
 from app.agent.collect_experiences_agent.data_extraction_llm import clean_string_field
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.experience.work_type import WORK_TYPE_DEFINITIONS_FOR_PROMPT
 from app.agent.llm_caller import LLMCaller
 from app.agent.penalty import get_penalty
@@ -126,7 +126,7 @@ class TemporalAndWorkTypeClassifierTool:
         return GeminiGenerativeLLM(
             system_instructions=self._system_instructions,
             config=LLMConfig(
-                language_model_name=AgentsConfig.deep_reasoning_model,
+                model_tier=ModelTier.REASONING,
                 generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | {
                     "max_output_tokens": 8192
                     # Limit the output to avoid the "reasoning recursion issues".
