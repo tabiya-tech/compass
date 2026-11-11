@@ -71,6 +71,12 @@ def main():
         langfuse_public_key=getenv("BACKEND_LANGFUSE_PUBLIC_KEY", False, False),
         langfuse_secret_key=getenv("BACKEND_LANGFUSE_SECRET_KEY", True, False),
         tracing_config=getenv("BACKEND_TRACING_CONFIG", False, False),
+
+        # Per-tier models - all optional, so an environment that has not opted in deploys on the Gemini defaults.
+        llm_default_model=getenv("LLM_DEFAULT_MODEL", False, False),
+        llm_reasoning_model=getenv("LLM_REASONING_MODEL", False, False),
+        llm_deep_reasoning_model=getenv("LLM_DEEP_REASONING_MODEL", False, False),
+
         enable_metrics=getenv("BACKEND_ENABLE_METRICS"),
         default_country_of_user=getenv("DEFAULT_COUNTRY_OF_USER"),
         gcp_oauth_client_id=getenv("GCP_OAUTH_CLIENT_ID"),

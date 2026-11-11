@@ -5,7 +5,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.experience import ExperienceEntity
 from app.agent.llm_caller import LLMCaller
 from app.agent.prompt_template.format_prompt import replace_placeholders_with_indent
@@ -87,7 +87,7 @@ class ExperiencesDiscoveredEvaluator:
         # Use GeminiGenerativeLLM as the LLM for evaluation
         self.llm = GeminiGenerativeLLM(
             config=LLMConfig(
-                language_model_name=AgentsConfig.deep_reasoning_model,
+                model_tier=ModelTier.REASONING,
                 generation_config=MEDIUM_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(MatchResult)
             ),
             system_instructions=_get_system_instructions()

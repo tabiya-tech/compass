@@ -90,6 +90,9 @@ def _eval_application_config(language_config: LanguageConfig) -> ApplicationConf
         features={},
         language_config=language_config,
         app_name="Compass Evaluation Tests",
+        llm_default_model=os.getenv("LLM_DEFAULT_MODEL") or None,
+        llm_reasoning_model=os.getenv("LLM_REASONING_MODEL") or None,
+        llm_deep_reasoning_model=os.getenv("LLM_DEEP_REASONING_MODEL") or None,
     )
 
 

@@ -161,6 +161,9 @@ The backend uses the following environment variables:
 - `VERTEX_API_GEN_AI_REGION`: (optional) The region of the Vertex API to use for generative-AI calls (Gemini etc.). Can be a regional location or `global`. If not set, defaults to `global`. The Gemini 3.x models are only served from `global`.
 - `EMBEDDINGS_SERVICE_NAME`: The name of the embeddings service to use. Currently, the only supported service is `GOOGLE-VERTEX-AI`.
 - `EMBEDDINGS_MODEL_NAME`: The name of the embeddings model to use. See https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings#supported-models for the list of supported models.
+- `LLM_DEFAULT_MODEL`: (optional) The model for the default tier, used by conversation-facing agents that need fast responses. If not set, defaults to `gemini-3.5-flash-lite`.
+- `LLM_REASONING_MODEL`: (optional) The model for the reasoning tier, used by classifiers, routing and extraction. If not set, defaults to `gemini-3.8-flash`.
+- `LLM_DEEP_REASONING_MODEL`: (optional) The model for the deep reasoning tier, used e.g. by the evaluation judges. If not set, defaults to `gemini-3.1-pro-preview`.
 - `LOG_CONFIG_FILE`: (Optional) See the [Logging](#logging) section for more information. If not set defaults to `logging.cfg.yaml`.
 - `BACKEND_URL`: The URL of the backend. It is used to correctly configure Swagger UI and the CORS policy.
 - `FRONTEND_URL`: The URL of the frontend. It is used to set the CORS policy.
@@ -201,6 +204,9 @@ VERTEX_API_EMBEDDINGS_REGION=<REGIONAL_LOCATION>
 VERTEX_API_GEN_AI_REGION=<REGIONAL_LOCATION_OR_GLOBAL>
 EMBEDDINGS_SERVICE_NAME=<EMBEDDINGS_SERVICE_NAME>
 EMBEDDINGS_MODEL_NAME=<EMBEDDINGS_MODEL_NAME>
+LLM_DEFAULT_MODEL=<LLM_DEFAULT_MODEL>
+LLM_REASONING_MODEL=<LLM_REASONING_MODEL>
+LLM_DEEP_REASONING_MODEL=<LLM_DEEP_REASONING_MODEL>
 LOG_CONFIG_FILE=<YAML_FILE>
 BACKEND_URL=<URL>
 FRONTEND_URL=<URL>

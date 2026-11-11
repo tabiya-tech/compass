@@ -1,6 +1,6 @@
 import pytest
 
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.conversation_memory.summarizer import Summarizer
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
@@ -13,7 +13,7 @@ SUMMARY_EVALUATION_TYPES = [EvaluationType.SUMMARY_CONSISTENCY, EvaluationType.S
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model))
+    llm = GeminiGenerativeLLM(config=LLMConfig(model_tier=ModelTier.DEEP_REASONING))
     return (await llm.generate_content(prompt)).text
 
 

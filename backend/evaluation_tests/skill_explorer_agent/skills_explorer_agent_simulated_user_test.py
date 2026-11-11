@@ -5,7 +5,7 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 from pydantic import BaseModel, Field
 
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.skill_explorer_agent import SkillsExplorerAgentState
 from app.conversation_memory.conversation_memory_manager import ConversationMemoryManager
 from app.conversation_memory.conversation_memory_types import ConversationMemoryManagerState
@@ -111,7 +111,7 @@ async def _get_missing_responsibilities(*, expected: list[str], actual: list[str
     if not expected:
         return []
     llm = GeminiGenerativeLLM(config=LLMConfig(
-        language_model_name=AgentsConfig.ultra_high_reasoning_model,
+        model_tier=ModelTier.DEEP_REASONING,
         generation_config=ZERO_TEMPERATURE_GENERATION_CONFIG | JSON_GENERATION_CONFIG | with_response_schema(_MissingResponsibilities)))
     response = await llm.generate_content(
         "Compare the expected responsibilities of a person with the responsibilities discovered in a conversation with them.\n"
