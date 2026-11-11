@@ -1,7 +1,7 @@
 import pytest
 
 from app.agent.agent_types import AgentInput
-from app.agent.config import AgentsConfig
+from app.agent.config import ModelTier
 from app.agent.qna_agent import QnaAgent
 from common_libs.llm.generative_models import GeminiGenerativeLLM
 from common_libs.llm.models_utils import LLMConfig
@@ -14,7 +14,7 @@ from evaluation_tests.conversation_libs.fake_conversation_context import FakeCon
 
 
 async def _evaluate_with_llm(prompt: str) -> str:
-    llm = GeminiGenerativeLLM(config=LLMConfig(language_model_name=AgentsConfig.ultra_high_reasoning_model))
+    llm = GeminiGenerativeLLM(config=LLMConfig(model_tier=ModelTier.DEEP_REASONING))
     return (await llm.generate_content(prompt)).text
 
 

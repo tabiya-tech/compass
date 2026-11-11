@@ -1,4 +1,5 @@
 import asyncio
+import os
 from datetime import datetime, timezone
 
 from app.app_config import ApplicationConfig, get_application_config, set_application_config
@@ -70,6 +71,9 @@ def _eval_application_config() -> ApplicationConfig:
         embeddings_model_name="test",
         cv_storage_bucket="test",
         features={},
+        llm_default_model=os.getenv("LLM_DEFAULT_MODEL") or None,
+        llm_reasoning_model=os.getenv("LLM_REASONING_MODEL") or None,
+        llm_deep_reasoning_model=os.getenv("LLM_DEEP_REASONING_MODEL") or None,
     )
 
 
