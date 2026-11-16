@@ -11,6 +11,18 @@ skills inherent in their formal and informal work.
 - By doing so, guide job-seekers in exploring and discovering
 their skills and interests based on their lived experiences.
 
+## Related Repositories
+
+Compass is the skills discovery conversation as a standalone application. Tabiya develops the components below in
+separate repositories. The code in all of them is open source under the MIT License.
+
+- **[compass-connect](https://github.com/tabiya-tech/compass-connect)**: Compass Connect is the broader career guidance platform. It is built
+  on the Compass codebase and adds career exploration, career readiness modules, job matching, and an admin portal.
+- **[taxonomy-model-application](https://github.com/tabiya-tech/taxonomy-model-application)**: The Open Taxonomy Platform hosts and publishes
+  taxonomy models such as the Inclusive Livelihoods Taxonomy. Compass searches occupations and skills in a taxonomy
+  model (`TAXONOMY_MODEL_ID`).
+- **[docs](https://github.com/tabiya-tech/docs)**: The source of [docs.tabiya.org](https://docs.tabiya.org).
+
 ## Table of Contents
 
 - **[Backend](backend)**: Explore the Backend directory for detailed insights about the backend project.
