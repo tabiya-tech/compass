@@ -35,7 +35,7 @@ Only options exposed in these namespaces are customizable. Core application logi
 - **appName**: Name displayed throughout the application
 - **browserTabTitle**: Text shown in the browser tab
 
-![Application name](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/app-name.svg) ![Browser Tab title](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/browser-tab.svg)
+![Application name](../docs/images/app-name.svg) ![Browser Tab title](../docs/images/browser-tab.svg)
 
 *Figure 1: Application name and browser tab title*
 
@@ -53,7 +53,7 @@ Only options exposed in these namespaces are customizable. Core application logi
 - **assets.favicon**: Browser favicon
 - **assets.appIcon**: Application icon
 
-![Main logo](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/logo.svg) ![Favicon](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/favicon.svg) ![Application logo](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/app-logo.svg)
+![Main logo](../docs/images/logo.svg) ![Favicon](../docs/images/favicon.svg) ![Application logo](../docs/images/app-logo.svg)
 
 *Figure 2: Logo and icon assets*
 
@@ -68,7 +68,7 @@ The following colors can be customized:
 - Primary and secondary brand colors (including light, dark, and contrast text)
 - Primary, secondary, and accent text colors
 
-![Branding Colors](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/branding-colors.svg)
+![Branding Colors](../docs/images/branding-colors.svg)
 
 *Figure 3: Theme color application*
 
@@ -84,7 +84,7 @@ After updating colors, run Storybook locally with the chosen configuration and *
 
 When disabled, all CV-related UI elements are hidden and CV APIs are not registered.
 
-![Feature CV](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/feature-cv.svg) 
+![Feature CV](../docs/images/feature-cv.svg) 
 
 *Figure 4: CV feature enabled*
 
@@ -103,7 +103,7 @@ When disabled (default), the conversation flows directly from experience explora
 
 These settings control how users authenticate in the application.
 
-![Login code enabled](https://raw.githubusercontent.com/tabiya-tech/docs/refs/heads/main/.gitbook/assets/login-code.svg) ![Registration code enabled](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/registration-code.svg)
+![Login code enabled](../docs/images/login-code.svg) ![Registration code enabled](../docs/images/registration-code.svg)
 
 *Figure 5: Login with code and registration with code enabled*
 
@@ -132,7 +132,7 @@ Partners can control which sections and fields appear in the report, including:
 - Date range
 - Location
 
-![Skills Report customization](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/skills-report.svg)
+![Skills Report customization](../docs/images/skills-report.svg)
 
 *Figure 6: Skills report customization*
 
@@ -151,7 +151,7 @@ Compass supports multiple languages through configuration.
 - **i18n.conversation.default_locale**: Default conversation language
 - **i18n.conversation.available_locales**: Locale-specific configuration, including date format
 
-![Language Switcher](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/languages.svg)
+![Language Switcher](../docs/images/languages.svg)
 
 *Figure 7: Language switcher interface*
 
@@ -170,7 +170,7 @@ This allows customization of:
 - Validation rules and error messages
 - Localized labels and values
 
-![Sensitive Data Fields](https://raw.githubusercontent.com/tabiya-tech/docs/main/.gitbook/assets/sensitive-data-fields.svg)
+![Sensitive Data Fields](../docs/images/sensitive-data-fields.svg)
 
 *Figure 8: Sensitive data collection fields*
 
