@@ -3,13 +3,11 @@
 <img src="docs/images/compass_logo_web_dark.png#gh-light-mode-only" alt="logo" width=300/>
 </h1>
 
-**Compass** is an AI chatbot designed to assist job-seekers in exploring and discovering their skills.
+**Compass** is an AI chatbot that helps jobseekers explore and discover their skills.
 
-Compass has two objectives: 
-- Populate a digital skill wallet that captures the experience of job-seekers, including the
-skills inherent in their formal and informal work.
-- By doing so, guide job-seekers in exploring and discovering
-their skills and interests based on their lived experiences.
+In a conversation, Compass asks a jobseeker about their experience, including formal, informal, and unpaid work. It
+identifies the skills in that experience and produces a skills report, which the jobseeker can download as a PDF or a
+Word document.
 
 ## Related Repositories
 
@@ -50,7 +48,7 @@ The images below show a high level overview of the solution architecture of Comp
 ## Why Contribute?
 
 - **Make an Impact:** Your contributions will directly improve the user experience and functionality of Compass, helping job-seekers explore and discover their skills more effectively.
-- **Help Achieve Our Goals:** By contributing, you are supporting Compass’s mission to populate digital skill wallets and guide job-seekers in understanding their skills and interests based on their lived experiences.
+- **Help Achieve Our Goals:** By contributing, you are supporting Compass’s mission to help jobseekers discover and describe the skills they have gained through their lived experience.
 
 ## Ways to Contribute
 
